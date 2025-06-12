@@ -1,0 +1,44 @@
+header{
+  background-color: white;
+  color:white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  font-family: inter;
+  box-shadow: 1px 2px 6px #cfcdcd;
+  color: black;
+  padding:30px;
+}
+header >h1{
+  font-size: 20px;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+.container .ingredient_list li{
+  margin-bottom: 10px;
+  margin-left: 0px;
+}
+.container .jumbotron{
+  background-color: rgb(243, 231, 231);
+  padding: 20px;
+  border-radius: 10px;
+  /* display: flex; */
+}
+
+.container .jumbotron button{
+  background-color: rgb(250, 103, 53);
+color:white;
+  border: none;
+margin-top: 10px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.container .jumbotron button:hover{
+  background-color: rgb(241, 62, 24);
+}
+

@@ -1,0 +1,9 @@
+.tab-content .item_setting{
+    border-bottom:1px  solid rgba(226, 217, 217, 0.747);
+    /* background-color: red; */
+    padding-bottom: 10px;
+}
+
+.outlet_section{
+    padding:20px;
+}

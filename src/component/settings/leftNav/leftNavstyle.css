@@ -1,0 +1,48 @@
+.settingsNavCon {
+  display: "flex";
+  justify-content: center;
+  align-content: center;
+  transition: ease-in-out 0.2s;
+ 
+}
+.central-meta .navhead {
+  display: none;
+  justify-content: space-between;
+  width: 100%;
+  padding:30px 20px 10px 20px;
+}
+
+.settingsNavCon .navhead h3 {
+}
+.settingsNavCon .navhead h4 {
+  width: 100%;
+  text-align: right;
+}
+
+@media screen and (max-width: 560px) {
+  .settingsNavCon {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    width: 100%;
+    z-index: 1; 
+    transition: ease-in-out 0.2s;
+    display: "flex";
+  justify-content: center;
+  align-content: center;
+  transition: ease-in-out 0.2s;
+  padding-left:30px;
+  }
+}
+@media screen and (max-width: 990px) {
+  .central-meta .navhead {
+    display: flex;
+  }
+  .nav_visible {
+    transition: ease-in-out 0.2s;
+    display: none;
+    height:30vh;
+  
+  }
+}

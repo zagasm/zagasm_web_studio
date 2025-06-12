@@ -1,0 +1,19 @@
+.post_icon_container {
+    margin: 0px;
+    padding: 0px;
+}
+
+.post_icon_container a {
+    margin: 0px 10px;
+    padding: 5px 0px
+}
+
+.post_icon_container a:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+
+div  a {
+    color: #8000FF
+}

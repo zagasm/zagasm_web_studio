@@ -1,0 +1,40 @@
+@media screen and (max-width: 960px) {
+    .big-ad .content {
+      display: none;
+    }
+    .big-ad img {
+      width: 150px;
+    }
+  }
+  @media screen and (max-width: 960px) {
+    .description,
+    .onnboarding_image {
+      height: 200px;
+    }
+    .description .innerDescription p {
+      font-size: 15px;
+      margin-bottom: 20px;
+      line-height: 20px;
+    }
+    .reg-from .row {
+      padding: 0px 0px;
+    }
+    .onnboarding_image {
+      height: 200px;
+      display: flex;
+      align-items: block;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .onboardingContainer {
+      display: flex;
+      height: 120vh;
+      align-items: center;
+    }
+    .carousel_btn .btncontainer button,
+    .carousel_btn .btncontainer .getstarted {
+      padding: 8px;
+      font-size: 15px;
+    }
+  }
+  

@@ -1,0 +1,6 @@
+.HTMLFORMATTER_content{
+    width: 100%; /* Set a fixed width for the container */
+    word-wrap: break-word; /* Break long words */
+    overflow-wrap: break-word; /* Modern alternative to word-wrap */
+}
+

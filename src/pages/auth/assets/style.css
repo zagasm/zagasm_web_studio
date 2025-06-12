@@ -1,0 +1,126 @@
+body {
+  font-family: 'Inter', sans-serif;
+}
+.form_container{
+  box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
+ border-radius: 25px;
+}
+form .input {
+  border: none;
+  box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
+  border-radius: 10px;
+  height: 60px;
+  outline: none;
+  margin-bottom: 20px;
+  border: 1px solid red;
+}
+
+.icon-form-control {
+  /* background-color: white; */
+
+}
+
+form .input-icon {
+  font-size: 25px;
+  padding-left: 10px;
+  color: #8000FF
+}
+
+.input:focus {
+  border: 2px solid #8000FF;
+  /* purple line on focus */
+}
+
+.input::placeholder {
+  color: #999;
+  /* or whatever color you want */
+  opacity: 1;
+}
+
+form .submit_button {
+  background: linear-gradient(to right, #8000FF, rgba(228, 40, 235, 0.87));
+  color: white;
+  height: 60px;
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 0 20px rgba(128, 0, 255, 0.15);
+  transition: 0.4ms ease-in-out;
+  font-weight: bolder;
+}
+
+.submit_button:hover {
+  background: linear-gradient(to right, #a14bff, rgba(233, 77, 238, 1));
+  box-shadow: 0 0 30px rgba(162, 75, 255, 0.171);
+}
+
+.api_btn {
+  height: 50px;
+  box-shadow: 0 0 20px rgba(128, 0, 255, 0.15);
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  background-color: white;
+}
+
+.dark_apple_api_btn {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.87);
+}
+
+.auth-footer {
+  background-color: #ad73e70e;
+  border-radius: 20px;
+  border: 1px solid #420a7a10;
+}
+
+.auth-footer a {
+  color: #7223c2;
+}
+
+form .code_container {
+  display: flex;
+  text-align: center;
+  
+}
+
+form .code_container .code {
+  padding: 10px;
+  outline: none;
+  margin: 0px 3px
+}
+
+.auth_container .auth_footer {
+  /* position: fixed;
+  bottom:0px; */
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  /* padding: 10px 10px; */
+}
+.auth_container .auth_footer ul{
+
+padding: 0px;}
+.auth_container .auth_footer ul li {
+  display: inline-block;
+  margin: 0px 20px;
+}
+.auth_container .container_heading_text {
+  color: #8000FF;
+  font-size: 30px;
+  font-family: 'Inter'
+}
+
+/* Mobile view: Remove background image */
+@media (max-width: 767px) {
+  .auth_container .container_heading_text {
+    color: #8000FF;
+    font-size: 20px;
+    font-family: 'Inter'
+  }
+
+  .auth-background {
+    background: none;
+    background: #fff;
+    /* fallback color if needed */
+  }
+}

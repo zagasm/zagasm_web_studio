@@ -1,0 +1,14 @@
+.coin-balance-container .badge {
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .coin-balance-container .badge:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+  
+  .coin-balance-container i.fa-coins {
+    color: inherit;
+  }

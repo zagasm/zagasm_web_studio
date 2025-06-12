@@ -1,0 +1,72 @@
+.tab-content .account-general{
+    margin:0px;
+    /* margin-bottom: 20px; */
+    /* background-color: white; */
+}
+.tab-content .account-general div{
+    margin-bottom: 20px;
+
+}
+.tab-content .account-general div span{
+    font-weight:400;
+    /* font-size: 18px; */
+}
+form div label{
+    font: 10px arial, helvetica, sans-serif;
+    font-weight: 900;
+   
+}
+form div{
+    margin:20px 0px;
+   
+}
+p{
+    font-size: 18px;
+    line-height: 25px;
+}
+.submit_btn{
+    background: #fa6342;
+    color:white ;
+}
+.cancel_btn{
+    background-color: #888da8;
+    color: white;
+    margin-right: 10px;
+}
+
+.tab-content .item_setting{
+    border-bottom:1px  solid rgba(226, 217, 217, 0.747);
+    /* background-color: red; */
+    padding-bottom: 5px;
+}
+.password-input-container {
+    position: relative;
+  }
+  
+  .password-toggle-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    z-index: 2;
+  }
+  
+  .password-toggle-icon:hover {
+    color: #333;
+  }
+  
+  /* Adjust input padding to prevent text overlap */
+  .form-control[type="password"],
+  .form-control[type="text"] {
+    padding-right: 35px;
+  }
+
+
+@media screen and (max-width: 560px) {
+    .tab-content .account-general div{
+        margin-bottom: 10px;
+    
+    }
+}
