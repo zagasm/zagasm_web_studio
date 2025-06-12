@@ -15,74 +15,6 @@ function MyMemes() {
         <div className="profile-content container mt-4">
             <div className="row">
                 {/* Left Sidebar */}
-                <div className="col-xl-4 col-md-4 d-none ">
-                    <div className="card mb-3">
-                        <div className="card-body">
-                            <h5 className="card-title">Intro</h5>
-                            <p className="card-text">This is a sample bio. You can write something about yourself here.</p>
-                            <div className="intro-details">
-                                {/* <div className="detail-item">
-                                        <FaGlobe className="mr-2" />
-                                        <span>www.example.com</span>
-                                    </div> */}
-                                <div className="detail-item">
-                                    {/* <FaFacebookF className="mr-2" /> */}
-                                    <span>Joined September 2023</span>
-                                </div>
-                            </div>
-                            <button className="btn btn-outline-secondary btn-block mt-2">
-                                Edit Details
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="card mb-3">
-                        <div className="card-body">
-                            <h5 className="card-title">Photos</h5>
-                            <div className="photos-grid">
-                                <div className="photo-item">
-                                    <img src={friendImage} alt="Photo" />
-                                </div>
-                                <div className="photo-item">
-                                    <img src={cover_img} alt="Photo" />
-                                </div>
-                                <div className="photo-item">
-                                    <img src={friendImage} alt="Photo" />
-                                </div>
-                                <div className="photo-item">
-                                    <img src={cover_img} alt="Photo" />
-                                </div>
-                                <div className="photo-item">
-                                    <img src={friendImage} alt="Photo" />
-                                </div>
-                                <div className="photo-item">
-                                    <img src={cover_img} alt="Photo" />
-                                </div>
-                            </div>
-                            <button className="btn btn-outline-secondary btn-block mt-2">
-                                See All Photos
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="card mb-3">
-                        <div className="card-body">
-                            <h5 className="card-title">Friends</h5>
-                            <p className="card-text">1,234 friends</p>
-                            <div className="friends-grid">
-                                {[1, 2, 3, 4, 5, 6].map((item) => (
-                                    <div className="friend-item" key={item}>
-                                        <img src={friendImage} alt="Friend" />
-                                        <span>Friend {item}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <button className="btn btn-outline-secondary btn-block mt-2">
-                                See All Friends
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Main Feed */}
                 <div className="col-xl-12  col-md-8 col-sm-12 " style={{ paddingBottom: '200px' }}>
@@ -91,8 +23,6 @@ function MyMemes() {
                     <div className="row">
                         {/* Post 1 */}
                         <div className="col-xl-6 col-lg- col-md-6 col-12">
-
-
                             <div className=" box shadow-l border rounded bg-white mb-3 osahan-post car">
                                 <div className="p-3 d-flex align-items-center border-bottom osahan-post-header">
                                     <div className="dropdown-list-image mr-3">

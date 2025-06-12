@@ -17,14 +17,12 @@ function LikesMeme() {
                 <div class="col-md-4">
                     <a href="profile.html">
                         <div class="border network-item rounded mb-3">
-                            <div class="p-3 d-flex align-items-center network-item-header">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle" src={postImg} alt="" />
-                                </div>
-                                <div class="font-weight-bold">
-                                    <h6 class="font-weight-bold text-dark mb-0">Sophia Lee</h6>
-                                    <div class="small text-black-50">Photographer at Photography</div>
-                                </div>
+                            <div className="p-3 border-bottom osahan-post-body">
+                                <p className="mb-0 p-4" style={{ background: '#8000FF', color: 'white', }}>
+                                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sequi iure saepe rem non corrupti quas.
+                                    Repellendus maxime voluptate eius, porro consequatur, sed possimus facere veniam ratione esse
+                                    reprehenderit dolores! Repellendus. <a href="#">laboris consequat.</a>
+                                </p>
                             </div>
                             <div class="d-flex align-items-center p-3 border-top border-bottom network-item-body">
                                 <div class="overlap-rounded-circle">
@@ -36,7 +34,56 @@ function LikesMeme() {
                                 </div>
                                 <span class="font-weight-bold small text-primary">4 likes</span>
                             </div>
-                           
+
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="profile.html">
+                        <div class="border network-item rounded mb-3">
+                            <div className="p-3 border-bottom osahan-post-body card">
+                                <p className="mb-0">
+                                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sequi iure saepe rem non corrupti quas.
+                                    Repellendus maxime voluptate eius, porro consequatur, sed possimus facere veniam ratione esse
+                                    reprehenderit dolores! Repellendus. <a href="#">laboris consequat.</a>
+                                </p>
+                            </div>
+                            <div class="d-flex align-items-center p-3 border-top border-bottom network-item-body">
+                                <div class="overlap-rounded-circle">
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Sophia Lee" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="John Doe" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Julia Cox" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Robert Cook" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Sophia Lee" src={postImg} alt="" />
+                                </div>
+                                <span class="font-weight-bold small text-primary">4 likes</span>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="profile.html">
+                        <div class="border network-item rounded mb-3">
+                            <div className="p-3 border-bottom osahan-post-body card">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur 😍😎 adipisicing elit, sed do eiusmod tempo incididunt ut
+                                    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                                    <a href="#">laboris consequat.</a>
+                                </p>
+                                <img src={postImg1} className="img-fluid" alt="Post content" />
+                            </div>
+                            <div class="d-flex align-items-center p-3 border-top border-bottom network-item-body">
+                                <div class="overlap-rounded-circle">
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Sophia Lee" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="John Doe" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Julia Cox" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Robert Cook" src={postImg} alt="" />
+                                    <img class="rounded-circle shadow-sm" data-toggle="tooltip" data-placement="top" title="Sophia Lee" src={postImg} alt="" />
+                                </div>
+                                <span class="font-weight-bold small text-primary">4 likes</span>
+                            </div>
+
                         </div>
                     </a>
                 </div>
