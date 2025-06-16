@@ -1,0 +1,144 @@
+.image-preview img {
+  border: 1px solid #ccc;
+  padding: 2px;
+}
+.dropzone {
+  background-color: #f8f9fa;
+  border-style: dashed;
+  transition: background-color 0.3s ease;
+}
+.dropzone.active {
+  background-color: #e2e6ea;
+}
+
+
+.dropzone-custom.active {
+  background-color: #8000FF;;
+  border-color: #8000FF;;
+  color: #343a40;
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: #8000FF;
+}
+
+
+.image-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 5px;
+  position: relative;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.image-wrapper button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: #8000FF;;
+  border: none;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 999999999999999999999;
+}
+.dropzone-custom {
+    background-color: #f8f9fa;
+    border: 20px dashed #ced4da;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.dropzone-custom:hover {
+    background-color: #e9ecef;
+}
+
+.dropzone-custom.active {
+    background-color: #e9ecef;
+}
+
+
+
+.carousel img {
+    object-fit: cover;
+}
+
+.carousel-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1050;
+  pointer-events: auto;
+}
+.carousel-delete-btn:hover {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+/* Tab container */
+.create-post-row .nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Inactive tabs */
+.create-post-row .nav-tabs .nav-link {
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  font-weight: 500;
+  background: #f8f9fa;
+  border-radius: 5px 5px 0 0;
+  margin-right: 5px;
+  transition: background-color 0.3s;
+  width: 100%;
+
+}
+
+/* Active tab */
+.create-post-row .nav-tabs .nav-link.active {
+  background-color: #8000FF; /* Bootstrap primary */
+  color: white;
+  font-weight: bold;
+  border: none;
+  width: 100%;
+}
+
+/* Hover effect */
+.create-post-row .nav-tabs .nav-link:hover {
+  background-color: #e2e6ea;
+}
+/* Style for the Prev/Next button containers */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #8000FF;
+  border-radius: 50%;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+/* Arrow icons - white */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-size: 70% 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* filter: invert(3) brightness(5); Ensures icon stays white */
+  color:white;
+  font-weight: bolder;
+}
+
+/* Hover effect for buttons */
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}

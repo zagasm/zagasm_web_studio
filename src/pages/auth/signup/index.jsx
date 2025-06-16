@@ -5,8 +5,8 @@ import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import googleLogo from "../../../assets/google-logo.png";
-import $ from "jquery";
-
+// import $ from "jquery";
+import axios from "axios";
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -63,8 +63,9 @@ export function SignUp() {
     setStep(1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     // Validation for step 2
     if (!formData.birth_month || !formData.birth_day || !formData.birth_year || !formData.gender) {
       showToast.error("Please fill in all fields");
@@ -72,73 +73,60 @@ export function SignUp() {
     }
 
     setIsLoading(true);
+    try {
+      // Prepare the data in x-www-form-urlencoded format
+      const formDataEncoded = new URLSearchParams();
+      formDataEncoded.append("first_name", formData.first_name);
+      formDataEncoded.append("last_name", formData.last_name);
+      formDataEncoded.append("username", formData.username);
+      formDataEncoded.append("email", formData.email);
+      formDataEncoded.append("password", formData.password);
+      formDataEncoded.append("birth_month", formData.birth_month);
+      formDataEncoded.append("birth_day", formData.birth_day);
+      formDataEncoded.append("birth_year", formData.birth_year);
+      formDataEncoded.append("gender", formData.gender);
+      formDataEncoded.append("privacy_agree", formData.privacy_agree ? "1" : "0");
+      formDataEncoded.append("api_secret_key", formData.reset_key);
 
-    // Prepare the data in x-www-form-urlencoded format
-    const formDataEncoded = new URLSearchParams();
-    formDataEncoded.append("first_name", formData.first_name);
-    formDataEncoded.append("last_name", formData.last_name);
-    formDataEncoded.append("username", formData.username);
-    formDataEncoded.append("email", formData.email);
-    formDataEncoded.append("password", formData.password);
-    formDataEncoded.append("birth_month", formData.birth_month);
-    formDataEncoded.append("birth_day", formData.birth_day);
-    formDataEncoded.append("birth_year", formData.birth_year);
-    formDataEncoded.append("gender", formData.gender);
-    formDataEncoded.append("privacy_agree", formData.privacy_agree ? "1" : "0");
-    formDataEncoded.append("reset_key", formData.reset_key);
-    formDataEncoded.append("reset_key", formData.reset_key);
-    formDataEncoded.append("reset_key", formData.reset_key);
-    formDataEncoded.append("user_logged_in", formData.user_logged_in ? "1" : "0");
-
-    $.ajax({
-      url: "https://zagasm.com/includes/ajax/users/connect.php",
-      type: "POST",
-      data: formDataEncoded.toString(),
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      processData: false,
-      timeout: 30000,
-      beforeSend: function() {
-        setIsLoading(true);
-      },
-      success: function(response) {
-        try {
-          const responseData = typeof response === 'string' ? JSON.parse(response) : response;
-          
-          if (responseData.status === "OK") {
-            showToast.success(responseData.api_message);
-            GeSignupData(responseData.userdata);
-            setTimeout(() => {
-              navigate("/auth/onboarding");
-            }, 2000);
-          } else {
-            showToast.error(responseData.api_message || "Registration failed");
-          }
-        } catch (e) {
-          console.error("Error parsing response:", e);
-          showToast.error("Invalid server response");
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/sign_up.php`,
+        formDataEncoded,
+        {
+          withCredentials: true,
         }
-      },
-      error: function(xhr, status, error) {
-        let errorMessage = "An unknown error occurred";
-        if (xhr.responseJSON && xhr.responseJSON.api_message) {
-          errorMessage = xhr.responseJSON.api_message;
-        } else if (xhr.responseText) {
-          try {
-            const errorResponse = JSON.parse(xhr.responseText);
-            errorMessage = errorResponse.api_message || errorMessage;
-          } catch (e) {
-            errorMessage = xhr.responseText || errorMessage;
-          }
-        }
-        showToast.error(errorMessage);
-        console.error("AJAX Error:", status, error);
-      },
-      complete: function() {
+      );
+      const data = response.data;
+      if (data.success) {
+        showToast.success(data.message || "Registration successful!");
         setIsLoading(false);
+        setFormData([]);
+        setStep(1);
+      } else {
+        showToast.error(data.message || "An error occurred. Please try again.");
+        setError(data.message || "An error occurred. Please try again.");
       }
-    });
-  };
+    } catch (err) {
+      console.error("Error during signup:", err);
 
+      // Backend responded with an error
+      const status = err.response.status;
+      const message =
+        err.response.data?.message || "An error occurred. Please try again.";
+
+      if (status === 401) {
+        showToast.error(message || "Invalid Email or email is not register on the platform.");
+        setError(message || "Invalid Email or email is not register on the platform.");
+      } else {
+        showToast.error(message);
+        setError(message);
+      }
+
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+  //  setIsLoading(false); 
   return (
     <>
       <AuthContainer
@@ -146,6 +134,7 @@ export function SignUp() {
         description={step === 1 ? "Let's get started with your basic details" : "Just a few more details to complete your profile"}
       >
         <form autoComplete="off" className="pr-3 pl-3" onSubmit={handleSubmit}>
+          {error && <div className="text-danger mb-3 alert alert-danger">{error}</div>}
           {step === 1 ? (
             <>
               <div className="row p-0 m-0">
@@ -320,7 +309,7 @@ export function SignUp() {
                 </div>
               </motion.div>
 
-              <div className="form-group form-check">
+              <div className="form-group form-check mb-3">
                 <input
                   type="checkbox"
                   name="privacy_agree"
@@ -335,7 +324,7 @@ export function SignUp() {
                 </label>
               </div>
 
-              {error && <div className="text-danger mb-3">{error}</div>}
+
 
               <motion.button
                 initial={{ opacity: 0, x: 40 }}
@@ -457,16 +446,14 @@ export function SignUp() {
                     required
                   >
                     <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer-not-to-say">Prefer not to say</option>
+                    <option value="1">Male</option>
+                    <option value="2">Female</option>
                   </select>
                   <i className="feather-users position-absolute input-icon"></i>
                 </div>
               </motion.div>
 
-              {error && <div className="text-danger mb-3">{error}</div>}
+
 
               <motion.button
                 initial={{ opacity: 0, x: 40 }}

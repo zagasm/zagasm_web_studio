@@ -1,4 +1,6 @@
 import { Fragment, useState, useEffect } from "react";
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Enables dropdown and other JS features
+
 import { Routes, Route, useLocation } from "react-router-dom";
 import AuthLayout from "./pages/auth/layout";
 import { SignUp } from "./pages/auth/signup";
@@ -25,6 +27,9 @@ import MyProfile from "./pages/Profile/Header.jsx";
 import ProfileOutlet from "./pages/Profile/ProfileOutlet.jsx";
 import MyMemes from "./pages/Profile/AllMemes.jsx";
 import LikesMeme from "./pages/Profile/memesLikes.jsx";
+import SavedMeme from "./pages/Profile/savedMemes.jsx";
+import Sessionpage from "./pages/auth/SessionPage/index.jsx";
+import CreatePost from "./pages/post/createPost/index.jsx";
 
 
 const MainLayout = () => (
@@ -34,11 +39,23 @@ const MainLayout = () => (
   </>
 );
 export function App() {
+  const [loading, setLoading] = useState(true);
+  const location = useLocation(); // Detects route changes
+  if (typeof global === "undefined") {
+    window.global = window;
+  }
+
+  useEffect(() => {
+    setLoading(true); // Show preloader
+    const timer = setTimeout(() => setLoading(false), 100); // Simulate load time
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]); // Runs on every route change
 
 
   return (
     <Fragment>
-
+      {loading && <FullpagePreloader loading={loading} />}
 
       <ToastContainer />
       <NetworkStatus />
@@ -54,15 +71,20 @@ export function App() {
           {/*
           {/* <Route path="onboarding" element={<Onboarding />} /> */}
         </Route>
-        <Route element={<MainLayout />}>
-          <Route index exact path="/" element={<Home />} />
-          <Route path="chat" element={<Chat />} />
-          
-          <Route path="/myprofile" element={<ProfileOutlet />}>
-            <Route index  element={<MyMemes />} />
-            <Route path="mymemes" element={<LikesMeme />} />
-          </Route>
+        <Route element={<Sessionpage />}>
+          <Route element={<MainLayout />}>
+            <Route index exact path="/" element={<Home />} />
+            <Route path="chat" element={<Chat />} />
+            <Route path="create-post" element={<CreatePost />} />
 
+            <Route path="/myprofile" element={<ProfileOutlet />}>
+              <Route index element={<MyMemes />} />
+              <Route path="mymemes" element={<LikesMeme />} />
+              <Route path="savedmemes" element={<SavedMeme />} />
+
+            </Route>
+
+          </Route>
         </Route>
 
         <Route path="/page-not-found" element={<Error404 />} />

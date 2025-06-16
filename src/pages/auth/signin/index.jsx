@@ -5,6 +5,7 @@ import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import googleLogo from "../../../assets/google-logo.png";
+import axios from "axios";
 
 export function Signin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +18,6 @@ export function Signin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Animation variants
   const containerVariants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.15 } },
@@ -39,7 +39,7 @@ export function Signin() {
     if (!formData.username_email.trim()) newErrors.username_email = "Email or username is required";
     if (!formData.password) newErrors.password = "Password is required";
     else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,32 +47,54 @@ export function Signin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('username_email', formData.username_email);
-      formData.append('password', formData.password);
+      const formPayload = new FormData();
+      formPayload.append("username_email", formData.username_email);
+      formPayload.append("password", formData.password);
 
-      const response = await fetch('https://zagasm.com/api/auth/sing_in.php', {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: formData
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/sign_in.php`,
+        formPayload,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const data = response.data;
+
+      if (data.error) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      login({
+        ...data.user,
+        token: data.token
       });
 
-      const data = await response.json();
+      showToast.success(data.message || "Login successful!");
+      navigate("/");
+    } catch (err) {
+      console.error("Error during sign in:", err);
 
-      if (!response.ok) throw new Error(data.message || "Login failed");
-      if (data.status !== "OK") throw new Error(data.api_message || "Invalid credentials");
+      // Backend responded with an error
+      const status = err.response.status;
+      const message =
+        err.response.data?.message || "An error occurred. Please try again.";
 
-      login(data.userdata);
-      showToast.success("Login successful!");
-      navigate("/dashboard");
-    } catch (error) {
-      showToast.error(error.message);
-      setErrors({ server: error.message });
-    } finally {
+      if (status === 401) {
+        showToast.error(message || "Invalid credentails.");
+        setErrors(message || "Invalid credentails.");
+      } else {
+        showToast.error(message);
+        setErrors(message);
+      }
+
+    }
+
+    finally {
       setIsLoading(false);
     }
   };
@@ -153,6 +175,7 @@ export function Signin() {
           type="submit"
           className="btn submit_button btn-block"
           disabled={isLoading}
+          style={{ color: 'white' }}
         >
           {isLoading ? (
             <>
@@ -172,23 +195,34 @@ export function Signin() {
           <p className="small text-muted mb-3">Or continue with</p>
           <div className="row">
             <div className="col-6">
-              <button type="button" className="btn btn-sm api_btn btn-block">
-                <img src={googleLogo} alt="Google" style={{ width: '20px' }} className="mr-2" />
-                Google
-              </button>
+              <motion.button
+                initial={{ opacity: 0, y: 70 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: "easeOut" }}
+                type="button"
+                className=" btn-sm api_btn btn-block"
+              >
+                <img src={googleLogo} alt="Google Logo" className="mr-2" style={{ width: '20px', height: '20px', marginTop: '-5px' }} />
+                <span>Google</span>
+              </motion.button>
             </div>
             <div className="col-6">
-              <button type="button" className="btn btn-sm api_btn dark_apple_api_btn btn-block">
-                <i className="fab fa-apple mr-2"></i>
-                Apple
-              </button>
+              <motion.button
+                initial={{ opacity: 0, y: 70 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: "easeOut" }}
+                type="button"
+                className=" api_btn dark_apple_api_btn btn-block"
+              >
+                <i className="fab fa-apple mr-2"></i> Apple
+              </motion.button>
             </div>
           </div>
         </div>
 
         {/* Sign Up Link */}
         <div className="text-center mt-4">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link to="/auth/signup" className="font-weight-bold">
             Create account
           </Link>

@@ -1,19 +1,41 @@
-.post_icon_container {
-    margin: 0px;
-    padding: 0px;
-}
-
-.post_icon_container a {
-    margin: 0px 10px;
-    padding: 5px 0px
-}
-
-.post_icon_container a:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
 
 
 div  a {
     color: #8000FF
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  opacity: 0.9;
+}
+
+/* Smooth transitions */
+img {
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+img:hover {
+  transform: scale(1.01);
+}
+
+.osahan-slider-main {
+  padding: 20px;
+}
+
+.job-item {
+  transition: box-shadow 0.3s ease;
+}
+
+.job-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.rounded-circle {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  margin-right: 5px;
 }

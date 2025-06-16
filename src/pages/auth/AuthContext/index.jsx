@@ -4,25 +4,20 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Initialize as true
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if the user is already logged in
     const storedUser = localStorage.getItem("userdata");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    setIsLoading(false); // Set loading to false after checking auth state
+    setIsLoading(false);
   }, []);
 
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("userdata", JSON.stringify(userData));
-  };
-
-  const GeSignupData = (userData) => {
-    setUser(userData);
-    localStorage.setItem("userdata", JSON.stringify(userData));
+    localStorage.setItem("token", userData.token); // Optional
   };
 
   const logout = () => {
@@ -30,9 +25,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userdata");
     localStorage.removeItem("token");
   };
-  
+
+  const isAuthenticated = !!user;
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, GeSignupData, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

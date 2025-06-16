@@ -1,0 +1,49 @@
+/* style.css */
+
+.rightBarPeopleSuggestedLoader .shimmer-line,
+.rightBarPeopleSuggestedLoader .shimmer-circle,
+.rightBarPeopleSuggestedLoader .shimmer-button {
+  background: #f0f0f0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.rightBarPeopleSuggestedLoader .shimmer-line::before,
+.rightBarPeopleSuggestedLoader .shimmer-circle::before,
+.rightBarPeopleSuggestedLoader .shimmer-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+  animation: shimmer 1.5s infinite;
+}
+
+.rightBarPeopleSuggestedLoader .shimmer-line {
+  height: 12px;
+  margin-bottom: 4px;
+}
+
+.rightBarPeopleSuggestedLoader .shimmer-circle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+.rightBarPeopleSuggestedLoader .shimmer-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -150px;
+  }
+  100% {
+    left: 100%;
+  }
+}

@@ -34,7 +34,7 @@
 }
 
 .osahan-nav-top .nav-icon {
-    font-size: 25px;
+    font-size: 300px;
     padding: 10px 60px;
     transition: 0.3s ease-in-out;
     /* background: #b5a6c518; */
@@ -54,43 +54,36 @@
     color: #8000FF;
 }
 
-.osahan-nav-top .right-icon:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 
 .navbar-nav.middle_nav {
     display: flex;
     justify-content: center;
     gap: 30px
 }
-
-
 .shadow-sm.side_bar_container {
     border-right: 1px solid rgba(221, 214, 214, 0.596);
     height: calc(100vh - 65px);
     position: fixed;
     top: 65px;
-    background-color: white;
+    /* background-color: white; */
     padding-top: 20px;
     overflow: hidden;
     width: 300px;
 }
-
 .side_bar_container .list-sidebar .list-group a {
     margin: 10px 0px;
-    font-size: 18px;
+    font-size: 17px;
     background: none;
-
+    /* font-weight: bold; */
 }
-
 .side_bar_container .list-sidebar .list-group a li {
     background: none;
     border: none;
+    color: #350466;
 }
-
 .side_bar_container .list-sidebar .list-group a li:hover {
     background: #e4cff881;
-    border-radius: 10px;
+    /* border-radius: 10px; */
 }
 
 .side_bar_container .list-sidebar .list-group a li span {
@@ -122,7 +115,7 @@
     margin: 0px;
 }
 
-.mobile_navbar_container ul li {
+.mobile_navbar_container ul a {
     font-size: 25px;
     padding: 0px;
 }
@@ -131,6 +124,7 @@
 }
 .mobile_navbar_container ul .active {
     margin: 0px;
+    margin-top: -5px;
     /* display: inline; */
     padding: 8px 10px;
     color: white;
@@ -169,7 +163,7 @@
 }
 
 @media (max-width: 1205px) {
-    .side_bar_container .list-sidebar .list-group a li span {
+    .side_bar_container .list-sidebar .list-group a li span, .side_bar_user_name {
         display: none;
     }
 
@@ -179,8 +173,9 @@
     }
 
     .osahan-nav-top .middle_nav .nav-icon {
-        font-size: 25px;
+        font-size: 30px;
         padding: 10px 20px;
+        display: none;
     }
 
     .main_container {
@@ -207,4 +202,7 @@
     .shadow-sm.side_bar_container {
         display: none;
     }
+}
+.list-group-item:hover {
+    background-color: #f0f2f5;
 }

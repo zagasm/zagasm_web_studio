@@ -15,7 +15,7 @@ const LoadingOverlay = ({  isVisible }) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 9999999999999, // Ensure it's on top of other elements
+        zIndex: 999999999999999999999999999999999999999999999999999, // Ensure it's on top of other elements
       }}
     >
       <p
