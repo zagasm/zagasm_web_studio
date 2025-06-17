@@ -13,7 +13,7 @@ import { usePost } from '../../component/Posts/PostContext';
 import SinglePostTemplate from '../../component/Posts/single';
 
 function MyMemes() {
-    const { UserProfilePostData } = usePost();
+    const { UserProfilePostData, refreshProfilePost } = usePost();
     console.log(UserProfilePostData);
     return (
         <div className="profile-content container mt-4">
@@ -21,25 +21,20 @@ function MyMemes() {
                 {/* Left Sidebar */}
 
                 {/* Main Feed */}
-                <div className="col-xl-12  col-md-8 col-sm-12 " style={{ paddingBottom: '200px' }}>
-                    {/* Create Post */}
-                    <div className="row">
-                        {UserProfilePostData ? (
-                            UserProfilePostData.map(post => (
-                                <div className='col-xl-6 col-lg- col-md-6 col-12'>
-                                    <SinglePostTemplate
-                                        key={post.post_id}
-                                        data={post}
-                                    /></div>
-                            ))
-                        ) : (
-                            <div className="text-center py-5">
-                                <p>No posts available</p>
+                <div className="row gx-3 gy-3">
+                    {UserProfilePostData && UserProfilePostData.length > 0 ? (
+                        UserProfilePostData.map(post => (
+                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-12" key={post.post_id}>
+                                <SinglePostTemplate data={post} />
                             </div>
-                        )}
-                    </div>
-
+                        ))
+                    ) : (
+                        <div className="col-12 text-center py-5">
+                            <p>No posts available</p>
+                        </div>
+                    )}
                 </div>
+
             </div>
         </div>
     );

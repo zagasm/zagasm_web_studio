@@ -1,0 +1,33 @@
+/* Loader styles */
+.post-content-loader {
+  background: white;
+  border-radius: 8px;
+}
+
+.loader-avatar {
+  width: 40px;
+  height: 40px;
+  background: #f0f2f5;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loader-line {
+  height: 12px;
+  background: #f0f2f5;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loader-image {
+  height: 300px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

@@ -83,23 +83,19 @@
 }
 .side_bar_container .list-sidebar .list-group a li:hover {
     background: #e4cff881;
-    /* border-radius: 10px; */
 }
-
 .side_bar_container .list-sidebar .list-group a li span {
     /* display: none; */
 }
-
 .side_bar_container .list-sidebar .list-group a li i {
     font-size: 25px;
     color: #8000FF;
 }
-
 .mobile_navbar_container {
     background: white;
     position: fixed;
     bottom: 0px;
-    z-index: 9999999999999;
+    z-index: 99;
     padding: 20px;
     width: 100%;
     overflow: hidden;

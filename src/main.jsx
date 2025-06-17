@@ -8,6 +8,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./style.css";
 import { AuthProvider, useAuth } from "./pages/auth/AuthContext/index.jsx";
 import { PostProvider } from "./component/Posts/PostContext/index.jsx";
+import { HelmetProvider } from "react-helmet-async";
 // import { VillageProvider } from "./component/villageSqare/VillageContext/index.jsx";
 // import { EventProvider } from "./component/Events/EventContext/index.jsx";
 // import { PostProvider } from "./component/posts/PostContext/index.jsx";
@@ -34,7 +35,9 @@ const RootWrapper = () => {
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
+       <HelmetProvider>
       <RootWrapper />
+      </HelmetProvider>
     </AuthProvider>
   </BrowserRouter>
 );

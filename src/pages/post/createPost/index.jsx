@@ -12,6 +12,7 @@ import { showToast } from '../../../component/ToastAlert';
 import { useAuth } from '../../auth/AuthContext';
 import LoadingOverlay from '../../../component/assets/projectOverlay.jsx';
 import { useNavigate } from 'react-router-dom';
+import { usePost } from '../../../component/Posts/PostContext/index.jsx';
 
 function CreatePost() {
     const [key, setKey] = useState('text');
@@ -31,6 +32,8 @@ function CreatePost() {
     const [isLoading, setIsLoading] = useState(true);
     const [showTextColorPicker, setShowTextColorPicker] = useState(false);
     const { user } = useAuth();
+     const { refreshPosts } = usePost();
+    // 
     const navigate = useNavigate();
     // Color templates organized by category
     const colorTemplates = {
@@ -160,6 +163,7 @@ function CreatePost() {
             const data = response.data;
             console.log('Response data:', data);
             if (data.success) {
+                refreshPosts();
                 navigate("/");
                 showToast.info(data.message || "Registration successful!");
             } else {

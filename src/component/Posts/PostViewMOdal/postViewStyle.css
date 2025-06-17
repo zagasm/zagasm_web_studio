@@ -1,0 +1,259 @@
+.post-view-modal .modal-dialog {
+    max-width: 100%;
+    width: 100%;
+    height: 130vh;
+    margin: 0 auto;
+}
+
+.post-view-modal .modal-content {
+    height: 10vh;
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 100%;
+}
+
+/* Desktop layout */
+.post-view-container {
+    display: flex;
+    height: 100%;
+}
+
+.post-content-section {
+    max-height: 100vh;
+    flex: 1;
+    border-right: 1px solid #dee2e6;
+}
+
+.post_content_container {
+    overflow-y: auto;
+    /* height: 800px; */
+    max-height: fit-content;
+    /* padding-bottom: 20px; */
+}
+
+.comments-section {
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+}
+
+/* Mobile layout */
+.post-view-modal.fullscreen .modal-content {
+    border-radius: 0;
+}
+
+.mobile-post {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.mobile-comments {
+    flex: 1;
+    overflow-y: auto;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Comment styles */
+.comments-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.comment-form {
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+.post-image-container {
+    display: flex;
+    justify-content: center;
+    background-color: #f8f9fa;
+    min-height: 300px;
+}
+
+.post-view-modal .modal-dialog {
+    max-width: 90%;
+    height: 90vh;
+    margin: 0 auto;
+}
+
+.post-view-modal .modal-content {
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+
+.comments-section {
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+}
+
+/* Mobile layout */
+.post-view-modal.fullscreen .modal-content {
+    border-radius: 0;
+}
+
+.mobile-post {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.mobile-comments {
+    flex: 1;
+    overflow-y: auto;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Carousel styles */
+.post-carousel {
+    position: relative;
+    background-color: black;
+    width: 100%;
+}
+
+.post-carousel .carousel-indicators {
+    position: absolute;
+    bottom: 10px;
+    margin-bottom: 0;
+}
+
+.post-carousel .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 4px;
+    border: none;
+    background-color: rgba(24, 24, 24, 0.5);
+}
+
+.post-carousel .carousel-indicators button.active {
+    background-color: #0095f6;
+}
+
+.post-carousel .carousel-control-prev,
+.post-carousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+    top: 50%;
+    right: 0px;
+    transform: translateY(-50%);
+    background-color: #8000FF;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.post-carousel:hover .carousel-control-prev,
+.post-carousel:hover .carousel-control-next {
+    opacity: 1;
+}
+
+.post-carousel .carousel-control-prev {
+    left: 15px;
+}
+
+.post-carousel .carousel-control-next {
+    right: 15px;
+}
+
+.post-image-container {
+    position: relative;
+}
+
+/* Comment styles */
+.comments-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.comment-form {
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+/* Full Screen Modal Styles */
+.fullscreen-post-modal {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+
+}
+
+.fullscreen-post-modal .modal-content {
+    height: 100vh;
+    border-radius: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.fullscreen-post-modal .modal-body {
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 56px);
+}
+
+/* Full Screen Preloader */
+.fullscreen-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    z-index: 9999;
+    background-color: rgba(71, 65, 65, 0.521);
+}
+
+.preloader-content {
+    text-align: center;
+}
+
+.preloader-spinner {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Responsive Layout */
+@media (max-width: 767.98px) {
+    .fullscreen-post-modal .modal-body {
+        flex-direction: column;
+    }
+
+    .post-content-section {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .comments-section {
+        flex: 0 0 auto;
+        max-height: 40vh;
+        border-top: 1px solid #dee2e6;
+    }
+}
+
+@media (min-width: 768px) {
+    .post-content-section {
+        flex: 1;
+        overflow-y: auto;
+        border-right: 1px solid #dee2e6;
+    }
+
+    .comments-section {
+        flex: 0 0 400px;
+        overflow-y: auto;
+    }
+}

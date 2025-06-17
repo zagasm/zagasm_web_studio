@@ -5,12 +5,19 @@ import ImageGallery from '../assets/ImageGallery';
 import './postcss.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import TimeAgo from '../assets/Timmer/timeAgo';
+import Linkify from 'react-linkify';
+import { useNavigate } from 'react-router-dom';
+import PostCommentButton from './comment/PostCommentButton';
 function SinglePostTemplate({ data }) {
     const [loading, setLoading] = useState(true);
     const [progress, setProgress] = useState(0);
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const navigate = useNavigate();
 
+    const handlePostClick = () => {
+        navigate(`/posts/${data.post_id}`);
+    };
     useEffect(() => {
         if (data) {
             // Simulate loading progress
@@ -59,8 +66,9 @@ function SinglePostTemplate({ data }) {
             <PostContent
                 data={data}
                 onImageClick={handleImageClick}
+                onPostClick={handlePostClick}
             />
-            <PostFooter data={data} />
+            <PostFooter data={data} onCommentClick={handlePostClick} />
 
             {galleryOpen && data.photos && (
                 <ImageGallery
@@ -94,7 +102,7 @@ function PostHeader({ data }) {
                 <div className="small text-gray-500">
                     {/* {new Date(data.time).toLocaleString()} */}
                     {/* {data.time} */}
-                     <TimeAgo date={data.time} />
+                    <TimeAgo date={data.time} />
                 </div>
             </div>
             <span className="ml-auto small">
@@ -156,24 +164,70 @@ function PostContent({ data, onImageClick }) {
         setImageLoading(false);
     };
     const isTextOnlyPost = !data.photos || data.photos.length === 0;
+    const [detectedLinks, setDetectedLinks] = useState([]);
+
+    useEffect(() => {
+        if (data.text) {
+            const links = detectLinks(data.text);
+            setDetectedLinks(links);
+        }
+    }, [data.text]);
+
+    const detectLinks = (text) => {
+        const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+        return text.match(urlRegex) || [];
+    };
+    const renderTextWithLinks = (text) => {
+        if (!text) return null;
+
+        return (
+            <Linkify
+                componentDecorator={(decoratedHref, decoratedText, key) => (
+                    <a
+                        key={key}
+                        href={decoratedHref.startsWith('www') ? `http://${decoratedHref}` : decoratedHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="whatsapp-link"
+                    >
+                        {decoratedText}
+                    </a>
+                )}
+            >
+                {text}
+            </Linkify>
+        );
+    };
+    function LinkPreview({ url }) {
+        return (
+            <div className="link-preview">
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                    {url}
+                </a>
+            </div>
+        );
+    }
     return (
         <div className="border-bottom osahan-post-body">
             {data.text && (
-                <p
-                    className="mb-3 "
-                    style={isTextOnlyPost ? {
+                <div className="post-text-container">
+                    <p className="mb-3 text" style={isTextOnlyPost ? {
                         background: data.background_color_code,
                         color: data.text_color_code || '#000',
                         padding: '80px',
                         fontWeight: 'bolder',
-                        borderRadius: '0px',
-                        margin: '0px',
                         textAlign: 'center',
-                    } : {padding: '10px',}}
-                >
-                    {data.text}
-                </p>
+                    } : { margin: '10px' }}>
+                        {renderTextWithLinks(data.text)}
+                    </p>
+                    {console.log("Detected Links:", data.text)}
+                    {/* Show link previews */}
+                    {detectedLinks.map((link, index) => (
+                        <LinkPreview key={index} url={link.startsWith('www') ? `http://${link}` : link} />
+                    ))}
+                </div>
             )}
+
 
             {data.photos && Array.isArray(data.photos) && data.photos.length > 0 && (
                 <div className="mt position-relative">
@@ -238,7 +292,8 @@ function PostContent({ data, onImageClick }) {
                                         style={{
                                             width: `${100 / Math.min(data.photos.length, 4)}%`,
                                             height: '60px',
-                                            objectFit: 'cover'
+                                            objectFit: 'cover',
+                                            borderRadius: '0px'
                                         }}
                                         onClick={() => onImageClick(index)}
                                         alt={`Image ${index + 1}`}
@@ -255,7 +310,7 @@ function PostContent({ data, onImageClick }) {
                 <div className="mt-2">
                     {imageLoadError['og'] ? (
                         <div className="d-flex justify-content-center align-items-center"
-                            style={{ height: '300px', backgroundColor: '#f5f5f5' }}>
+                            style={{ height: '300px', backgroundColor: '#f5f5f5', borderRadius: '0px' }}>
                             <div className="text-center">
                                 <i className="feather-image text-muted" style={{ fontSize: '48px' }}></i>
                                 <p className="mt-2">Image failed to load</p>
@@ -275,15 +330,13 @@ function PostContent({ data, onImageClick }) {
     );
 }
 
-function PostFooter({ data }) {
+export function PostFooter({ data, onCommentClick }) {
     return (
         <div className="p-3 osahan-post-footer d-flex justify-content-between text-center w-100 row post_icon_containe">
             <a href="#" className="text-secondary col">
-                <i className="feather-heart"></i> {data.reactions_total_count_formatted || 0}
+                <i className="feather-hear">😍</i> {data.reactions_total_count_formatted || 0}
             </a>
-            <a href="#" className="text-secondary col">
-                <i className="feather-message-square"></i> {data.comments_formatted || 0}
-            </a>
+            {onCommentClick && <PostCommentButton postId={data.post_id} />}
             <a href="#" className="text-secondary col">
                 <i className="feather-share-2"></i> {data.shares_formatted || 0}
             </a>

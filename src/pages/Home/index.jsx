@@ -104,7 +104,7 @@ function Home() {
                             </div>
                         </div> */}
                         <div className="containe">
-                            {HomePostData ? (
+                            {HomePostData && HomePostData.length > 0  ? (
                                 HomePostData.map(post => (
                                     <SinglePostTemplate
                                         key={post.post_id}
@@ -112,8 +112,8 @@ function Home() {
                                     />
                                 ))
                             ) : (
-                                <div className="text-center py-5">
-                                    <p>No posts available</p>
+                                <div className="text-center py-5 ">
+                                    <p>Fetching for posts <span className='fa fa-spinner fa-spin'></span></p>
                                 </div>
                             )}
                         </div>

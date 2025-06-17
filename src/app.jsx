@@ -30,6 +30,8 @@ import LikesMeme from "./pages/Profile/memesLikes.jsx";
 import SavedMeme from "./pages/Profile/savedMemes.jsx";
 import Sessionpage from "./pages/auth/SessionPage/index.jsx";
 import CreatePost from "./pages/post/createPost/index.jsx";
+import PostDetailsPage from "./pages/post/postDetails/index.jsx";
+import PostViewModal from "./component/Posts/PostViewMOdal/index.jsx";
 
 
 const MainLayout = () => (
@@ -41,6 +43,7 @@ const MainLayout = () => (
 export function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation(); // Detects route changes
+  const state = location.state;
   if (typeof global === "undefined") {
     window.global = window;
   }
@@ -51,11 +54,11 @@ export function App() {
 
     return () => clearTimeout(timer);
   }, [location.pathname]); // Runs on every route change
-
+  const background = location.state?.background;
 
   return (
     <Fragment>
-      {loading && <FullpagePreloader loading={loading} />}
+      {/* {loading && <FullpagePreloader loading={loading} />} */}
 
       <ToastContainer />
       <NetworkStatus />
@@ -71,12 +74,12 @@ export function App() {
           {/*
           {/* <Route path="onboarding" element={<Onboarding />} /> */}
         </Route>
-        <Route element={<Sessionpage />}>
+        <Route element={<Sessionpage />} location={state?.backgroundLocation || location}>
           <Route element={<MainLayout />}>
             <Route index exact path="/" element={<Home />} />
             <Route path="chat" element={<Chat />} />
             <Route path="create-post" element={<CreatePost />} />
-
+            <Route path="/posts/:postId" element={<PostDetailsPage />} />
             <Route path="/myprofile" element={<ProfileOutlet />}>
               <Route index element={<MyMemes />} />
               <Route path="mymemes" element={<LikesMeme />} />
@@ -91,7 +94,19 @@ export function App() {
         <Route path="*" element={<Error404 />} />
       </Routes>
 
-
+        {state?.backgroundLocation && (
+        <Routes>
+          <Route 
+            path="/posts/:postId" 
+            element={
+              <PostViewModal 
+                show={true} 
+                onHide={() => navigate(-1)} 
+              />
+            } 
+          />
+        </Routes>
+      )}
     </Fragment>
   );
 }
