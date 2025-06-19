@@ -23,7 +23,7 @@ const TextFormatter = ({ text, maxLength = 150 }) => {
             </a>
           )}
         >
-            
+
           {paragraph}
         </Linkify>
       </div>
@@ -44,7 +44,9 @@ const TextFormatter = ({ text, maxLength = 150 }) => {
             border: 'none',
             padding: 0,
             cursor: 'pointer',
-            textDecoration: 'underline'
+            textDecoration: 'none',
+            color:'#8000FF',
+            display:'inline'
           }}
         >
           {showFullText ? 'Show less' : 'Read more'}

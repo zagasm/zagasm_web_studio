@@ -95,7 +95,7 @@ export const PostProvider = ({ children, user }) => {
         try {
             const formPayload = new FormData();
             formPayload.append("api_secret_key", import.meta.env.VITE_API_SECRET || 'Zagasm2025!Api_Key_Secret');
-            formPayload.append("offset", '3');
+            formPayload.append("offset", '1');
             formPayload.append("user_id", user_id);
 
             const response = await fetch(

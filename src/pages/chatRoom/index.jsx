@@ -11,7 +11,7 @@ function Chat() {
             <div className="container-fluid p-0" >
                 <SideBarNav />
                 <div className="row offset-xl-2 offset-lg-1 offset-md-1" >
-                    <main className="col col-xl-9 order-xl-2 col-lg-8 order-lg-1 col-md-12 col-sm-12 col-12 main_container bg-dange   ">
+                    <main className="col col-xl-9 order-xl-2 col-lg-8 order-lg-1 col-md-12 col-sm-12 col-12 main_container   ">
                         <div class="box shadow-sm rounded bg-white mb-3 osahan-chat" >
                             <h5 class="pl-3 pt-3 pr-3 border-bottom mb-0 pb-3" style={{ color: '#8000FF' }}>Messaging</h5>
                             <div class="row m-0">

@@ -21,19 +21,21 @@ function MyMemes() {
                 {/* Left Sidebar */}
 
                 {/* Main Feed */}
-                <div className="row gx-3 gy-3">
-                    {UserProfilePostData && UserProfilePostData.length > 0 ? (
-                        UserProfilePostData.map(post => (
-                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-12" key={post.post_id}>
-                                <SinglePostTemplate data={post} />
-                            </div>
-                        ))
-                    ) : (
-                        <div className="col-12 text-center py-5">
-                            <p>No posts available</p>
-                        </div>
-                    )}
-                </div>
+            <div className="post-grid">
+  {UserProfilePostData && UserProfilePostData.length > 0 ? (
+    UserProfilePostData.map(post => (
+      <div className="post-grid-item" key={post.post_id}>
+        <SinglePostTemplate data={post} />
+      </div>
+    ))
+  ) : (
+    <div className="text-center py-5">
+      <p>No posts available</p>
+    </div>
+  )}
+</div>
+
+
 
             </div>
         </div>

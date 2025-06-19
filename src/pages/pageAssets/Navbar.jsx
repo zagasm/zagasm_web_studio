@@ -32,7 +32,7 @@ const Navbar = () => {
             <nav className="navbar navbar-expand osahan-nav-top p-0 w-100 position-fixed" style={{ background: 'white' }}>
                 <div className="container-fluid p-3">
                     <Link className="navbar-brand" to="/">
-                        <img style={{ width: '160px', height: '45px' }} src={logo} alt="Zagasm Logo" className="d-no d-md-block" />
+                        <img  src={logo} alt="Zagasm Logo" className="zagasm_logo" />
                         {/* <img src={logoMobile} alt="Zagasm Logo Mobile" className="d-block d-md-none" /> */}
                     </Link>
                     <form className="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search nav_search"></form>
@@ -91,7 +91,7 @@ const Navbar = () => {
                         {/* Messages Dropdown */}
                         <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
                             <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i className="right-icon nav-ico fa fa-comments" style={{ fontSize: '25px' }}></i>
+                                <i className="right-icon nav-ico fa fa-comments" ></i>
                                 <span className="badge badge-danger badge-counter">8</span>
                             </button>
                             <div className="dropdown-list dropdown-menu dropdown-menu-right shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">
@@ -115,7 +115,7 @@ const Navbar = () => {
                         {/* Alerts Dropdown */}
                         <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
                             <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i className="right-icon nav-ico fa fa-bell" style={{ fontSize: '25px' }}></i>
+                                <i className="right-icon nav-ico fa fa-bell" ></i>
                                 <span className="badge badge-danger badge-counter">6</span>
                             </button>
                             <div className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">

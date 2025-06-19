@@ -39,3 +39,17 @@ img:hover {
   object-fit: cover;
   margin-right: 5px;
 }
+.heading_tab_container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  /* padding-bottom: 10px; */
+}
+.heading_tab_container .active {
+  color: #8000FF;
+  font-weight: bold;
+  border-bottom: 1px solid #8000FF;
+  padding-bottom: 10px;
+}

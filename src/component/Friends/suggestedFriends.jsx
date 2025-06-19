@@ -14,7 +14,7 @@ function SuggestedFriends() {
   if (loading) return <SuggestedFriendsLoader />;
 
   return (
-    <div className="box shadow-s rounded bg-white mb-3" style={{ marginTop: '65px' }}>
+    <div className="box shadow-s rounded bg-white mb-3" >
       <div className="box-title border-botto p-3">
         <h6 className="m-0">People you might know</h6>
       </div>

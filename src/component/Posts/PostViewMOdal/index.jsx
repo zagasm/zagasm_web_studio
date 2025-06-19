@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Modal, Button, Form, Image, Spinner, Carousel } from 'react-bootstrap';
+import { Modal,  } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
-import { BsEmojiSmile, BsThreeDots } from 'react-icons/bs';
-import { FiSend, FiHeart, FiMessageSquare, FiShare2 } from 'react-icons/fi';
-import { FaRegBookmark, FaHeart } from 'react-icons/fa';
+
 import './postViewStyle.css';
-import Linkify from 'react-linkify';
-import PostTextFormatter from '../PostTextFormatter';
 import SinglePostTemplate, { PostFooter } from '../single';
 import PostContentLoader from '../../assets/Loader/postContentSection';
 import FullScreenPreloader from './FullScreenPreloader';
 import CommentContainer from '../comment/commentContainer';
-import TimeAgo from '../../assets/Timmer/timeAgo';
 function PostViewModal({ post, show, onHide }) {
     const [isMobile, setIsMobile] = useState(false);
-    const [liked, setLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(post?.reactions_total_count || 0);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(true); // Add loading state
     const [isTextOnlyPost, setisTextOnlyPost] = useState(false); // Add loading state
@@ -88,8 +81,9 @@ function PostViewModal({ post, show, onHide }) {
                 onHide={onHide}
                 size="xl"
                 centered
-                className="fullscreen-post-modal p-0 m-0"
+                className="fullscreen-post-modal p-0 m-0 "
                 backdrop="static"
+                style={{Height:'100vh', padding:'0px', margin:'0px', width:'100%'}}
             >
                  <span
                 // type="span"
@@ -117,7 +111,8 @@ function PostViewModal({ post, show, onHide }) {
             >
                 &times;
             </span>
-                <Modal.Header className="border-0 p-2 pt-4 d-flex align-items-center">
+               <div style={{maxHeight:'40vh'}}>
+                 <Modal.Header className="border-0 p-2 pt-4 d-flex align-items-center">
                     {/* Close Button (X icon) */}
 
 
@@ -138,7 +133,7 @@ function PostViewModal({ post, show, onHide }) {
                     </Button> */}
                 </Modal.Header>
 
-                <Modal.Body className="p-0 d-flex flex-column flex-md-row">
+                <Modal.Body className="p-0 d-flex flex-column flex-md-row bg-dang" >
                     {/* Post Content Section */}
                     <div className={`post-content-section ${isMobile ? 'mobile-post' : ''}`}>
                         {isLoading ? (
@@ -155,6 +150,7 @@ function PostViewModal({ post, show, onHide }) {
                     {/* Comments Section */}
                     <CommentContainer post={post}  comment_data={post.post_comments} />
                 </Modal.Body>
+               </div>
             </Modal>
         </>
     );

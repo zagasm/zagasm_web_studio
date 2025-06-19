@@ -16,7 +16,7 @@ const CommentContainer = ({ post, comment_data }) => {
     const { user } = useAuth();
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const emojiButtonRef = useRef(null);
-
+     console.log('all comments', comment_data);
     useEffect(() => {
         if (comment_data && comment_data.length > 0) {
             const formattedComments = comment_data.map(comment => ({
@@ -29,7 +29,12 @@ const CommentContainer = ({ post, comment_data }) => {
                 text: comment.text_plain || comment.text,
                 timestamp: comment.time,
                 likes: comment.reactions_total_count || 0,
-                author_url: comment.author_url
+                author_url: comment.author_url,
+                canEdit: comment.edit_comment,
+                canDelete: comment.delete_comment,
+                reactions: comment.reactions || {},
+                isVerified: comment.author_verified === "1",
+                user_id: comment.user_id
             }));
             setComments(formattedComments);
         }
@@ -49,19 +54,32 @@ const CommentContainer = ({ post, comment_data }) => {
             formData.append('api_secret_key', 'Zagasm2025!Api_Key_Secret');
 
             const response = await axios.post(
-                'https://zagasm.com/includes/ajax/posts/add_comment.php',
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Accept': 'application/json'
-                    },
-                    withCredentials: true
-                }
+                `${import.meta.env.VITE_API_URL}/includes/ajax/posts/add_comment.php`,
+                formData
             );
-            return response.data.comment;
+
+            if (!response.data) {
+                throw new Error('Empty response from server');
+            }
+            // console.log('post id',post.post_id,'response----',response);
+            // Format the response to match our comment structure
+            return {
+                id: response.data.comment_id,
+                author: user?.username || 'You',
+                avatar: user?.profile_picture || 
+                    'https://zagasm.com/content/themes/default/images/blank_profile.png',
+                text: commentText,
+                timestamp: new Date().toISOString(),
+                likes: 0,
+                author_url: `https://zagasm.com/${user?.username || ''}`,
+                canEdit: true,
+                canDelete: true,
+                reactions: {},
+                isVerified: false,
+                user_id: user?.user_id
+            };
         } catch (error) {
-            console.error('Error posting comment:', error.message);
+            console.error('Error posting comment:', error);
             throw error;
         }
     };
@@ -73,13 +91,19 @@ const CommentContainer = ({ post, comment_data }) => {
         setIsSubmitting(true);
 
         const tempComment = {
-            id: Date.now(),
+            id: `temp-${Date.now()}`,
             author: user?.username || 'You',
-            avatar: user?.profile_picture || 'https://randomuser.me/api/portraits/men/1.jpg',
+            avatar: user?.profile_picture || 
+                'https://zagasm.com/content/themes/default/images/blank_profile.png',
             text: newComment,
             timestamp: new Date().toISOString(),
             likes: 0,
-            author_url: '#',
+            author_url: `https://zagasm.com/${user?.username || ''}`,
+            canEdit: true,
+            canDelete: true,
+            reactions: {},
+            isVerified: false,
+            user_id: user?.user_id,
             isPending: true
         };
 
@@ -93,10 +117,8 @@ const CommentContainer = ({ post, comment_data }) => {
                 prev.map(comment =>
                     comment.id === tempComment.id
                         ? {
-                              ...comment,
-                              id: apiComment.comment_id,
-                              timestamp: apiComment.time,
-                              isPending: false
+                            ...apiComment,
+                            isPending: false
                           }
                         : comment
                 )
@@ -147,7 +169,11 @@ const CommentContainer = ({ post, comment_data }) => {
             >
                 {comments.length > 0 ? (
                     comments.map(comment => (
-                        <SingleComment key={comment.id} comment={comment} isPending={comment.isPending} />
+                        <SingleComment 
+                            key={comment.id} 
+                            comment={comment} 
+                            isPending={comment.isPending}
+                        />
                     ))
                 ) : (
                     <div className="text-center py-4 text-muted">No comments yet</div>

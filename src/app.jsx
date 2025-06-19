@@ -25,7 +25,7 @@ import Navbar from "./pages/pageAssets/Navbar.jsx";
 import Chat from "./pages/chatRoom/index.jsx";
 import MyProfile from "./pages/Profile/Header.jsx";
 import ProfileOutlet from "./pages/Profile/ProfileOutlet.jsx";
-import MyMemes from "./pages/Profile/AllMemes.jsx";
+import MyMemes from "./pages/Profile/AlluserPosts.jsx";
 import LikesMeme from "./pages/Profile/memesLikes.jsx";
 import SavedMeme from "./pages/Profile/savedMemes.jsx";
 import Sessionpage from "./pages/auth/SessionPage/index.jsx";
@@ -59,7 +59,7 @@ export function App() {
 
   return (
     <Fragment>
-      {/* {loading && <FullpagePreloader loading={loading} />} */}
+      {loading && <FullpagePreloader loading={loading} />}
 
       <ToastContainer />
       <NetworkStatus />
@@ -75,7 +75,8 @@ export function App() {
           {/*
           {/* <Route path="onboarding" element={<Onboarding />} /> */}
         </Route>
-        <Route element={<Sessionpage />} location={state?.backgroundLocation || location}>
+        {/* location={state?.backgroundLocation || location} */}
+        <Route element={<Sessionpage />} >
           <Route element={<MainLayout />}>
             <Route index exact path="/" element={<Home />} />
             <Route path="chat" element={<Chat />} />

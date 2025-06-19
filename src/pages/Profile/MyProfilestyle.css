@@ -301,3 +301,16 @@
         margin-left: 0px;
     }
 }
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.post-grid-item {
+  break-inside: avoid;
+  background: #fff;
+}

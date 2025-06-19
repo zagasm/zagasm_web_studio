@@ -10,7 +10,11 @@
     background: white;
 
 }
-
+ .navbar-brand .zagasm_logo{
+    width:120px; 
+    height:100%; 
+    /* height: 60px; */
+}
 .navbar .nav_search .input-group {
     /* box-shadow: 0 0 20px rgba(154, 114, 194, 0.15); */
     border-radius: 5px;
@@ -48,11 +52,6 @@
     transition: 0.3s ease-in-out;
 }
 
-.osahan-nav-top .right-icon {
-    padding: 6px;
-    border-radius: 50%;
-    color: #8000FF;
-}
 
 
 .navbar-nav.middle_nav {
@@ -60,6 +59,7 @@
     justify-content: center;
     gap: 30px
 }
+
 .shadow-sm.side_bar_container {
     border-right: 1px solid rgba(221, 214, 214, 0.596);
     height: calc(100vh - 65px);
@@ -70,27 +70,33 @@
     overflow: hidden;
     width: 300px;
 }
+
 .side_bar_container .list-sidebar .list-group a {
     margin: 10px 0px;
-    font-size: 17px;
+    font-size: 16px;
     background: none;
     /* font-weight: bold; */
 }
+
 .side_bar_container .list-sidebar .list-group a li {
     background: none;
     border: none;
     color: #350466;
 }
+
 .side_bar_container .list-sidebar .list-group a li:hover {
     background: #e4cff881;
 }
+
 .side_bar_container .list-sidebar .list-group a li span {
     /* display: none; */
 }
+
 .side_bar_container .list-sidebar .list-group a li i {
     font-size: 25px;
     color: #8000FF;
 }
+
 .mobile_navbar_container {
     background: white;
     position: fixed;
@@ -115,9 +121,11 @@
     font-size: 25px;
     padding: 0px;
 }
+
 .mobile_navbar_container ul .mobile_icon_name {
     display: none;
 }
+
 .mobile_navbar_container ul .active {
     margin: 0px;
     margin-top: -5px;
@@ -138,17 +146,27 @@
 }
 
 .right_side_bar {
-    margin-top: 65px;
+    /* margin-top: 65px; */
+    /* width: 100%; */
 }
 
 .right_side_bar_inner_container {
     position: fixed;
     right: 20px;
+    top: 70px;
     width: 320px;
     max-height: 100vh;
     overflow-y: auto;
     padding-right: 10px;
     padding-bottom: 200px;
+}
+
+.osahan-nav-top .right-icon::before {
+    padding: 6px;
+    border-radius: 50%;
+    color: #8000FF;
+    font-size: 25px;
+    transition: 0.3s ease-in-out;
 }
 
 @media (max-width: 1265px) {
@@ -159,7 +177,9 @@
 }
 
 @media (max-width: 1205px) {
-    .side_bar_container .list-sidebar .list-group a li span, .side_bar_user_name {
+
+    .side_bar_container .list-sidebar .list-group a li span,
+    .side_bar_user_name {
         display: none;
     }
 
@@ -180,8 +200,8 @@
         /* margin-left: 330px; */
         overflow: hidden;
         margin: 0px;
-        padding-left:0px ;
-        padding-right:0px ;
+        padding-left: 0px;
+        padding-right: 0px;
     }
 }
 
@@ -192,7 +212,9 @@
         display: none;
     }
 
-
+   .osahan-nav-top .right-icon::before{
+        font-size: 20px;
+    }
 
     .mobile_navbar_container {
         display: block;
@@ -202,6 +224,7 @@
         display: none;
     }
 }
+
 .list-group-item:hover {
     background-color: #f0f2f5;
 }

@@ -10,6 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import PostCommentButton from './comment/PostCommentButton';
 import TextFormatter from './PostTextFormatter';
 import PostViewModal from './PostViewMOdal';
+import { useAuth } from '../../pages/auth/AuthContext';
+import axios from 'axios';
+import { Toast } from 'bootstrap/dist/js/bootstrap.bundle.min';
+import { showToast } from '../ToastAlert';
+import ShareButton from './sharePostModal';
+import { ReactionButton } from './ReactionButton';
+import DownloadStyledText from './DownloadAttachment';
+import PostDownloadButton from './DownloadAttachment';
 function SinglePostTemplate({ data, hideCommentButton = false }) {
     const [loading, setLoading] = useState(true);
     const [progress, setProgress] = useState(0);
@@ -118,7 +126,6 @@ function PostHeader({ data }) {
         </div>
     );
 }
-
 function PostContent({ data, currentImageIndex, onImageClick }) {
     const [imageLoadError, setImageLoadError] = useState({});
     const [imageLoading, setImageLoading] = useState(true);
@@ -179,20 +186,18 @@ function PostContent({ data, currentImageIndex, onImageClick }) {
     }
 
     return (
-        <div className="border-bottom osahan-post-body">
+        <div className="border-botto osahan-post-body">
             {data.text && (
-                <div className="post-text-container text-light">
-                    {console.log('color codr - ', data.text_color_code)}
-                    <p className="mb-3 text" style={isTextOnlyPost ? {
+                <div className="post-text-container text-dark">
+                    <div className="mb-3 text" style={isTextOnlyPost ? {
                         background: data.background_color_code,
-                        color: data.text_color_code || 'white',
-                        color: 'white',
+                        color: data.text_color_code || 'black',
                         padding: '80px',
                         fontWeight: 'bolder',
                         textAlign: 'center',
                     } : { margin: '10px' }}>
                         {<TextFormatter text={data.text} />}
-                    </p>
+                    </div>
 
                 </div>
             )}
@@ -328,35 +333,32 @@ function PostContent({ data, currentImageIndex, onImageClick }) {
         </div>
     );
 }
-
 export function PostFooter({ data, hideCommentButton = false }) {
     const [showModal, setShowModal] = useState(false);
-
+    const { user } = useAuth();
     const handleCommentClick = (e) => {
         e.preventDefault();
         setShowModal(true);
     };
 
     return (
-        <footer className="p-3 osahan-post-footer">
+        <footer className="p-3 osahan-post-footer border-bottom">
             <div className="d-flex justify-content-between text-center w-100">
-                <ReactionButton
-                    initialCount={data.reactions_total_count_formatted || 0}
-                    postId={data.id}
-                    emoji="😂"
+                {/* Replace the download button with our new component */}
+               <PostDownloadButton data={data} />
+                
+                <ShareButton
+                    sharesCount={data.shares_formatted || 0}
+                    postUrl={`https://zagasmdemo.netlify.app/posts/${data.post_id}`}
+                    postTitle="Check out this amazing content!"
                 />
-
-                {/* Other buttons remain the same */}
+                
                 {!hideCommentButton && (
                     <button className="text-secondary border-0 bg-transparent" onClick={handleCommentClick}>
-                        <span className="feather-message-square"></span> {data.comments_count_formatted || 0}
+                        <span className="feather-message-square"></span> {data.post_comments && data.post_comments.length || 0}
                     </button>
                 )}
-
-                <button className="text-secondary border-0 bg-transparent">
-                    <span className="feather-share-2"></span> {data.shares_formatted || 0}
-                </button>
-
+                
                 <button
                     className="text-secondary border-0 bg-transparent"
                     aria-label={`Views (${data.views_formatted || 0})`}
@@ -364,6 +366,14 @@ export function PostFooter({ data, hideCommentButton = false }) {
                     <span className="feather-icon feather-eye" aria-hidden="true"></span>
                     <span className="ms-1">{data.views_formatted || 0}</span>
                 </button>
+                
+                <ReactionButton
+                    initialCount={data.reaction_haha_count}
+                    emoji="😂"
+                    postId={data.post_id}
+                    userId={user.user_id}
+                    reactionType="haha"
+                />
             </div>
 
             {!hideCommentButton && showModal && (
@@ -376,113 +386,4 @@ export function PostFooter({ data, hideCommentButton = false }) {
         </footer>
     );
 }
-
-export function ReactionButton({
-    initialCount = 0,
-    emoji = "😂"
-}) {
-    const [reactionCount, setReactionCount] = useState(initialCount);
-    const [isAnimating, setIsAnimating] = useState(false);
-    const audioRef = useRef(null);
-
-    // Base64 encoded fallback beep sound
-    const fallbackBeep = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...';
-
-    useEffect(() => {
-        // Try loading external sound first, then fallback
-        audioRef.current = new Audio();
-        audioRef.current.volume = 0.8;
-        
-        // Try multiple sources
-        const sources = [
-            '/ochoochogift-winner-laugh-154997.mp3',       // First try project sound
-            '/ochoochogift-winner-laugh-154997.mp3',       // Alternate format
-            fallbackBeep              // Fallback base64 sound
-        ];
-
-        let sourceIndex = 0;
-        
-        const tryLoadSource = () => {
-            if (sourceIndex >= sources.length) return;
-            
-            audioRef.current.src = sources[sourceIndex];
-            audioRef.current.load();
-            
-            audioRef.current.onerror = () => {
-                sourceIndex++;
-                tryLoadSource();
-            };
-        };
-        
-        tryLoadSource();
-
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-        };
-    }, []);
-
-    const handleReactionClick = (e) => {
-        e.preventDefault();
-        if (isAnimating) return;
-        
-        setIsAnimating(true);
-        setReactionCount(prev => prev + 1);
-        
-        // Play sound with error handling
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(e => {
-                console.warn("Sound playback failed:", e);
-                // Fallback to Web Audio API if available
-                playFallbackBeep();
-            });
-        } else {
-            playFallbackBeep();
-        }
-        
-        setTimeout(() => setIsAnimating(false), 400);
-    };
-
-    const playFallbackBeep = () => {
-        // Web Audio API fallback
-        if (window.AudioContext || window.webkitAudioContext) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.value = 800;
-            gainNode.gain.value = 0.3;
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.start();
-            setTimeout(() => {
-                oscillator.stop();
-            }, 100);
-        }
-    };
-
-    return (
-        <button
-            className="reaction-button relative border-0 bg-transparent p-0"
-            onClick={handleReactionClick}
-            aria-label="Add reaction"
-        >
-            <span
-                className={`emoji-container ${isAnimating ? 'animate' : ''}`}
-                role="img"
-                aria-hidden="true"
-            >
-                {emoji}
-            </span>
-            <span className="count ms-1">{reactionCount}</span>
-        </button>
-    );
-}
-
 export default SinglePostTemplate;
