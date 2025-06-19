@@ -32,6 +32,7 @@ import Sessionpage from "./pages/auth/SessionPage/index.jsx";
 import CreatePost from "./pages/post/createPost/index.jsx";
 import PostDetailsPage from "./pages/post/postDetails/index.jsx";
 import PostViewModal from "./component/Posts/PostViewMOdal/index.jsx";
+import Post from "./component/Posts/PostViewNoModal/index.jsx";
 
 
 const MainLayout = () => (
@@ -79,7 +80,7 @@ export function App() {
             <Route index exact path="/" element={<Home />} />
             <Route path="chat" element={<Chat />} />
             <Route path="create-post" element={<CreatePost />} />
-            <Route path="/posts/:postId" element={<PostDetailsPage />} />
+            <Route path="/posts/:postId" element={<Post />} />
             <Route path="/myprofile" element={<ProfileOutlet />}>
               <Route index element={<MyMemes />} />
               <Route path="mymemes" element={<LikesMeme />} />
@@ -97,7 +98,7 @@ export function App() {
         {state?.backgroundLocation && (
         <Routes>
           <Route 
-            path="/posts/:postId" 
+            // path="/posts/:postId" 
             element={
               <PostViewModal 
                 show={true} 

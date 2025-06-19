@@ -8,7 +8,7 @@ import { FaRegBookmark, FaHeart } from 'react-icons/fa';
 import './postViewStyle.css';
 import Linkify from 'react-linkify';
 import PostTextFormatter from '../PostTextFormatter';
-import { PostFooter } from '../single';
+import SinglePostTemplate, { PostFooter } from '../single';
 import PostContentLoader from '../../assets/Loader/postContentSection';
 import FullScreenPreloader from './FullScreenPreloader';
 import CommentContainer from '../comment/commentContainer';
@@ -80,119 +80,80 @@ function PostViewModal({ post, show, onHide }) {
                     <meta property="og:description" content={post.text.substring(0, 160)} />
                 )}
             </Helmet>
+
             {isLoading && <FullScreenPreloader />}
+           
             <Modal
                 show={show && !isLoading}
-                onHide={handleClose}
+                onHide={onHide}
                 size="xl"
                 centered
-                fullscreen={true} // Force fullscreen always
-                className="fullscreen-post-modal"
+                className="fullscreen-post-modal p-0 m-0"
                 backdrop="static"
             >
-                <Modal.Header closeButton className="border-0 p-2">
-                    <Modal.Title className="visually-hidden">Post Details</Modal.Title>
-                    {/* Add copy link button to header */}
+                 <span
+                // type="span"
+                // className="btn-clos"
+                onClick={onHide}
+                aria-label="Close"
+                style={{
+                    fontSize: '40px',
+                    padding: '1px',
+                    marginRight: 'auto',
+                    color: 'black',
+                    float: 'right', 
+                    position: 'absolute',
+                    right: '20px',
+                    top: '0px',
+                    // backgroundColor:"#8000FF",
+                    // width: '50px',
+                    height: '50px',
+                    cursor: 'pointer',  
+                    zIndex: 1050, // Ensure it appears above the modal content  
+                    // borderRadius: '50%',
+                    // boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' // Optional shadow for better visibility 
+
+                }}
+            >
+                &times;
+            </span>
+                <Modal.Header className="border-0 p-2 pt-4 d-flex align-items-center">
+                    {/* Close Button (X icon) */}
+
+
+                    {/* Post Title or Author */}
+                    <div className="mx-auto">
+                        <h6 className="mb-0">{post.post_author_name}'s Post</h6>
+                    </div>
+
+                    {/* Copy Link Button */}
                     {/* <Button
+                    type='button'
                         variant="link"
                         className="text-dark ms-auto"
                         onClick={handleCopyLink}
+                        style={{ padding: '0.5rem' }}
                     >
-                        <FiShare2 size={20} /> Copy Link
+                        <FiShare2 size={20} />
                     </Button> */}
-                    <div className="post-header p-3 d-flex align-items-center border-bottom w-100">
-                        <Image
-                            src={post.post_author_picture || 'https://via.placeholder.com/40'}
-                            roundedCircle
-                            width={40}
-                            height={40}
-                            className="me-3"
-                        />
-                        <div className="flex-grow-1">
-                            <h6 className="mb-0 fw-bold">{post.post_author_name}</h6>
-                            <small className="text-muted">
-                                <TimeAgo date={post.time} />
-                            </small>
-                        </div>
-                        {/* <Button variant="link" className="text-dark p-0">
-                            <BsThreeDots size={20} />
-                        </Button> */}
-                    </div>
                 </Modal.Header>
+
                 <Modal.Body className="p-0 d-flex flex-column flex-md-row">
                     {/* Post Content Section */}
                     <div className={`post-content-section ${isMobile ? 'mobile-post' : ''}`}>
                         {isLoading ? (
                             <PostContentLoader />
                         ) : (
-                            <>
-
-
-                                <div className="post_content_container">
-                                    <div className="post-body ">
-                                        <div className='p-2'>
-                                            {post.text && (
-                                                <PostTextFormatter
-                                                    className=' mx-auto' style={{ maxWidth: '800px', height: '100%' }}
-                                                    text={post.text}
-                                                    isTextOnlyPost={isTextOnlyPost}
-                                                    background_color_code={post.background_color_code}
-                                                    text_color_code={post.text_color_code}
-                                                />
-                                            )}
-                                        </div>
-
-                                        {post.photos && post.photos.length > 0 && (
-                                            <div className="post-image-container">
-                                                <Carousel
-                                                    activeIndex={currentImageIndex}
-                                                    onSelect={handleSelect}
-                                                    indicators={post.photos.length > 1}
-                                                    controls={post.photos.length > 1}
-                                                    interval={null}
-                                                    touch={true}
-                                                    className="post-carousel"
-                                                >
-                                                    {post.photos.map((photo, index) => (
-                                                        <Carousel.Item key={index}>
-                                                            <div className="d-flex justify-content-center align-items-center"
-                                                                style={{ backgroundColor: 'rgba(24, 24, 24, 0.5)', minHeight: '300px' }}>
-                                                                <img
-                                                                    src={`https://zagasm.com/content/uploads/${photo.source}`}
-                                                                    className="d-block img-fluid"
-                                                                    style={{
-                                                                        maxHeight: '70vh',
-                                                                        objectFit: 'contain',
-                                                                        width: 'auto',
-                                                                        margin: '0 auto'
-                                                                    }}
-                                                                    alt={`Post content ${index + 1}`}
-                                                                />
-                                                            </div>
-                                                        </Carousel.Item>
-                                                    ))}
-                                                </Carousel>
-
-                                                {post.photos.length > 1 && (
-                                                    <div className="position-absolute top-0 end-0 m-2 bg-dark text-white px-2 py-1 rounded">
-                                                        {`${currentImageIndex + 1}/${post.photos.length}`}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="post-footer px-3 m-auto pb-2 border-top" style={{ maxWidth: '800px', height: '100%' }}>
-                                        <PostFooter data={post} />
-                                        <hr />
-                                    </div>
-                                </div>
-                            </>
+                            <SinglePostTemplate
+                                key={post.post_id}
+                                data={post}
+                                hideCommentButton={true}
+                            />
                         )}
                     </div>
 
                     {/* Comments Section */}
-                    <CommentContainer post={post} show={show} />
+                    <CommentContainer post={post}  comment_data={post.post_comments} />
                 </Modal.Body>
             </Modal>
         </>

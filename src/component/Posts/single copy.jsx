@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import friendImage from '../../assets/img/IMG_9488.jpeg';
 import SinglePostLoader from '../assets/Loader/SinglePostLoader';
 import { Carousel } from 'react-bootstrap'; // Import Carousel from react-bootstrap
@@ -9,12 +9,17 @@ import Linkify from 'react-linkify';
 import { useNavigate } from 'react-router-dom';
 import PostCommentButton from './comment/PostCommentButton';
 import TextFormatter from './PostTextFormatter';
-import PostViewModal from './PostViewMOdal';
-function SinglePostTemplate({ data, hideCommentButton = false }) {
+function SinglePostTemplate({ data }) {
     const [loading, setLoading] = useState(true);
     const [progress, setProgress] = useState(0);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [showCommentsModal, setShowCommentsModal] = useState(false); // Add this state
+    const [showCarousel, setShowCarousel] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);  // Initialize with 0
+    const navigate = useNavigate();
+
+
+    const handlePostClick = () => {
+        navigate(`/posts/${data.post_id}`);
+    };
 
     useEffect(() => {
         if (data) {
@@ -33,6 +38,9 @@ function SinglePostTemplate({ data, hideCommentButton = false }) {
         }
     }, [data]);
 
+
+
+
     if (loading) {
         return <SinglePostLoader />;
     }
@@ -44,11 +52,15 @@ function SinglePostTemplate({ data, hideCommentButton = false }) {
                 data={data}
                 currentImageIndex={currentImageIndex}
                 onImageClick={setCurrentImageIndex}
+                onPostClick={handlePostClick}
             />
-            <PostFooter data={data} totalComment={data.post_comments} hideCommentButton={hideCommentButton} />
+            <PostFooter data={data} onCommentClick={handlePostClick} />
+
+
         </div>
     );
 }
+
 function PostHeader({ data }) {
     return (
         <div className="p-3 d-flex align-items-center border-bottom osahan-post-header">
@@ -181,19 +193,17 @@ function PostContent({ data, currentImageIndex, onImageClick }) {
     return (
         <div className="border-bottom osahan-post-body">
             {data.text && (
-                <div className="post-text-container text-light">
-                    {console.log('color codr - ', data.text_color_code)}
+                <div className="post-text-container">
                     <p className="mb-3 text" style={isTextOnlyPost ? {
                         background: data.background_color_code,
-                        color: data.text_color_code || 'white',
-                        color: 'white',
+                        color: data.text_color_code || '#000',
                         padding: '80px',
                         fontWeight: 'bolder',
                         textAlign: 'center',
                     } : { margin: '10px' }}>
                         {<TextFormatter text={data.text} />}
                     </p>
-
+                  
                 </div>
             )}
 
@@ -209,7 +219,7 @@ function PostContent({ data, currentImageIndex, onImageClick }) {
                             prevIcon={<span aria-hidden="true" className="custom-prev-icon" />}
                             nextIcon={<span aria-hidden="true" className="custom-next-icon" />}
                             className="zagasm-carousel"
-                            wrap={false}
+                            wrap={false} 
                         >
                             {data.photos.map((photo, index) => (
                                 <Carousel.Item key={index}>
@@ -329,159 +339,20 @@ function PostContent({ data, currentImageIndex, onImageClick }) {
     );
 }
 
-export function PostFooter({ data, hideCommentButton = false }) {
-    const [showModal, setShowModal] = useState(false);
-
-    const handleCommentClick = (e) => {
-        e.preventDefault();
-        setShowModal(true);
-    };
-
+export function PostFooter({ data, onCommentClick }) {
     return (
-        <footer className="p-3 osahan-post-footer">
-            <div className="d-flex justify-content-between text-center w-100">
-                <ReactionButton
-                    initialCount={data.reactions_total_count_formatted || 0}
-                    postId={data.id}
-                    emoji="😂"
-                />
-
-                {/* Other buttons remain the same */}
-                {!hideCommentButton && (
-                    <button className="text-secondary border-0 bg-transparent" onClick={handleCommentClick}>
-                        <span className="feather-message-square"></span> {data.comments_count_formatted || 0}
-                    </button>
-                )}
-
-                <button className="text-secondary border-0 bg-transparent">
-                    <span className="feather-share-2"></span> {data.shares_formatted || 0}
-                </button>
-
-                <button
-                    className="text-secondary border-0 bg-transparent"
-                    aria-label={`Views (${data.views_formatted || 0})`}
-                >
-                    <span className="feather-icon feather-eye" aria-hidden="true"></span>
-                    <span className="ms-1">{data.views_formatted || 0}</span>
-                </button>
-            </div>
-
-            {!hideCommentButton && showModal && (
-                <PostViewModal
-                    post={data}
-                    show={showModal}
-                    onHide={() => setShowModal(false)}
-                />
-            )}
-        </footer>
-    );
-}
-
-export function ReactionButton({
-    initialCount = 0,
-    emoji = "😂"
-}) {
-    const [reactionCount, setReactionCount] = useState(initialCount);
-    const [isAnimating, setIsAnimating] = useState(false);
-    const audioRef = useRef(null);
-
-    // Base64 encoded fallback beep sound
-    const fallbackBeep = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...';
-
-    useEffect(() => {
-        // Try loading external sound first, then fallback
-        audioRef.current = new Audio();
-        audioRef.current.volume = 0.8;
-        
-        // Try multiple sources
-        const sources = [
-            '/ochoochogift-winner-laugh-154997.mp3',       // First try project sound
-            '/ochoochogift-winner-laugh-154997.mp3',       // Alternate format
-            fallbackBeep              // Fallback base64 sound
-        ];
-
-        let sourceIndex = 0;
-        
-        const tryLoadSource = () => {
-            if (sourceIndex >= sources.length) return;
-            
-            audioRef.current.src = sources[sourceIndex];
-            audioRef.current.load();
-            
-            audioRef.current.onerror = () => {
-                sourceIndex++;
-                tryLoadSource();
-            };
-        };
-        
-        tryLoadSource();
-
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-        };
-    }, []);
-
-    const handleReactionClick = (e) => {
-        e.preventDefault();
-        if (isAnimating) return;
-        
-        setIsAnimating(true);
-        setReactionCount(prev => prev + 1);
-        
-        // Play sound with error handling
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(e => {
-                console.warn("Sound playback failed:", e);
-                // Fallback to Web Audio API if available
-                playFallbackBeep();
-            });
-        } else {
-            playFallbackBeep();
-        }
-        
-        setTimeout(() => setIsAnimating(false), 400);
-    };
-
-    const playFallbackBeep = () => {
-        // Web Audio API fallback
-        if (window.AudioContext || window.webkitAudioContext) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.value = 800;
-            gainNode.gain.value = 0.3;
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.start();
-            setTimeout(() => {
-                oscillator.stop();
-            }, 100);
-        }
-    };
-
-    return (
-        <button
-            className="reaction-button relative border-0 bg-transparent p-0"
-            onClick={handleReactionClick}
-            aria-label="Add reaction"
-        >
-            <span
-                className={`emoji-container ${isAnimating ? 'animate' : ''}`}
-                role="img"
-                aria-hidden="true"
-            >
-                {emoji}
-            </span>
-            <span className="count ms-1">{reactionCount}</span>
-        </button>
+        <div className="p-3 osahan-post-footer d-flex justify-content-between text-center w-100 row post_icon_containe">
+            <a href="#" className="text-secondary col">
+                <i className="feather-hear">😍</i> {data.reactions_total_count_formatted || 0}
+            </a>
+            {onCommentClick && <PostCommentButton postId={data.post_id} />}
+            <a href="#" className="text-secondary col">
+                <i className="feather-share-2"></i> {data.shares_formatted || 0}
+            </a>
+            <a href="#" className="text-secondary col">
+                <i className="feather-eye"></i> {data.views_formatted || 0}
+            </a>
+        </div>
     );
 }
 

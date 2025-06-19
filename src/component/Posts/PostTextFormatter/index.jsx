@@ -1,30 +1,57 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './postFormattingstyle.css';
+import React, { useState } from 'react';
+import Linkify from 'react-linkify';
 
-const PostTextFormatter = ({ htmlContent }) => {
-  const createMarkup = () => {
-    // First, decode HTML entities
-    const decoded = new DOMParser().parseFromString(htmlContent, 'text/html').body.textContent;
-    
-    // Then reconstruct with proper formatting
-    const formatted = decoded
-      .replace(/\n/g, '<br />') // Preserve newlines
-      .replace(/<a /g, '<a target="_blank" rel="noopener noreferrer nofollow" class="formatted-link" ');
+const TextFormatter = ({ text, maxLength = 150 }) => {
+  const [showFullText, setShowFullText] = useState(false);
+  
+  if (!text) return null;
 
-    return { __html: formatted };
+  // Format text with line breaks and links
+  const formatText = (text) => {
+    return text.split('\n').map((paragraph, i) => (
+      <div key={i} style={{ marginBottom: '0.5rem' }}>
+        <Linkify
+          componentDecorator={(decoratedHref, decoratedText, key) => (
+            <a 
+              key={key} 
+              href={decoratedHref.startsWith('www') ? `http://${decoratedHref}` : decoratedHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'underline' }}
+            >
+              {decoratedText}
+            </a>
+          )}
+        >
+            
+          {paragraph}
+        </Linkify>
+      </div>
+    ));
   };
 
+  const needsTruncation = text.length > maxLength;
+  const displayText = showFullText ? text : (needsTruncation ? text.substring(0, maxLength) + '...' : text);
+
   return (
-    <div 
-      className="post-html-content"
-      dangerouslySetInnerHTML={createMarkup()}
-    />
+    <div className="post-text" style={{ whiteSpace: 'pre-line' }}>
+      {formatText(displayText)}
+      {needsTruncation && (
+        <button 
+          onClick={() => setShowFullText(!showFullText)}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            textDecoration: 'underline'
+          }}
+        >
+          {showFullText ? 'Show less' : 'Read more'}
+        </button>
+      )}
+    </div>
   );
 };
 
-PostTextFormatter.propTypes = {
-  htmlContent: PropTypes.string.isRequired,
-};
-
-export default PostTextFormatter;
+export default TextFormatter;

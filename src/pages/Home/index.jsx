@@ -11,6 +11,7 @@ import { usePost } from '../../component/Posts/PostContext';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import SideAds from '../../component/ads/sideAds';
 
 // import LoadingOverlay from '../../assets/projectOverlay';
 
@@ -37,8 +38,8 @@ function Home() {
 
             <div className="container-fluid p-0">
                 <SideBarNav />
-                <div className="row offset-xl-3 offset-lg-1 offset-md-1">
-                    <main className="col col-xl-8 order-xl-2 col-lg-8 order-lg-1 col-md-12 col-sm-12 col-12 main_container">
+                <div className="row offset-xl-4 offset-lg-1 offset-md-1 ">
+                    <main className="col col-xl-6  col-lg-8  col-md-12 col-sm-12 col-12 main_container  m-0 " >
 
                         {/* <div className="mb-3 shadow-s rounded box bg-whit osahan-slider-main">
                             <div className="osahan-slide mt-4">
@@ -103,8 +104,8 @@ function Home() {
                                 </Slider>
                             </div>
                         </div> */}
-                        <div className="containe">
-                            {HomePostData && HomePostData.length > 0  ? (
+                           <div>
+                             {HomePostData && HomePostData.length > 0  ? (
                                 HomePostData.map(post => (
                                     <SinglePostTemplate
                                         key={post.post_id}
@@ -116,12 +117,12 @@ function Home() {
                                     <p>Fetching for posts <span className='fa fa-spinner fa-spin'></span></p>
                                 </div>
                             )}
-                        </div>
+                           </div>
                     </main>
 
                     <RightBarComponent>
                         <SuggestedFriends />
-                        {/* <SideAds /> */}
+                        <SideAds />
                     </RightBarComponent>
                 </div>
             </div>

@@ -89,3 +89,153 @@
   color: #999;
   font-size: 14px;
 }
+
+/* Main Carousel Container */
+.zagasm-carousel {
+  overflow: hidden;
+  background-color: #000; /* Optional: if you want a black background */
+}
+
+/* Carousel Item - removes all default backgrounds */
+.zagasm-carousel .carousel-item {
+  background-color: transparent;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Image container - ensures consistent sizing */
+.carousel-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+}
+
+/* Image styling */
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder styles */
+.image-error-placeholder,
+.image-loading-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+/* Arrow buttons styling */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 40px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.zagasm-carousel:hover .carousel-control-prev,
+.zagasm-carousel:hover .carousel-control-next {
+  opacity: 1;
+}
+
+.custom-prev-icon,
+.custom-next-icon {
+  /* background-color: rgba(0, 0, 0, 0.3); */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-prev-icon:after,
+.custom-next-icon:after {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid white;
+  border-top: 2px solid white;
+}
+
+.custom-prev-icon:after {
+  transform: rotate(-135deg);
+  margin-left: 4px;
+}
+
+.custom-next-icon:after {
+  transform: rotate(45deg);
+  margin-right: 4px;
+}
+
+/* Dot indicators */
+.carousel-indicators {
+  bottom: 10px;
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin: 0 3px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+}
+
+.carousel-indicators .active {
+  background-color: #0095f6;
+}
+.osahan-post-footer button {
+  display: inline-block;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+
+/* Reaction Button Animation */
+.reaction-button {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.emoji-container {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.emoji-container.animate {
+    animation: tiktok-bounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tiktok-bounce {
+    0% { transform: scale(1); }
+    25% { transform: scale(3); }
+    50% { transform: scale(4); }
+    75% { transform: scale(6); }
+    100% { transform: scale(9); }
+}
+
+.count {
+    transition: transform 0.9s ease;
+}
+
+.reaction-button:hover .emoji-container {
+    transform: scale(1.1);
+}
+
+.reaction-button:hover .count {
+    transform: translateY(-1px);
+}

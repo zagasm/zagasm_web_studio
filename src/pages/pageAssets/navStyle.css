@@ -179,6 +179,9 @@
         padding-bottom: 65px;
         /* margin-left: 330px; */
         overflow: hidden;
+        margin: 0px;
+        padding-left:0px ;
+        padding-right:0px ;
     }
 }
 

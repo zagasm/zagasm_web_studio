@@ -7,7 +7,7 @@ const FullScreenPreloader = () => {
         <div className="fullscreen-preloader">
             <div className="preloader-content">
                 <Spinner animation="border" variant="primary" className="preloader-spinner" />
-                {/* <h5 className="mt-3">Loading post...</h5> */}
+                <h5 className="mt-3">Loading post...</h5>
             </div>
         </div>
     );
