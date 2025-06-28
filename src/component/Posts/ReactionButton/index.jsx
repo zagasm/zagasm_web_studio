@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import './ReactionStyle.css';
 export function ReactionButton({
     initialCount,
     emoji = "😂",
     postId,
     userId,
+    i_react,
     reactionType = "haha"
 }) {
     const [reactionCount, setReactionCount] = useState(initialCount);
     const [isAnimating, setIsAnimating] = useState(false);
     const audioRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [current_i_react, setIscurrent_i_react] = useState(i_react);
     // Base64 encoded fallback beep sound
     const fallbackBeep = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...';
 
@@ -69,11 +72,18 @@ export function ReactionButton({
                     }
                 }
             );
-
+            console.log(response.data);
             if (response.data.success) {
-                // Use the exact count from server response
                 const serverCount = parseInt(response.data.reactions[`reaction_${reactionType}_count`]);
                 setReactionCount(serverCount);
+                if (response.data.i_react == 'haha') {
+                    setIscurrent_i_react(true);
+                    setReactionCount(serverCount - 1);
+                } else {
+                    setIscurrent_i_react(false)
+                }
+                // Use the exact count from server response
+
                 // console.log('Reaction successfully sent:', serverCount);
                 // showToast.info(response.data.message);
             } else {
@@ -106,7 +116,6 @@ export function ReactionButton({
         } else {
             playFallbackBeep();
         }
-
         // Send reaction to server
         sendReactionToServer();
 
@@ -133,21 +142,26 @@ export function ReactionButton({
             }, 100);
         }
     };
-
+    console.log('reaction', i_react);
     return (
         <button
-            className="reaction-button relative border-0 bg-transparent p-0"
+            className=" relative border-0 bg-transparent p-0"
             onClick={handleReactionClick}
             aria-label="Add reaction"
         >
             <span
-                className={`emoji-container ${isAnimating ? 'animate' : ''}`}
+
+                className={` emoji-container reaction-button reaction_btn post_icon shadow-sm pr-2 pl-2  ${current_i_react ? 'i_react' : ''}  ${isAnimating ? 'animate' : ''}`}
                 role="img"
                 aria-hidden="true"
             >
-                {emoji}
+                <span className=' '>{emoji}</span>
+                <span  className="count ms-1" style={{ marginTop: '-40px', }}>
+
+                    {current_i_react ? reactionCount > 1 ?  'You & '+ reactionCount : 'You reacted'  : reactionCount}
+
+                </span>
             </span>
-            <span className="count ms-1">{reactionCount}</span>
         </button>
     );
 }

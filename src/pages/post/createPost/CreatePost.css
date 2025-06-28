@@ -43,7 +43,7 @@
   top: -6px;
   right: -6px;
   background: red;
-  color: #8000FF;;
+  color: #8000FF;
   border: none;
   border-radius: 50%;
   padding: 2px 6px;
@@ -120,7 +120,7 @@
   height: 20px;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #8000FF;
+  background-color: #00000091;
   border-radius: 50%;
   opacity: 0.85;
   transition: opacity 0.3s ease;

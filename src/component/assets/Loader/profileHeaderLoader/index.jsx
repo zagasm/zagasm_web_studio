@@ -25,7 +25,7 @@ function ShimmerLoader() {
                                 <div className="profile-picture-container shimmer-circle"></div>
 
                                 <div className="profile-details w-100 px-3">
-                                    <div className="shimmer shimmer-line w-50 mb-2"></div>
+                                    <div className="shimmer shimmer-line w-50 mb-2  m-auto "></div>
                                     <div className="shimmer shimmer-line w-25 mb-3"></div>
 
                                     <div className="d-flex">

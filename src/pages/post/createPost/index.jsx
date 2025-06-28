@@ -333,8 +333,8 @@ function CreatePost() {
             <div className="container-fluid p-0">
                 <SideBarNav />
 
-                <div className="row offset-xl-3 offset-lg-1 offset-md-1 create-post-row">
-                    {isLoading ? <PostShimmerLoader /> : <main className="col col-xl-8 order-xl-2 col-lg-8 order-lg-1 col-md-12 col-sm-12 col-12 main_container ">
+                <div className=" offset-xl-3 offset-lg-1 offset-md-1 create-post-row">
+                    {isLoading ? <PostShimmerLoader /> : <main className="col col-xl-7 col-lg-6 col-md-12 col-sm-12 col-12 main-container main_container " style={{paddingTop:'65px'}}>
                         {/* <div className="container my-4"> */}
                         <div className="card shadow-sm p-4 rounded ">
                             <h5 className="mb-4" style={{ color: '#8000FF' }}>Create a Post</h5>
@@ -356,8 +356,9 @@ function CreatePost() {
                                                 style={{
                                                     backgroundColor: textBgColor,
                                                     color: textColor,
-                                                    border: textExceedsLimit ? '2px solid red' : '1px solid #ccc',
+                                                    borderBottom: textExceedsLimit ? '2px solid red' : '1px solid #ccc',
                                                     borderRadius: '10px',
+                                                    border:'none',
                                                     textAlign: 'center',
                                                     fontSize: '16px',
                                                     fontWeight: 'bolder',
@@ -366,7 +367,8 @@ function CreatePost() {
                                                     height: '200px',
                                                     paddingTop: '80px',
                                                     paddingBottom: '80px',
-                                                    transition: 'all 0.3s ease'
+                                                    transition: 'all 0.3s ease',
+                                                    border:'none'
                                                 }}
                                             />
                                             <div className="d-flex justify-content-between mt-1">

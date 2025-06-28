@@ -25,14 +25,14 @@ import Navbar from "./pages/pageAssets/Navbar.jsx";
 import Chat from "./pages/chatRoom/index.jsx";
 import MyProfile from "./pages/Profile/Header.jsx";
 import ProfileOutlet from "./pages/Profile/ProfileOutlet.jsx";
-import MyMemes from "./pages/Profile/AlluserPosts.jsx";
-import LikesMeme from "./pages/Profile/memesLikes.jsx";
-import SavedMeme from "./pages/Profile/savedMemes.jsx";
+import UserPost from "./pages/Profile/AlluserPosts.jsx";
 import Sessionpage from "./pages/auth/SessionPage/index.jsx";
 import CreatePost from "./pages/post/createPost/index.jsx";
 import PostDetailsPage from "./pages/post/postDetails/index.jsx";
 import PostViewModal from "./component/Posts/PostViewMOdal/index.jsx";
-import Post from "./component/Posts/PostViewNoModal/index.jsx";
+import Post from "./component/Posts/ReadPost/index.jsx";
+import ExplorePage from "./pages/Explore/index.jsx";
+import Notifications from "./pages/Notification/index.jsx";
 
 
 const MainLayout = () => (
@@ -79,14 +79,15 @@ export function App() {
         <Route element={<Sessionpage />} >
           <Route element={<MainLayout />}>
             <Route index exact path="/" element={<Home />} />
+            <Route path="notification" element={<Notifications />} />
             <Route path="chat" element={<Chat />} />
+            <Route path="chat/:recipient_id" element={<Chat />} />
+            <Route path="explore" element={<ExplorePage />} />
             <Route path="create-post" element={<CreatePost />} />
             <Route path="/posts/:postId" element={<Post />} />
-            <Route path="/myprofile" element={<ProfileOutlet />}>
-              <Route index element={<MyMemes />} />
-              <Route path="mymemes" element={<LikesMeme />} />
-              <Route path="savedmemes" element={<SavedMeme />} />
-
+            <Route path=":profileId" element={<ProfileOutlet />}>
+              <Route index element={<UserPost />} />
+              {/* <Route path="mymemes" element={<LikesMeme />} /> */}
             </Route>
 
           </Route>
@@ -96,16 +97,16 @@ export function App() {
         <Route path="*" element={<Error404 />} />
       </Routes>
 
-        {state?.backgroundLocation && (
+      {state?.backgroundLocation && (
         <Routes>
-          <Route 
+          <Route
             // path="/posts/:postId" 
             element={
-              <PostViewModal 
-                show={true} 
-                onHide={() => navigate(-1)} 
+              <PostViewModal
+                show={true}
+                onHide={() => navigate(-1)}
               />
-            } 
+            }
           />
         </Routes>
       )}

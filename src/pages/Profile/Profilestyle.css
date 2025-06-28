@@ -1,0 +1,445 @@
+.profile-wrapper {
+    background-color: #f0f2f5;
+    /* min-height: 100vh; */
+}
+
+.cover-photo-container {
+    position: relative;
+}
+
+.cover-photo-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.cover-action-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.profile-picture-container {
+    margin-top: -50px;
+    position: relative;
+}
+
+.profile-picture-wrapper {
+    position: relative;
+}
+
+.profile-picture {
+    width: 168px;
+    height: 168px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+.profile-picture-action {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: #a158eb;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+}
+
+.profile-name {
+    font-size: 32px;
+    font-weight: 700;
+    text-align: left;
+    color: #a158eb;
+
+}
+
+.profile-username {
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .profile-name {
+        font-size: 24px;
+        text-align: center;
+        margin-left: 20px;
+    }
+
+    .profile-username {
+        text-align: center;
+    }
+}
+
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #8000FF;
+    border-radius: 50%;
+    color: white;
+}
+
+.profile-stats {
+    margin-top: 10px;
+}
+
+.profile-stats .profile_icon {
+    display: none;
+}
+
+.stat-item {
+    cursor: pointer;
+    margin: 0px;
+    margin: 0px 10px;
+}
+
+.stat-number {
+    font-weight: 600;
+    color: #a158eb;
+    /* margin-right: 5px; */
+}
+
+.stat-label {
+    color: #65676b;
+    font-size: 14px;
+}
+
+@media (max-width: 576px) {
+    .profile-stats {
+        align-items: center;
+    }
+
+
+
+    .profile-name {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .profile-stats .profile_icon {
+        display: block;
+        background-color: #ecebeea4;
+        color: #a158eb;
+        width: 40px;
+        height: 40px;
+        margin: 10px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-stats .stat-item {
+        margin: 0px 30px;
+    }
+
+    .stat-number {
+        display: block;
+        color: black;
+    }
+
+    .stat-label {
+        display: block;
+    }
+}
+
+.profile-navigation {
+    position: sticky;
+    top: 60px;
+    z-index: 10;
+}
+
+.profile-nav {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-nav .nav-link {
+    padding: 16px;
+    color: #65676b;
+    font-weight: 600;
+
+
+}
+
+@media (max-width: 768px) {
+    .profile-nav .nav-link {
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+}
+
+.profile-nav .nav-link.active {
+    color: #8000FF;
+    border-bottom: 3px solid #8000FF;
+}
+
+.intro-details {
+    margin: 10px 0;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.photos-grid,
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.photo-item img,
+.friend-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.friend-item {
+    text-align: center;
+}
+
+.friend-item span {
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.post-user-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.post-input {
+    border-radius: 20px;
+    background: #f0f2f5;
+    border: none;
+    padding: 10px 15px;
+}
+
+.post-image {
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Profile Header */
+.profile-header {
+    position: relative;
+}
+
+/* Profile Details */
+.profile-details {
+    line-height: 20px;
+    margin-left: 20px;
+    /* display: ; */
+}
+
+/* Profile Actions */
+.profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.profile-actions button {
+    background: #8000ff;
+    color: white;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 0 20px rgba(128, 0, 255, 0.15);
+    transition: 0.4ms ease-in-out;
+}
+
+@media (min-width: 768px) {
+    .profile-actions {
+        justify-content: flex-end;
+    }
+
+
+}
+
+/* Profile Picture Positioning */
+.profile-picture-container {
+    margin-top: -50px;
+    position: relative;
+    flex-shrink: 0;
+    /* Prevent shrinking on desktop */
+}
+
+@media (max-width: 767.98px) {
+    .profile-picture-container {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .profile-details {
+        margin-left: 0px;
+    }
+}
+
+.post-grid {
+    display: grid;
+    gap: 1rem;
+    margin: 0 auto;
+    padding: 0;
+    width: 100%;
+}
+
+/* Mobile view (default) - 2 columns */
+.post-grid {
+    grid-template-columns: repeat(1, 1fr);
+}
+
+/* Tablet view (min-width: 768px) - 3 columns */
+@media (min-width: 768px) {
+    .post-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Laptop/desktop view (min-width: 1024px) - 4 columns */
+@media (min-width: 1024px) {
+    .post-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Optional: Adjust the minimum column width if needed */
+.post-grid-item {
+    min-width: 0;
+    /* Allows items to shrink below their default minimum width */
+}
+
+/* Keep your existing overlay styles */
+.post-grid-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.post-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.253);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Rest of your existing overlay styles... */
+
+.post-grid-item {
+    break-inside: avoid;
+    background: #fff;
+}
+
+/* Post grid item with relative positioning for absolute overlay */
+.post-grid-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* Overlay styles */
+.post-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.096);
+    opacity: 3;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:0px;margin:0px
+    /* opacity: 1; */
+}
+
+/* .post-grid-item:hover .post-grid-overlay {
+} */
+
+/* Overlay content styles */
+.overlay-content {
+    display: flex;
+    gap: 15px;
+}
+
+.overlay-button {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.overlay-button:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.overlay-icon {
+    color: #333;
+    font-size: 18px;
+}
+
+/* Love icon styles */
+.chart-icon-container {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    color: white;
+    /* font-size: 24px; */
+}
+
+.chart-icon {
+    color: white;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.397));
+    transition: transform 0.2s ease, color 0.2s ease;
+    fill: white;
+    color: white;
+    filter: brightness(0) invert(20);
+}
+
+.chart-icon:hover {
+    color: #ff4081;
+    transform: scale(1.2);
+}

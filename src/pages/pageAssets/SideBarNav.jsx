@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import './navStyle.css';
 import SidebarLoader from '../../component/assets/Loader/sidebarLoader';
 // import SidebarLoader from './SidebarLoader'; // import loader
-import NewsFeed from '../../assets/newsfeed.png';
-import bookmark from '../../assets/bookmark.png';
-import community from '../../assets/community.png';
-import chat from '../../assets/chat.webp';
-import pages from '../../assets/pages.png';
+
+import home_icon from '../../assets/nav_icon/Home.svg';
+import saved_icon from '../../assets/nav_icon/saved_icon.svg';
+import chat_icon from '../../assets/nav_icon/chat_icon.svg';
+import template_icon from '../../assets/nav_icon/template_icon.svg';
 import { useAuth } from '../auth/AuthContext';
 import default_profilePicture from '../../assets/avater_pix.avif';
 function SideBarNav() {
@@ -27,64 +27,29 @@ function SideBarNav() {
                 <ul className="list-group list-group-flush side_bar_nav">
                     <Link to="/">
                         <li className="list-group-item pl-3 pr-3 d-flex align-items-center">
-                            <i className="fas fa-newspaper" style={{
-                                width: '35px',
-                                marginRight: '20px',
-                                fontSize: '20px',
-                                color: '#8000FF',
-                                textAlign: 'center'
-                            }}></i>
-                            <span className="link_name">Post feed</span>
+                            <img src={home_icon} />
+                            <span className="link_name">Home</span>
                         </li>
                     </Link>
                     <Link to="#">
                         <li className="list-group-item pl-3 pr-3 d-flex align-items-center">
-                            <i className="fas fa-bookmark" style={{
-                                width: '35px',
-                                marginRight: '20px',
-                                fontSize: '20px',
-                                color: '#8000FF',
-                                textAlign: 'center'
-                            }}></i>
-                            <span className="link_name">Saved Posts</span>
+                            <img src={saved_icon} />
+                            <span className="link_name">Saved </span>
                         </li>
                     </Link>
                     <Link to="/chat">
                         <li className="list-group-item pl-3 pr-3 d-flex align-items-center">
-                            <i className="fas fa-comment-dots" style={{
-                                width: '35px',
-                                marginRight: '20px',
-                                fontSize: '20px',
-                                color: '#8000FF',
-                                textAlign: 'center'
-                            }}></i>
-                            <span className="link_name">Messaging</span>
+                            <img src={chat_icon} />
+                            <span className="link_name">Chat</span>
                         </li>
                     </Link>
-                    <Link to="#">
+                    <Link to="/create-post">
                         <li className="list-group-item pl-3 pr-3 d-flex align-items-center">
-                            <i className="fas fa-users" style={{
-                                width: '35px',
-                                marginRight: '20px',
-                                fontSize: '20px',
-                                color: '#8000FF',
-                                textAlign: 'center'
-                            }}></i>
-                            <span className="link_name">People</span>
+                            <img src={template_icon} />
+                            <span className="link_name">Template</span>
                         </li>
                     </Link>
-                    <Link to="#">
-                        <li className="list-group-item pl-3 pr-3 d-flex align-items-center">
-                            <i className="fas fa-flag" style={{
-                                width: '35px',
-                                marginRight: '20px',
-                                fontSize: '20px',
-                                color: '#8000FF',
-                                textAlign: 'center'
-                            }}></i>
-                            <span className="link_name">Pages</span>
-                        </li>
-                    </Link>
+
                 </ul>
             </div>
 

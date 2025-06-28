@@ -5,7 +5,7 @@ import {
     FiLinkedin, FiMessageSquare, FiX
 } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
-
+import shared_icon from '../../../assets/post_icon/shared_icon.svg';
 function ShareButton({ sharesCount = 0, postUrl = '', postTitle = '' }) {
     const [showModal, setShowModal] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
@@ -61,9 +61,10 @@ function ShareButton({ sharesCount = 0, postUrl = '', postTitle = '' }) {
             <Button
                 variant="light"
                 onClick={handleShow}
-                className="d-flex align-items-center border-none"
+                className="d-flex align-items-center border-none post_icon"
+                style={{background:'none', border:'none', outline:'none'}}
             >
-                <FiShare2 className="me-1" />
+                <img src={shared_icon} className="me-1 post_icon" />
                 <span style={{ fontWeight: 500 }}></span>
             </Button>
 

@@ -25,8 +25,8 @@ function Home() {
         <div className="py-4">
             <div className="container-fluid p-0">
                 <SideBarNav />
-                <div className="ro offset-xl-4 offset-lg-1 offset-md-1  bg-none ">
-                    <main className="col col-xl-6  col-lg-8  col-md-12 col-sm-12 col-12 main_container  m-0 " >
+                <div className="ro offset-xl-3 offset-lg-1 offset-md-1  bg-none ">
+                    <main className="col col-xl-6  col-lg-8  col-md-12 col-sm-12 col-12 main_container  m-0 pt-5" >
                         <div className="car shadow-s mb-3 p-2">
                             <div className="heading_tab_container text-center  d-flex w-100 justify-content-between align-items-center">
                                 <Link to="/" className="following_tab tab active w-50"> 
@@ -56,7 +56,7 @@ function Home() {
 
                     <RightBarComponent>
                         <SuggestedFriends />
-                        <SideAds />
+                        {/* <SideAds /> */}
                     </RightBarComponent>
                 </div>
             </div>

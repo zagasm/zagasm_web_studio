@@ -7,7 +7,7 @@ import SingleComment from './singleComment';
 import axios from 'axios';
 import { useAuth } from '../../../pages/auth/AuthContext';
 import { showToast } from '../../ToastAlert';
-
+// import './commentStyle.css'
 const CommentContainer = ({ post, comment_data }) => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
@@ -24,8 +24,8 @@ const CommentContainer = ({ post, comment_data }) => {
                 author: comment.author_name || comment.user_name,
                 avatar: comment.author_picture ||
                     (comment.user_picture
-                        ? `https://zagasm.com/content/uploads/${comment.user_picture}`
-                        : 'https://zagasm.com/content/themes/default/images/blank_profile.png'),
+                        ? `${import.meta.env.VITE_API_URL}/content/uploads/${comment.user_picture}`
+                        : `${import.meta.env.VITE_API_URL}/content/themes/default/images/blank_profile.png`),
                 text: comment.text_plain || comment.text,
                 timestamp: comment.time,
                 likes: comment.reactions_total_count || 0,
@@ -67,11 +67,11 @@ const CommentContainer = ({ post, comment_data }) => {
                 id: response.data.comment_id,
                 author: user?.username || 'You',
                 avatar: user?.profile_picture || 
-                    'https://zagasm.com/content/themes/default/images/blank_profile.png',
+                    `${import.meta.env.VITE_API_URL}/content/themes/default/images/blank_profile.png`,
                 text: commentText,
                 timestamp: new Date().toISOString(),
                 likes: 0,
-                author_url: `https://zagasm.com/${user?.username || ''}`,
+                author_url: `${import.meta.env.VITE_API_URL}${user?.username || ''}`,
                 canEdit: true,
                 canDelete: true,
                 reactions: {},
@@ -94,11 +94,11 @@ const CommentContainer = ({ post, comment_data }) => {
             id: `temp-${Date.now()}`,
             author: user?.username || 'You',
             avatar: user?.profile_picture || 
-                'https://zagasm.com/content/themes/default/images/blank_profile.png',
+                `${import.meta.env.VITE_API_URL}/content/themes/default/images/blank_profile.png`,
             text: newComment,
             timestamp: new Date().toISOString(),
             likes: 0,
-            author_url: `https://zagasm.com/${user?.username || ''}`,
+            author_url: `${import.meta.env.VITE_API_URL}${user?.username || ''}`,
             canEdit: true,
             canDelete: true,
             reactions: {},
@@ -153,7 +153,7 @@ const CommentContainer = ({ post, comment_data }) => {
     return (
         <div
             className={`comments-section ${isMobile ? 'mobile-comments' : ''}`}
-            style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}
+            style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', width:'100%' }}
         >
             <div className="comments-header p-3 border-bottom">
                 <h5 className="mb-0">Comments ({comments.length})</h5>

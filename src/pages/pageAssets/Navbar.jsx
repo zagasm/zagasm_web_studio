@@ -9,8 +9,10 @@ import p2 from '../../assets/img/p2.png';
 import p3 from '../../assets/img/p3.png';
 import p4 from '../../assets/img/p4.png';
 import home from '../../assets/home.png';
-import Add_user from '../../assets/Add_user.png';
-import creat_post from '../../assets/creat_post.png';
+import bell_icon from '../../assets/nav_icon/Bell.png';
+import Edit_icon from '../../assets/nav_icon/Edit_icon.png';
+import search_icon from '../../assets/nav_icon/search_icon.png';
+
 import default_profilePicture from '../../assets/avater_pix.avif';
 // import './navStyle.css';
 import MobileNav from './MobileNav';
@@ -31,113 +33,47 @@ const Navbar = () => {
             <MobileNav />
             <nav className="navbar navbar-expand osahan-nav-top p-0 w-100 position-fixed" style={{ background: 'white' }}>
                 <div className="container-fluid p-3">
-                    <Link className="navbar-brand" to="/">
-                        <img  src={logo} alt="Zagasm Logo" className="zagasm_logo" />
+                    <Link className="navbar-brand " to="/">
+                        <img src={logo}  alt="Zagasm Logo" className="zagasm_logo" />
                         {/* <img src={logoMobile} alt="Zagasm Logo Mobile" className="d-block d-md-none" /> */}
                     </Link>
                     <form className="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search nav_search"></form>
                     <ul className="navbar-nav middle_nav text-center">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/">
-                                <i className="fas fa-home" style={{
-                                    fontSize: '24px',
-                                    color: '#8000FF',
-                                    marginRight: '20px'
-                                }}></i>
+                            <Link className="nav-link search_form" to="/explore">
+                               <i className='fa fa-search mr-2 ml-3'></i> <span>search for creator</span>
                             </Link>
+                           
                         </li>
 
-                        <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
-                            <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i className="fas fa-plus-square" style={{
-                                    fontSize: '24px',
-                                    color: '#8000FF',
-                                    marginRight: '20px'
-                                }}></i>
-                            </button>
-                            <div className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm p-3">
-                                <Link to={'/create-post'} className="text-gray-500 text-light btn d-flex justify-center p-2 border-none" style={{
-                                    color: 'white',
-                                    justifyContent: "space-between",
-                                    alignItems: 'center',
-                                    background: 'linear-gradient(to right, #8000FF, rgba(228, 40, 235, 0.87))'
-                                }}>
-                                    <i className="fas fa-pen"></i>
-                                    <span>Create Post</span>
-                                    <i className="fas fa-chevron-right"></i>
-                                </Link>
-                                <Link className="mt-2 text-gray-500 btn-success text-light btn d-flex justify-center p-2 border-none" style={{
-                                    justifyContent: "space-between",
-                                    alignItems: 'center'
-                                }} to="/notifications">
-                                    <i className="fas fa-layer-group"></i>
-                                    <span>Create Template</span>
-                                    <i className="fas fa-chevron-right"></i>
-                                </Link>
-                            </div>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/friends">
-                                <i className="fas fa-user-plus" style={{
-                                    fontSize: '24px',
-                                    color: '#8000FF',
-                                    marginRight: '20px'
-                                }}></i>
-                            </Link>
-                        </li>
+                        
                     </ul>
 
                     <ul className="navbar-nav ml-auto d-flex align-items-center">
                         {/* Messages Dropdown */}
-                        <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
-                            <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i className="right-icon nav-ico fa fa-comments" ></i>
-                                <span className="badge badge-danger badge-counter">8</span>
-                            </button>
-                            <div className="dropdown-list dropdown-menu dropdown-menu-right shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">
-                                <h6 className="dropdown-header">Message Center</h6>
-                                {messages.map((msg, i) => (
-                                    <Link key={i} className="dropdown-item d-flex align-items-center" to="/chat">
-                                        <div className="dropdown-list-image mr-3">
-                                            <img className="rounded-circle" src={msg.img} alt={`Sender ${i + 1}`} />
-                                            <div className={`status-indicator ${i % 2 === 0 ? 'bg-success' : i === 2 ? 'bg-warning' : ''}`}></div>
-                                        </div>
-                                        <div className="overflow-hidden">
-                                            <div className="text-truncate">{msg.content}</div>
-                                            <div className="small text-gray-500">{msg.sender} · {msg.time}</div>
-                                        </div>
-                                    </Link>
-                                ))}
-                                <Link className="dropdown-item text-center small text-gray-500" to="/messages">Read More Messages</Link>
-                            </div>
-                        </li>
 
+                        <li className="nav-item dropdown no-arrow mx- osahan-list-dropdown mr-5">
+                            <Link to={'/create-post'} className="nav-link dropdown-toggl create_post_btn shadow-sm p-3 text-light" >
+                                <img src={Edit_icon} alt="notification icon" /> <span>Create a Post</span>
+                            </Link>
+                          
+                        </li>
                         {/* Alerts Dropdown */}
-                        <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
-                            <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i className="right-icon nav-ico fa fa-bell" ></i>
-                                <span className="badge badge-danger badge-counter">6</span>
-                            </button>
-                            <div className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">
-                                <h6 className="dropdown-header">Alerts Center</h6>
-                                <Link className="dropdown-item d-flex align-items-center" to="/notifications">
-                                    <div className="mr-3">
-                                        <div className="icon-circle bg-primar" style={{background:'#8000FF'}}>
-                                            <i className=" fa fa-file text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="small text-gray-500">Dec 12, 2019</div>
-                                        <span className="font-weight-bold">New monthly report is ready!</span>
-                                    </div>
-                                </Link>
-                                <Link className="dropdown-item text-center small text-gray-500" to="/notifications">Show All Alerts</Link>
-                            </div>
+                         <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown mobile_search ">
+                            <Link to="/explore" className="nav-link dropdown-toggle p-2" >
+                                <img src={search_icon} alt="" />
+                            </Link> 
                         </li>
-
-                        <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
-                            <button className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img style={{ width: '50px', height: '50px' }} className="img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
+                        <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown ">
+                            <Link to={'/notification'} className="nav-link dropdown-toggle p-2" >
+                                <img src={bell_icon} alt="notification icon" />
+                                <span style={{ background: '#8F07E7' }} className="badge  badge-counter">0</span>
+                            </Link> 
+                        </li>
+                        <li className="nav-item dropdown no-arro0 mx-1 osahan-list-dropdown profile_link">
+                            <button style={{ borderRadius: '20px', padding: '5px 10px', marginLeft: '20px' }} className="nav-link dropdown-toggl shadow-sm " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img style={{ width: '40px', height: '40px' }} className="img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
+                                 <span className='fa fa-bars ml-2'></span>
                             </button>
                             <div className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">
                                 <div className="p-3 d-flex align-items-center">
@@ -151,8 +87,8 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 <div className="dropdown-divider"></div>
-                                <Link className="dropdown-item" to="/myprofile"><i className=" feather-edit mr-1"></i> My Account</Link>
-                                <Link className="dropdown-item" to="/myprofile"><i className=" feather-user mr-1"></i> Edit Profile</Link>
+                                <Link className="dropdown-item" to={"/" + user.user_id}><i className=" feather-edit mr-1"></i> My Account</Link>
+                                <Link className="dropdown-item" to={"/" + user.user_id}><i className=" feather-user mr-1"></i> Edit Profile</Link>
                                 <div className="dropdown-divider"></div>
                                 <Link onClick={() => logout()} className="dropdown-item" ><i className=" feather-log-out mr-1"></i> Logout</Link>
                             </div>

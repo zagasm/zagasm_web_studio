@@ -263,8 +263,8 @@ Version: 1.0
 }
 .osahan-chat-list {
    overflow-y: auto;
-   height: 463px;
-   min-height: 463px;
+   height: 663px;
+   min-height: 663px;
 }
 /* End Chat */
 /* Blog */

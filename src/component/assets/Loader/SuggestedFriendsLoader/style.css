@@ -1,5 +1,7 @@
 /* style.css */
-
+.rightBarPeopleSuggestedLoader{
+  height:calc(100vh - 90px)
+}
 .rightBarPeopleSuggestedLoader .shimmer-line,
 .rightBarPeopleSuggestedLoader .shimmer-circle,
 .rightBarPeopleSuggestedLoader .shimmer-button {

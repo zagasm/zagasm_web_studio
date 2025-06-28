@@ -1,210 +1,250 @@
+/* Overlay */
 .image-gallery-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.9);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 15, 15, 0.95);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation: fadeIn 0.4s ease;
+  cursor: default;
 }
 
+/* Close Button */
 .close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    z-index: 10;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10002; /* Stay above all */
+  font-size: 1.8rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
+.close-btn:hover {
+  background: rgba(65, 65, 65, 0.7);
+}
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.visible {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+/* Main content area */
 .gallery-content {
-    position: relative;
-    width: 90%;
-    max-width: 1200px;
-    height: 70vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Main image */
 .main-image-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  max-width: 90vw;
+  max-height: 80vh;
+  position: relative;
 }
-
 .gallery-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  transition: transform 0.3s ease;
 }
-
 .gallery-image.hidden {
-    display: none;
+  display: none;
 }
 
-.image-loading, .image-error {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
+/* Loading spinner */
+.image-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
 }
-
 .spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top: 4px solid white;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ccc;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.image-error i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+/* Image error */
+.image-error {
+  color: #eee;
+  text-align: center;
 }
 
+/* Navigation arrows */
 .nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    color: white;
-    font-size: 2rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  width: 50px;
+  height: 70px;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+.nav-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+.nav-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+.left-btn {
+  left: 10px;
+}
+.right-btn {
+  right: 10px;
+}
+
+/* Controls */
+.gallery-controls {
+  position: absolute;
+  top: 70px; /* moved down from 20px */
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10001;
+  color: #fff;
+  transition: opacity 0.3s ease;
+}
+
+.zoom-controls button,
+.info-controls button {
+  margin: 0 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  padding: 8px 10px;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.zoom-controls button:hover,
+.info-controls button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.image-counter {
+  margin-right: 10px;
+  font-size: 1rem;
+}
+
+/* Thumbnail strip */
+.thumbnail-container {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(0,0,0,0.6);
+  overflow-x: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  justify-content: center;
+  z-index: 10000;
+}
+.thumbnail-wrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+.thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border 0.2s ease;
+}
+.thumbnail.active {
+  border-color: #fff;
+}
+.thumb-loading,
+.thumb-error {
+  background: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 1.2rem;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nav-btn {
+    width: 40px;
+    height: 60px;
+    font-size: 2.2rem;
+  }
+
+  .close-btn {
+      top: 10px;
+    right: 10px;
+
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+  }
+
+  .thumbnail-wrapper {
     width: 50px;
     height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 10;
-}
+  }
 
-.nav-btn.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.left-btn {
-    left: 20px;
-}
-
-.right-btn {
-    right: 20px;
-}
-
-.thumbnail-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    padding: 10px;
-    overflow-x: auto;
-    max-width: 90%;
-}
-
-.thumbnail-wrapper {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    flex-shrink: 0;
-}
-
-.thumbnail {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
-
-.thumbnail.active {
-    opacity: 1;
-    border: 2px solid white;
-}
-
-.thumb-loading {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.thumb-error {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-}
-
-/* Add these styles to your existing ImageGallery.css */
-
-.zoom-controls {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    gap: 10px;
-    z-index: 10;
-}
-
-.zoom-controls button {
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.zoom-controls button:hover {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-.gallery-content {
-    cursor: default;
-}
-
-.gallery-image {
-    transition: transform 0.1s ease-out;
-    transform-origin: center center;
-    max-width: 100%;
-    max-height: 100%;
-    will-change: transform;
-}
-
-.main-image-container {
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+ .gallery-controls {
+    top: 60px;
+  }
 }

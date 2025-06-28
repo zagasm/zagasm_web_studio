@@ -1,26 +1,27 @@
 .post_icon_container {
-    margin: 0px;
-    padding: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 
 .post_icon_container a {
-    margin: 0px 10px;
-    padding: 5px 0px
+  margin: 0px 10px;
+  padding: 5px 0px
 }
 
 .post_icon_container a:hover {
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-    /* border-radius: 10px; */
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  /* border-radius: 10px; */
 }
+
 .post-text-link {
-    color: yellow;
-    text-decoration: underline;
-    word-break: break-all;
+  color: yellow;
+  text-decoration: underline;
+  word-break: break-all;
 }
 
 .post-text-link:hover {
-    color: #8000FF;
-    text-decoration: none;
+  color: #8000FF;
+  text-decoration: none;
 }
 
 /* Link styling */
@@ -92,8 +93,43 @@
 
 /* Main Carousel Container */
 .zagasm-carousel {
-  overflow: hidden;
-  background-color: #000; /* Optional: if you want a black background */
+  /* overflow: hidden; */
+  background-color: #000;
+  /* Optional: if you want a black background */
+}
+
+/* .zagasm-carousel .carousel-indicators {
+  position: absolute;
+  right: 0;
+  bottom: 0px;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+
+} */
+
+.custom-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  position: absolute;
+  right: 0;
+  bottom: 0px;
+}
+
+.indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background-color: #ccc;
+  transition: background-color 0.3s;
+}
+
+.indicator-dot.active {
+  background-color: #8000FF;
 }
 
 /* Carousel Item - removes all default backgrounds */
@@ -107,7 +143,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1/1;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Image styling */
@@ -139,6 +175,7 @@
   width: 40px;
   opacity: 0;
   transition: opacity 0.3s ease;
+  margin: 0px 20px;
 }
 
 .zagasm-carousel:hover .carousel-control-prev,
@@ -187,13 +224,14 @@
   height: 6px;
   border-radius: 50%;
   margin: 0 3px;
-  background-color: rgba(255, 255, 255, 0.5);
+  /* background-color: rgba(255, 255, 255, 0.5); */
   border: none;
 }
 
 .carousel-indicators .active {
   background-color: #0095f6;
 }
+
 .osahan-post-footer button {
   display: inline-block;
   padding: 0;
@@ -204,38 +242,26 @@
 }
 
 
-/* Reaction Button Animation */
-.reaction-button {
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
+
+
+/* Optional styling for better visibility */
+.position-absolute .btn {
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-.emoji-container {
-    display: inline-block;
-    transition: transform 0.2s ease;
+.position-absolute .btn:hover {
+  /* background-color: rgba(0, 0, 0, 0.8); */
+  transform: scale(1.1);
 }
 
-.emoji-container.animate {
-    animation: tiktok-bounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes tiktok-bounce {
-    0% { transform: scale(1); }
-    25% { transform: scale(3); }
-    50% { transform: scale(4); }
-    75% { transform: scale(6); }
-    100% { transform: scale(9); }
-}
-
-.count {
-    transition: transform 0.9s ease;
-}
-
-.reaction-button:hover .emoji-container {
-    transform: scale(1.1);
-}
-
-.reaction-button:hover .count {
-    transform: translateY(-1px);
+.post_icon img {
+  width: 22px;
 }

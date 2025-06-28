@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Modal,  } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
-
-import './postViewStyle.css';
 import SinglePostTemplate, { PostFooter } from '../single';
 import PostContentLoader from '../../assets/Loader/postContentSection';
 import FullScreenPreloader from './FullScreenPreloader';
 import CommentContainer from '../comment/commentContainer';
+import './postViewStyle.css';
+
 function PostViewModal({ post, show, onHide }) {
     const [isMobile, setIsMobile] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(true); // Add loading state
-    const [isTextOnlyPost, setisTextOnlyPost] = useState(false); // Add loading state
+    const [isLoading, setIsLoading] = useState(true);
+    const [isTextOnlyPost, setIsTextOnlyPost] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+
     useEffect(() => {
         if (show && post?.id) {
-            // Create a simple serializable state object
             const background = {
                 pathname: location.pathname,
                 search: location.search,
@@ -26,7 +27,7 @@ function PostViewModal({ post, show, onHide }) {
 
             navigate(`/posts/${post.post_id}`, {
                 state: { background },
-                replace: true // Prevents double entries in history
+                replace: true
             });
         }
     }, [show, post?.id]);
@@ -37,7 +38,7 @@ function PostViewModal({ post, show, onHide }) {
         window.addEventListener('resize', handleResize);
 
         if (show && post) {
-            setisTextOnlyPost(!post.photos || post.photos.length === 0);
+            setIsTextOnlyPost(!post.photos || post.photos.length === 0);
             const timer = setTimeout(() => {
                 setIsLoading(false);
             }, 1000);
@@ -47,6 +48,7 @@ function PostViewModal({ post, show, onHide }) {
 
         return () => window.removeEventListener('resize', handleResize);
     }, [show, post]);
+
     const handleCopyLink = () => {
         const postUrl = `${window.location.origin}/posts/${post.post_id}`;
         navigator.clipboard.writeText(postUrl)
@@ -57,13 +59,22 @@ function PostViewModal({ post, show, onHide }) {
                 console.error('Failed to copy link: ', err);
             });
     };
+
     const handleSelect = (selectedIndex) => {
         setCurrentImageIndex(selectedIndex);
     };
+
     const handleClose = () => {
-        navigate(-1);
+        setIsClosing(true);
+        setTimeout(() => {
+            onHide();
+            setIsClosing(false);
+            // navigate(-1);
+        }, 300); // Match this duration with your CSS animation duration
     };
+
     if (!post) return null;
+
     return (
         <>
             <Helmet>
@@ -75,84 +86,38 @@ function PostViewModal({ post, show, onHide }) {
             </Helmet>
 
             {isLoading && <FullScreenPreloader />}
-           
+
             <Modal
                 show={show && !isLoading}
-                onHide={onHide}
-                size="xl"
+                onHide={handleClose}
+                size="md"
                 centered
-                className="fullscreen-post-modal p-0 m-0 "
-                backdrop="static"
-                style={{Height:'100vh', padding:'0px', margin:'0px', width:'100%'}}
+                className={`fullscreen-post-modal ${isClosing ? 'closing' : ''}`}
+                backdropClassName="modal-backdrop"
+                dialogClassName="m-0"
+                animation={false}
+                 backdrop="static"
             >
-                 <span
-                // type="span"
-                // className="btn-clos"
-                onClick={onHide}
-                aria-label="Close"
-                style={{
-                    fontSize: '40px',
-                    padding: '1px',
-                    marginRight: 'auto',
-                    color: 'black',
-                    float: 'right', 
-                    position: 'absolute',
-                    right: '20px',
-                    top: '0px',
-                    // backgroundColor:"#8000FF",
-                    // width: '50px',
-                    height: '50px',
-                    cursor: 'pointer',  
-                    zIndex: 1050, // Ensure it appears above the modal content  
-                    // borderRadius: '50%',
-                    // boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' // Optional shadow for better visibility 
+                <button
+                    className="modal-close-btn"
+                    onClick={handleClose}
+                    aria-label="Close"
+                >
+                    <span className='fa fa-angle-left'></span>
+                </button>
 
-                }}
-            >
-                &times;
-            </span>
-               <div style={{maxHeight:'40vh'}}>
-                 <Modal.Header className="border-0 p-2 pt-4 d-flex align-items-center">
-                    {/* Close Button (X icon) */}
-
-
-                    {/* Post Title or Author */}
+                <Modal.Header className="modal-header-custom border- p-3">
                     <div className="mx-auto">
-                        <h6 className="mb-0">{post.post_author_name}'s Post</h6>
+                        <h6 className="mb-0">Comments</h6>
                     </div>
-
-                    {/* Copy Link Button */}
-                    {/* <Button
-                    type='button'
-                        variant="link"
-                        className="text-dark ms-auto"
-                        onClick={handleCopyLink}
-                        style={{ padding: '0.5rem' }}
-                    >
-                        <FiShare2 size={20} />
-                    </Button> */}
                 </Modal.Header>
 
-                <Modal.Body className="p-0 d-flex flex-column flex-md-row bg-dang" >
-                    {/* Post Content Section */}
-                    <div className={`post-content-section ${isMobile ? 'mobile-post' : ''}`}>
-                        {isLoading ? (
-                            <PostContentLoader />
-                        ) : (
-                            <SinglePostTemplate
-                                key={post.post_id}
-                                data={post}
-                                hideCommentButton={true}
-                            />
-                        )}
-                    </div>
-
-                    {/* Comments Section */}
-                    <CommentContainer post={post}  comment_data={post.post_comments} />
+                <Modal.Body>
+                    <CommentContainer post={post} comment_data={post.post_comments} />
                 </Modal.Body>
-               </div>
             </Modal>
         </>
     );
 }
+
 export default PostViewModal;

@@ -1,0 +1,68 @@
+/* Reaction Button Animation */
+.reaction-button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.emoji-container {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.emoji-container.animate {
+  animation: tiktok-bounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tiktok-bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(3);
+  }
+
+  50% {
+    transform: scale(4);
+  }
+
+  75% {
+    transform: scale(6);
+  }
+
+  100% {
+    transform: scale(9);
+  }
+}
+
+.count {
+  transition: transform 0.9s ease;
+}
+
+.reaction-button:hover .emoji-container {
+  transform: scale(1.1);
+}
+
+.reaction-button:hover .count {
+  transform: translateY(-1px);
+}
+.reaction_btn {
+    padding: 5px 7px;
+    border-radius: 20px;
+    box-shadow: -1px 1px 2px 0px #4040401A;
+    box-shadow: -3px 3px 4px 0px #40404017;
+    box-shadow: -7px 7px 6px 0px #4040400D;
+    box-shadow: -12px 13px 7px 0px #40404003;
+    box-shadow: -19px 20px 8px 0px #40404000;
+    background: #F4E6FD;
+}
+.i_react{
+     box-shadow: -1px 1px 2px 0px #4040401A;
+    box-shadow: -3px 3px 4px 0px #40404017;
+    box-shadow: -7px 7px 6px 0px #4040400D;
+    box-shadow: -12px 13px 7px 0px #40404003;
+    box-shadow: -19px 20px 8px 0px #40404000;
+    background: #8F07E7;
+  color:white;
+}

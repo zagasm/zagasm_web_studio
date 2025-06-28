@@ -16,7 +16,7 @@ function SuggestedFriends() {
   return (
     <div className="box shadow-s rounded bg-white mb-3" >
       <div className="box-title border-botto p-3">
-        <h6 className="m-0">People you might know</h6>
+        <h4 className="m-0 text-dark">People you might know</h4>
       </div>
       <div className="box-body p-3">
         {[...Array(5)].map((_, index) => (
@@ -26,12 +26,12 @@ function SuggestedFriends() {
               <div className="status-indicator bg-success"></div>
             </div>
             <div className="font-weight-bold mr-2">
-              <div className="text-truncate">Tomilayo Barnabas</div>
-              <div className="small text-gray-500">Username</div>
+              <p className="text-truncate m-0">Tomilayo Barnabas</p>
+              <span className="small text-gray-500">@Username</span>
             </div>
-            <span className="ml-auto">
-              <button type="button" className="btn btn-light btn-sm">
-                <i className="feather-user-plus"></i>
+            <span className="ml-auto ">
+              <button type="button" style={{background:'#EEDAFB'}} className="btn btn-sm">
+               <span>Follow</span> <i className="feather-user-plus"></i>
               </button>
             </span>
           </div>

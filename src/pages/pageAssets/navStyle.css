@@ -1,5 +1,5 @@
 .navbar {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.144);
     width: 100%;
     overflow: visible;
     height: 65px;
@@ -10,13 +10,17 @@
     background: white;
 
 }
- .navbar-brand .zagasm_logo{
-    width:120px; 
-    height:100%; 
-    /* height: 60px; */
+
+.navbar-brand {
+    margin-left: 20px;
 }
+
+.navbar-brand img.zagasm_logo {
+    width: 180px;
+    height: 50px;
+}
+
 .navbar .nav_search .input-group {
-    /* box-shadow: 0 0 20px rgba(154, 114, 194, 0.15); */
     border-radius: 5px;
     background-color: white;
 }
@@ -52,8 +56,6 @@
     transition: 0.3s ease-in-out;
 }
 
-
-
 .navbar-nav.middle_nav {
     display: flex;
     justify-content: center;
@@ -78,10 +80,14 @@
     /* font-weight: bold; */
 }
 
+
 .side_bar_container .list-sidebar .list-group a li {
     background: none;
     border: none;
     color: #350466;
+    width: 200px;
+    border-radius: 20px;
+    margin-left: 20px
 }
 
 .side_bar_container .list-sidebar .list-group a li:hover {
@@ -92,9 +98,23 @@
     /* display: none; */
 }
 
-.side_bar_container .list-sidebar .list-group a li i {
-    font-size: 25px;
-    color: #8000FF;
+.side_bar_container .list-sidebar .list-group a li img {
+    margin-right: 20px;
+}
+
+.side_bar_container .list-sidebar .list-group a li:hover {
+    color: white;
+    background: linear-gradient(84.41deg, #C207E7 1.78%, #490481 69.04%);
+}
+
+.side_bar_container .list-sidebar .list-group a li img {
+    margin-right: 20px;
+}
+
+.side_bar_container .list-sidebar .list-group a li:hover img {
+    fill: white;
+    color: white;
+    filter: brightness(0) invert(20);
 }
 
 .mobile_navbar_container {
@@ -120,6 +140,7 @@
 .mobile_navbar_container ul a {
     font-size: 25px;
     padding: 0px;
+
 }
 
 .mobile_navbar_container ul .mobile_icon_name {
@@ -128,14 +149,14 @@
 
 .mobile_navbar_container ul .active {
     margin: 0px;
-    margin-top: -5px;
-    /* display: inline; */
     padding: 8px 10px;
     color: white;
-    background: linear-gradient(to right, #8000FF, rgba(228, 40, 235, 0.87));
+    background: linear-gradient(84.41deg, #C207E7 1.78%, #490481 69.04%);
     box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
     border-radius: 15px;
     display: flex;
+
+
 }
 
 .mobile_navbar_container ul .active .mobile_icon_name {
@@ -143,6 +164,14 @@
     margin-top: 2px;
     margin-left: 10px;
     display: inline;
+
+
+}
+
+.mobile_navbar_container ul .active img {
+    fill: white;
+    color: white;
+    filter: brightness(0) invert(20);
 }
 
 .right_side_bar {
@@ -150,15 +179,18 @@
     /* width: 100%; */
 }
 
+
 .right_side_bar_inner_container {
     position: fixed;
     right: 20px;
-    top: 70px;
-    width: 320px;
+    top: 50px;
+    width: 350px;
     max-height: 100vh;
+    height: calc(100vh - 90px);
     overflow-y: auto;
-    padding-right: 10px;
-    padding-bottom: 200px;
+    background-color: white;
+    padding-top: 30px;
+    /* padding: 40px 20px 20px 20px; */
 }
 
 .osahan-nav-top .right-icon::before {
@@ -169,20 +201,57 @@
     transition: 0.3s ease-in-out;
 }
 
+.navbar-nav .create_post_btn {
+    gap: 10px;
+    border-radius: 30px;
+    /* box-shadow: 1px 0px 1px 0px #808080D6; */
+    color: white;
+    background: #8F07E7;
+    height: 40px;
+    padding: 0px 00px;
+}
+
+.osahan-nav-top .middle_nav .search_form {
+    border: 1px solid #E6E6E6;
+    width: 300px;
+    border-radius: 25px;
+    height: 45px;
+    font-size: 16px;
+    color: #838383;
+
+}
+
+.mobile_search {
+    display: none;
+}
+
 @media (max-width: 1265px) {
     .right_side_bar_inner_container {
         width: 300px;
     }
 
+    
 }
 
 @media (max-width: 1205px) {
+    .side_bar_container .list-sidebar .list-group a li {
+        width: fit-content;
+        margin: 0px;
+        border-radius: 0px;
+    }
+
+    .navbar-brand {
+        margin-left: 0px;
+    }
 
     .side_bar_container .list-sidebar .list-group a li span,
     .side_bar_user_name {
         display: none;
     }
 
+    .side_bar_container .list-sidebar .list-group a li img {
+        margin: 0px;
+    }
 
     .shadow-sm.side_bar_container {
         width: fit-content;
@@ -193,6 +262,7 @@
         padding: 10px 20px;
         display: none;
     }
+
 
     .main_container {
         padding-top: 65px;
@@ -205,14 +275,22 @@
     }
 }
 
-@media (max-width: 927px) {}
+@media (max-width: 927px) {
+    .navbar-nav .create_post_btn {
+        display: none;
+    }
+    .navbar-brand img.zagasm_logo {
+        width: 100px;
+        height: 30px;
+    }
+}
 
 @media (max-width: 767px) {
     .navbar-nav.middle_nav {
         display: none;
     }
 
-   .osahan-nav-top .right-icon::before{
+    .osahan-nav-top .right-icon::before {
         font-size: 20px;
     }
 
@@ -223,6 +301,15 @@
     .shadow-sm.side_bar_container {
         display: none;
     }
+
+    .profile_link {
+        display: none;
+    }
+
+    .mobile_search {
+        display: block;
+    }
+
 }
 
 .list-group-item:hover {

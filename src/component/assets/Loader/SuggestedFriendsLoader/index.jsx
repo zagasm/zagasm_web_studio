@@ -5,9 +5,7 @@ import './style.css'; // Reuse the same CSS file or create another
 function SuggestedFriendsLoader() {
   return (
     <div className="box shadow-sm rounded bg-white mb-3 rightBarPeopleSuggestedLoader" style={{ marginTop: '65px' }}>
-      <div className="box-title border-botto p-3">
-        <h6 className="m-0">People you might know</h6>
-      </div>
+    
       <div className="box-body p-3">
         {[...Array(8)].map((_, index) => (
           <div className="d-flex align-items-center osahan-post-header mb-3 people-list" key={index}>

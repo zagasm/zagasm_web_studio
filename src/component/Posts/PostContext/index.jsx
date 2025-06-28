@@ -80,6 +80,8 @@ export const PostProvider = ({ children, user }) => {
         }
     };
 
+  
+
     const fetchPost = async () => {
         if (!user_id) {
             setMessage({
@@ -95,7 +97,8 @@ export const PostProvider = ({ children, user }) => {
         try {
             const formPayload = new FormData();
             formPayload.append("api_secret_key", import.meta.env.VITE_API_SECRET || 'Zagasm2025!Api_Key_Secret');
-            formPayload.append("offset", '1');
+            // formPayload.append("offset", '1');
+            formPayload.append("limit", '30');
             formPayload.append("user_id", user_id);
 
             const response = await fetch(
@@ -121,7 +124,7 @@ export const PostProvider = ({ children, user }) => {
         }
     };
 
-    const fetchUserPost = async () => {
+    const fetchUserPost = async (profileId) => {
         if (!user_id) {
             setMessage({
                 type: 'error',
@@ -135,8 +138,9 @@ export const PostProvider = ({ children, user }) => {
         try {
             const formPayload = new FormData();
             formPayload.append("api_secret_key", import.meta.env.VITE_API_SECRET || 'Zagasm2025!Api_Key_Secret');
-            formPayload.append("profile_id", user_id);
-            formPayload.append("offset", '1');
+            formPayload.append("profile_id", profileId);
+            // formPayload.append("offset", '1');
+            formPayload.append("limit", '100');
             formPayload.append("user_id", user_id);
 
             const response = await fetch(
@@ -152,7 +156,11 @@ export const PostProvider = ({ children, user }) => {
             }
 
             const responseData = await response.json();
+             if (!responseData.posts) {
+                throw new Error("Post not found");
+            }
             setUserProfilePostData(responseData.posts);
+            return responseData.posts;
 
         } catch (error) {
             console.log("Error fetching posts:", error);
@@ -177,6 +185,7 @@ export const PostProvider = ({ children, user }) => {
                 message,
                 currentPost,
                 singlePostLoading,
+                
                 fetchPost,
                 fetchPostById,
                 refreshProfilePost: fetchUserPost,

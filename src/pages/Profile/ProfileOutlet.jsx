@@ -8,7 +8,7 @@ import { IoMdPhotos } from 'react-icons/io';
 import { RiVideoLine } from 'react-icons/ri';
 import imgTomilayo from '../../assets/img/IMG_9488.jpeg';
 import postImg1 from '../../assets/img/post1.png';
-import './MyProfilestyle.css';
+import './Profilestyle.css';
 import { Outlet } from 'react-router-dom';
 import ProfileHeader from './Header';
 

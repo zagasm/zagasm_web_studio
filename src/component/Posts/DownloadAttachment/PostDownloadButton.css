@@ -1,0 +1,101 @@
+.mobile-slide-modal {
+  margin: none;
+}
+
+/* Modal layout styling */
+@media (max-width: 768px) {
+  .mobile-slide-modal {
+    position: fixed !important;
+    top: 200px;
+    bottom: 0;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    /* height: 10vh; */
+    z-index: 1055;
+    margin: 0px;
+    /* display: none; */
+  }
+
+  .mobile-slide-modal .modal-content {
+    height: 100%;
+    border-radius: 20px 20px 0 0;
+    animation: slideUp 0.3s ease-out;
+    background-color: white;
+    margin: none;
+    height: 70vh;
+    max-height: 70vh;
+    /* background-color: red; */
+  }
+
+  .modal-backdrop.show {
+    opacity: 0.3;
+  }
+}
+
+/* Desktop modal width */
+@media (min-width: 769px) {
+  .custom-desktop-width {
+    max-width: 600px;
+    margin: auto;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
+}
+
+.grabber-bar {
+  width: 40px;
+  height: 5px;
+  background-color: #ccc;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.post-modal-body {
+  background: linear-gradient(to bottom right, #ffffff, #f7f4ff);
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  overflow-y: auto;
+  padding-bottom: 30px;
+  position: fixed;
+  bottom: 0;
+  min-width: 100%;
+  /* background-color: red; */
+  border-radius: 0px;
+
+}
+
+.post-image-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.post-image-card:hover {
+  transform: scale(1.03);
+  z-index: 2;
+}
+
+.post-action-button {
+  background: linear-gradient(135deg, #8000ff, #a64dff);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  padding: 10px 16px;
+  box-shadow: 0 4px 10px rgba(128, 0, 255, 0.3);
+  transition: background 0.3s ease, transform 0.2s ease;
+  width: 100%;
+}
+
+.post-action-button:hover {
+  background: linear-gradient(135deg, #6a00cc, #944dff);
+  transform: translateY(-2px);
+}
