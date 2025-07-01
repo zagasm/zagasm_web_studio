@@ -1,0 +1,68 @@
+.help-center-settings {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  /* box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05); */
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.help-center-settings h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #222;
+  text-align: left;
+}
+
+.help-item {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.help-icon {
+  /* color: #8000ff; */
+  width: 28px;
+  height: 28px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.help-item h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1rem;
+}
+
+.help-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.help-item a {
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #8000ff;
+  text-decoration: none;
+}
+
+.help-item a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .help-center-settings {
+    padding: 30px 5px 100px 5px;
+
+  }
+
+  .help-center-settings h2 {
+    padding-bottom: 20px;
+    font-size: 25px;
+  }
+}

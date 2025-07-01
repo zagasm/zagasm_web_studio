@@ -18,7 +18,7 @@ function UserPost() {
   }, [profileId]);
 
   return (
-    <div className="profile-content container mt-4 pb-5" style={{ paddingBottom: '300px' }}>
+    <div className="profile-content container  pb-5" style={{ paddingBottom: '300px' }}>
       <div className="row">
         {/* Main Feed */}
         <div className="post-grid">
@@ -26,8 +26,7 @@ function UserPost() {
             UserProfilePostData.map(post => (
               <div className="post-grid-item col" key={post.post_id}>
                 {/* Post content */}
-                <PostContent data={post} />
-                
+                <PostContent profileData={true} data={post} />
                 {/* Overlay element */}
                 <div className="post-grid-overlay">
                   {/* Love icon at bottom right */}

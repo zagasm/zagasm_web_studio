@@ -2,19 +2,23 @@
   border: 1px solid #ccc;
   padding: 2px;
 }
+
 .dropzone {
   background-color: #f8f9fa;
   border-style: dashed;
   transition: background-color 0.3s ease;
 }
+
 .dropzone.active {
   background-color: #e2e6ea;
 }
 
 
 .dropzone-custom.active {
-  background-color: #8000FF;;
-  border-color: #8000FF;;
+  background-color: #8000FF;
+  ;
+  border-color: #8000FF;
+  ;
   color: #343a40;
 }
 
@@ -51,24 +55,26 @@
   cursor: pointer;
   z-index: 999999999999999999999;
 }
+
 .dropzone-custom {
-    background-color: #f8f9fa;
-    border: 20px dashed #ced4da;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #f8f9fa;
+  border: 20px dashed #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
 .dropzone-custom:hover {
-    background-color: #e9ecef;
+  background-color: #e9ecef;
 }
 
 .dropzone-custom.active {
-    background-color: #e9ecef;
+  background-color: #e9ecef;
 }
 
 
 
 .carousel img {
-    object-fit: cover;
+  object-fit: cover;
 }
 
 .carousel-delete-btn {
@@ -78,9 +84,11 @@
   z-index: 1050;
   pointer-events: auto;
 }
+
 .carousel-delete-btn:hover {
   background-color: rgba(255, 0, 0, 0.8);
 }
+
 /* Tab container */
 .create-post-row .nav-tabs {
   border-bottom: 2px solid #dee2e6;
@@ -102,7 +110,8 @@
 
 /* Active tab */
 .create-post-row .nav-tabs .nav-link.active {
-  background-color: #8000FF; /* Bootstrap primary */
+  background-color: #8000FF;
+  /* Bootstrap primary */
   color: white;
   font-weight: bold;
   border: none;
@@ -113,6 +122,7 @@
 .create-post-row .nav-tabs .nav-link:hover {
   background-color: #e2e6ea;
 }
+
 /* Style for the Prev/Next button containers */
 .carousel-control-prev,
 .carousel-control-next {
@@ -133,7 +143,7 @@
   background-position: center;
   background-repeat: no-repeat;
   /* filter: invert(3) brightness(5); Ensures icon stays white */
-  color:white;
+  color: white;
   font-weight: bolder;
 }
 
@@ -141,4 +151,46 @@
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
   opacity: 1;
+}
+
+/* Remove these existing styles: */
+.dropzone-custom {
+  background-color: #f8f9fa;
+  border: 20px dashed #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+}
+
+.dropzone-custom:hover {
+  background-color: #e9ecef;
+}
+
+.dropzone-custom.active {
+  background-color: #e9ecef;
+}
+
+/* Add this new style: */
+#image-upload-input {
+  display: none;
+}
+
+.img_upload_container {
+  background-color: white;
+  color: #8000FF;
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.11);
+  cursor: pointer;
+  width: 50%;
+  transition: 0.3s ease-in-out;
+}
+
+.img_upload_container:hover {
+  box-shadow:none;
+}
+@media (max-width: 760px) {
+  .img_upload_container {
+  width: 100%;
+  }
 }

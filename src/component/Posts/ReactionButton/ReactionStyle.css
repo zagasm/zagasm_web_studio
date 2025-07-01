@@ -1,68 +1,52 @@
-/* Reaction Button Animation */
-.reaction-button {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-}
-
-.emoji-container {
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-
-.emoji-container.animate {
-  animation: tiktok-bounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes tiktok-bounce {
-  0% {
-    transform: scale(1);
-  }
-
-  25% {
-    transform: scale(3);
-  }
-
-  50% {
-    transform: scale(4);
-  }
-
-  75% {
-    transform: scale(6);
-  }
-
-  100% {
-    transform: scale(9);
-  }
-}
-
-.count {
-  transition: transform 0.9s ease;
-}
-
-.reaction-button:hover .emoji-container {
-  transform: scale(1.1);
-}
-
-.reaction-button:hover .count {
-  transform: translateY(-1px);
-}
-.reaction_btn {
-    padding: 5px 7px;
-    border-radius: 20px;
-    box-shadow: -1px 1px 2px 0px #4040401A;
-    box-shadow: -3px 3px 4px 0px #40404017;
-    box-shadow: -7px 7px 6px 0px #4040400D;
-    box-shadow: -12px 13px 7px 0px #40404003;
-    box-shadow: -19px 20px 8px 0px #40404000;
+/* ReactionStyle.css */
+.reaction-container {
+    display: inline-flex;
+    align-items: center;
     background: #F4E6FD;
+    border: none;
+    /* padding: 5px 10px; */
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: -1px 1px 2px 0px #4040401A;
+    transition: background-color 0.3s ease;
+    min-height: 32px; /* Ensure consistent height */
+    font-size: 16px;
 }
-.i_react{
-     box-shadow: -1px 1px 2px 0px #4040401A;
-    box-shadow: -3px 3px 4px 0px #40404017;
-    box-shadow: -7px 7px 6px 0px #4040400D;
-    box-shadow: -12px 13px 7px 0px #40404003;
-    box-shadow: -19px 20px 8px 0px #40404000;
+
+.reaction-container.i_react {
     background: #8F07E7;
-  color:white;
+    color: white;
+    box-shadow: -1px 1px 2px 0px #8F07E733;
+}
+
+.emoji-and-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.emoji-wrapper {
+    display: inline-block;
+    transform-origin: bottom center;
+    line-height: 1; /* Remove extra spacing */
+}
+
+.emoji-wrapper.animate {
+    animation: bounce 0.8s cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
+@keyframes bounce {
+    0% { transform: translateY(0) scale(1, 1); }
+    15% { transform: translateY(-15px) scale(1.1, 0.9); }
+    30% { transform: translateY(-25px) scale(0.9, 1.1); }
+    45% { transform: translateY(0) scale(1.05, 0.95); }
+    60% { transform: translateY(-8px) scale(1, 1); }
+    75% { transform: translateY(0) scale(1, 1); }
+    100% { transform: translateY(0) scale(1, 1); }
+}
+
+.reaction-count {
+    font-size: 0.9em;
+    line-height: 1; /* Remove extra spacing */
+    vertical-align: middle;
 }

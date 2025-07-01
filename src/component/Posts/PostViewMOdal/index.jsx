@@ -6,7 +6,7 @@ import SinglePostTemplate, { PostFooter } from '../single';
 import PostContentLoader from '../../assets/Loader/postContentSection';
 import FullScreenPreloader from './FullScreenPreloader';
 import CommentContainer from '../comment/commentContainer';
-import './postViewStyle.css';
+// import './postViewStyle.css';
 
 function PostViewModal({ post, show, onHide }) {
     const [isMobile, setIsMobile] = useState(false);
@@ -78,8 +78,8 @@ function PostViewModal({ post, show, onHide }) {
     return (
         <>
             <Helmet>
-                <title>{post.post_author_name}'s Post</title>
-                <meta property="og:title" content={`${post.post_author_name}'s Post`} />
+                <title>{post.user_name}'s Post</title>
+                <meta property="og:title" content={`${post.user_name}'s Post`} />
                 {post.text && (
                     <meta property="og:description" content={post.text.substring(0, 160)} />
                 )}
@@ -92,11 +92,12 @@ function PostViewModal({ post, show, onHide }) {
                 onHide={handleClose}
                 size="md"
                 centered
-                className={`fullscreen-post-modal ${isClosing ? 'closing' : ''}`}
+                className={`fullscreen-post-modal comment_modal ${isClosing ? 'closing' : ''}`}
                 backdropClassName="modal-backdrop"
                 dialogClassName="m-0"
                 animation={false}
-                 backdrop="static"
+                backdrop="static"
+                
             >
                 <button
                     className="modal-close-btn"
@@ -112,8 +113,8 @@ function PostViewModal({ post, show, onHide }) {
                     </div>
                 </Modal.Header>
 
-                <Modal.Body>
-                    <CommentContainer post={post} comment_data={post.post_comments} />
+                <Modal.Body >
+                    <CommentContainer post={post} comment_data={post.comments} />
                 </Modal.Body>
             </Modal>
         </>

@@ -33,6 +33,10 @@ import PostViewModal from "./component/Posts/PostViewMOdal/index.jsx";
 import Post from "./component/Posts/ReadPost/index.jsx";
 import ExplorePage from "./pages/Explore/index.jsx";
 import Notifications from "./pages/Notification/index.jsx";
+import EditProfile from "./pages/Profile/Settings/header.jsx";
+import Settings from "./pages/Profile/Settings/header.jsx";
+import Help from "./pages/Profile/Settings/HelpCenterSettings/HelpOutlet.jsx";
+import Faqs from "./pages/Profile/Settings/HelpCenterSettings/Faqs/index.jsx";
 
 
 const MainLayout = () => (
@@ -85,12 +89,18 @@ export function App() {
             <Route path="explore" element={<ExplorePage />} />
             <Route path="create-post" element={<CreatePost />} />
             <Route path="/posts/:postId" element={<Post />} />
+            <Route  path="/help" element={<Help />} >
+              <Route path="faqs" element={<Faqs />} />
+
+            </Route>
+            <Route index path="settings" element={<Settings />} >
+            </Route>
             <Route path=":profileId" element={<ProfileOutlet />}>
               <Route index element={<UserPost />} />
-              {/* <Route path="mymemes" element={<LikesMeme />} /> */}
             </Route>
 
           </Route>
+
         </Route>
 
         <Route path="/page-not-found" element={<Error404 />} />

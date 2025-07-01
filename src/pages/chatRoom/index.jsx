@@ -161,11 +161,11 @@ function Chat() {
   };
 
   return (
-    <div className="container-fluid" style={{ paddingTop: '10px' }}>
+    <div className="container-fluid" >
       <SideBarNav />
-      <div className="offset-xl-2 offset-lg-1 offset-md-1" style={{ paddingTop: '65px' }}>
+      <div className="offset-xl-2 offset-lg-1 offset-md-1" >
         <main  className={`col ml-xl-5 col-xl-8 order-xl-2 col-lg-8 order-lg-1 col-md-12 col-sm-12 col-12 ${recipient_id ? 'chat-overlay-mobile' : ''}`}>
-          <div className="card rounded chat-container">
+          <div className="car rounded chat-container">
             {recipient_id ? (
               <>
                 <div className="chat-header d-flex align-items-center p-3 border-bottom">
@@ -228,8 +228,8 @@ function Chat() {
         </main>
       </div>
       <RightBarComponent>
-        <h3 className="m-0 mt-3 mb-3 pl-3" style={{ color: '#8000FF' }}>Chats</h3>
-        <AllChats />
+        <h3 className="m-0 mt-3 mb-3 pl-3" style={{ color: '#8000FF',marginTop:'65px' }}>Chats</h3>
+        <AllChats  style={{ color: '#8000FF',marginTop:'65px' }} />
       </RightBarComponent>
     </div>
   );

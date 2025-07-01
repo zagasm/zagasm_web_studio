@@ -33,10 +33,11 @@ button.sendMsgBtn {
     /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); */
     transition: all 0.3s ease-in-out;
     padding: 0px;
+     margin: 0px;
 }
 
 .chat-placeholder {
-    min-height: 90vh;
+    /* min-height: 90vh; */
     /* background: linear-gradient(135deg, #fdfbfb, #ebedee); */
     /* border-radius: 10px; */
     /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); */

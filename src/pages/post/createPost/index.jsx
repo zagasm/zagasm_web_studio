@@ -32,7 +32,7 @@ function CreatePost() {
     const [isLoading, setIsLoading] = useState(true);
     const [showTextColorPicker, setShowTextColorPicker] = useState(false);
     const { user } = useAuth();
-     const { refreshPosts } = usePost();
+    const { refreshPosts } = usePost();
     // 
     const navigate = useNavigate();
     // Color templates organized by category
@@ -334,9 +334,9 @@ function CreatePost() {
                 <SideBarNav />
 
                 <div className=" offset-xl-3 offset-lg-1 offset-md-1 create-post-row">
-                    {isLoading ? <PostShimmerLoader /> : <main className="col col-xl-7 col-lg-6 col-md-12 col-sm-12 col-12 main-container main_container " style={{paddingTop:'65px'}}>
+                    {isLoading ? <PostShimmerLoader /> : <main className="col col-xl-7 col-lg-6 col-md-12 col-sm-12 col-12 main-container main_container " style={{ paddingTop: '65px' }}>
                         {/* <div className="container my-4"> */}
-                        <div className="card shadow-sm p-4 rounded ">
+                        <div className="car shadow-s p-4 rounde ">
                             <h5 className="mb-4" style={{ color: '#8000FF' }}>Create a Post</h5>
 
                             {/* Display success/error messages */}
@@ -358,7 +358,7 @@ function CreatePost() {
                                                     color: textColor,
                                                     borderBottom: textExceedsLimit ? '2px solid red' : '1px solid #ccc',
                                                     borderRadius: '10px',
-                                                    border:'none',
+                                                    border: 'none',
                                                     textAlign: 'center',
                                                     fontSize: '16px',
                                                     fontWeight: 'bolder',
@@ -368,7 +368,7 @@ function CreatePost() {
                                                     paddingTop: '80px',
                                                     paddingBottom: '80px',
                                                     transition: 'all 0.3s ease',
-                                                    border:'none'
+                                                    border: 'none'
                                                 }}
                                             />
                                             <div className="d-flex justify-content-between mt-1">
@@ -511,15 +511,15 @@ function CreatePost() {
                                             style={{
                                                 width: '100%',
                                                 marginBottom: '10px',
-                                                height: '100px',
-                                                border: captionExceedsLimit ? '2px solid red' : '1px solid #ccc',
-                                                borderRadius: '5px',
+                                                MinHeight: '100px',
+                                                border: captionExceedsLimit ? '2px solid red' : 'none',
+                                                borderRadius: 'none',
                                                 padding: '10px',
                                                 resize: 'none',
                                                 outline: 'none'
                                             }}
                                         ></textarea>
-                                        <div className="d-flex justify-content-between m-0 p-0 mb-2">
+                                       {caption.length > 0 && <div className="d-flex justify-content-between m-0 p-0 mb-2">
                                             <small className={`text-${captionExceedsLimit ? 'danger' : 'muted'}`}>
                                                 {caption.length}/{maxChars} characters
                                             </small>
@@ -528,19 +528,32 @@ function CreatePost() {
                                                     Caption exceeds limit
                                                 </small>
                                             )}
-                                        </div>
+                                        </div>}
                                     </Form.Group>
-                                    <div
-                                        {...getRootProps({ className: 'dropzone' })}
-                                        className={`dropzone-custom border rounded text-center d-flex flex-column justify-content-center align-items-center p-4 ${isDragActive ? 'active' : ''}`}
-                                    >
-                                        <input {...getInputProps()} />
-                                        <i className="fas fa-cloud-upload-alt upload-icon mb-2 fa-3x " ></i>
-                                        {
-                                            isDragActive
-                                                ? <p>Drop the images here...</p>
-                                                : <p>Drag & drop or <span className="" style={{ color: '#8000FF' }}>click </span> to upload</p>
-                                        }
+                                    {/* // Replace the existing dropzone section in your code with this: */}
+                                    <div onClick={() => document.getElementById('image-upload-input').click()} className="mt-3 mb-4 text-center d-flex img_upload_container">
+                                        <input
+                                            {...getInputProps()}
+                                            id="image-upload-input"
+                                            style={{ display: 'none' }}
+                                        />
+                                        <div
+
+                                            style={{
+                                                cursor: 'pointer',
+                                                display: 'inline-block',
+                                                padding: '10px',
+                                                borderRadius: '50%',
+                                                transition: 'background-color 0.3s'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f0f0f0'}
+                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                                        >
+                                            <i className="fas fa-image fa-2x" style={{ color: '#8000FF' }}></i>
+                                        </div>
+                                        <p className="mt-3 small  ">
+                                            Click to upload images (max {maxImages})
+                                        </p>
                                     </div>
                                     {images.length > 0 && (
                                         <div className="mt-4 position-relative bg-dark">

@@ -9,7 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 99999999999999999999999999;
 }
 /* Add these to your FollowModal.css */
 .follow-modal {
@@ -22,7 +22,8 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
-  margin:0px 20px
+  margin:0px 20px;
+  
 }
 
 .follow-modal.modal-lg {

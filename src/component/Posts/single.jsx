@@ -30,7 +30,7 @@ function SinglePostTemplate({ data, hideCommentButton = false }) {
     const [progress, setProgress] = useState(0);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [showCommentsModal, setShowCommentsModal] = useState(false); // Add this state
-console.log(data);
+    // console.log(data);
     useEffect(() => {
         if (data) {
             const timer = setInterval(() => {
@@ -60,7 +60,7 @@ console.log(data);
                 currentImageIndex={currentImageIndex}
                 onImageClick={setCurrentImageIndex}
             />
-            <PostFooter data={data} totalComment={data.post_comments} hideCommentButton={hideCommentButton} />
+            <PostFooter data={data} totalComment={data.comments} hideCommentButton={hideCommentButton} />
         </div>
     );
 }
@@ -76,21 +76,21 @@ function PostHeader({ data }) {
             <div className="dropdown-list-image mr-3" style={{ background: '#edf2fe75' }} >
                 <img
                     className="rounded-circle"
-                    src={data.post_author_picture || friendImage}
-                    alt={data.post_author_name}
+                    src={data.user_picture || friendImage}
+                    alt={data.user_name}
                 />
                 <div className={`status-indicator ${data.post_author_online ? 'bg-success' : 'bg-secondary'}`}></div>
             </div>
             <div className="font-weight-bold">
                 <div className="text-truncate">
                     <Link to={data.user_id} className="text-dark">
-                        {data.post_author_name}
+                        {data.user_name}
                     </Link>
                 </div>
                 <div className="small text-gray-500">
                     {/* {new Date(data.time).toLocaleString()} */}
                     {/* {data.time} */}
-                    <img className='mr-2' src={globe_icon} alt="" />
+                    <img className='mr-1' style={{ width: '16px' }} src={globe_icon} alt="" />
                     <TimeAgo date={data.time} />
                 </div>
             </div>
@@ -118,7 +118,7 @@ function PostHeader({ data }) {
     );
 }
 
-export function PostContent({ data, currentImageIndex, onImageClick }) {
+export function PostContent({ data, currentImageIndex, onImageClick, profileData }) {
     const [imageLoadError, setImageLoadError] = useState({});
     const [imageLoading, setImageLoading] = useState(true);
     const [showGallery, setShowGallery] = useState(false);
@@ -173,7 +173,7 @@ export function PostContent({ data, currentImageIndex, onImageClick }) {
                             padding: '80px 20px',
                             fontWeight: 'bolder',
                             textAlign: 'center',
-                            fontSize:'15px'
+                            fontSize: '15px'
                         } : { padding: '10px' }}
                     >
                         {data.text}
@@ -315,14 +315,14 @@ export function PostFooter({ data, hideCommentButton = false }) {
 
                 <button
                     className="text-secondary border-0 bg-transparent post_icon"
-                    aria-label={`Views (${data.views_formatted || 0})`}
+                    aria-label={`Views (${data.views || 0})`}
                 >
                     <img src={post_chart} alt="" />
-                    <span className="ms-1">{data.views_formatted}</span>
+                    <span className="ms-1">{data.views}</span>
                 </button>
 
                 <ShareButton
-                    sharesCount={data.shares_formatted || 0}
+                    sharesCount={data.shares || 0}
                     postUrl={`https://zagasmdemo.netlify.app/posts/${data.post_id}`}
                     postTitle="Check out this amazing content!"
                 />
@@ -331,14 +331,10 @@ export function PostFooter({ data, hideCommentButton = false }) {
                     <button className="text-secondary border-0 bg-transparent post_icon" onClick={handleCommentClick}>
                         <img src={Message_square} alt="" />
 
-                        <span className='' style={{ marginLeft: '1px' }}> {data.post_comments?.length || 0}</span>
+                        <span className='' style={{ marginLeft: '1px' }}> {data.comments || 0}</span>
                     </button>
                 )}
-
-
-
                 <ReactionButton
-
                     initialCount={data.reaction_haha_count}
                     emoji="😂"
                     postId={data.post_id}

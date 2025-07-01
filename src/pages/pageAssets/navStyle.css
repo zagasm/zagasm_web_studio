@@ -1,5 +1,5 @@
 .navbar {
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.144);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.055);
     width: 100%;
     overflow: visible;
     height: 65px;
@@ -16,8 +16,8 @@
 }
 
 .navbar-brand img.zagasm_logo {
-    width: 180px;
-    height: 50px;
+    width: 120px;
+    height: 40px;
 }
 
 .navbar .nav_search .input-group {
@@ -90,9 +90,9 @@
     margin-left: 20px
 }
 
-.side_bar_container .list-sidebar .list-group a li:hover {
+/* .side_bar_container .list-sidebar .list-group a li:hover {
     background: #e4cff881;
-}
+} */
 
 .side_bar_container .list-sidebar .list-group a li span {
     /* display: none; */
@@ -102,18 +102,20 @@
     margin-right: 20px;
 }
 
-.side_bar_container .list-sidebar .list-group a li:hover {
+.side_bar_container .list-sidebar .list-group a li.active {
     color: white;
     background: linear-gradient(84.41deg, #C207E7 1.78%, #490481 69.04%);
+ 
+    
+    
 }
 
 .side_bar_container .list-sidebar .list-group a li img {
     margin-right: 20px;
 }
 
-.side_bar_container .list-sidebar .list-group a li:hover img {
+.side_bar_container .list-sidebar .list-group a .active img {
     fill: white;
-    color: white;
     filter: brightness(0) invert(20);
 }
 
@@ -183,13 +185,13 @@
 .right_side_bar_inner_container {
     position: fixed;
     right: 20px;
-    top: 50px;
+    top: 70px;
     width: 350px;
     max-height: 100vh;
     height: calc(100vh - 90px);
     overflow-y: auto;
     background-color: white;
-    padding-top: 30px;
+    /* padding-top: 30px; */
     /* padding: 40px 20px 20px 20px; */
 }
 

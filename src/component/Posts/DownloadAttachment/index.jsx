@@ -94,20 +94,21 @@ const PostDownloadButton = ({ data }) => {
                 </button> */}
             <Button
                 // variant="link"
-                type="button"
+                // type="button"
                 className="w-100 text-left d-flex align-items-center py-3 px-4"
                 style={{
                     background: 'none',
                     border: 'none',
                     fontSize: '16px',
                     color: 'black',
-                    outline: 'none'
+                    outline: '0px'
                 }}
                 onClick={handleClick}
                 title="Download or View"
             >
                 <i style={{ fontSize: '20px' }} className="feather-download me-3"></i>
-                <span className='ml-2'>Download image</span>
+                {hasImages && <span className='ml-2'>Download image</span>}
+                {hasText && <span className='ml-2'>Download text as image</span>}
             </Button>
 
             <Modal

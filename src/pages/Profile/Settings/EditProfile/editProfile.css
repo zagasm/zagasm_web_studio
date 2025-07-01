@@ -1,0 +1,141 @@
+/* EditProfileForm.css */
+.edit-profile-form {
+  max-width: 600px;
+  margin: 0 auto;
+  /* padding: 2rem; */
+  /* background: #fff; */
+  border-radius: 12px;
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.edit-profile-form h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  color: #262626;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.3s ease;
+  background:transparent;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #8000ff;
+}
+
+.form-group textarea {
+  resize: none;
+}
+
+.save-btn {
+  /* width: 100%; */
+  padding: 12px;
+  background-color: #8000FF;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 1rem;
+}
+
+.save-btn:hover {
+  background-color: #6700cc;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .edit-profile-form {
+    padding: 5px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 0.9rem;
+  }
+
+  .save-btn {
+    font-size: 0.95rem;
+  }
+
+}
+
+@media (max-width: 756px) {
+ 
+  .edit-profile-form{
+    padding-bottom: 100px;
+  }
+}
+/* Phone input override */
+.phone-input-custom {
+  width: 100% !important;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+/* Profile image upload */
+.profile-image-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.profile-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #ddd;
+}
+
+.upload-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #8000ff;
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  font-size: 0.9rem;
+}
+
+.upload-icon:hover {
+  background-color: #6700cc;
+}

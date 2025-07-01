@@ -131,14 +131,14 @@ const FollowModal = ({
     const modalSizeClass = size === "lg" ? "modal-lg" : "";
 
     return (
-        <div className="modal-overlay">
+        <div className="modal-overlay" style={{  zIndex: '99999999999999999999999999'}}>
             <div className={`follow-modal ${modalSizeClass}`}>
-                <div className="modal-header p-3">
+                <div className="modal-header p-3" style={{  zIndex: '99999999999999999999999999'}}>
                     <h3>{title}</h3>
                     <button className="close-button" onClick={onClose}>×</button>
                 </div>
 
-                <div className="search-container">
+                <div className="search-container" >
                     <input
                         type="text"
                         placeholder="Search by name or username..."

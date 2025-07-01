@@ -52,7 +52,7 @@ export const PostProvider = ({ children, user }) => {
                 {
                     method: "POST",
                     body: formPayload,
-                    credentials: 'include'
+                    // credentials: 'include'
                 }
             );
             if (!response.ok) {
@@ -97,7 +97,7 @@ export const PostProvider = ({ children, user }) => {
         try {
             const formPayload = new FormData();
             formPayload.append("api_secret_key", import.meta.env.VITE_API_SECRET || 'Zagasm2025!Api_Key_Secret');
-            // formPayload.append("offset", '1');
+            // formPayload.append("offset", '30');
             formPayload.append("limit", '30');
             formPayload.append("user_id", user_id);
 
@@ -106,7 +106,7 @@ export const PostProvider = ({ children, user }) => {
                 {
                     method: "POST",
                     body: formPayload,
-                    credentials: 'include'
+                    // credentials: 'include'
                 }
             );
             if (!response.ok) {
@@ -148,7 +148,7 @@ export const PostProvider = ({ children, user }) => {
                 {
                     method: "POST",
                     body: formPayload,
-                    credentials: 'include'
+                    // credentials: 'include'
                 }
             );
             if (!response.ok) {
