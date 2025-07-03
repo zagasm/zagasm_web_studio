@@ -334,7 +334,7 @@ function CreatePost() {
                 <SideBarNav />
 
                 <div className=" offset-xl-3 offset-lg-1 offset-md-1 create-post-row">
-                    {isLoading ? <PostShimmerLoader /> : <main className="col col-xl-7 col-lg-6 col-md-12 col-sm-12 col-12 main-container main_container " style={{ paddingTop: '65px' }}>
+                    {isLoading ? <PostShimmerLoader /> : <main className="col col-xl-7 col-lg-8 col-md-12 col-sm-12 col-12 main-container main_container " style={{ paddingTop: '65px' }}>
                         {/* <div className="container my-4"> */}
                         <div className="car shadow-s p-4 rounde ">
                             <h5 className="mb-4" style={{ color: '#8000FF' }}>Create a Post</h5>
@@ -368,7 +368,7 @@ function CreatePost() {
                                                     paddingTop: '80px',
                                                     paddingBottom: '80px',
                                                     transition: 'all 0.3s ease',
-                                                    border: 'none'
+                                                    // border: 'none'
                                                 }}
                                             />
                                             <div className="d-flex justify-content-between mt-1">
@@ -496,7 +496,7 @@ function CreatePost() {
                                             type="submit"
                                             className="mt-3"
                                             disabled={isSubmitting}
-                                            style={{ background: 'linear-gradient(to right, #8000FF, rgba(228, 40, 235, 0.87))', float: 'right', border: 'none' }}
+                                            style={{ background: '#8F07E7', float: 'right', border: 'none' }}
                                         >
                                             {isSubmitting ? 'Submitting...' : 'Submit Post'}
                                         </Button>

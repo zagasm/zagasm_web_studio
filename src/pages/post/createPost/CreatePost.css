@@ -89,6 +89,11 @@
   background-color: rgba(255, 0, 0, 0.8);
 }
 
+.create-post-row {
+  padding-left: 100px;
+  transition: 0.3s ease-in-out;
+}
+
 /* Tab container */
 .create-post-row .nav-tabs {
   border-bottom: 2px solid #dee2e6;
@@ -187,10 +192,22 @@
 }
 
 .img_upload_container:hover {
-  box-shadow:none;
+  box-shadow: none;
 }
+
 @media (max-width: 760px) {
   .img_upload_container {
-  width: 100%;
+    width: 100%;
   }
+}
+
+@media (max-width: 1760px) {
+  .create-post-row {
+    padding-left: 10px;
+  }
+}
+@media (max-width: 760px) {
+ .create-post-row{
+  padding-left: 0px;
+}
 }

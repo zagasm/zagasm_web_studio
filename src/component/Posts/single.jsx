@@ -117,7 +117,6 @@ function PostHeader({ data }) {
         </div>
     );
 }
-
 export function PostContent({ data, currentImageIndex, onImageClick, profileData }) {
     const [imageLoadError, setImageLoadError] = useState({});
     const [imageLoading, setImageLoading] = useState(true);
@@ -293,9 +292,6 @@ export function PostContent({ data, currentImageIndex, onImageClick, profileData
         </div>
     );
 }
-
-
-
 export function PostFooter({ data, hideCommentButton = false }) {
     const { user } = useAuth();
 

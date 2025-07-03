@@ -114,7 +114,7 @@ function PostViewModal({ post, show, onHide }) {
                 </Modal.Header>
 
                 <Modal.Body >
-                    <CommentContainer post={post} comment_data={post.comments} />
+                    <CommentContainer post={post} comment_data={post.comment} />
                 </Modal.Body>
             </Modal>
         </>

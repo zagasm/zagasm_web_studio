@@ -138,9 +138,9 @@ function ExplorePage() {
           <main className="col col-xl-8 col-lg-8 col-md-12 main_container explore-main-section">
             <div className="explore-header text-center mb-4">
               <h2 className="explore-title">Discover People</h2>
-              <p className="explore-subtitle">
+              {/* <p className="explore-subtitle">
                 Find creators, friends and communities
-              </p>
+              </p> */}
             </div>
 
             <div className="container">

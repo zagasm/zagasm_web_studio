@@ -62,38 +62,35 @@ export function Signin() {
           withCredentials: true,
         }
       );
-  console.log(data);
-      // const data = response.data;
 
-      // if (data.error) {
-      //   throw new Error(data.message || "Login failed");
-      // }
+      const data = response.data;
 
-      // login({
-      //   ...data.user,
-      //   token: data.token
-      // });
+      if (data.error) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      login({
+        ...data.user,
+        token: data.token
+      });
 
       showToast.success(data.message || "Login successful!");
       navigate("/");
     } catch (err) {
-      // console.error("Error during sign in:", err);
+      console.error("Error during sign in:", err);
 
       // Backend responded with an error
-      // const status = err.response.status;
-      // const message =
-        // err.response.data?.message || "An error occurred. Please try again.";
+      const status = err.response.status;
+      const message =
+        err.response.data?.message || "An error occurred. Please try again.";
 
-      console.error('Error loggging:', err);
-      // setErrors(message || 'Failed to login. Please try again.');
-      // showToast.error(message || 'Failed to login. Please try again.');
-      // if (status === 401) {
-      //   showToast.error(message || "Invalid credentails.");
-      //   setErrors(message || "Invalid credentails.");
-      // } else {
-      //   showToast.error(message);
-      //   setErrors(message);
-      // }
+      if (status === 401) {
+        showToast.error(message || "Invalid credentails.");
+        setErrors(message || "Invalid credentails.");
+      } else {
+        showToast.error(message);
+        setErrors(message);
+      }
 
     }
 

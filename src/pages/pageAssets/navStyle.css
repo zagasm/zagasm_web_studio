@@ -8,7 +8,13 @@
     z-index: 999;
     padding: 0px;
     background: white;
+    transition: 0.2s ease-in-out;
 
+}
+
+.nav-item .nav_icon_img {
+    width: 25px;
+    height: 25px
 }
 
 .navbar-brand {
@@ -16,7 +22,7 @@
 }
 
 .navbar-brand img.zagasm_logo {
-    width: 120px;
+    width: 150px;
     height: 40px;
 }
 
@@ -105,9 +111,9 @@
 .side_bar_container .list-sidebar .list-group a li.active {
     color: white;
     background: linear-gradient(84.41deg, #C207E7 1.78%, #490481 69.04%);
- 
-    
-    
+
+
+
 }
 
 .side_bar_container .list-sidebar .list-group a li img {
@@ -232,7 +238,7 @@
         width: 300px;
     }
 
-    
+
 }
 
 @media (max-width: 1205px) {
@@ -281,6 +287,7 @@
     .navbar-nav .create_post_btn {
         display: none;
     }
+
     .navbar-brand img.zagasm_logo {
         width: 100px;
         height: 30px;
@@ -310,6 +317,11 @@
 
     .mobile_search {
         display: block;
+    }
+
+    .nav-item .nav_icon_img {
+        width: 25px;
+        height: 25px;
     }
 
 }

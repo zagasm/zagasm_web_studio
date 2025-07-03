@@ -17,14 +17,13 @@ import default_profilePicture from '../../assets/avater_pix.avif';
 // import './navStyle.css';
 import MobileNav from './MobileNav';
 import { useAuth } from '../auth/AuthContext';
-
+import NotificationCounter from '../Notification/NotificationCounter';
 const messages = [
     { img: p1, content: 'Sample message content 1', sender: 'Alice', time: '1h' },
     { img: p2, content: 'Sample message content 2', sender: 'Bob', time: '2h' },
     { img: p3, content: 'Sample message content 3', sender: 'Charlie', time: '3h' },
     { img: p4, content: 'Sample message content 4', sender: 'Diana', time: '4h' },
 ];
-
 const Navbar = () => {
     const { user, logout } = useAuth();
     const Default_user_image = user.user_picture || default_profilePicture;
@@ -43,36 +42,34 @@ const Navbar = () => {
                             <Link className="nav-link search_form" to="/explore">
                                <i className='fa fa-search mr-2 ml-3'></i> <span>search for creator</span>
                             </Link>
-                           
                         </li>
-
-                        
-                    </ul>
-
-                    <ul className="navbar-nav ml-auto d-flex align-items-center">
-                        {/* Messages Dropdown */}
-
-                        <li className="nav-item dropdown no-arrow mx- osahan-list-dropdown mr-5">
+                          <li className="nav-item dropdown no-arrow mx- osahan-list-dropdown mr-5">
                             <Link to={'/create-post'} className="nav-link dropdown-toggl create_post_btn shadow-sm p-3 text-light" >
                                 <img src={Edit_icon} alt="notification icon" /> <span>Create a Post</span>
                             </Link>
                           
                         </li>
+                    </ul>
+
+                    <ul className="navbar-nav ml-auto d-flex align-items-center">
+                        {/* Messages Dropdown */}
+
+                      
                         {/* Alerts Dropdown */}
                          <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown mobile_search ">
-                            <Link to="/explore" className="nav-link dropdown-toggle p-2" >
-                                <img src={search_icon} alt="" />
+                            <Link to="/explore" className="nav-link dropdown-toggle " >
+                                <img className='nav_icon_im m-0' src={search_icon} alt="" />
                             </Link> 
                         </li>
                         <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown ">
                             <Link to={'/notification'} className="nav-link dropdown-toggle p-2" >
-                                <img src={bell_icon} alt="notification icon" />
-                                <span style={{ background: '#8F07E7' }} className="badge  badge-counter">0</span>
+                                <img className='nav_icon_img'  src={bell_icon} alt="notification icon" />
+                                <span style={{ background: '#8F07E7', fontWeight:'700', fontSize:'9px',height:"18px", top:'5px', left:'19px', width:'18px',display:'flex',alignItems:'center', justifyContent:'center',paddingLeft:'1px' }} className="badge badge-counter  m-0"><NotificationCounter userId={user.user_id} /></span>
                             </Link> 
                         </li>
                         <li className="nav-item dropdown no-arro0 mx-1 osahan-list-dropdown profile_link">
                             <button style={{ borderRadius: '20px', padding: '5px 10px', marginLeft: '20px' }} className="nav-link dropdown-toggl shadow-sm " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img style={{ width: '40px', height: '40px' }} className="img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
+                                <img   className="nav_icon_img img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
                                  <span className='fa fa-bars ml-2'></span>
                             </button>
                             <div className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">

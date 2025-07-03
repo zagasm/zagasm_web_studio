@@ -162,13 +162,13 @@ function Chat() {
 
   return (
     <div className="container-fluid" >
-      <SideBarNav />
-      <div className="offset-xl-2 offset-lg-1 offset-md-1" >
+      {/* <SideBarNav /> */}
+      <div className="offset-xl-1 offset-lg-0 offset-md-0" >
         <main  className={`col ml-xl-5 col-xl-8 order-xl-2 col-lg-8 order-lg-1 col-md-12 col-sm-12 col-12 ${recipient_id ? 'chat-overlay-mobile' : ''}`}>
           <div className="car rounded chat-container">
             {recipient_id ? (
               <>
-                <div className="chat-header d-flex align-items-center p-3 border-bottom">
+                <div className="chat-header d-flex align-items-center p-3 border-bottom bg-ligh" style={{background:'white'}}>
                   <Link to={'/chat'} className='fa fa-angle-left mr-4'></Link>
                   <img src={conversation?.picture || DEFAULT_AVATAR} className="rounded-circle me-2" width={45} height={45} alt="user" />
                   <div>
@@ -209,9 +209,9 @@ function Chat() {
               <div className="chat-placeholder text-center">
                 <div className="container p-0 m-0">
                   <div className="d-none d-lg-block">
-                    <div className="mt-5 d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+                    <div className="mt-5 d-flex justify-content-center align-items-center " style={{ height: '80vh' }}>
                       <div>
-                        <span className="fa fa-comments mb-4 placeholder-img" style={{ fontSize: '100px', color: '#8000FF' }}></span>
+                        <span className="fa fa-comments mb-4 placeholder-img" style={{ fontSize: '50px', color: '#8000FF' }}></span>
                         <h4 className="fw-semibold text-dark">Welcome to your inbox</h4>
                         <p className="text-muted mb-0">Select a conversation or start a new one to begin chatting.</p>
                       </div>
@@ -227,7 +227,7 @@ function Chat() {
           </div>
         </main>
       </div>
-      <RightBarComponent>
+      <RightBarComponent >
         <h3 className="m-0 mt-3 mb-3 pl-3" style={{ color: '#8000FF',marginTop:'65px' }}>Chats</h3>
         <AllChats  style={{ color: '#8000FF',marginTop:'65px' }} />
       </RightBarComponent>
