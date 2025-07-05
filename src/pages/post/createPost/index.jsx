@@ -54,7 +54,28 @@ function CreatePost() {
             '#FECACA', '#E9D5FF', '#F0F0F0', '#D1C4E9', '#FFCDD2', '#C8E6C9'
         ]
     };
-
+    const gradientCombinations = [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+        'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+        'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+        'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+        'linear-gradient(135deg, #ff8177 0%, #ff867a 100%)',
+        'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+        'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+        'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+        'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
+        'linear-gradient(135deg, #f83600 0%, #f9d423 100%)',
+        'linear-gradient(135deg, #3f51b1 0%, #5a55ae 100%)',
+        'linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%)',
+        'linear-gradient(135deg, #b8cbb8 0%, #b8cbb8 100%)'
+    ];
     // Validate text length
     useEffect(() => {
         setTextExceedsLimit(text.length > maxChars);
@@ -142,6 +163,7 @@ function CreatePost() {
                 formData.append('message', text);
                 formData.append('background_color_code', textBgColor);
                 formData.append('text_color_code', textColor);
+                console.log(textBgColor);
             } else {
                 formData.append('photo_caption', caption);
                 images.forEach((image, index) => {
@@ -157,8 +179,11 @@ function CreatePost() {
                 `${import.meta.env.VITE_API_URL}/includes/ajax/posts/app_post.php`,
                 formData,
                 {
-                    withCredentials: true,
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 }
+            }
             );
             const data = response.data;
             console.log('Response data:', data);
@@ -191,8 +216,32 @@ function CreatePost() {
     // Background color picker popover
     const bgColorPickerPopover = (
         <Popover id="bg-color-picker-popover">
-            <Popover.Header as="h3">Choose Background Color</Popover.Header>
+            <Popover.Header as="h3">Choose Background</Popover.Header>
             <Popover.Body>
+                <div className="mb-3">
+                    <h6 className="mb-2">Gradient Backgrounds</h6>
+                    <div className="d-flex gap-2 flex-wrap">
+                        {gradientCombinations.map((gradient, idx) => (
+                            <div
+                                key={`gradient-${idx}`}
+                                onClick={() => {
+                                    setTextBgColor(gradient);
+                                    setShowBgColorPicker(false);
+                                }}
+                                style={{
+                                    background: gradient,
+                                    width: '30px',
+                                    height: '30px',
+                                    borderRadius: '5px',
+                                    cursor: 'pointer',
+                                    border: textBgColor === gradient ? '2px solid #000' : '1px solid #ccc'
+                                }}
+                                title={gradient}
+                            />
+                        ))}
+                    </div>
+                </div>
+
                 <div className="mb-3">
                     <h6 className="mb-2">Primary Colors</h6>
                     <div className="d-flex gap-2 flex-wrap">
@@ -267,6 +316,7 @@ function CreatePost() {
             </Popover.Body>
         </Popover>
     );
+
 
     // Text color picker popover
     const textColorPickerPopover = (
@@ -354,7 +404,7 @@ function CreatePost() {
                                                 value={text}
                                                 onChange={e => setText(e.target.value)}
                                                 style={{
-                                                    backgroundColor: textBgColor,
+                                                    background: textBgColor, // Changed from backgroundColor to background
                                                     color: textColor,
                                                     borderBottom: textExceedsLimit ? '2px solid red' : '1px solid #ccc',
                                                     borderRadius: '10px',
@@ -368,7 +418,6 @@ function CreatePost() {
                                                     paddingTop: '80px',
                                                     paddingBottom: '80px',
                                                     transition: 'all 0.3s ease',
-                                                    // border: 'none'
                                                 }}
                                             />
                                             <div className="d-flex justify-content-between mt-1">
@@ -519,7 +568,7 @@ function CreatePost() {
                                                 outline: 'none'
                                             }}
                                         ></textarea>
-                                       {caption.length > 0 && <div className="d-flex justify-content-between m-0 p-0 mb-2">
+                                        {caption.length > 0 && <div className="d-flex justify-content-between m-0 p-0 mb-2">
                                             <small className={`text-${captionExceedsLimit ? 'danger' : 'muted'}`}>
                                                 {caption.length}/{maxChars} characters
                                             </small>
@@ -603,11 +652,10 @@ function CreatePost() {
                                     {images.length >= maxImages && (
                                         <p className="text-danger mt-2">You can only upload up to {maxImages} images.</p>
                                     )}
-
                                     <Button
                                         type="submit"
                                         className="mt-3"
-                                        style={{ background: 'linear-gradient(to right, #8000FF, rgba(228, 40, 235, 0.87))', float: 'right', border: 'none' }}
+                                        style={{ background: '#8F07E7', float: 'right', border: 'none' }}
                                         onClick={handleSubmit}
                                         disabled={isSubmitting}
                                     >

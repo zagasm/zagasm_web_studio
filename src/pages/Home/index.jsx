@@ -32,7 +32,7 @@ function Home() {
                                 <Link to="/" className="following_tab tab active w-50"> 
                                     Following
                                 </Link>
-                                <Link className="for_you_tab tab w-50 " href="/for-you">
+                                <Link className="for_you_tab tab w-50 " >
                                     For you
                                 </Link>
 

@@ -18,27 +18,15 @@ function AuthContainer({ title, description, children }) {
     }, []);
     return (
         <Fragment>
-            <div className="bg-light  position-relative overflow-visible  auth-background" style={{ height: 'fit-content' }}>
+            <div className="  auth-background" >
 
-                {/* Background Slider */}
-                {/* <div className="slider-overlay position-absolute top-0 start-0 w-100 h-100">
-                    <img
-                        src={images[currentImage]}
-                        alt="Slider"
-                        className="w-100 h-100 object-fit-cover"
-                        style={{ objectFit: 'cover', transition: 'opacity 1s ease-in-out', opacity: 0.4 }}
-                    />
-                    Terms and conditions 
-About 
-Help
-                    <div className="overlay position-absolute top-0 start-0 w-100 h-100 " style={{ opacity: 0.5 }} />
-                </div> */}
+                
 
                 {/* Main Content */}
                 <div className="container-fluid position-relative auth_container">
-                   <div className="row justify-content-center align-items-center d-flex vh-100 mb-5">
-                        <div className="col-xl-4 col-lg-7 col-md-6  col  card form_container">
-                            <div className="osahan-login py-4">
+                   <div className="row justify-content-center align-items-center d-flex align-center mb-5 inner_form_con">
+                        <div className="col-xl-4 col-lg-7 col-md-6  col form_container ">
+                            <div className="osahan-login ">
                                 <div className="text-center mb-4 pr-4 pl-4">
                                     <p href="index.html" style={{ display: 'flex', justifyContent: 'center' }}>
                                         <a href="#">
@@ -57,7 +45,7 @@ Help
                             </div>
                         </div>
                     </div>
-                     <div className="auth_footer pb-4">
+                     <div className="auth_footer ">
                         <div className=''><a href="">Language</a></div>
                         <ul>
                             <li><a href="#">Terms and conditions </a></li>

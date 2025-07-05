@@ -64,7 +64,7 @@ const Navbar = () => {
                         <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown ">
                             <Link to={'/notification'} className="nav-link dropdown-toggle p-2" >
                                 <img className='nav_icon_img'  src={bell_icon} alt="notification icon" />
-                                <span style={{ background: '#8F07E7', fontWeight:'700', fontSize:'9px',height:"18px", top:'5px', left:'19px', width:'18px',display:'flex',alignItems:'center', justifyContent:'center',paddingLeft:'1px' }} className="badge badge-counter  m-0"><NotificationCounter userId={user.user_id} /></span>
+                                {/* <span style={{ background: '#8F07E7', fontWeight:'700', fontSize:'9px',height:"18px", top:'5px', left:'19px', width:'18px',display:'flex',alignItems:'center', justifyContent:'center',paddingLeft:'1px' }} className="badge badge-counter  m-0"><NotificationCounter userId={user.user_id} /></span> */}
                             </Link> 
                         </li>
                         <li className="nav-item dropdown no-arro0 mx-1 osahan-list-dropdown profile_link">
@@ -72,22 +72,19 @@ const Navbar = () => {
                                 <img   className="nav_icon_img img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
                                  <span className='fa fa-bars ml-2'></span>
                             </button>
-                            <div className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm">
-                                <div className="p-3 d-flex align-items-center">
-                                    <div className="dropdown-list-image mr-3">
-                                        <img className="rounded-circle" src={Default_user_image} alt="User" />
-                                        <div className="status-indicator bg-success"></div>
+                            <div style={{maxWidth:'20px', border:'none'}} className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end dropdown-menu-left shadow-sm border-none">
+                                <div className="px-3 d-flex align-items-center">
+                                    <div className="dropdown-list-image ">
+                                        <img className="rounded-circle nav_icon_img" src={Default_user_image} alt="User" />
                                     </div>
-                                    <div className="font-weight-bold">
-                                        <div className="text-truncate">{user.user_lastname} {user.user_firstname}</div>
-                                        <div className="small text-gray-500">@{user.user_name}</div>
+                                    <div className="font-weight-bold " style={{marginTop:'-20px'}}>
+                                        <div className="text-truncate m-0 p-0" style={{fontWeight:'lighter'}}>{user.user_lastname} {user.user_firstname}</div>
+                                        {/* <div className="small text-gray-500">@{user.user_name}</div> */}
                                     </div>
                                 </div>
-                                <div className="dropdown-divider"></div>
-                                <Link className="dropdown-item" to={"/" + user.user_id}><i className=" feather-edit mr-1"></i> My Account</Link>
-                                <Link className="dropdown-item" to={"/" + user.user_id}><i className=" feather-user mr-1"></i> Edit Profile</Link>
-                                <div className="dropdown-divider"></div>
-                                <Link onClick={() => logout()} className="dropdown-item" ><i className=" feather-log-out mr-1"></i> Logout</Link>
+                                <Link style={{border:'none'}} className="dropdown-item border-bottom mb-3" to={"/" + user.user_id}><i className=" feather-settings mr-1"></i> Settings</Link>
+                                
+                                <Link onClick={() => logout()} className="dropdown-item  " style={{border:'none', color:'red'}} ><i className=" feather-log-out mr-1"></i> Sign Out</Link>
                             </div>
                         </li>
 

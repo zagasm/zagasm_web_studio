@@ -54,17 +54,15 @@ export function Signin() {
       const formPayload = new FormData();
       formPayload.append("username_email", formData.username_email);
       formPayload.append("password", formData.password);
-
+// const response = await axios.post(`https://zagasm.com/api/auth/sign_in.php`, formPayload);
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/sign_in.php`,
-        formPayload,
-        {
-          withCredentials: true,
-        }
+        formPayload
+       
       );
 
       const data = response.data;
-
+    console.log(data);
       if (data.error) {
         throw new Error(data.message || "Login failed");
       }
@@ -75,7 +73,7 @@ export function Signin() {
       });
 
       showToast.success(data.message || "Login successful!");
-      navigate("/");
+      // navigate("/");
     } catch (err) {
       console.error("Error during sign in:", err);
 
@@ -153,7 +151,7 @@ export function Signin() {
             />
             <i
               className={`position-absolute ${showPassword ? "feather-eye" : "feather-eye-off"}`}
-              style={{ right: "15px", cursor: "pointer" }}
+              style={{ right: "9px", top:'-23px', cursor: "pointer" }}
               onClick={() => setShowPassword(!showPassword)}
             />
             {errors.password && (

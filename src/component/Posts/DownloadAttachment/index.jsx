@@ -107,8 +107,9 @@ const PostDownloadButton = ({ data }) => {
                 title="Download or View"
             >
                 <i style={{ fontSize: '20px' }} className="feather-download me-3"></i>
-                {hasImages && <span className='ml-2'>Download image</span>}
-                {hasText && <span className='ml-2'>Download text as image</span>}
+
+                {hasImages ? <span className='ml-2'>Download image</span> : hasText && <span className='ml-2'>Download text as image</span> }
+                {/* {hasText && <span className='ml-2'>Download text as image</span>} */}
             </Button>
 
             <Modal

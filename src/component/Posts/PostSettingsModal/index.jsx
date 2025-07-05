@@ -43,7 +43,7 @@ function PostSettingsModal({ post, show, onHide }) {
     // New function to copy post link
     const copyPostLink = () => {
         if (!post) return;
-        
+
         const postUrl = `${window.location.origin}/posts/${post.post_id}`;
         navigator.clipboard.writeText(postUrl)
             .then(() => {
@@ -83,10 +83,10 @@ function PostSettingsModal({ post, show, onHide }) {
             {isLoading && <FullScreenPreloader />}
 
             {/* Toast Notification */}
-            <Toast 
-                onClose={() => setShowToast(false)} 
-                show={showToast} 
-                delay={3000} 
+            <Toast
+                onClose={() => setShowToast(false)}
+                show={showToast}
+                delay={3000}
                 autohide
                 style={{
                     position: 'fixed',
@@ -114,17 +114,20 @@ function PostSettingsModal({ post, show, onHide }) {
                 animation={false}
                 backdrop="static"
             >
-                <button
-                    className="modal-close-btn ml-3"
-                    onClick={handleClose}
-                    aria-label="Close"
-                >
-                    <span className='fa fa-angle-left'></span>
-                </button>
+                <div className=" d-flex justify-content-center bg-dange mt-2 w-100">
+                    <button
+                        className="modal-close-btn "
+                        onClick={handleClose}
+                        aria-label="Close"
+                    >
+                        <span className='fa fa-close'></span>
+                        {/* <span className='fa fa-angle-left'></span> */}
+                    </button>
+                </div>
                 <Modal.Body style={{ padding: '0px', margin: '0px' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                        <div className='w-100 ' style={{ padding: '70px 10px 0px 10px' }}>
-                           { user.user_id != post.user_id && <div className="d-flex align-items-center p-3 " >
+                        <div className='w-100 ' style={{ padding: '0px 10px 0px 10px' }}>
+                            {user.user_id != post.user_id && <div className="d-flex align-items-center pt-4" >
                                 <div className="mr-3" style={{ position: 'relative' }}>
                                     <img
                                         className="rounded-circle"

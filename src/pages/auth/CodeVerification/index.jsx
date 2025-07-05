@@ -83,7 +83,7 @@ export function CodeVerification({ email }) {
 
     } catch (err) {
 
-      if (err.response) {
+      // if (err.response) {
         // Backend responded with an error
         const status = err.response.status;
         const message =
@@ -94,10 +94,10 @@ export function CodeVerification({ email }) {
         } else {
           setError(message);
         }
-      } else {
-        // No response received
-        setError("Network error. Please check your internet connection.");
-      }
+      // } else {
+      //   // No response received
+      //   setError("Network error. Please check your internet connection.");
+      // }
 
       setIsVerifying(false);
     }

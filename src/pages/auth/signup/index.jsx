@@ -90,10 +90,7 @@ export function SignUp() {
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/sign_up.php`,
-        formDataEncoded,
-        {
-          withCredentials: true,
-        }
+        formDataEncoded
       );
       const data = response.data;
       if (data.success) {
@@ -234,7 +231,7 @@ export function SignUp() {
                 className="form-group"
               >
                 <div className="position-relative icon-form-control" style={{ maxWidth: '100%' }}>
-                  <i className="feather-lock position-absolute input-icon" style={{ top: '50%', transform: 'translateY(-50%)' }}></i>
+                  <i className="feather-lock position-absolute input-icon" ></i>
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
@@ -255,12 +252,12 @@ export function SignUp() {
                     className={`position-absolute input-icon ${showPassword ? "feather-eye" : "feather-eye-off"}`}
                     style={{
                       right: "15px",
-                      top: "50%",
+                      top: "60%",
                       cursor: "pointer",
                       transform: "translateY(-50%)",
                       color: '#666',
                       userSelect: 'none',
-                      fontSize: '20px'
+                      fontSize: '16px'
                     }}
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
@@ -275,7 +272,7 @@ export function SignUp() {
                 className="form-group"
               >
                 <div className="position-relative icon-form-control" style={{ maxWidth: '100%' }}>
-                  <i className="feather-lock position-absolute input-icon" style={{ top: '50%', transform: 'translateY(-50%)' }}></i>
+                  <i className="feather-lock position-absolute input-icon" ></i>
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
@@ -296,12 +293,12 @@ export function SignUp() {
                     className={`position-absolute input-icon ${showConfirmPassword ? "feather-eye" : "feather-eye-off"}`}
                     style={{
                       right: "15px",
-                      top: "50%",
+                      top: "60%",
                       cursor: "pointer",
                       transform: "translateY(-50%)",
                       color: '#666',
                       userSelect: 'none',
-                      fontSize: '20px'
+                      fontSize: '16px',
                     }}
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
@@ -313,13 +310,14 @@ export function SignUp() {
                 <input
                   type="checkbox"
                   name="privacy_agree"
-                  className="form-check-input"
+                  className="form-check-input privacy_checker"
                   checked={formData.privacy_agree}
                   onChange={handleChange}
                   id="privacyAgree"
                   required
+                  style={{padding:'1px'}}
                 />
-                <label className="form-check-label" htmlFor="privacyAgree">
+                <label className="form-check-label privacy_text ml-3" htmlFor="privacyAgree">
                   I agree to the privacy policy and terms of service
                 </label>
               </div>

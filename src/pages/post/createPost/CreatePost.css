@@ -90,7 +90,7 @@
 }
 
 .create-post-row {
-  padding-left: 100px;
+  padding-left: 10px;
   transition: 0.3s ease-in-out;
 }
 
@@ -99,6 +99,11 @@
   border-bottom: 2px solid #dee2e6;
 }
 
+.create-post-row .nav-tabs .nav-item {
+  width: 50%;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.11);
+   /* border-radius:  50px; */
+}
 /* Inactive tabs */
 .create-post-row .nav-tabs .nav-link {
   color: #333;
@@ -106,7 +111,7 @@
   padding: 10px 20px;
   font-weight: 500;
   background: #f8f9fa;
-  border-radius: 5px 5px 0 0;
+  
   margin-right: 5px;
   transition: background-color 0.3s;
   width: 100%;
@@ -121,6 +126,7 @@
   font-weight: bold;
   border: none;
   width: 100%;
+  
 }
 
 /* Hover effect */

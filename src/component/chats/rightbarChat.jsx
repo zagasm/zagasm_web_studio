@@ -18,10 +18,10 @@ function AllChats() {
     );
 
     return (
-        <div className="boxshadow-s rounded mb-3 bg-white p-0 m-0">
+        <div className="boxshadow-sm rounded mb-3 bg-white p-0 m-0 ">
             <div className="border-rig col-lg-12 col-xl-12 p-0 m-0">
                 <div className="osahan-chat-left text-left">
-                    <div className="position-relative icon-form-control p-3 border-bottom">
+                    <div className="position-relative icon-form-control p-3 border-botto">
                         <i className="feather-search position-absolute"></i>
                         <input
                             placeholder="Search messages"

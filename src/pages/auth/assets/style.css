@@ -1,10 +1,17 @@
 body {
   font-family: 'Inter', sans-serif;
 }
-.form_container{
-  box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
- border-radius: 25px;
+.inner_form_con{
+  min-height: 100vh;
 }
+.form_container {
+  box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
+  border-radius: 25px;
+  justify-content: center;
+  align-items: center;
+  padding:15px 0px;
+}
+
 form .input {
   border: none;
   box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
@@ -21,6 +28,7 @@ form .input {
 }
 
 form .input-icon {
+  margin-top: -20px;
   font-size: 25px;
   padding-left: 10px;
   color: #8000FF
@@ -80,7 +88,7 @@ form .submit_button {
 form .code_container {
   display: flex;
   text-align: center;
-  
+
 }
 
 form .code_container .code {
@@ -97,19 +105,25 @@ form .code_container .code {
   width: 100%;
   /* padding: 10px 10px; */
 }
-.auth_container .auth_footer ul{
 
-padding: 0px;}
+.auth_container .auth_footer ul {
+  padding: 0px;
+}
+
 .auth_container .auth_footer ul li {
   display: inline-block;
   margin: 0px 20px;
 }
+
 .auth_container .container_heading_text {
   color: #8000FF;
   font-size: 30px;
   font-family: 'Inter'
 }
-
+#privacyAgree{
+    width: 20px;
+    height: 20px;
+  }
 /* Mobile view: Remove background image */
 @media (max-width: 767px) {
   .auth_container .container_heading_text {
@@ -122,5 +136,41 @@ padding: 0px;}
     background: none;
     background: #fff;
     /* fallback color if needed */
+  }
+
+  form .input-icon {
+    font-size: 20px;
+  }
+
+  form .input {
+    height: 50px;
+  }
+
+  .auth_container .auth_footer {
+    display: block;
+    text-align: center;
+    /* padding-bottom: 200px; */
+    width: 100%;
+    overflow: visible;
+    /* height: 50vh; */
+  }
+
+  .auth_container .auth_footer ul li {
+    display: block;
+    margin: 10px 0px;
+  }
+
+  .form_container {
+    box-shadow: none;
+  }
+  .privacy_text{
+    font-size: 13px;
+  }
+  input.privacy_checker{
+    width: 20px;
+    height: 20px;
+    margin-bottom:-70px;
+    top:-4px;
+
   }
 }

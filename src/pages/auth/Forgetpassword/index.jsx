@@ -27,13 +27,10 @@ export function ForgetPassword() {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/send_reset_code.php`,
         formPayload,
-        {
-          withCredentials: true,
-        }
       );
       const data = response.data;
-
-      if (  data.status === "success") {
+// console.log(data);
+      if (data.success) {
         showToast.success(data.message ||"Reset code sent successfully!");
         setShowCodeVerification(true);
         setResetCode(data.user.reset_key);
@@ -42,7 +39,7 @@ export function ForgetPassword() {
         showToast.error(data.message || "Something went wrong.");
       }
     }catch (err) {
-
+ 
       if (err.response) {
         // Backend responded with an error
         const status = err.response.status;
@@ -54,12 +51,9 @@ export function ForgetPassword() {
         } else {
           showToast.error(message);
         }
-      } else {
-        // No response received
-        showToast.error("Network error. Please check your internet connection.");
       }
 
-      setIsVerifying(false);
+      // setIsVerifying(false);
     }
     
     finally {

@@ -27,7 +27,7 @@ function SideBarNav() {
 
     return (
         <aside className="shadow-sm side_bar_container bg-white">
-            <div className="box mb-3 rounded bg-white list-sidebar">
+            <div className="box mb-3 rounde bg-white list-sidebar">
                 <ul className="list-group list-group-flush side_bar_nav">
                     <Link to="/">
                         <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/') ? 'active' : ''}`}>

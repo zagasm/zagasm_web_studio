@@ -4,6 +4,11 @@
     padding-bottom: 100px;
 }
 
+.main-container {
+    margin-left: 45px;
+    transition: 0.3s ease-in-out ;
+}
+
 .notification-card {
     /* background: white; */
     border-radius: 12px;
@@ -37,6 +42,8 @@
 
 .notification-list {
     padding: 8px 0;
+    height:72vh;
+    overflow: auto;
 }
 
 .notification-item {
@@ -160,13 +167,33 @@
 
 /* Animation */
 @keyframes shimmer {
-    0% { background-position: -468px 0 }
-    100% { background-position: 468px 0 }
+    0% {
+        background-position: -468px 0
+    }
+
+    100% {
+        background-position: 468px 0
+    }
 }
 
-.shimmer-avatar, .shimmer-line {
+.shimmer-avatar,
+.shimmer-line {
     animation: shimmer 1.5s infinite linear;
     background: linear-gradient(to right, #f0f0f0 8%, #e0e0e0 18%, #f0f0f0 33%);
     background-size: 800px 104px;
     position: relative;
+}
+
+@media (max-width: 1555px) {
+    .main-container {
+        margin-left: 10px;
+    }
+
+}
+
+@media (max-width: 1005px) {
+    .main-container {
+        margin-left: 0px;
+    }
+
 }

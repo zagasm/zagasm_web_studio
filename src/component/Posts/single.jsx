@@ -53,7 +53,7 @@ function SinglePostTemplate({ data, hideCommentButton = false }) {
     }
 
     return (
-        <div className="box shadow-s border-0 rounded bg-white mb-3 osahan-post">
+        <div className="box shadow-s border-0 rounded bg-white osahan-post">
             <PostHeader data={data} />
             <PostContent
                 data={data}

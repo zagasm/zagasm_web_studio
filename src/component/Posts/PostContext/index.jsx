@@ -170,11 +170,11 @@ export const PostProvider = ({ children, user }) => {
         }
     };
 
-    const getRandomEvents = (posts, count) => {
-        if (!posts || posts.length === 0) return [];
-        const shuffled = [...posts].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, Math.min(count, shuffled.length));
-    };
+    // const getRandomEvents = (posts, count) => {
+    //     if (!posts || posts.length === 0) return [];
+    //     const shuffled = [...posts].sort(() => 0.5 - Math.random());
+    //     return shuffled.slice(0, Math.min(count, shuffled.length));
+    // };
 
     return (
         <PostContext.Provider
@@ -185,7 +185,6 @@ export const PostProvider = ({ children, user }) => {
                 message,
                 currentPost,
                 singlePostLoading,
-                
                 fetchPost,
                 fetchPostById,
                 refreshProfilePost: fetchUserPost,
