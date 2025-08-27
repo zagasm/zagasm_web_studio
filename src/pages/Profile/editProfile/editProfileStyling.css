@@ -1,0 +1,151 @@
+.edit_form_container {
+    margin-bottom: 100px;
+}
+
+.heading_section .profle_img_container {
+    display: flex;
+
+}
+
+/* Email input with icon */
+.email-input-group {
+    position: relative;
+}
+
+.profile_img_info {
+    /* margin-top: 30px; */
+    position: relative;
+
+}
+.details_display{
+    width: 100%;
+}
+.profile_img_info label {
+    background: none;
+    padding: 8px  ;
+    border-radius: 20px;
+    border: 1px solid rgb(202, 198, 198);
+    position: absolute;
+    bottom: 0px;
+    width: 150px;
+    /* height: 40px; */
+    text-align: center;
+   cursor: pointer;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: #6c757d;
+    z-index: 10;
+}
+
+.email-input-group .form-control {
+    padding-left: 40px;
+}
+
+/* Phone input styling */
+.phone-input {
+    /* padding: 8px 12px; */
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.PhoneInputInput {
+    border: none;
+    outline: none;
+}
+
+.phone-input:focus {
+    border-color: #80bdff;
+    outline: 0;
+    /* box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); */
+}
+
+/* Existing styles */
+.profle_img img {
+    /* width: 80px; */
+    /* height: 80px; */
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit_form_container {
+    background: #fff;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    height: 40px;
+    border-radius: 4px;
+}
+
+.form-control {
+    height: 45px;
+}
+
+.password_tab {
+    border-bottom: 1px solid rgb(226, 221, 221);
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+
+.password_tab a {
+    color: black;
+}
+
+
+
+.update_picture {
+    display: none;
+}
+
+.profile_update_btn {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 30px;
+    color: white;
+    background-color: rgba(143, 7, 231, 1);
+}
+
+
+
+@media (max-width: 959px) {
+    .edit_form_container {
+        padding: 10px;
+    }
+
+    .heading_section .profle_img_container {
+        justify-content: center;
+        display: block;
+        width: 100%;
+    }
+
+    .heading_section .profle_img_container .profle_img {
+        display: block;
+        margin: auto;
+    }
+
+    .profle_img_container .profile_img_info {
+        display: none;
+    }
+
+    .update_picture {
+        display: block;
+        text-align: center;
+        color: rgba(143, 7, 231, 1);
+        text-decoration: underline;
+        /* font-family: 'Montserrat'; */
+    }
+}

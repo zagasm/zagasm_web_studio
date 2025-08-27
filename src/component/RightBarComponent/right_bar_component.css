@@ -1,0 +1,33 @@
+.right_bar_component {
+    height: calc(100vh - 80px);
+    position: fixed;
+    padding: 0px;
+    margin: 0;
+    right: 0;
+    width: 370px;
+    /* Takes full width of parent */
+    max-width: inherit;
+    /* Respects parent's width constraints */
+    overflow-y: scroll;
+    box-sizing: border-box;
+    /* background-color: blue; */
+    /* Ensures padding doesn't affect width */
+}
+
+/* Optional: Make close button more accessible */
+.right_bar_component .fa-close {
+    cursor: pointer;
+    padding: 10px;
+    font-size: 1.2rem;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 10;
+}
+
+@media (max-width: 1770px) {
+    .rightBarContainer {
+        display: none;
+    }
+
+}

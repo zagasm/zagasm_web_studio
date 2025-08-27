@@ -1,36 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
-import googleLogo from "../../../assets/google-logo.png";
-// import $ from "jquery";
 import axios from "axios";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { isValidPhoneNumber, getCountryCallingCode } from 'react-phone-number-input';
+
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
-  const [step, setStep] = useState(1);
-  const { GeSignupData } = useAuth();
+  const { login } = useAuth(); // Updated to use login
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    label: "",
+    class: ""
+  });
+  const [countryCode, setCountryCode] = useState("+234"); // Default to Nigeria
+  const [phoneError, setPhoneError] = useState("");
 
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    username: "",
-    email: "",
+    phone: "",
     password: "",
-    confirmPassword: "",
-    birth_month: "",
-    birth_day: "",
-    birth_year: "",
-    gender: "",
-    privacy_agree: false,
-    reset_key: "",
-    user_logged_in: true
+    country_code: "+234"
   });
+
+  useEffect(() => {
+    if (formData.password) {
+      checkPasswordStrength(formData.password);
+    } else {
+      setPasswordStrength({
+        score: 0,
+        label: "",
+        class: ""
+      });
+    }
+  }, [formData.password]);
+
+  const checkPasswordStrength = (password) => {
+    let score = 0;
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    let label, strengthClass;
+    if (score >= 5) {
+      label = "Strong";
+      strengthClass = "strong";
+    } else if (score >= 3) {
+      label = "Medium";
+      strengthClass = "medium";
+    } else if (score > 0) {
+      label = "Weak";
+      strengthClass = "weak";
+    } else {
+      label = "";
+      strengthClass = "";
+    }
+
+    setPasswordStrength({
+      score,
+      label,
+      class: strengthClass
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,484 +82,235 @@ export function SignUp() {
     }));
   };
 
-  const handleContinue = (e) => {
-    e.preventDefault();
-    // Basic validation for step 1
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.password || !formData.confirmPassword) {
-      showToast.error("Please fill in all fields");
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      showToast.error("Passwords do not match");
-      return;
-    }
-    if (!formData.privacy_agree) {
-      showToast.error("You must agree to the privacy policy");
-      return;
-    }
-    setError("");
-    setStep(2);
-  };
+  const handlePhoneChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      phone: value || ""
+    }));
 
-  const handleBack = () => {
-    setStep(1);
+    if (value) {
+      try {
+        const code = `+${getCountryCallingCode(value)}`;
+        setCountryCode(code);
+        setFormData(prev => ({
+          ...prev,
+          country_code: code
+        }));
+      } catch (e) {
+        console.error("Could not get country code", e);
+      }
+    }
+
+    if (value && !isValidPhoneNumber(value)) {
+      setPhoneError("Invalid phone number");
+    } else {
+      setPhoneError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    // Validation for step 2
-    if (!formData.birth_month || !formData.birth_day || !formData.birth_year || !formData.gender) {
+
+    // Validate all fields
+    if (!formData.first_name || !formData.last_name || !formData.phone || !formData.password) {
       showToast.error("Please fill in all fields");
+      return;
+    }
+
+    if (!isValidPhoneNumber(formData.phone)) {
+      showToast.error("Please enter a valid phone number");
       return;
     }
 
     setIsLoading(true);
     try {
-      // Prepare the data in x-www-form-urlencoded format
-      const formDataEncoded = new URLSearchParams();
-      formDataEncoded.append("first_name", formData.first_name);
-      formDataEncoded.append("last_name", formData.last_name);
-      formDataEncoded.append("username", formData.username);
-      formDataEncoded.append("email", formData.email);
-      formDataEncoded.append("password", formData.password);
-      formDataEncoded.append("birth_month", formData.birth_month);
-      formDataEncoded.append("birth_day", formData.birth_day);
-      formDataEncoded.append("birth_year", formData.birth_year);
-      formDataEncoded.append("gender", formData.gender);
-      formDataEncoded.append("privacy_agree", formData.privacy_agree ? "1" : "0");
-      formDataEncoded.append("api_secret_key", formData.reset_key);
+      const phoneWithoutCountryCode = formData.phone.replace(new RegExp(`^\\${formData.country_code}`), '');
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone: phoneWithoutCountryCode,
+        password: formData.password,
+        country_code: formData.country_code
+      };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/sign_up.php`,
-        formDataEncoded
+        `${import.meta.env.VITE_API_URL}/api/v1/users`,
+        payload
       );
-      const data = response.data;
-      if (data.success) {
-        showToast.success(data.message || "Registration successful!");
-        setIsLoading(false);
-        setFormData([]);
-        setStep(1);
-      } else {
-        showToast.error(data.message || "An error occurred. Please try again.");
-        setError(data.message || "An error occurred. Please try again.");
+
+      // console.log(response);
+      // Handle successful response
+      if (response.data && response.data.token) {
+        // Store user data in context/state
+        login({
+          token: response.data.token,
+          user: response.data.user
+        });
+        // Show success message
+        showToast.success(response.data.message || "Account created successfully!");
+        // Navigate to dashboard or appropriate page
+        navigate("/"); // Update this to your desired redirect path
       }
     } catch (err) {
-      console.error("Error during signup:", err);
-
-      // Backend responded with an error
-      const status = err.response.status;
-      const message =
-        err.response.data?.message || "An error occurred. Please try again.";
-
-      if (status === 401) {
-        showToast.error(message || "Invalid Email or email is not register on the platform.");
-        setError(message || "Invalid Email or email is not register on the platform.");
-      } else {
-        showToast.error(message);
-        setError(message);
-      }
-
-    }
-    finally {
+      console.error("Signup error:", err);
+      const errorMessage = err.response?.data?.message || "Registration failed";
+      showToast.error(errorMessage);
+      setError(errorMessage);
+    } finally {
       setIsLoading(false);
     }
   };
-  //  setIsLoading(false); 
+
+  const isFormValid = () => {
+    return (
+      formData.first_name.trim() !== "" &&
+      formData.last_name.trim() !== "" &&
+      formData.phone.trim() !== "" &&
+      isValidPhoneNumber(formData.phone) &&
+      formData.password.trim() !== ""
+    );
+  };
+
   return (
-    <>
-      <AuthContainer
-        title={step === 1 ? "Basic information" : "Personal Details"}
-        description={step === 1 ? "Let's get started with your basic details" : "Just a few more details to complete your profile"}
-      >
-        <form autoComplete="off" className="pr-3 pl-3" onSubmit={handleSubmit}>
-          {error && <div className="text-danger mb-3 alert alert-danger">{error}</div>}
-          {step === 1 ? (
-            <>
-              <div className="row p-0 m-0">
-                <motion.div
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  className="form-group col-md-6 p-0 m-0"
-                >
-                  <div className="position-relative icon-form-control">
-                    <input
-                      type="text"
-                      name="first_name"
-                      className="form-control input"
-                      style={{ paddingLeft: "60px", outline: "none" }}
-                      placeholder="First Name"
-                      autoComplete="off"
-                      value={formData.first_name}
-                      onChange={handleChange}
-                      required
-                    />
-                    <i className="feather-user position-absolute input-icon"></i>
-                  </div>
-                </motion.div>
+    <AuthContainer
+      title={"Create Your Account"}
+      description={"Begin to explore amazing events"}
+      footer={true}
+      header={true}
+      privacy={true}
+      haveAccount={false}
+    >
+      <form autoComplete="off" className="" onSubmit={handleSubmit}>
+        {error && <div className="text-danger mb-3 alert alert-danger">{error}</div>}
 
-                <motion.div
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  className="form-group col-md-6 p-0 m-0"
-                >
-                  <div className="position-relative icon-form-control">
-                    <input
-                      type="text"
-                      name="last_name"
-                      className="form-control input"
-                      style={{ paddingLeft: "60px", outline: "none" }}
-                      placeholder="Last Name"
-                      autoComplete="off"
-                      value={formData.last_name}
-                      onChange={handleChange}
-                      required
-                    />
-                    <i className="feather-user position-absolute input-icon"></i>
-                  </div>
-                </motion.div>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="form-group"
-              >
-                <div className="position-relative icon-form-control">
-                  <input
-                    type="text"
-                    name="username"
-                    className="form-control input"
-                    style={{ paddingLeft: "60px", outline: "none" }}
-                    placeholder="Username"
-                    autoComplete="off"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                  />
-                  <i className="feather-at-sign position-absolute input-icon"></i>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="form-group"
-              >
-                <div className="position-relative icon-form-control">
-                  <input
-                    type="email"
-                    name="email"
-                    className="form-control input"
-                    style={{ paddingLeft: "60px", outline: "none" }}
-                    placeholder="Email Address"
-                    autoComplete="off"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                  <i className="feather-mail position-absolute input-icon"></i>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="form-group"
-              >
-                <div className="position-relative icon-form-control" style={{ maxWidth: '100%' }}>
-                  <i className="feather-lock position-absolute input-icon" ></i>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    className="form-control input"
-                    style={{
-                      paddingLeft: "60px",
-                      fontSize: "16px",
-                      color: "#000",
-                      paddingRight: '40px',
-                    }}
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    minLength="6"
-                  />
-                  <i
-                    className={`position-absolute input-icon ${showPassword ? "feather-eye" : "feather-eye-off"}`}
-                    style={{
-                      right: "15px",
-                      top: "60%",
-                      cursor: "pointer",
-                      transform: "translateY(-50%)",
-                      color: '#666',
-                      userSelect: 'none',
-                      fontSize: '16px'
-                    }}
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  ></i>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="form-group"
-              >
-                <div className="position-relative icon-form-control" style={{ maxWidth: '100%' }}>
-                  <i className="feather-lock position-absolute input-icon" ></i>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    className="form-control input"
-                    style={{
-                      paddingLeft: "60px",
-                      fontSize: "16px",
-                      color: "#000",
-                      paddingRight: '40px',
-                    }}
-                    placeholder="Confirm Password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    minLength="6"
-                  />
-                  <i
-                    className={`position-absolute input-icon ${showConfirmPassword ? "feather-eye" : "feather-eye-off"}`}
-                    style={{
-                      right: "15px",
-                      top: "60%",
-                      cursor: "pointer",
-                      transform: "translateY(-50%)",
-                      color: '#666',
-                      userSelect: 'none',
-                      fontSize: '16px',
-                    }}
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                  ></i>
-                </div>
-              </motion.div>
-
-              <div className="form-group form-check mb-3">
+        <div className="row p-0 m-0">
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="col-md-6 col-6 p-0 m-0"
+          >
+            <div className="form-group m-2">
+              <label htmlFor="fName">First name</label>
+              <div className="position-relative">
                 <input
-                  type="checkbox"
-                  name="privacy_agree"
-                  className="form-check-input privacy_checker"
-                  checked={formData.privacy_agree}
+                  id="fName"
+                  type="text"
+                  name="first_name"
+                  className="form-control input"
+                  style={{ paddingLeft: "50px" }}
+                  placeholder="First Name"
+                  value={formData.first_name}
                   onChange={handleChange}
-                  id="privacyAgree"
                   required
-                  style={{padding:'1px'}}
                 />
-                <label className="form-check-label privacy_text ml-3" htmlFor="privacyAgree">
-                  I agree to the privacy policy and terms of service
-                </label>
-              </div>
-
-
-
-              <motion.button
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="btn submit_button btn-block"
-                type="button"
-                style={{ color: 'white' }}
-                onClick={handleContinue}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    Continue <span className="fas fa-arrow-right mr-3"></span>
-                  </>
-                )}
-              </motion.button>
-            </>
-          ) : (
-            <>
-              <div className="row">
-                <motion.div
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  className="form-group col-md-4"
-                >
-                  <div className="position-relative icon-form-control">
-                    <select
-                      name="birth_month"
-                      className="form-control input"
-                      style={{ paddingLeft: "60px", outline: "none", appearance: 'none' }}
-                      value={formData.birth_month}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Month</option>
-                      {Array.from({ length: 12 }, (_, i) => (
-                        <option key={i} value={String(i + 1).padStart(2, '0')}>
-                          {new Date(0, i).toLocaleString('default', { month: 'long' })}
-                        </option>
-                      ))}
-                    </select>
-                    <i className="feather-calendar position-absolute input-icon"></i>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  className="form-group col-md-4"
-                >
-                  <div className="position-relative icon-form-control">
-                    <select
-                      name="birth_day"
-                      className="form-control input"
-                      style={{ paddingLeft: "60px", outline: "none", appearance: 'none' }}
-                      value={formData.birth_day}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Day</option>
-                      {Array.from({ length: 31 }, (_, i) => (
-                        <option key={i} value={String(i + 1).padStart(2, '0')}>
-                          {i + 1}
-                        </option>
-                      ))}
-                    </select>
-                    <i className="feather-calendar position-absolute input-icon"></i>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  className="form-group col-md-4"
-                >
-                  <div className="position-relative icon-form-control">
-                    <select
-                      name="birth_year"
-                      className="form-control input"
-                      style={{ paddingLeft: "60px", outline: "none", appearance: 'none' }}
-                      value={formData.birth_year}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Year</option>
-                      {Array.from({ length: 100 }, (_, i) => (
-                        <option key={i} value={new Date().getFullYear() - i}>
-                          {new Date().getFullYear() - i}
-                        </option>
-                      ))}
-                    </select>
-                    <i className="feather-calendar position-absolute input-icon"></i>
-                  </div>
-                </motion.div>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="form-group"
-              >
-                <div className="position-relative icon-form-control">
-                  <select
-                    name="gender"
-                    className="form-control input"
-                    style={{ paddingLeft: "60px", outline: "none", appearance: 'none' }}
-                    value={formData.gender}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="1">Male</option>
-                    <option value="2">Female</option>
-                  </select>
-                  <i className="feather-users position-absolute input-icon"></i>
-                </div>
-              </motion.div>
-
-
-
-              <motion.button
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="btn submit_button btn-block"
-                type="submit"
-                style={{ color: 'white' }}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    Create Account <span className="fas fa-check ml-2"></span>
-                  </>
-                )}
-              </motion.button>
-
-              {step === 2 && (
-                <p className="text-center mt-2" style={{ cursor: 'pointer' }} onClick={handleBack}>
-                  <span className="fas fa-arrow-left ml-2"></span> Back
-                </p>
-              )}
-            </>
-          )}
-
-          <div className="text-center mt-3 border-botto pb-3 mb-3">
-            <p className="small text-muted">Or continue with</p>
-            <div className="row">
-              <div className="col-6">
-                <motion.button
-                  initial={{ opacity: 0, y: 70 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  type="button"
-                  className=" btn-sm api_btn btn-block"
-                >
-                  <img src={googleLogo} alt="Google Logo" className="mr-2" style={{ width: '20px', height: '20px', marginTop: '-5px' }} />
-                  <span>Google</span>
-                </motion.button>
-              </div>
-              <div className="col-6">
-                <motion.button
-                  initial={{ opacity: 0, y: 70 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, ease: "easeOut" }}
-                  type="button"
-                  className=" api_btn dark_apple_api_btn btn-block"
-                >
-                  <i className="fab fa-apple mr-2"></i> Apple
-                </motion.button>
+                <i className="input-icon feather-user position-absolute"></i>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="py-3 text-center auth-footer">
-            <span className="text-center">
-              Already have an account? <Link className="font-weight-bold" to="/auth/signin">Sign in</Link>
-            </span>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="col-md-6 col-6 p-0 m-0"
+          >
+            <div className="form-group m-2">
+              <label htmlFor="lName">Last name</label>
+              <div className="position-relative">
+                <input
+                  id="lName"
+                  type="text"
+                  name="last_name"
+                  className="form-control input"
+                  style={{ paddingLeft: "50px" }}
+                  placeholder="Last Name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  required
+                />
+                <i className="input-icon feather-user position-absolute"></i>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="form-group phone-input-section m-2" style={{background:'white'}}
+        >
+          <label htmlFor="PhoneNumber">Phone Number</label>
+          <div className="phone-input-container" style={{background:'white'}}>
+            <PhoneInput
+              id="PhoneNumber"
+              international
+              defaultCountry="NG"
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              className={`phone-input ${phoneError ? 'is-invalid' : ''}`}
+              placeholder="Enter phone number"
+              style={{background:'white'}}
+            />
+            {phoneError && <div className="phone-error-message">{phoneError}</div>}
           </div>
-        </form>
-      </AuthContainer>
-    </>
+          <input style={{background:'white'}} type="hidden" name="country_code" value={formData.country_code} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="form-group m-2"
+        >
+          <label>Password</label>
+          <div className="position-relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              className="form-control input"
+              style={{ paddingLeft: "40px", paddingRight: "40px" }}
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              minLength="8"
+            />
+            <i
+              className={`input-password-icon feather-eye${showPassword ? "" : "-off"} position-absolute`}
+              onClick={() => setShowPassword(!showPassword)}
+            ></i>
+            <i className="input-icon feather-lock position-absolute"></i>
+          </div>
+          {/* {formData.password && (
+            <>
+              <div className="password-strength-meter">
+                <div className={`strength-bar ${passwordStrength.class}`}></div>
+              </div>
+              <small className={`text-${passwordStrength.class}`}>
+                {passwordStrength.label}
+              </small>
+            </>
+          )} */}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="mt-4 mr-2 ml-2"
+        >
+          <button
+            className={`${isFormValid() ? 'active_submit_button' : 'inactive_submit_button'}`}
+            type="submit"
+            disabled={!isFormValid() || isLoading}
+          >
+            {isLoading ? "Creating Account..." : "Complete Registration"}
+          </button>
+        </motion.div>
+      </form>
+    </AuthContainer>
   );
 }

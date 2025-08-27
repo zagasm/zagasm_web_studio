@@ -2,7 +2,7 @@
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.055);
     width: 100%;
     overflow: visible;
-    height: 65px;
+    height: 80px;
     position: fixed;
     top: 0px;
     z-index: 999;
@@ -18,12 +18,12 @@
 }
 
 .navbar-brand {
-    margin-left: 20px;
+    margin-left: 10px;
 }
 
 .navbar-brand img.zagasm_logo {
-    width: 150px;
-    height: 40px;
+    width: 120px;
+    height: 70px;
 }
 
 .navbar .nav_search .input-group {
@@ -65,15 +65,13 @@
 .navbar-nav.middle_nav {
     display: flex;
     justify-content: center;
-    gap: 30px
+    gap: 380px
 }
 
 .shadow-sm.side_bar_container {
-    /* border-right: 1px solid rgba(221, 214, 214, 0.596); */
-    height: calc(100vh - 65px);
+    height: calc(100vh - 80px);
     position: fixed;
-    top: 65px;
-    /* background-color: white; */
+    top: 80px;
     padding-top: 20px;
     overflow: hidden;
     width: 300px;
@@ -122,62 +120,7 @@
     filter: brightness(0) invert(20);
 }
 
-.mobile_navbar_container {
-    background: white;
-    position: fixed;
-    bottom: 0px;
-    z-index: 99;
-    padding: 20px;
-    width: 100%;
-    overflow: hidden;
-    display: none;
-}
 
-.mobile_navbar_container ul {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    list-style-type: none;
-    padding: 200px;
-    margin: 0px;
-}
-
-.mobile_navbar_container ul a {
-    font-size: 25px;
-    padding: 0px;
-
-}
-
-.mobile_navbar_container ul .mobile_icon_name {
-    display: none;
-}
-
-.mobile_navbar_container ul .active {
-    margin: 0px;
-    padding: 8px 10px;
-    color: white;
-    background: linear-gradient(84.41deg, #C207E7 1.78%, #490481 69.04%);
-    box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
-    border-radius: 15px;
-    display: flex;
-
-
-}
-
-.mobile_navbar_container ul .active .mobile_icon_name {
-    font-size: 15px;
-    margin-top: 2px;
-    margin-left: 10px;
-    display: inline;
-
-
-}
-
-.mobile_navbar_container ul .active img {
-    fill: white;
-    color: white;
-    filter: brightness(0) invert(20);
-}
 
 .right_side_bar {
     /* margin-top: 65px; */
@@ -217,12 +160,15 @@
 }
 
 .osahan-nav-top .middle_nav .search_form {
-    border: 1px solid #E6E6E6;
-    width: 300px;
-    border-radius: 25px;
+    border: 1px solid rgba(244, 230, 253, 1);
+    width: 400px;
+    border-radius: 20px;
     height: 45px;
     font-size: 16px;
     color: #838383;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px;
 
 }
 
@@ -230,12 +176,36 @@
     display: none;
 }
 
+.page_wrapper {
+    /* background-color: red; */
+    width: calc(100% - 310px);
+    margin-left: 300px;
+    margin-top: 80px;
+    padding-left: 20px;
+    /* padding-left: 20px; */
+    /* padding-right: 20px; */
+    /* overflow: hid; */
+}
+
+@media (max-width: 1365px) {
+    .osahan-nav-top .middle_nav .search_form {
+        width: 300px;
+        font-size: 13px;
+    }
+
+    .navbar-nav.middle_nav {
+        gap: 80px
+    }
+}
+
 @media (max-width: 1265px) {
     .right_side_bar_inner_container {
         width: 300px;
     }
 
-
+    .navbar-nav.middle_nav {
+        gap: 40px
+    }
 }
 
 @media (max-width: 1205px) {
@@ -263,12 +233,14 @@
         transition: 0.4s ease-in-out;
     }
 
-    .osahan-nav-top .middle_nav .nav-icon {
-        font-size: 30px;
-        padding: 10px 20px;
-        display: none;
-        transition: 0.4s ease-in-out;
+    .page_wrapper {
+        width: calc(100% - 40px);
+        margin-left: 70px;
+        margin-top: 80px;
+         padding-left: 0px;
     }
+
+
 
 
     .main_container {
@@ -289,8 +261,9 @@
 
     .navbar-brand img.zagasm_logo {
         width: 100px;
-        height: 30px;
+        height: 40px;
     }
+
 }
 
 @media (max-width: 767px) {
@@ -310,6 +283,12 @@
         display: none;
     }
 
+    .page_wrapper {
+        width: calc(100%);
+        margin-left: 0px;
+        margin-top: 80px;
+    }
+
     .profile_link {
         display: none;
     }
@@ -323,8 +302,264 @@
         height: 25px;
     }
 
+    /* .osahan-nav-top .middle_nav .nav-icon {
+        font-size: 30px;
+        padding: 10px 20px;
+        display: none;
+        transition: 0.4s ease-in-out;
+    } */
+
 }
 
 .list-group-item:hover {
     background-color: #f0f2f5;
+}
+
+.mobile_navbar_container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 5px 0;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.floating-nav-wrapper {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 50px;
+    position: relative;
+}
+
+.mobile_navbar_container .nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    transition: transform 0.35s cubic-bezier(0.645, 0.045, 0.355, 1), color 0.3s ease;
+    position: relative;
+    z-index: 1;
+    transform: translateY(0);
+}
+
+.mobile_navbar_container .nav-link.float-up {
+    transform: translateY(-10px);
+}
+
+.mobile_navbar_container .nav-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.mobile_navbar_container .nav-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+}
+
+.mobile_navbar_container .profile-pic {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mobile_navbar_container .mobile_icon_name {
+    font-size: 10px;
+    text-transform: capitalize;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.mobile_navbar_container .nav-link.active .mobile_icon_name,
+.mobile_navbar_container .nav-link.float-up .mobile_icon_name {
+    opacity: 1;
+    font-weight: 600;
+    font-size: 10px;
+}
+
+.mobile_navbar_container .nav-link.active {
+    color: #490481;
+}
+
+.mobile_navbar_container .nav-link.float-up .nav-content {
+    padding: 9px 12px;
+    border-radius: 50%;
+    background: linear-gradient(131.28deg, #8F07E7 22.4%, #490481 66.23%);
+    box-shadow: -1px 1px 5px rgba(72, 10, 123, 0.4);
+    color: white;
+}
+
+.mobile_navbar_container .nav-link.float-up .nav-content img {
+    filter: brightness(0) invert(1);
+}
+
+.mobile_navbar_container .nav-link.float-up .nav-content .profile-pic {
+    filter: brightness(1) invert(0);
+
+}
+
+
+@media (min-width: 768px) {
+    .mobile_navbar_container {
+        display: none;
+    }
+}
+
+/* Ripple and smooth round effect */
+
+.mobile_navbar_container .nav-link {
+    position: relative;
+    overflow: hidden;
+    /* necessary for ripple */
+    border-radius: 35px;
+    /* always rounded */
+    padding: 5px 8px;
+    transition: all 0.4s ease-in-out;
+}
+
+.mobile_navbar_container .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 4px;
+    background: rgba(137, 0, 255, 0.4);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    transition: all 0.4s ease;
+}
+
+.mobile_navbar_container .nav-link.active::after {
+    width: 80%;
+    height: 8px;
+    animation: rippleCurve 0.6s ease;
+    background: radial-gradient(ellipse at center, rgba(137, 0, 255, 0.3) 0%, transparent 70%);
+}
+
+/* Animation curve like ripple */
+@keyframes rippleCurve {
+    0% {
+        width: 0%;
+        height: 0px;
+        opacity: 0.7;
+    }
+
+    50% {
+        width: 70%;
+        height: 8px;
+        opacity: 1;
+    }
+
+    100% {
+        width: 80%;
+        height: 8px;
+        opacity: 0.3;
+    }
+}
+
+/* .mobile_navbar_container .nav-link.float-up .nav-content {
+    border-radius: 35px;
+    background: linear-gradient(131.28deg, #8F07E7 22.4%, #490481 66.23%);
+    box-shadow: -1px 1px 6px rgba(72, 10, 123, 0.5);
+    color: white;
+    padding: 10px 14px;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+} */
+ .mobile_navbar_container .nav-link.float-up .nav-content {
+    width: 80px; /* or any fixed width */
+    height: 80px; /* or any fixed height */
+    border-radius: 50%;
+    background: linear-gradient(131.28deg, #8F07E7 22.4%, #490481 66.23%);
+    box-shadow: -1px 1px 6px rgba(72, 10, 123, 0.5);
+    color: white;
+    padding: 10px 14px;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Prevents overflow if content is larger */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.mobile_navbar_container .nav-link.float-up .nav-content img {
+    filter: brightness(0) invert(1);
+}
+
+
+.ripple {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(137, 0, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: rippleEffect 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+
+.mobile_navbar_container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 5px 0;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: visible;
+}
+
+/* Ocean wave dip when nav item is active */
+.mobile_navbar_container.has-active::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 40px;
+    background: white;
+    border-radius: 0 0 50% 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    z-index: 0;
+    transition: all 0.3s ease;
+}
+
+/* Floating nav setup */
+.floating-nav-wrapper {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 70px;
+    position: relative;
+    z-index: 2;
+}
+
+@media (max-width: 468px) {
+    .navbar {
+        box-shadow: none;
+
+
+    }
 }

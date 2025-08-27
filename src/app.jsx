@@ -21,26 +21,31 @@ import NetworkStatus from "./component/assets/NetworkStatus";
 import Home from "./pages/Home/index.jsx";
 
 import FullpagePreloader from "./component/assets/FullPagePreloader/index.jsx";
-import Navbar from "./pages/pageAssets/Navbar.jsx";
-import Chat from "./pages/chatRoom/index.jsx";
-import MyProfile from "./pages/Profile/Header.jsx";
-import ProfileOutlet from "./pages/Profile/ProfileOutlet.jsx";
-import UserPost from "./pages/Profile/AlluserPosts.jsx";
-import Sessionpage from "./pages/auth/SessionPage/index.jsx";
-import CreatePost from "./pages/post/createPost/index.jsx";
-import PostDetailsPage from "./pages/post/postDetails/index.jsx";
-import PostViewModal from "./component/Posts/PostViewMOdal/index.jsx";
-import Post from "./component/Posts/ReadPost/index.jsx";
-import ExplorePage from "./pages/Explore/index.jsx";
-import Notifications from "./pages/Notification/index.jsx";
-import EditProfile from "./pages/Profile/Settings/header.jsx";
-import Settings from "./pages/Profile/Settings/header.jsx";
-import Help from "./pages/Profile/Settings/HelpCenterSettings/HelpOutlet.jsx";
-import Faqs from "./pages/Profile/Settings/HelpCenterSettings/Faqs/index.jsx";
 
+import { SigninWithCode } from "./pages/auth/signin/SignCode.jsx";
+import { ChangePasswordSuccesffully } from "./pages/auth/ChangePassword/successPasswordChange.jsx";
+import Navbar from "./pages/pageAssets/Navbar.jsx";
+import PostSignupForm from "./component/assets/ModalContext/signupForm/PostSignUpForm.jsx";
+import Sessionpage from "./pages/auth/SessionPage/index.jsx";
+import Event from "./pages/event/EventOutlet.jsx";
+import ViewEvent from "./pages/event/ViewEvent/index.jsx";
+import CreateEvent from "./pages/event/CreateEvent/index.jsx";
+import SaveEvents from "./pages/event/SaveEvent/index.jsx";
+import AllOrganizers from "./pages/Organizers/index.jsx";
+import AccountOutlet from "./pages/Account/AccountOutlet.jsx";
+import Account from "./pages/Account/index.jsx";
+import AccountInterest from "./pages/Account/interest/index.jsx";
+import AccountNotification from "./pages/Account/manageNotification/index.jsx";
+import EditProfile from "./pages/Profile/editProfile/index.jsx";
+import Profile from "./pages/Profile/index.jsx";
+import EditPassword from "./pages/Profile/EditPassword/index.jsx";
+import AllNotification from "./pages/Notification/AllNotification/index.jsx";
+import Notification from "./pages/Notification/index.jsx";
+import EventType from "./pages/event/CreateEvent/event_types.jsx";
 
 const MainLayout = () => (
   <>
+    <PostSignupForm />
     <Navbar />
     <Outlet />
   </>
@@ -52,7 +57,6 @@ export function App() {
   if (typeof global === "undefined") {
     window.global = window;
   }
-
   useEffect(() => {
     setLoading(true); // Show preloader
     const timer = setTimeout(() => setLoading(false), 100); // Simulate load time
@@ -60,7 +64,6 @@ export function App() {
     return () => clearTimeout(timer);
   }, [location.pathname]); // Runs on every route change
   const background = location.state?.background;
-
   return (
     <Fragment>
       {loading && <FullpagePreloader loading={loading} />}
@@ -68,14 +71,15 @@ export function App() {
       <ToastContainer />
       <NetworkStatus />
       <Routes>
-
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="signin" element={<Signin />} />
+          <Route path="signinwithcode" element={<SigninWithCode />} />
           <Route path="forget-password" element={<ForgetPassword />} />
           <Route path="code-verification" element={<CodeVerification />} />
           <Route path="change-password" element={<ChangePassword />} />
+          <Route path="change-password-success" element={<ChangePasswordSuccesffully />} />
           {/*
           {/* <Route path="onboarding" element={<Onboarding />} /> */}
         </Route>
@@ -83,22 +87,24 @@ export function App() {
         <Route element={<Sessionpage />} >
           <Route element={<MainLayout />}>
             <Route index exact path="/" element={<Home />} />
-            <Route path="notification" element={<Notifications />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="chat/:recipient_id" element={<Chat />} />
-            <Route path="explore" element={<ExplorePage />} />
-            <Route path="create-post" element={<CreatePost />} />
-            <Route path="/posts/:postId" element={<Post />} />
-            <Route  path="/help" element={<Help />} >
-              <Route path="faqs" element={<Faqs />} />
-
+            <Route path="organizers" element={<AllOrganizers />} />
+            <Route path="/profile" element={<Profile />} >
+              <Route index exact   path="edit-profile" element={<EditProfile />} />
+              <Route path="edit-password" element={<EditPassword />} />
             </Route>
-            <Route index path="settings" element={<Settings />} >
+            <Route path="/event" element={<Event />} >
+              <Route path="view/:eventId" element={<ViewEvent />} />
+              <Route path="create-event" element={<EventType />} />
+              <Route path="saved-events" element={<SaveEvents />} />
             </Route>
-            <Route path=":profileId" element={<ProfileOutlet />}>
-              <Route index element={<UserPost />} />
+            <Route path="/account" element={<AccountOutlet />} >
+              <Route index exact path="/account" element={<Account />} />
+              <Route path="interest" element={<AccountInterest />} />
+              <Route path="manage-notification" element={<AccountNotification />} />
             </Route>
-
+            <Route path="/notification" element={<Notification />} >
+              <Route index exact element={<AllNotification />} />
+            </Route>
           </Route>
 
         </Route>

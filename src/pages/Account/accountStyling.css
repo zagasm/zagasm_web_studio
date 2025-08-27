@@ -1,0 +1,84 @@
+.account_section {
+    padding: 70px 50px 100px 50px;
+
+}
+
+.account_section .account_nav_section {
+    margin-top: 50px;
+
+}
+
+.account_section .account_nav_section .card {
+    padding: 0px;
+    padding: 15px 10px 0px 10px
+}
+
+.account_section .account_nav_section h6 {
+    font-size: 15px;
+    color: black;
+    margin-left: 10px;
+}
+
+.account_section .account_nav_section ul {
+    list-style-type: none;
+    padding: 10px;
+    margin: 0px;
+    margin-top: 20px;
+}
+
+.account_section .account_nav_section ul li {
+    margin-bottom: 25px;
+}
+
+.account_section .account_nav_section .account_link {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(230, 230, 230, 1);
+    color: black;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.account_section .account_nav_section .account_link div {
+    display: flex;
+    gap: 20px;
+}
+
+.account_section .internal_container {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.055);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.footer_section {
+    font-size: 13px;
+    margin-top: 20px;
+}
+.logout_section{
+    color:rgba(179, 38, 30, 1);
+    display: flex;
+    gap:12px;
+    margin-top: 20px;
+    font-size: 15px;
+}
+.logout_section img{
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 1000px) {
+    .Preference_section {
+        margin-bottom: 30px
+    }
+
+    .account_section .account_nav_section .card {
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .account_section {
+        padding: 20px 10px 100px 10px;
+    }
+}

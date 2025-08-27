@@ -1,0 +1,209 @@
+.event_view_container {
+    /* padding: 20px; */
+    padding-bottom: 100px;
+}
+
+.event_view_container button {
+    transition: 0.3s ease-in-out;
+}
+
+.event_view_container .event_pay_btn {
+    background: rgba(143, 7, 231, 1);
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    padding: 5px 15px
+}
+
+.event_view_container .event_detail_content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.quest_performers_section,.quest_performers_section2 {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.event_view_container .contact_section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+    min-height: 50vh;
+    text-align: center;
+}
+
+.event_view_container .contact_section .image_card {
+    width: 300px;
+}
+
+.event_view_container .contact_section .image_card h4 {
+    font-size: 25px;
+    margin-top: 20px;
+    font-weight: bolder;
+}
+
+.event_view_container .contact_section .image_card img {
+    width: 100%;
+}
+
+.event_view_container .contact_section .btn_card {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.event_view_container .contact_section .btn_card button {
+    border: none;
+    border-radius: 20px;
+    padding: 10px 40px;
+    font-weight: 300px;
+    transition: 0.3s ease-in-out;
+}
+
+.event_view_container .contact_section .btn_card .follow_btn {
+    background: rgba(143, 7, 231, 1);
+    color: white;
+}
+
+.event_view_container .contact_section .btn_card .contact_btn {
+    border: 1px solid rgba(143, 7, 231, 1);
+    color: rgba(143, 7, 231, 1);
+    background: white;
+}
+
+.event_view_container .contact_section .btn_card .contact_btn:hover {
+    background: rgba(143, 7, 231, 1);
+    color: white;
+}
+
+.event_view_container .contact_section .btn_card .follow_btn:hover {
+    border: 1px solid rgba(143, 7, 231, 1);
+    color: rgba(143, 7, 231, 1);
+    background: white;
+}
+
+.event_view_container .report {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+.event_view_container .report p {
+    color: rgba(255, 59, 48, 1);
+    cursor: pointer;
+}
+
+.event_view_container .remark_section .remarks p {
+    line-height: 18px;
+    font-size: 14px;
+    color: black;
+}
+
+.event_view_container textarea {
+    min-height: 400px;
+    height: 200px;
+    outline: none;
+    border: none;
+}
+
+.event_view_container textarea::after {
+    outline: none;
+}
+
+.event_view_container .remark_input_area {
+    position: relative;
+    /* border: 1px solid grey; */
+}
+
+.event_view_container .remark_input_area button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    border: none;
+    background: none;
+    /* width: 20px; */
+}
+
+.event_view_container .event_detail_footer {
+    background: rgba(244, 230, 253, 1);
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.event_view_container .event_detail_footer .footer_event_pay_btn {
+    background: rgba(143, 7, 231, 1);
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    padding: 10px 25px
+}
+
+.event_view_container .event_detail_footer .footer_event_pay_btn:hover {
+    background: rgb(221, 177, 250);
+}
+
+@media (max-width: 459px) {
+    .quest_performers_section {
+        display: block;
+        text-align: center;
+    }
+
+    .quest_performers_section .perfomer_heading {
+        margin-bottom: 10px;
+    }
+}
+
+.event_view_container .overlay-icon {
+    background: none;
+}
+
+@media (max-width: 1000px) {
+    .event_view_container textarea {
+        min-height: 100px;
+        height: 100px;
+
+    }
+}
+
+.spinner {
+  border: 4px solid rgba(0,0,0,0.1);
+  border-top: 4px solid #8f07e7;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 0.8s linear infinite;
+  margin: auto;
+}
+
+.spinner-small {
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top: 3px solid white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.image-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.6);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

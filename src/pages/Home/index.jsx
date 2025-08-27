@@ -1,62 +1,64 @@
-import React from 'react';
-import Navbar from '../pageAssets/Navbar';
-import logo from '../../assets/zagasm_logo.png';
-import './Homestyle.css';
+import React, { useState } from 'react';
 import SideBarNav from '../pageAssets/sideBarNav';
-import RightBarComponent from '../pageAssets/rightNav';
-import SuggestedFriends from '../../component/Friends/suggestedFriends';
-import SinglePostTemplate from '../../component/Posts/single';
-import { usePost } from '../../component/Posts/PostContext';
-
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import SideAds from '../../component/ads/sideAds';
+// 
+import live_camera from '../../assets/navbar_icons/solar_stream-broken.svg';
+import './Homestyle.css';
+import RightBarComponent from '../../component/RightBarComponent';
+import EventTemplate from '../../component/Events/SingleEvent';
+import SuggestedOrganizer from '../../component/Suggested_organizer/suggestedOrganizer';
+import MobileSingleOrganizers from '../../component/Organizers/ForMobile';
 import { Link } from 'react-router-dom';
 
-// import LoadingOverlay from '../../assets/projectOverlay';
-
 function Home() {
-    const { HomePostData } = usePost();
-    console.log(HomePostData);
-
-
+    const [activeTab, setActiveTab] = useState('ForYou');
     return (
-        <div className="py-4">
-            <div className="container-fluid p-0">
-                <SideBarNav />
-                <div className="ro offset-xl-3 offset-lg-1 offset-md-1  bg-none home_section">
-                    <main className="col col-xl-6  col-lg-8  col-md-12 col-sm-12 col-12 main_container  m-0 pt-5" >
-                        <div className="car shadow-s mb-3 p-2">
-                            <div className="heading_tab_container text-center  d-flex w-100 justify-content-between align-items-center">
-                                <Link to="/" className="following_tab tab active w-50"> 
-                                    Following
-                                </Link>
-                                <Link className="for_you_tab tab w-50 " >
-                                    For you
-                                </Link>
+        <div className="container-flui m-0 p-0">
+            <SideBarNav />
+            <div className="page_wrapper overflow-hidden ">
+                <div className="row p-0 ">
+                    <div className="col ">
+                        <div className="shadow-s mb-3 p-0">
+                            <div className="heading_tab_container">
+                                <button
+                                    className={`tab ${activeTab === 'ForYou' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('ForYou')}
+                                >
+                                    For You
+                                </button>
+                                <button
+                                    className={`tab ${activeTab === 'Live' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('Live')}
+                                    style={{ color: "red" }}
+                                >
+                                    Live <img src={live_camera} alt="" />
+                                </button>
 
                             </div>
                         </div>
-                        <div>
-                            {HomePostData && HomePostData.length > 0 ? (
-                                HomePostData.map(post => (
-                                    <SinglePostTemplate
-                                        key={post.post_id}
-                                        data={post}
-                                    />
-                                ))
-                            ) : (
-                                <div className="text-center py-5 ">
-                                    <p>Fetching for posts <span className='fa fa-spinner fa-spin'></span></p>
+
+                        <div className="posts-containe ">
+                           
+                                <div className="col mobile_organizer">
+                                    <div className="d-flex justify-content-between p-1">
+                                        <small><b>Organizers you may know</b></small>
+                                        <Link to={'/organizers'}>view all</Link>
+                                    </div>
+                                    <MobileSingleOrganizers />
                                 </div>
+                            {activeTab === 'ForYou' ? (
+                                <div className="row">
+                                    <EventTemplate />
+                                </div>
+                            ) : (
+                                <div className="row">
+                                    <EventTemplate live={true} />
+                                </div>
+
                             )}
                         </div>
-                    </main>
-
+                    </div>
                     <RightBarComponent>
-                        <SuggestedFriends />
-                        {/* <SideAds /> */}
+                        <SuggestedOrganizer />
                     </RightBarComponent>
                 </div>
             </div>

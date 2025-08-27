@@ -1,196 +1,354 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import AuthContainer from "../assets/auth_container";
-import { ChangePassword } from "../ChangePassword";
-import axios from "axios";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { showToast } from "../../../component/ToastAlert";
-export function CodeVerification({ email }) {
-  const CODE_LENGTH = 6;
-  const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
-  const [resetcode, setResetCode] = useState(0);
-  const [resetemail, setEmail] = useState('');
-  const [isVerified, setIsVerified] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-  const inputsRef = useRef([]);
+import AuthContainer from "../assets/auth_container";
+import { motion } from "framer-motion";
+import authCodeImg from "../../../assets/authCode.png";
+import axios from "axios";
+import '../signin/signInStyle.css';
+import { ChangePassword } from "../ChangePassword";
 
-  // Mask email
-  const maskEmail = (email) => {
-    const [username, domain] = email.split("@");
-    if (username.length <= 2) return email;
-    const visiblePart = username.slice(0, 2);
-    const maskedPart = "*".repeat(username.length - 2);
-    return `${visiblePart}${maskedPart}@${domain}`;
+export function CodeVerification({ verificationData }) {
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [forgetPasswordAccess, setforgetPasswordAccess] = useState(false);
+  const [code, setCode] = useState(['', '', '', '', '']);
+  const [isCodeComplete, setIsCodeComplete] = useState(false);
+  const [isEditingInput, setIsEditingInput] = useState(false);
+  const [editedInput, setEditedInput] = useState(verificationData?.input || '');
+  const [ResetPasswordVerificationData,setResetPasswordVerificationData]  = useState();
+  const [inputError, setInputError] = useState('');
+  const inputsRef = useRef([]);
+  const inputRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Destructure verificationData with defaults
+  const {
+    input = '',
+    isEmail = true,
+    code: initialCode = 0,
+    expiresAt = ''
+  } = verificationData || {};
+
+  // Mask the input (email or phone)
+  const maskInput = (value) => {
+    if (!value) return '';
+    
+    if (isEmail) {
+      const [localPart, domain] = value.split('@');
+      if (!localPart || !domain) return value;
+      const firstChar = localPart[0];
+      const maskedLocal = firstChar + '*****';
+      return `${maskedLocal}@${domain}`;
+    } else {
+      // Mask phone number (show last 4 digits)
+      if (value.length <= 4) return value;
+      return `*******${value.slice(-4)}`;
+    }
   };
 
-  // Handle input change
-  const handleChange = (e, idx) => {
-    const val = e.target.value;
-    if (/^\d?$/.test(val)) {
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    },
+  };
+
+  const inputVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10
+      }
+    },
+  };
+
+  const buttonVariants = {
+    hover: {
+      scale: 1.02,
+      boxShadow: "0 4px 12px rgba(143, 7, 231, 0.3)"
+    },
+    tap: { scale: 0.98 }
+  };
+
+  useEffect(() => {
+    if (inputsRef.current[0]) {
+      inputsRef.current[0].focus();
+    }
+    if (input) {
+      setEditedInput(input);
+    }
+  }, [input]);
+
+  useEffect(() => {
+    if (isEditingInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditingInput]);
+
+  useEffect(() => {
+    const complete = code.every(digit => digit !== '');
+    setIsCodeComplete(complete);
+  }, [code]);
+
+  const validateInput = (value) => {
+    if (!value.trim()) {
+      setInputError(`${isEmail ? 'Email' : 'Phone number'} is required`);
+      return false;
+    }
+
+    if (isEmail && !/^\w+@\w+\.\w{2,}$/.test(value)) {
+      setInputError('Please enter a valid email address');
+      return false;
+    }
+
+    setInputError('');
+    return true;
+  };
+
+  const handleChange = (e, index) => {
+    const value = e.target.value;
+    if (/^\d$/.test(value) || value === '') {
       const newCode = [...code];
-      newCode[idx] = val;
+      newCode[index] = value;
       setCode(newCode);
-      if (val && idx < CODE_LENGTH - 1) {
-        inputsRef.current[idx + 1].focus();
+      if (value !== '' && index < 4) {
+        inputsRef.current[index + 1].focus();
       }
     }
   };
 
-  // Handle keyboard navigation
-  const handleKeyDown = (e, idx) => {
-    if (e.key === "Backspace" && !code[idx] && idx > 0) {
-      inputsRef.current[idx - 1].focus();
-    } else if (e.key === "ArrowLeft" && idx > 0) {
-      inputsRef.current[idx - 1].focus();
-    } else if (e.key === "ArrowRight" && idx < CODE_LENGTH - 1) {
-      inputsRef.current[idx + 1].focus();
+  const handleKeyDown = (e, index) => {
+    if (e.key === 'Backspace' && code[index] === '' && index > 0) {
+      inputsRef.current[index - 1].focus();
     }
   };
 
-  const verifyCode = async () => {
-    const joinedCode = code.join("");
-    if (joinedCode.length < CODE_LENGTH) {
-      setError("Please enter the full 6-digit code.");
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text/plain').slice(0, 5);
+    if (/^\d+$/.test(pasteData)) {
+      const newCode = [...code];
+      for (let i = 0; i < pasteData.length; i++) {
+        if (i < 5) {
+          newCode[i] = pasteData[i];
+        }
+      }
+      setCode(newCode);
+    }
+  };
+
+  const handleEditInputClick = () => {
+    setIsEditingInput(true);
+  };
+
+  const handleInputChange = (e) => {
+    setEditedInput(e.target.value);
+    if (inputError) setInputError('');
+  };
+
+  const handleInputBlur = () => {
+    if (!validateInput(editedInput)) {
+      setEditedInput(input);
+    }
+    setIsEditingInput(false);
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      if (validateInput(editedInput)) {
+        setIsEditingInput(false);
+      } else {
+        setEditedInput(input);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!validateInput(editedInput)) return;
+    const verificationCode = code.join('');
+    if (verificationCode.length !== 5) {
+      setErrors({ server: "Please enter a complete 5-digit code" });
       return;
     }
-
-    setIsVerifying(true);
-    setError("");
-
+    setIsLoading(true);
+    setErrors({});
     try {
-      const formPayload = new FormData();
-      formPayload.append("email", email);
-      formPayload.append("reset_key", joinedCode);
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/verify_reset_code.php`,
-        formPayload,
-        {
-          withCredentials: true,
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/password/verify-code`, {
+        code: verificationCode,
+        input: editedInput,
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
         }
-      );
-      // 874352
+      });
+       console.log(response);
       const data = response.data;
-      if (data.status === "success") {
-        setResetCode(data.data.reset_code);
-        setEmail(data.data.email);
-        setSuccess(true);
-        setTimeout(() => setIsVerified(true), 1000);
-      } else {
-        setError(data.message || "Incorrect verification code. Please try again.");
+      if (data.reset_token != null || data.reset_token != undefined) {
+        showToast.success(data.message || "Verification successful!");
+        setResetPasswordVerificationData({
+            input: data.input,
+            message:data.message,
+            reset_token:data.reset_token
+        });
+        setforgetPasswordAccess(true);
+      }else{
+          throw new Error(data.message || "Verification failed");
       }
-
     } catch (err) {
-
-      // if (err.response) {
-        // Backend responded with an error
-        const status = err.response.status;
-        const message =
-          err.response.data?.message || "An error occurred. Please try again.";
-
-        if (status === 401) {
-          setError(message || "Invalid or expired verification code.");
-        } else {
-          setError(message);
-        }
-      // } else {
-      //   // No response received
-      //   setError("Network error. Please check your internet connection.");
-      // }
-
-      setIsVerifying(false);
-    }
-    finally {
-      setIsVerifying(false);
+      const errorMessage = err.response?.data?.message || err.message || "An error occurred during verification";
+      showToast.error(errorMessage);
+      setErrors({ server: errorMessage });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-
+   if(forgetPasswordAccess){
+         return <ChangePassword ResetPasswordVerificationData={ResetPasswordVerificationData} />
+   }
   return (
-    <>
-      {!isVerified ? (
-        <AuthContainer title="Verification code" description="We've sent a 6-digit code to">
-          <p className="text-center" style={{ color: "#8000FF", fontSize: "15px", marginTop: "-20px", fontFamily: "Inter" }}>
-            {maskEmail(email)}
-          </p>
-
-          <form autoComplete="off" className="pr-3 pl-3" onSubmit={(e) => e.preventDefault()}>
-            <div className="code_container row m-4 justify-content-center">
-              {code.map((digit, idx) => (
-                <input
-                  key={idx}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(e, idx)}
-                  onKeyDown={(e) => handleKeyDown(e, idx)}
-                  ref={(el) => (inputsRef.current[idx] = el)}
-                  className="code col card m-1 text-center"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    fontSize: "24px",
-                    textAlign: "center",
-                    border: "1px solid #ccc",
-                    borderRadius: "8px",
-                  }}
-                />
-              ))}
-            </div>
-
-            {error && (
-              <div className="text-danger text-center mb-3" style={{ fontSize: "14px" }}>
-                <i className="fa fa-exclamation-circle mr-1"></i> {error}
-              </div>
+    <AuthContainer 
+      footer={false} 
+      header={false}
+      privacy={false}
+      haveAccount={true}
+    >
+      <style>{`
+        .submit-btn {
+          background-color: ${isCodeComplete ? 'rgba(143, 7, 231, 1)' : 'rgba(169, 169, 169, 0.7)'};
+          color: white;
+          cursor: ${isCodeComplete ? 'pointer' : 'not-allowed'};
+          height: 50px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 500;
+          border: none;
+          width: 100%;
+          transition: background-color 0.3s;
+        }
+      `}</style>
+      <motion.form 
+        autoComplete="off" 
+        className="pr-3 pl-3 shadow-s signIncodeForm" 
+        variants={containerVariants} 
+        initial="hidden" 
+        animate="visible" 
+        onSubmit={handleSubmit}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '30px' }}>
+          <img src={authCodeImg} alt="Verification Code" className="verification-image" />
+        </div>
+        <div className='text-center' style={{ marginBottom: '30px' }}>
+          <motion.h5 
+            initial={{ opacity: 0, x: -70 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            transition={{ duration: 0.9, ease: "easeOut" }} 
+            className="font-weight-bold mt-3 container_heading_text text-center"
+          >
+            5-Digit OTP Verification
+          </motion.h5>
+          <motion.p 
+            initial={{ opacity: 0, x: 70 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            transition={{ duration: 0.9, ease: "easeOut" }} 
+            className="text-muted heading_content mb-2 text-center"
+          >
+            We have sent the OTP verification code to your {isEmail ? 'Email' : 'Phone'} <span style={{ color: 'rgba(143, 7, 231, 1)' }}>{maskInput(editedInput)}</span>
+          </motion.p>
+        </div>
+        <p>Code: {verificationData.code}</p>
+        {errors.server && (
+          <motion.div 
+            className="alert alert-danger mb-4" 
+            initial={{ opacity: 0, y: -20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.3 }}
+          >
+            {errors.server}
+          </motion.div>
+        )}
+        
+        <motion.div variants={inputVariants} className="form-group">
+          <div className="code-input-container">
+            {[0, 1, 2, 3, 4].map((index) => (
+              <input 
+                key={index} 
+                type="text" 
+                maxLength="1" 
+                value={code[index]} 
+                onChange={(e) => handleChange(e, index)} 
+                onKeyDown={(e) => handleKeyDown(e, index)} 
+                onPaste={handlePaste} 
+                ref={(el) => (inputsRef.current[index] = el)} 
+                className="code-input" 
+                inputMode="numeric" 
+                pattern="[0-9]*" 
+              />
+            ))}
+          </div>
+        </motion.div>
+        
+        {/* <motion.div variants={inputVariants} className="form-group">
+          {isEditingInput ? (
+            <>
+              <input 
+                type={isEmail ? "email" : "tel"} 
+                value={editedInput} 
+                onChange={handleInputChange} 
+                onBlur={handleInputBlur} 
+                onKeyDown={handleInputKeyDown} 
+                ref={inputRef} 
+                className="form-control edit-source-input" 
+              />
+              {inputError && <div className="invalid-feedback d-block">{inputError}</div>}
+            </>
+          ) : (
+            <span className="edit_code_display" onClick={handleEditInputClick}>
+              {maskInput(editedInput) || `No ${isEmail ? 'email' : 'phone'} provided`} <i className="feather-edit ml-2"></i>
+            </span>
+          )}
+        </motion.div> */}
+        
+        {/* <motion.div variants={inputVariants} className="text-center mt-3">
+          <button 
+            type="button" 
+            className="resend-btn" 
+            onClick={handleResendCode} 
+            disabled={isLoading}
+          >
+            Resend
+          </button>
+        </motion.div> */}
+        
+        <motion.div variants={inputVariants} className="mt-4">
+          <motion.button 
+            className="submit-btn" 
+            type="submit" 
+            disabled={!isCodeComplete || isLoading} 
+            variants={buttonVariants} 
+            whileHover={isCodeComplete ? "hover" : {}} 
+            whileTap={isCodeComplete ? "tap" : {}}
+          >
+            {isLoading ? (
+              <>
+                <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                Submitting...
+              </>
+            ) : (
+              "Submit"
             )}
-
-            {success && (
-              <div className="text-success text-center mb-3" style={{ fontSize: "14px" }}>
-                <i className="fa fa-check-circle mr-1"></i> Code verified successfully! Redirecting...
-              </div>
-            )}
-
-            <button
-              type="button"
-              className="btn submit_button btn-block"
-              style={{ color: "white" }}
-              onClick={verifyCode}
-              disabled={isVerifying}
-            >
-              {isVerifying ? (
-                <>
-                  <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
-                  Verifying...
-                </>
-              ) : (
-                <>
-                  <span className="fas fa-sign-in-alt mr-3"></span> Verify Code
-                </>
-              )}
-            </button>
-
-            <div className="text-center mt-3 border-botto pb-1 mb-1">
-              <p className="small text-muted">
-                Didn't receive the code?{" "}
-                <Link className="font-weight-bold" to="/auth/signup">
-                  Create account
-                </Link>
-              </p>
-            </div>
-
-            <div className="py-3 text-center auth-footer">
-              <span className="text-info" style={{ fontSize: "13px" }}>
-                <i className="fa fa-exclamation-circle"></i> Check your spam folder if you don't see the email
-              </span>
-            </div>
-          </form>
-        </AuthContainer>
-      ) : (
-        <ChangePassword email={resetemail} resetcode={resetcode} />
-      )}
-    </>
+          </motion.button>
+        </motion.div>
+      </motion.form>
+    </AuthContainer>
   );
 }
-// "031727"

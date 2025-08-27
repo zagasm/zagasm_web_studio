@@ -1,25 +1,67 @@
 body {
   font-family: 'Inter', sans-serif;
 }
-.inner_form_con{
-  min-height: 100vh;
+
+.inner_form_con {
+  min-height: 90vh;
+}
+.zagasm_logo{
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin-bottom: 0px;
 }
 .form_container {
-  box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
+  /* box-shadow: 0 0 20px rgba(154, 114, 194, 0.15); */
   border-radius: 25px;
   justify-content: center;
   align-items: center;
-  padding:15px 0px;
+  /* padding: 15px 20px; */
+}
+
+.bar_section {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  position: absolute;
+  top: 0px;
+
+}
+
+.bar_container {
+  background: linear-gradient(180deg, #8F07E7 0%, #500481 100%);
+  width: 20px;
+  height: 700px;
+  /* top:20%; */
+  opacity: 1;
+  margin: 0px;
+  /* position: relative; */
+}
+
+.bar_container.left_bar {
+  position: fixed;
+  left: 0px;
+  border-radius: 0px 16px 16px 0px;
+  margin: 0px;
+
+}
+
+.bar_container.right_bar {
+  position: fixed;
+  right: 0px;
+  border-radius: 16px 0px 0px 16px;
+  margin: 0px;
+
 }
 
 form .input {
   border: none;
-  box-shadow: 0 0 20px rgba(154, 114, 194, 0.15);
+  /* box-shadow: 0 0 20px rgba(154, 114, 194, 0.15); */
   border-radius: 10px;
   height: 60px;
   outline: none;
-  margin-bottom: 20px;
-  border: 1px solid red;
+  margin-bottom: 10px;
+  border: 1px solid rgba(154, 114, 194, 0.15);
 }
 
 .icon-form-control {
@@ -28,10 +70,9 @@ form .input {
 }
 
 form .input-icon {
-  margin-top: -20px;
-  font-size: 25px;
-  padding-left: 10px;
-  color: #8000FF
+  font-size: 20px;
+  left: 15px;
+  top: 22px;
 }
 
 .input:focus {
@@ -45,44 +86,149 @@ form .input-icon {
   opacity: 1;
 }
 
-form .submit_button {
-  background: linear-gradient(to right, #8000FF, rgba(228, 40, 235, 0.87));
+form .inactive_submit_button {
+  background: rgba(230, 230, 230, 1);
+  color: dark;
+  height: 60px;
+  border-radius: 15px;
+  border: none;
+  color: black;
+  /* box-shadow: 0 0 20px rgba(128, 0, 255, 0.15); */
+  transition: 0.4ms ease-in-out;
+  /* font-weight: bolder; */
+}
+
+.active_submit_button {
+  background: rgba(143, 7, 231, 1);
   color: white;
   height: 60px;
   border-radius: 15px;
   border: none;
-  box-shadow: 0 0 20px rgba(128, 0, 255, 0.15);
+  box-shadow: none;
   transition: 0.4ms ease-in-out;
-  font-weight: bolder;
 }
 
-.submit_button:hover {
-  background: linear-gradient(to right, #a14bff, rgba(233, 77, 238, 1));
-  box-shadow: 0 0 30px rgba(162, 75, 255, 0.171);
+/* .inactive_submit_button:hover {
+  background: rgba(230, 230, 230, 1);
+} */
+
+
+
+.password-strength-meter {
+  height: 5px;
+  background-color: #eee;
+  border-radius: 3px;
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+
+.strength-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.strength-bar.weak {
+  background-color: #ff4d4f;
+  width: 33%;
+}
+
+.strength-bar.medium {
+  background-color: #faad14;
+  width: 66%;
+}
+
+.strength-bar.strong {
+  background-color: #52c41a;
+  width: 100%;
+}
+
+.phone-input-container {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.phone-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+  border:none;
+  outline: none;
+}
+
+.phone-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  outline: none;
+}
+
+.phone-input.is-invalid {
+  border-color: #ff4d4f;
+}
+.react-tel-input .selected-flag{
+  background:white;
+}
+.phone-input.is-invalid:focus {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.phone-error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* Customize the dropdown */
+.PhoneInputCountrySelect {
+  padding-right: 8px;
+  outline: none;
+}
+
+.PhoneInputCountryIcon {
+  width: 24px;
+  height: 18px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+.PhoneInput:focus{
+  outline: none;
+  border: 0px;
+}
+
+.PhoneInputCountrySelectArrow {
+  margin-left: 4px;
+  width: 8px;
+  height: 8px;
+  border-style: solid;
+  border-width: 0 1px 1px 0;
+  border-color: #666;
+  transform: rotate(45deg);
 }
 
 .api_btn {
   height: 50px;
-  box-shadow: 0 0 20px rgba(128, 0, 255, 0.15);
-  border-radius: 10px;
+  border-radius: 20px;
   outline: none;
-  border: none;
+  border: 1px solid rgba(128, 128, 128, 0.171);
   background-color: white;
-}
-
-.dark_apple_api_btn {
-  color: white;
-  background-color: rgba(0, 0, 0, 0.87);
+  margin-bottom: 10px;
+  padding: none;
+  width: 100%;
 }
 
 .auth-footer {
   background-color: #ad73e70e;
   border-radius: 20px;
   border: 1px solid #420a7a10;
+  font-size: 10px
 }
 
-.auth-footer a {
+
+.footer_text a {
   color: #7223c2;
+  text-decoration: none;
 }
 
 form .code_container {
@@ -97,80 +243,205 @@ form .code_container .code {
   margin: 0px 3px
 }
 
-.auth_container .auth_footer {
-  /* position: fixed;
-  bottom:0px; */
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  /* padding: 10px 10px; */
+.auth_container .container_heading_text {
+  color: rgba(64, 64, 64, 1);
+  font-family: 'Inter';
+  text-align: left;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0%;
+
 }
 
-.auth_container .auth_footer ul {
+.auth_container .heading_content {
+  text-align: left;
+  font-family: 'Figtree', sans-serif;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.phone-input-section {
+  margin-top: -15px;
+}
+
+.phone-input-container {
+  width: 100%;
+  margin-bottom: 1rem;
+  margin-top: 0px;
   padding: 0px;
 }
 
-.auth_container .auth_footer ul li {
-  display: inline-block;
-  margin: 0px 20px;
+.phone-input {
+  width: 100%;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
 }
 
-.auth_container .container_heading_text {
-  color: #8000FF;
-  font-size: 30px;
-  font-family: 'Inter'
+#PhoneNumber {
+  border: none
 }
-#privacyAgree{
-    width: 20px;
-    height: 20px;
-  }
+
+.phone-input:focus {
+  border-color: none;
+  outline: none;
+}
+
+.phone-input.is-invalid {
+  border-color: #ff4d4f;
+}
+
+.phone-error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.password-strength-meter {
+  height: 5px;
+  background-color: #eee;
+  border-radius: 3px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+.strength-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.strength-bar.weak {
+  background-color: #ff4d4f;
+  width: 33%;
+}
+
+.strength-bar.medium {
+  background-color: #faad14;
+  width: 66%;
+}
+
+.strength-bar.strong {
+  background-color: #52c41a;
+  width: 100%;
+}
+
+.active_submit_button {
+  background-color: rgba(143, 7, 231, 1);
+  color: white;
+  cursor: pointer;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.active_submit_button:hover {
+  background-color: rgba(141, 7, 231, 0.81);
+}
+
+.inactive_submit_button {
+  background-color: #d9d9d9;
+  color: #8c8c8c;
+  cursor: not-allowed;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.input-password-icon {
+  font-size: 20px;
+  right: 15px;
+  top: 18px;
+  cursor: pointer;
+}
+
+.form-group label {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: lighter;
+}
+
 /* Mobile view: Remove background image */
 @media (max-width: 767px) {
-  .auth_container .container_heading_text {
-    color: #8000FF;
-    font-size: 20px;
-    font-family: 'Inter'
+
+  .auth_container .container_heading_text,
+  .auth_container .heading_content {
+    font-family: 'Inter';
+    text-align: center;
   }
 
   .auth-background {
     background: none;
     background: #fff;
-    /* fallback color if needed */
   }
 
   form .input-icon {
-    font-size: 20px;
-  }
-
-  form .input {
-    height: 50px;
-  }
-
-  .auth_container .auth_footer {
-    display: block;
-    text-align: center;
-    /* padding-bottom: 200px; */
-    width: 100%;
-    overflow: visible;
-    /* height: 50vh; */
-  }
-
-  .auth_container .auth_footer ul li {
-    display: block;
-    margin: 10px 0px;
+    font-size: 18px;
+    left: 15px;
+    top: 10px;
   }
 
   .form_container {
     box-shadow: none;
+    margin: 0px 20px;
   }
-  .privacy_text{
-    font-size: 13px;
-  }
-  input.privacy_checker{
-    width: 20px;
-    height: 20px;
-    margin-bottom:-70px;
-    top:-4px;
 
+  .bar_section {
+    display: none
   }
+
+  form .input {
+    height: 40px;
+    margin-bottom: 1px;
+  }
+
+  .phone-input {
+    padding: 2px 16px;
+    font-size: 16px;
+  }
+
+  form .inactive_submit_button {
+    height: 40px;
+    padding: 0px;
+  }
+
+  .active_submit_button {
+    height: 40px;
+    padding: 0px;
+  }
+
+  .footer_text {
+    font-size: 12px;
+  }
+
+  .input-password-icon {
+    font-size: 15px;
+    right: 15px;
+    top: 12px;
+    cursor: pointer;
+  }
+  .zagasm_logo{
+  width: 100px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 0px;
+}
 }

@@ -1,0 +1,164 @@
+ .signIncodeForm .code-input-container {
+     display: flex;
+     justify-content: center;
+     gap: 10px;
+     margin-top: 30px;
+ }
+
+ .signIncodeForm .code-input {
+     width: 70px;
+     height: 70px;
+     text-align: center;
+     font-size: 40px;
+     border: 2px solid #ddd;
+     border-radius: 8px;
+     transition: all 0.3s ease;
+     color: rgba(143, 7, 231, 1);
+     font-weight: bolder
+ }
+
+ .signIncodeForm .code-input:focus {
+     border-color: rgba(143, 7, 231, 1);
+     outline: none;
+     box-shadow: 0 0 0 2px rgba(143, 7, 231, 0.2);
+ }
+
+ .signIncodeForm .resend-btn {
+     background-color: transparent;
+     color: rgba(143, 7, 231, 1);
+     cursor: pointer;
+     font-size: 14px;
+     margin-top: 15px;
+
+     border: 1px solid rgba(143, 7, 231, 1);
+     height: 50px;
+     border-radius: 8px;
+     font-size: 16px;
+     font-weight: 500;
+     width: 100%;
+     transition: background-color 0.3s;
+ }
+
+ .signIncodeForm .verification-image {
+     width: 90px;
+     height: 90px;
+     object-fit: contain;
+ }
+
+ .signIncodeForm .edit_code_display {
+
+     background-color: rgba(242, 242, 242, 1);
+     padding: 6px 10px;
+     min-width: 50%;
+     margin: auto;
+     border-radius: 5px;
+     text-align: center;
+     font-size: 15px;
+ }
+
+ .edit-source-input {
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     padding: 8px 12px;
+     min-width: 50%;
+     margin: auto;
+     font-size: 16px;
+ }
+
+ .edit_code_display {
+     cursor: pointer;
+ }
+
+ .edit_code_display:hover {
+     color: rgba(143, 7, 231, 1);
+ }
+
+ .login-tabs {
+     display: flex;
+     margin-bottom: 1.5rem;
+     border-radius: 20px;
+     overflow: hidden;
+     background: #f5f5f5;
+     padding: 4px;
+ }
+
+ .login-tab {
+     flex: 1;
+     padding: 12px;
+     text-align: center;
+     cursor: pointer;
+     font-weight: 500;
+     transition: all 0.3s ease;
+     border-radius: 20px;
+     background: transparent;
+     border: none;
+     color: #666;
+ }
+
+ .login-tab.active {
+     background: white;
+     color: dark;
+     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ }
+
+ .phone-input-container {
+     width: 100%;
+     margin-bottom: 1rem;
+ }
+
+ .phone-input {
+     width: 100%;
+     padding: 12px 16px 12px 15px;
+     font-size: 16px;
+     border: 1px solid #ddd;
+     border-radius: 8px;
+     transition: all 0.3s ease;
+     background-color: #fff;
+     height: 50px;
+ }
+
+ #PhoneInputInput {
+     border: none;
+ }
+
+ .phone-input:focus {
+     border-color: #1890ff;
+     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+     outline: none;
+ }
+
+ .phone-input.is-invalid {
+     border-color: #ff4d4f;
+ }
+
+ .phone-error-message {
+     color: #ff4d4f;
+     font-size: 14px;
+     margin-top: 6px;
+ }
+
+ @media (max-width: 990px) {
+     .signIncodeForm .code-input {
+         width: 60px;
+         height: 60px;
+         font-size: 20px;
+     }
+
+     .signIncodeForm .edit_code_display {
+         font-size: 15px;
+         padding: 10px 12px;
+
+     }
+
+     .login-tabs {
+         font-size: 14px;
+         padding: 4px;
+     }
+ }
+
+ @media (max-width: 354px) {
+     .signIncodeForm .code-input {
+         width: 50px;
+         height: 60px;
+     }
+ }

@@ -1,0 +1,87 @@
+.interest_section {
+    margin-top: 30px;
+    /* background-color: red; */
+    /* Remove if not needed */
+}
+
+.interest_container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allow buttons to wrap on smaller screens */
+    gap: 12px;
+}
+
+.interest_container button {
+    border-radius: 20px;
+    /* Rounded corners */
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: fit-content;
+    /* Dynamic width */
+    border-width: 1px;
+}
+
+.interest_container button:hover {
+    transform: translateY(-2px);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+}
+
+.interest_container button img {
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+.interest_section {
+    margin-top: 30px;
+}
+
+.interest_container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.interest_container button {
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 14px;
+    width: fit-content;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.interest_container button:hover {
+    transform: translateY(-1px);
+}
+
+.interest_footer .skip_btn {
+    margin-top: 30px;
+}
+
+.interest_footer .skip_btn span {
+    color: rgba(143, 7, 231, 1);
+    text-decoration: underline;
+}
+
+.interest_footer .save_btn button {
+    background: rgba(230, 230, 230, 1);
+    color: rgba(153, 153, 153, 1);
+    padding: 10px 40px;
+    border: none;
+    border-radius: 20px;
+    margin-top: 30px;
+}
+
+.interest_footer .save_btn button.active {
+    background: rgba(143, 7, 231, 1);
+    color: white
+}
+
+
+@media (max-width: 400px) {
+    .interest_footer .save_btn button {
+        width: 100%;
+        display: block;
+    }
+}

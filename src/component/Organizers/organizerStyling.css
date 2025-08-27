@@ -1,0 +1,30 @@
+.organizer_section .card-img-top {
+    height: 230px;
+}
+.organizer_heading {
+    margin: 20px 0px;
+    margin-left:10px;
+}
+.organizer_section .upcoming_event {
+    display: flex;
+    gap: 20px;
+    border-radius: 100px;
+}
+.organizer_section .organizer_name {
+    font-size: 15px;
+    font-weight: bolder;
+    text-transform: capitalize;
+}
+.organizer_section .organizer_price {
+    font-size: 20px;
+}
+.organizer_section .upcoming_event img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+.organizer_section .organizers_views {
+    width: fit-content;
+    padding-right: 20px;
+    margin-bottom: 20px;
+}
