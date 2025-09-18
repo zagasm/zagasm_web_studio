@@ -1,0 +1,133 @@
+name: 🚀 Zagasm Studios Web Deployment
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+    env:
+      # Default to test API for dev branch
+      VITE_API_URL: ${{ secrets.VITE_STUDIOS_TEST_API_URL }}
+      VITE_WEB_SOCKET: ${{ secrets.STUDIOS_WEB_SOCKET_TEST }}
+
+    steps:
+      - name: Override API URL for main branch
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_STUDIOS_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_WEB_SOCKET=${{ secrets.STUDIOS_WEB_SOCKET }}" >> $GITHUB_ENV
+
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⎔ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build the application
+        run: npm run build
+
+      - name: 📦 Archive build files
+        run: tar -czf dist.tar.gz -C dist .
+
+      - name: ⬆️ Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: dist.tar.gz
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    
+    # Only deploy on dev and main branches
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+
+      - name: ✅ Verify dist.tar.gz exists
+        run: test -f dist.tar.gz && echo "✅ File exists" || (echo "❌ File not found" && exit 1)
+
+      - name: 🔐 Install sshpass for password authentication
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: 🔐 Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.STUDIOS_VPS_IP }} >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: 🔗 Test SSH connection with password
+        env:
+          VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+        run: |
+          echo "Testing SSH connection..."
+          sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no -o BatchMode=no root@${{ secrets.STUDIOS_VPS_IP }} 'echo "✅ SSH connection successful to $(hostname)"'
+
+      - name: 🚀 Deploy to VPS using Password
+        env:
+          VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+        run: |
+          # Set deployment path based on branch
+          if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
+            DEPLOY_PATH="/var/www/studios"
+            echo "🎯 Deploying to PRODUCTION: $DEPLOY_PATH"
+          else
+            DEPLOY_PATH="/var/www/staging_studios"
+            echo "🧪 Deploying to STAGING: $DEPLOY_PATH"
+          fi
+
+          # Upload the archive to the VPS using password
+          echo "📤 Uploading build package to server..."
+          sshpass -p "$VPS_PASSWORD" scp -o StrictHostKeyChecking=no -o BatchMode=no dist.tar.gz root@${{ secrets.STUDIOS_VPS_IP }}:$DEPLOY_PATH/
+
+          # Run deployment commands on the VPS using password
+          echo "🔄 Starting deployment process on server..."
+          sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no -o BatchMode=no root@${{ secrets.STUDIOS_VPS_IP }} "
+            cd $DEPLOY_PATH
+            
+            echo '🧹 Clearing old build files...'
+            # Remove only what we'll replace, keep other files intact
+            rm -rf assets _netlify.toml _redirects index.html 2>/dev/null || true
+            
+            # Extract new build
+            if [ -f dist.tar.gz ]; then
+              echo '📦 Extracting new build...'
+              tar -xzf dist.tar.gz -C .
+              
+              # Clean up
+              rm -rf dist.tar.gz
+              
+              # Set ownership for web server access
+              chown -R root:www-data ./
+              find . -type d -exec chmod 775 {} \;
+              find . -type f -exec chmod 664 {} \;
+              
+              echo '✅ Deployment complete successfully!'
+              echo '📍 Deployed to: ' $DEPLOY_PATH
+              
+              # Quick test to verify files are there
+              echo '📋 Contents after deployment:'
+              ls -la
+            else
+              echo '❌ Error: dist.tar.gz not found on server!'
+              exit 1
+            fi
+          "
