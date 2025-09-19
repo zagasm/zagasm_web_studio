@@ -283,14 +283,7 @@ export function Signin() {
                   onChange={handlePhoneChange}
                   className={`phone-input ${errors.phone ? 'is-invalid' : ''}`}
                   placeholder="Enter phone number"
-                  inputStyle={{
-                    outline: 'none',
-                    height: '50px',
-                    width: '100%',
-                    borderRadius: '8px',
-                    border: '1px solid #ddd',
-                    paddingLeft: '48px'
-                  }}
+                 
                   onBlur={() => console.log("Current phone value on blur:", formData.phone)}
                 />
                 {errors.phone && (
@@ -311,13 +304,13 @@ export function Signin() {
                   type="email"
                   id="email"
                   name="email"
-                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                  style={{
-                    paddingLeft: "45px",
-                    height: "50px",
-                    borderRadius: "8px",
-                    border: "1px solid #ddd"
-                  }}
+                  className={`form-control input ${errors.email ? 'is-invalid' : ''}`}
+                  // style={{
+                  //   paddingLeft: "45px",
+                  //   height: "40px",
+                  //   borderRadius: "8px",
+                  //   border: "1px solid #ddd"
+                  // }}
                   placeholder="Enter email address"
                   value={formData.email}
                   onChange={handleChange}
@@ -357,7 +350,7 @@ export function Signin() {
                   style={{
                     paddingLeft: "45px",
                     paddingRight: "45px",
-                    height: "50px",
+                    height: "40px",
                     borderRadius: "8px",
                     border: "1px solid #ddd"
                   }}
@@ -409,7 +402,7 @@ export function Signin() {
               type="button"
               className="bt w-100 continue-btn"
               style={{
-                height: "50px",
+                height: "40px",
                 borderRadius: "8px",
                 fontSize: "16px",
                 fontWeight: "500",
@@ -431,7 +424,7 @@ export function Signin() {
                 type="submit"
                 className="bt w-100 signin-btn mb-3"
                 style={{
-                  height: "50px",
+                  height: "40px",
                   borderRadius: "8px",
                   fontSize: "16px",
                   fontWeight: "500",
@@ -461,11 +454,11 @@ export function Signin() {
                 type="button"
                 className="bt w-100 verification-btn"
                 style={{
-                  height: "50px",
+                  height: "40px",
                   borderRadius: "8px",
                   fontSize: "16px",
                   fontWeight: "500",
-                  Width: '50px',
+                  Width: '40px',
                   margin: 'auto'
                 }}
                 onClick={handleVerificationCode}

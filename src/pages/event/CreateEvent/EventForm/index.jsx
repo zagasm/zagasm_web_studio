@@ -7,11 +7,9 @@ import './eventFormStyling.css';
 import { CheckCircle } from "lucide-react";
 import { useAuth } from '../../../auth/AuthContext';
 import axios from "axios";
-
 import countries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
-import { Link } from 'react-router-dom';
-
+import { Link, useParams } from 'react-router-dom';
 countries.registerLocale(enLocale);
 
 const countryList = Object.entries(countries.getNames('en', { select: 'official' })).map(
@@ -21,17 +19,6 @@ const countryList = Object.entries(countries.getNames('en', { select: 'official'
 // Primary color constant
 const PRIMARY_COLOR = 'rgba(143, 7, 231, 1)';
 const PRIMARY_COLOR_LIGHT = 'rgba(143, 7, 231, 0.1)';
-
-
-
-// Currency data with flags (simplified)
-const currencies = [
-    { code: 'USD', symbol: '$', name: 'US Dollar' },
-    { code: 'EUR', symbol: '€', name: 'Euro' },
-    { code: 'GBP', symbol: '£', name: 'British Pound' },
-    { code: 'NG', symbol: '#', name: 'Nigria naira' },
-    // Add more currencies as needed
-];
 
 // Genre options
 const genres = [
@@ -50,14 +37,12 @@ const streamingOptions = [
     'rtmp',
     'zoom'
 ];
-
 // Visibility options
 const visibilityOptions = [
     { value: 'public', label: 'Public', icon: <FiEye /> },
     { value: 'private', label: 'Private', icon: <FiLock /> },
     { value: 'unlisted', label: 'Unlisted', icon: <FiEyeOff /> }
 ];
-
 // Schema validation for each step
 const eventInfoSchema = z.object({
     title: z.string().min(10, 'Event title must be at least 5 characters'),
@@ -69,10 +54,10 @@ const eventInfoSchema = z.object({
         message: 'Event date must be in the future'
     }),
     time: z.string().min(1, 'Please select a time'),
+    timezone: z.string().min(1, 'Please select a timezone'), // Add this
 });
-
 const mediaSchema = z.object({
-    eventImage: z.instanceof(File, { message: 'Event image is required' })
+    eventImage: z.instanceof(File, { message: 'Event poster is required' })
         .refine(file => file.size <= 2 * 1024 * 1024, {
             message: 'Image must be less than 2MB'
         }),
@@ -84,7 +69,6 @@ const mediaSchema = z.object({
             }),
     })).min(1, 'At least one performer is required')
 });
-
 const ticketingSchema = z.object({
     price: z.number().min(0),
     maxTickets: z.enum(['limited', 'unlimited']),
@@ -99,13 +83,12 @@ const streamingSchema = z.object({
     enableReplay: z.boolean(),
     streamingDuration: z.string().optional()
 });
-
 const accessSchema = z.object({
     visibility: z.string().min(1, 'Please select visibility'),
     matureContent: z.boolean()
 });
-
-const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
+const EventCreationWizard = () => {
+    const { eventType } = useParams();
     const [currentEventType, SetcurrentEventType] = useState(eventType);
     const [currentStep, setCurrentStep] = useState(1);
     const [completedSteps, setCompletedSteps] = useState([]);
@@ -114,6 +97,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
     const [eventImage, setEventImage] = useState(null);
     const [performers, setPerformers] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const { user, token } = useAuth();
     const [formData, setFormData] = useState({
         eventInfo: {},
         media: {},
@@ -121,16 +105,16 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         streaming: {},
         access: {}
     });
-
+    const [formErrors, setFormErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     // Refs for file inputs
     const eventImageInputRef = useRef(null);
     const performerImageInputRefs = useRef({});
-
     // Set user's timezone on component mount
     useEffect(() => {
         setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     }, []);
-
     // Handle file drop
     const handleDrop = (e) => {
         e.preventDefault();
@@ -140,7 +124,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             setEventImage(file);
         }
     };
-
     // Handle file input change
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -148,7 +131,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             setEventImage(file);
         }
     };
-
     // Add new performer
     const addPerformer = () => {
         const newPerformer = { name: '', image: null, id: Date.now() };
@@ -159,15 +141,12 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             if (input) input.focus();
         }, 100);
     };
-
     // Update performer name
     const updatePerformerName = (id, name) => {
         setPerformers(performers.map(p =>
             p.id === id ? { ...p, name } : p
         ));
     };
-
-
     // Handle performer image click
     const handlePerformerImageClick = (id) => {
         const inputId = `performer-image-${id}`;
@@ -186,18 +165,15 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         }
         performerImageInputRefs.current[inputId].click();
     };
-
     // Remove performer
     const removePerformer = (id) => {
         setPerformers(performers.filter(p => p.id !== id));
     };
-
     // Handle form submission
     const handleSubmit = (data) => {
         console.log('Event created:', data);
         setShowSuccessModal(true);
     };
-
     // Move to next step
     const nextStep = (stepData) => {
         // Save data for current step
@@ -212,7 +188,11 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         );
 
         if (currentStep < 6) {
-            setCurrentStep(currentStep + 1);
+            setIsLoading(true);
+            setTimeout(() => {
+                setCurrentStep(currentStep + 1);
+                setIsLoading(false);
+            }, 300);
         } else {
             // On final step, submit all data
             const allData = {
@@ -226,11 +206,14 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             handleSubmit(allData);
         }
     };
-
     // Move to previous step
     const prevStep = () => {
         if (currentStep > 1) {
-            setCurrentStep(currentStep - 1);
+            setIsLoading(true);
+            setTimeout(() => {
+                setCurrentStep(currentStep - 1);
+                setIsLoading(false);
+            }, 300);
         }
     };
     // Format currency input
@@ -238,16 +221,103 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         if (!value) return '';
         return parseFloat(value).toFixed(2);
     };
+    // Display field error function
+    const displayFieldError = (fieldName, stepKey = null) => {
+        if (!formErrors || Object.keys(formErrors).length === 0) return null;
+        
+        let errorMessage = '';
+        
+        if (stepKey && formErrors[stepKey] && formErrors[stepKey][fieldName]) {
+            errorMessage = Array.isArray(formErrors[stepKey][fieldName]) 
+                ? formErrors[stepKey][fieldName][0] 
+                : formErrors[stepKey][fieldName];
+        } else if (formErrors[fieldName]) {
+            errorMessage = Array.isArray(formErrors[fieldName]) 
+                ? formErrors[fieldName][0] 
+                : formErrors[fieldName];
+        }
+        
+        return errorMessage ? (
+            <div className="text-danger small mt-1">{errorMessage}</div>
+        ) : null;
+    };
+    // Full Page Loader Component
+    const FullPageLoader = () => (
+        <div className="full-page-loader" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999
+        }}>
+            <div className="spinner-border text-purple" role="status" style={{ color: PRIMARY_COLOR }}>
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    );
+    // Step Loader Component
+    const StepLoader = () => (
+        <div className="step-loader" style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10,
+            borderRadius: '8px'
+        }}>
+            <div className="spinner-border spinner-border-sm text-purple" role="status" style={{ color: PRIMARY_COLOR }}>
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    );
     // Step 1: Event Information
     const EventInformationStep = () => {
         const { register, handleSubmit, formState: { errors } } = useForm({
             resolver: zodResolver(eventInfoSchema),
             defaultValues: formData.step1 || {}
         });
-        const { user,token } = useAuth();
+        const { user, token } = useAuth();
         const fullname = user.lastName;
+        const [timeZones, setTimeZones] = useState([]);
+        const [loadingTimeZones, setLoadingTimeZones] = useState(true);
+        const [error, setError] = useState(null);
+        // Fetch time zones
+        useEffect(() => {
+            const fetchTimeZones = async () => {
+                try {
+                    const response = await axios.get(
+                        `${import.meta.env.VITE_API_URL}/api/v1/time/zone`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    if (response.data && response.data.timeZones) {
+                        setTimeZones(response.data.timeZones);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoadingTimeZones(false);
+                }
+            };
+            fetchTimeZones();
+        }, [token]);
+
         return (
-            <div className="container p-2">
+            <div className="container p-2" style={{ position: 'relative' }}>
+                {isLoading && <StepLoader />}
                 <h6 className="text-2xl font-bol mb-6">Basic event details</h6>
 
                 <div className="mt-4">
@@ -262,8 +332,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                         {errors.title && <span className="text-red-500 text-sm">{errors.title.message}</span>}
                     </div>
 
-
-
                     <div className="form-group md:col-span-2">
                         <label>Description*</label>
                         <textarea
@@ -273,6 +341,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             placeholder="Describe your event in detail"
                         />
                         {errors.description && <span className="text-red-500 text-sm">{errors.description.message}</span>}
+                        {displayFieldError('description', 'step_2')}
                     </div>
 
                     <div className="form-group">
@@ -290,7 +359,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                     </div>
                     <div className="form-group">
                         <label>Organizer's Name*</label>
-                        { }
                         <input
                             type="text"
                             {...register('organizer')}
@@ -323,7 +391,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                 min={new Date().toISOString().split('T')[0]}
                                 className={`form-input pr-10 ${errors.date ? 'border-red-500' : ''}`}
                             />
-                            {/* <FiCalendar className="absolute right-3 top-3 text-gray-400" /> */}
                         </div>
                         {errors.date && <span className="text-red-500 text-sm">{errors.date.message}</span>}
                     </div>
@@ -337,22 +404,31 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                     {...register('time')}
                                     className={`form-input pr-10 ${errors.time ? 'border-red-500' : ''}`}
                                 />
-                                {/* <FiClock className="absolute right-3 top-3 text-gray-400" /> */}
                             </div>
                             {errors.time && <span className="text-red-500 text-sm">{errors.time.message}</span>}
                         </div>
 
                         <div className="form-group col">
-                            <label>Timezone</label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={timezone}
-                                    readOnly
-                                    className="form-input bg-gray-100 pr-10"
-                                />
-                                {/* <FiGlobe className="absolute right-3 top-3 text-gray-400" /> */}
-                            </div>
+                            <label>Timezone*</label>
+                            <select
+                                {...register("timezone")}
+                                className="form-input"
+                                disabled={loadingTimeZones}
+                            >
+                                <option value="">Select Timezone</option>
+                                {loadingTimeZones && <option>Loading...</option>}
+                                {error && <option disabled>Error loading timezones</option>}
+                                {timeZones.map((tz) => (
+                                    <option key={tz.id} value={tz.id}>
+                                        {tz.name} (GMT {tz.gmt_offset})
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.timezone && (
+                                <span className="text-red-500 text-sm">
+                                    {errors.timezone.message}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -363,13 +439,11 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                         onClick={handleSubmit(nextStep)}
                         className="btn btn-sm  btn-purple text-light px-3 px-sm-4 py-2"
                         style={{ borderRadius: '20px', backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
+                        disabled={isLoading}
                     >
                         <span className=" d-sm-inline">Next</span>
-                        {/* <FiChevronRight className="ms-0 ms-sm-2" /> */}
                     </button>
                 </div>
-
-
             </div>
         );
     };
@@ -387,7 +461,8 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         }, [performers, eventImage, setValue]);
 
         return (
-            <div className="container p-2">
+            <div className="container p-2" style={{ position: 'relative' }}>
+                {isLoading && <StepLoader />}
                 <h2 className="h5 mb-4 ">Event Media</h2>
 
                 {/* Poster Upload Section */}
@@ -423,13 +498,14 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                 </button>
                             </div>
                         ) : (
-                            <div className="d-flex flex-column align-items-center justify-content-center py-4">
+                            <div className="d-flex flex-column align-items-center justify-content-center py-4 file-upload" >
                                 <FiUploadCloud className="fs-4 mb-3 " />
 
                                 <p className="text-purple mb-1">Drag & drop your image here</p>
                                 <p className="text-muted small">or click to browse</p>
-                                <p className="text-muted small mt-2">JPG or PNG (Max 5MB)</p>
-                                <FiPlus className="fs-1 mb-3  text-light" style={{ backgroundColor: PRIMARY_COLOR, color: 'white' }} />
+                                <p className="text-muted small mt-2">JPG, PNG, JPEG  or WEBP (Max 5MB)</p>
+                                {/* <FiPlus className="fs-1 mb-3  text-light btn" style={{ backgroundColor: PRIMARY_COLOR, color: 'white', width:'10px', fontSize:'30px' }} /> */}
+                                <span className='btn btn-sm' style={{ backgroundColor: PRIMARY_COLOR, color: 'white', width:'34px', padding:'10px', height:'34px', fontSize:'15px' }}>+</span>
                             </div>
                         )}
                         <input
@@ -442,6 +518,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                         />
                     </div>
                     {errors.eventImage && <div className="text-danger small mt-2">{errors.eventImage.message}</div>}
+                    {displayFieldError('eventImage')}
                 </div>
                 <span className=" form-span fw-bol">Performer's / Speaker's Name*</span>
                 {/* Performers Section */}
@@ -533,6 +610,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                         </div>
                     </div>
                     {errors.performers && <div className="text-danger small mt-2">{errors.performers.message}</div>}
+                    {displayFieldError('performers.0.image', 'step_3')}
                 </div>
 
                 {/* Navigation Buttons */}
@@ -543,6 +621,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             type="button"
                             onClick={prevStep}
                             className="btn btn-sm  btn-outline-purple px-3 px-sm-4 py-2"
+                            disabled={isLoading}
                         >
                             <FiChevronLeft className="me-0 me-sm-2" />
                             <span className=" d-sm-inline">Back</span>
@@ -556,103 +635,16 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             onClick={handleSubmit(nextStep)}
                             className="btn btn-sm  btn-purple text-light px-3 px-sm-4 py-2"
                             style={{ backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
+                            disabled={isLoading}
                         >
                             <span className=" d-sm-inline">Next</span>
                             <FiChevronRight className="ms-0 ms-sm-2" />
                         </button>
                     </div>
                 </div>
-                {/* Add this CSS to your stylesheet */}
-                <style jsx>{`
-            .border-dashed-upload {
-                border: 1px dashed ${PRIMARY_COLOR};
-                border-radius: 12px;
-                background-color: rgba(244, 230, 253, 0.3);
-                transition: all 0.3s ease;
-                cursor: pointer;
-            }
-            
-            .active-drag {
-                border-color: ${PRIMARY_COLOR};
-                background-color: rgba(244, 230, 253, 0.6);
-                transform: scale(1.01);
-            }
-            
-            .border-dashed-placeholder {
-                border: 2px dashed rgba(244, 230, 253, 1);
-                background-color: rgba(244, 230, 253, 0.2);
-            }
-            
-            .hover-card {
-                transition: all 0.3s ease;
-                background-color: rgba(244, 230, 253, 0.1);
-            }
-            
-            .hover-card:hover {
-                background-color: rgba(244, 230, 253, 0.3);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            }
-            
-            .hover-scale {
-                transition: transform 0.2s ease;
-            }
-            
-            .hover-scale:hover {
-                transform: scale(1.1);
-            }
-            
-            .hover-grow {
-                transition: transform 0.3s ease;
-            }
-            
-            .hover-grow:hover {
-                transform: scale(1.02);
-            }
-            
-            .hover-bounce {
-                transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            }
-            
-            .hover-bounce:hover {
-                transform: translateY(-2px);
-            }
-            
-            .bg-light-purple {
-                background-color: rgba(244, 230, 253, 0.5);
-            }
-            
-            .btn-purple {
-                background-color: ${PRIMARY_COLOR};
-                color: white;
-                transition: all 0.3s ease;
-            }
-            
-            .btn-purple:hover {
-                background-color: ${PRIMARY_COLOR};
-                opacity: 0.9;
-                transform: translateY(-1px);
-            }
-            
-            .btn-outline-purple {
-                border-color: ${PRIMARY_COLOR};
-                color: ${PRIMARY_COLOR};
-                transition: all 0.3s ease;
-            }
-            
-            .btn-outline-purple:hover {
-                background-color: rgba(244, 230, 253, 0.3);
-                transform: translateY(-1px);
-            }
-            
-            .text-purple {
-                color: ${PRIMARY_COLOR};
-            }
-        `}</style>
             </div>
         );
     };
-
     // Step 3: Ticketing & Pricing
     const TicketingStep = () => {
         const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
@@ -662,17 +654,40 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                 maxTickets: 'unlimited' // Default to unlimited
             }
         });
-
+        const [currencies, setCurrencies] = useState([]);
+        const [loadingCurrencies, setLoadingCurrencies] = useState(true);
+        const [error, setError] = useState(null);
+        useEffect(() => {
+            const fetchCurrencies = async () => {
+                try {
+                    const response = await axios.get(
+                        `${import.meta.env.VITE_API_URL}/api/v1/currency`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    console.log('checkkk', response.data)
+                    if (response.data && response.data.currencies) {
+                        setCurrencies(response.data.currencies);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoadingCurrencies(false);
+                }
+            };
+            fetchCurrencies();
+        }, [token]);
         const maxTickets = watch('maxTickets');
-
         return (
-            <div className="container p-2">
+            <div className="container p-2" style={{ position: 'relative' }}>
+                {isLoading && <StepLoader />}
                 <h2 className="h6 mb-4">Ticketing & Pricing</h2>
-
                 <div className="mb-4">
                     <span className="form-span">Ticket Price*</span>
                     <div className="input-group">
-
                         <input
                             type="number"
                             {...register('price', { valueAsNumber: true })}
@@ -689,23 +704,26 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                     </div>
                     {errors.price && <div className="invalid-feedback">{errors.price.message}</div>}
                 </div>
-
                 <div className="mb-4">
                     <span className="form-span">Currency*</span>
                     <select
-                        {...register('currency')}
-                        className={`form-select ${errors.currency ? 'is-invalid' : ''}`}
+                        {...register("currency")}
+                        className={`form-select ${errors.currency ? "is-invalid" : ""}`}
+                        disabled={loadingCurrencies}
                     >
                         <option value="">Select Currency</option>
-                        {currencies.map(currency => (
-                            <option key={currency.code} value={currency.code}>
+                        {loadingCurrencies && <option>Loading...</option>}
+                        {error && <option disabled>Error loading currencies</option>}
+                        {currencies.map((currency) => (
+                            <option key={currency.code} value={currency.id}>
                                 {currency.symbol} - {currency.name} ({currency.code})
                             </option>
                         ))}
                     </select>
-                    {errors.currency && <div className="invalid-feedback">{errors.currency.message}</div>}
+                    {errors.currency && (
+                        <div className="invalid-feedback">{errors.currency.message}</div>
+                    )}
                 </div>
-
                 <div className="mb-4">
                     <span className="form-span">Ticket Availability*</span>
                     <select
@@ -739,6 +757,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             type="button"
                             onClick={prevStep}
                             className="btn btn-sm  btn-outline-purple px-3 px-sm-4 py-2"
+                            disabled={isLoading}
                         >
                             <FiChevronLeft className="me-0 me-sm-2" />
                             <span className=" d-sm-inline">Back</span>
@@ -752,6 +771,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             onClick={handleSubmit(nextStep)}
                             className="btn btn-sm  btn-purple text-light px-3 px-sm-4 py-2"
                             style={{ backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
+                            disabled={isLoading}
                         >
                             <span className=" d-sm-inline">Next</span>
                             <FiChevronRight className="ms-0 ms-sm-2" />
@@ -761,7 +781,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             </div>
         );
     };
-
     // Step 4: Streaming Setup
     const StreamingStep = () => {
         const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
@@ -780,7 +799,8 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         };
 
         return (
-            <div className="container p-2">
+            <div className="container p-2" style={{ position: 'relative' }}>
+                {isLoading && <StepLoader />}
                 <h2 className="h5 mb-4">How will you stream this event?</h2>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -846,6 +866,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                 type="button"
                                 onClick={prevStep}
                                 className="btn btn-sm  btn-outline-purple px-3 px-sm-4 py-2"
+                                disabled={isLoading}
                             >
                                 <FiChevronLeft className="me-0 me-sm-2" />
                                 <span className=" d-sm-inline">Back</span>
@@ -859,6 +880,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                 onClick={handleSubmit(nextStep)}
                                 className="btn btn-sm  btn-purple text-light px-3 px-sm-4 py-2"
                                 style={{ backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
+                                disabled={isLoading}
                             >
                                 <span className=" d-sm-inline">Next</span>
                                 <FiChevronRight className="ms-0 ms-sm-2" />
@@ -869,7 +891,6 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             </div>
         );
     };
-
     // Step 5: Access & Visibility
     const AccessStep = () => {
         const { register, handleSubmit, formState: { errors }, watch } = useForm({
@@ -881,7 +902,8 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         });
 
         return (
-            <div className="container p-2">
+            <div className="container p-2" style={{ position: 'relative' }}>
+                {isLoading && <StepLoader />}
                 <h2 className="h5 mb-4">Access & Visibility</h2>
 
                 <div className="mb-4">
@@ -925,6 +947,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             type="button"
                             onClick={prevStep}
                             className="btn btn-sm  btn-outline-purple px-3 px-sm-4 py-2"
+                            disabled={isLoading}
                         >
                             <FiChevronLeft className="me-0 me-sm-2" />
                             <span className=" d-sm-inline">Back</span>
@@ -938,6 +961,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             onClick={handleSubmit(nextStep)}
                             className="btn btn-sm  btn-purple text-light px-3 px-sm-4 py-2"
                             style={{ backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
+                            disabled={isLoading}
                         >
                             <span className=" d-sm-inline">Next</span>
                             <FiChevronRight className="ms-0 ms-sm-2" />
@@ -947,13 +971,11 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             </div>
         );
     };
-
     // Step 6: Review & Publish
     const ReviewStep = () => {
         const { handleSubmit } = useForm();
-        const [isSubmitting, setIsSubmitting] = useState(false);
         const [error, setError] = useState(null);
-        const { user,token } = useAuth();
+        const { user, token } = useAuth();
         console.log(token);
         const reviewData = {
             ...formData.step1,
@@ -966,14 +988,14 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         const submitEvent = async () => {
             setIsSubmitting(true);
             setError(null);
+            setFormErrors({});
 
             try {
                 // Create FormData object
                 const formData = new FormData();
-                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                formData.append('event_type_id', currentEventType.id);
-                formData.append('time_zone', userTimezone);
-
+                formData.append('event_type_id', currentEventType);
+                formData.append('time_zone_id', reviewData.timezone);
+                console.log('user timezone', reviewData.userTimezone);
                 // Add all the basic fields from step1
                 formData.append('title', reviewData.title || '');
                 formData.append('description', reviewData.description || '');
@@ -982,8 +1004,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                 // formData.append('organizer', reviewData.organizer || '');
 
                 // Format date and time
-                const formattedDate = reviewData.date ? new Date(reviewData.date).toLocaleDateString('en-US') : '';
-                formData.append('event_date', formattedDate);
+                formData.append('event_date', reviewData.date);
                 formData.append('start_time', reviewData.time || '');
 
                 // Add ticketing data from step3
@@ -992,22 +1013,18 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                 if (reviewData.maxTickets === 'limited') {
                     formData.append('ticket_limit_number', reviewData.ticketLimit || '0');
                 }
-
                 // Find currency ID based on selected currency
-                const selectedCurrency = currencies.find(c => c.code === reviewData.currency);
-                formData.append('currency', selectedCurrency.code + 'N'); // Default to 1 if not found
+                formData.append('currency_id', reviewData.currency); // Default to 1 if not found
 
                 // Add streaming data from step4
                 formData.append('streaming_option', reviewData.streamingOption || '');
-                formData.append('enable_replay', reviewData.enableReplay ? true : false);
+                formData.append('enable_replay', reviewData.enableReplay ? '1' : '0');
                 if (reviewData.enableReplay) {
                     formData.append('replay_time', reviewData.streamingDuration || '24');
                 }
-
                 // Add access data from step5
                 formData.append('visibility', reviewData.visibility || 'public');
-                formData.append('post_mature_content', reviewData.matureContent ? 'true' : 'false');
-
+                // formData.append('post_mature_content', reviewData.matureContent ? true : false);
                 // Add performers with their names and images
                 performers.forEach((performer, index) => {
                     formData.append(`performers[${index}][name]`, performer.name || '');
@@ -1015,12 +1032,10 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                         formData.append(`performers[${index}][image]`, performer.image);
                     }
                 });
-
                 // Add event image if exists
                 if (eventImage) {
                     formData.append('poster', eventImage);
                 }
-
                 const response = await axios.post(
                     `${import.meta.env.VITE_API_URL}/api/v1/event/store`,
                     formData,
@@ -1041,7 +1056,13 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                 setShowSuccessModal(true);
             } catch (err) {
                 console.log(err);
-                setError(err.message || 'Failed to create event');
+                if (err.response && err.response.status === 422) {
+                    // Handle validation errors
+                    setFormErrors(err.response.data.errors || {});
+                    setError('Please fix the validation errors below.');
+                } else {
+                    setError(err.message || 'Failed to create event');
+                }
             } finally {
                 setIsSubmitting(false);
             }
@@ -1052,8 +1073,25 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         };
 
         return (
-            <div className="container review_container py-4">
-                {/* <h2 className="text-center fw-bold mb-4" style={{ color: PRIMARY_COLOR }}>Review Your Event</h2> */}
+            <div className="container review_container py-4" style={{ position: 'relative' }}>
+                {isSubmitting && <FullPageLoader />}
+                {isLoading && <StepLoader />}
+                
+                {/* Add this error display section */}
+                {error && (
+                    <div className="alert alert-danger mb-4">
+                        <strong>Error:</strong> {error}
+                        {formErrors && Object.keys(formErrors).length > 0 && (
+                            <ul className="mb-0 mt-2">
+                                {Object.entries(formErrors).map(([key, value]) => (
+                                    <li key={key}>
+                                        <strong>{key}:</strong> {Array.isArray(value) ? value.join(', ') : value}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
 
                 <div className="bg-white rounded shadow-sm p-3 p-md-4">
                     {/* Event Image */}
@@ -1259,7 +1297,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                             </div>
                             <div className="col-md-6 mb-3">
                                 <small className="text-muted">Mature Content</small>
-                                <p>{reviewData.matureContent ? 'Yes' : 'No'}</p>
+                                <p>{reviewData.matureContent ? 'Yes' : 'No'} </p>
                             </div>
                         </div>
                     </div>
@@ -1270,6 +1308,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                 type="button"
                                 onClick={prevStep}
                                 className="btn btn-sm  btn-outline-purple px-3 px-sm-4 py-2"
+                                disabled={isSubmitting || isLoading}
                             >
                                 <FiChevronLeft className="me-0 me-sm-2" />
                                 <span className=" d-sm-inline">Back</span>
@@ -1283,25 +1322,16 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                 onClick={handleSubmit(onSubmit)}
                                 className="btn btn-sm  btn-purple text-light px-3 px-sm-4 py-2"
                                 style={{ backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || isLoading}
                             >
                                 {isSubmitting ? 'Creating...' : 'Create Event'}
                             </button>
-
                         </div>
                     </div>
-                    {error && (
-                        <div className="alert alert-danger mt-3">
-                            {error}
-                        </div>
-                    )}
-
                 </div>
             </div>
         );
     };
-
-
     // Success Modal
     const SuccessModal = () => {
         const reviewData = {
@@ -1343,9 +1373,9 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
                                         style={{ backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}
                                         onClick={() => {
                                             setShowSuccessModal(false);
-                                            // setCurrentStep(1);
-                                            // setEventImage(null);
-                                            // setPerformers([]);
+                                            setCurrentStep(1);
+                                            setEventImage(null);
+                                            setPerformers([]);
                                         }}
                                     >
                                         <span className=" d-sm-inline">Go Home</span>
@@ -1358,9 +1388,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             </div>
         );
     };
-
     // Progress Steps
-
     const ProgressSteps = ({ currentStep, completedSteps = [] }) => {
         const steps = [
             "Event Information",
@@ -1376,13 +1404,7 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             }
         };
         return (
-            <div className="w-100 mb-5   create_event_section d-non">
-                {/* <p className='text-center '>
-                    <button className='btn text-light btn-inline btn-sm' style={{ cursor: 'pointer', backgroundColor: PRIMARY_COLOR, borderColor: PRIMARY_COLOR }}>
-                        <span className='fa fa-cancle' onClickCapture={() => setSelectedEvent(null)}></span>Cancle
-                    </button>
-                </p> */}
-
+            <div className="w-100 mb-5 pr-3 pl-3  create_event_section d-non">
                 <div className="mobile_step  justify-content-between">
                     <div className="goBack">
                         {currentStep > 1 && (
@@ -1439,19 +1461,8 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
             </div>
         );
     };
-
-
-
-
-
-
-
-
     return (
         <div className="containe m mx-auto pb-5 mb-5">
-            {/* <h1 className="text-3xl font-bold mb-2">Create New Event</h1>
-            <p className="text-gray-600 mb-8">Fill in the details below to create your event</p> */}
-
             <ProgressSteps currentStep={currentStep} completedSteps={completedSteps} />
 
             {currentStep === 1 && <EventInformationStep />}
@@ -1465,5 +1476,4 @@ const EventCreationWizard = ({ setSelectedEvent, eventType }) => {
         </div>
     );
 };
-
 export default EventCreationWizard;

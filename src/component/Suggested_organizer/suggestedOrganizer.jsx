@@ -38,29 +38,28 @@ function SingleOrganizers() {
   const [organizers, setOrganizers] = useState([]);
   const [error, setError] = useState(null);
   const { token } = useAuth();
-
   useEffect(() => {
     const fetchOrganizers = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users`, {
-          method: 'GET',
+          method: 'OPTIONS',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           }
         });
-        if (!response.ok) {
-          throw new Error('Failed to fetch organizers');
-        }
+        // if (!response.ok) {
+        //   throw new Error('Failed to fetch organizers');
+        // }
         const data = await response.json();
-
+        console.log('Response___',response);
         // Add "following" property to each organizer
-        const organizersWithFollowState = data.data.map(org => ({
-          ...org,
-          following: org.following || false // default false if not provided
-        }));
+        // const organizersWithFollowState = data.data.map(org => ({
+        //   ...org,
+        //   following: org.following || false // default false if not provided
+        // }));
 
-        setOrganizers(organizersWithFollowState);
+        // setOrganizers(organizersWithFollowState);
       } catch (err) {
         console.error('Error fetching organizers:', err);
         setError(err.message);

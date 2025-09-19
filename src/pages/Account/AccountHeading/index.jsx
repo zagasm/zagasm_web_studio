@@ -4,34 +4,32 @@ import { Link } from 'react-router-dom';
 import default_profilePicture from '../../../assets/avater_pix.avif';
 import { useAuth } from '../../auth/AuthContext';
 function AccountHeading() {
-    const {user} = useAuth();
-       const Default_user_image = user?.profileUrl ? user.profileUrl : default_profilePicture;
+    const { user } = useAuth();
+    const Default_user_image = user?.profileUrl ? user.profileUrl : default_profilePicture;
     return (
 
-        <div className="heading_section">
+        <div className="heading_section bg-dange">
             <div className="details_display">
-                <div className='d-flex '>
-                    <div className='profle_img'>
-                        <img
-                            className=""
-                            src={Default_user_image}
-                            loading="lazy"
-                        />
-                    </div>
-                    <div className='profile_info '>
-                        <div>
-                            <small> <b>Username</b></small> <br />
-                            <small>0 events attended</small>
-                            <p className='follow_section'><small>12 following</small> <small>302 followers</small></p>
-                        </div>
+                <div className='profle_img'>
+                    <img
+                        className=""
+                        src={Default_user_image}
+                        loading="lazy"
+                    />
+                </div>
+                <div className='profile_info '>
+                    <div>
+                        <small><b>Username</b></small> <br />
+                        <small>0 events attended</small>
+                        <p className='follow_section'><small> <span>12</span> following</small> <small> <span>302</span> followers</small></p>
                     </div>
                 </div>
-            </div>
-            <div className='create_event_section'>
-                <div>
-                    <Link to={'/event/create-event'}>Create Events <i className='fa fa-users'></i></Link>
+                <div className='View_Profile_button'>
+                        <Link to={'/event/create-event'}>View profile</Link>
+                   
                 </div>
             </div>
+
         </div>
     );
 }

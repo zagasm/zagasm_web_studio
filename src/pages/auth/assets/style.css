@@ -58,21 +58,18 @@ form .input {
   border: none;
   /* box-shadow: 0 0 20px rgba(154, 114, 194, 0.15); */
   border-radius: 10px;
-  height: 60px;
+  height: 40px;
   outline: none;
   margin-bottom: 10px;
   border: 1px solid rgba(154, 114, 194, 0.15);
+   padding-left: 45px
 }
 
-.icon-form-control {
-  /* background-color: white; */
-
-}
 
 form .input-icon {
   font-size: 20px;
   left: 15px;
-  top: 22px;
+  top: 10px;
 }
 
 .input:focus {
@@ -89,7 +86,7 @@ form .input-icon {
 form .inactive_submit_button {
   background: rgba(230, 230, 230, 1);
   color: dark;
-  height: 60px;
+  height: 50px;
   border-radius: 15px;
   border: none;
   color: black;
@@ -101,7 +98,7 @@ form .inactive_submit_button {
 .active_submit_button {
   background: rgba(143, 7, 231, 1);
   color: white;
-  height: 60px;
+  height: 50px;
   border-radius: 15px;
   border: none;
   box-shadow: none;
@@ -149,7 +146,7 @@ form .inactive_submit_button {
 
 .phone-input {
   width: 100%;
-  padding: 12px 16px;
+  /* padding: 12px 16px; */
   font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -253,11 +250,12 @@ form .code_container .code {
   font-size: 20px;
   line-height: 100%;
   letter-spacing: 0%;
+  text-align: center;
 
 }
 
 .auth_container .heading_content {
-  text-align: left;
+  /* text-align: left; */
   font-family: 'Figtree', sans-serif;
   font-weight: 400;
   font-style: Regular;
@@ -266,7 +264,7 @@ form .code_container .code {
   letter-spacing: 0%;
 }
 
-.phone-input-section {
+/* .phone-input-section {
   margin-top: -15px;
 }
 
@@ -303,13 +301,13 @@ form .code_container .code {
 
 .phone-input.is-invalid {
   border-color: #ff4d4f;
-}
+} */
 
-.phone-error-message {
+/* .phone-error-message {
   color: #ff4d4f;
   font-size: 14px;
   margin-top: 6px;
-}
+} */
 
 .password-strength-meter {
   height: 5px;
@@ -366,17 +364,20 @@ form .code_container .code {
 }
 
 .input-password-icon {
-  font-size: 20px;
+  font-size: 14px;
   right: 15px;
-  top: 18px;
+  top: 14px;
   cursor: pointer;
 }
 
 .form-group label {
-  font-size: 15px;
+  font-size: 13px;
   color: #333;
   margin-bottom: 8px;
   font-weight: lighter;
+}
+.heading_section{
+  display: block;
 }
 
 /* Mobile view: Remove background image */
@@ -433,9 +434,9 @@ form .code_container .code {
   }
 
   .input-password-icon {
-    font-size: 15px;
+    /* font-size: 15px; */
     right: 15px;
-    top: 12px;
+    top: 14px;
     cursor: pointer;
   }
   .zagasm_logo{
