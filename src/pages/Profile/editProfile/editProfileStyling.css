@@ -2,8 +2,14 @@
     margin-bottom: 100px;
 }
 
-.heading_section .profle_img_container {
-    display: flex;
+.edit_heading_section {
+    box-shadow: none;
+    /* width: 20px; */
+    width: 100%;
+}
+
+.edit_heading_section .profle_img_container {
+    width: 100%;
 
 }
 
@@ -17,12 +23,21 @@
     position: relative;
 
 }
-.details_display{
+
+.editdetails_display {
     width: 100%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 7px 15px -3px rgba(97, 96, 96, 0.1), 0 4px 6px -2px rgba(151, 149, 149, 0.05);
+    border-radius: 20px;
+
 }
+
 .profile_img_info label {
     background: none;
-    padding: 8px  ;
+    padding: 8px;
     border-radius: 20px;
     border: 1px solid rgb(202, 198, 198);
     position: absolute;
@@ -30,7 +45,7 @@
     width: 150px;
     /* height: 40px; */
     text-align: center;
-   cursor: pointer;
+    cursor: pointer;
 }
 
 .input-with-icon {
@@ -70,11 +85,16 @@
 }
 
 /* Existing styles */
+.profle_img {
+    width: 150px;
+    margin: auto;
+}
+
 .profle_img img {
-    /* width: 80px; */
-    /* height: 80px; */
-    border-radius: 50%;
+    width: 100%;
+    height: 200px;
     object-fit: cover;
+    border-radius: 20px;
 }
 
 .edit_form_container {
@@ -105,12 +125,6 @@
     color: black;
 }
 
-
-
-.update_picture {
-    display: none;
-}
-
 .profile_update_btn {
     border: none;
     padding: 10px 15px;
@@ -119,20 +133,38 @@
     background-color: rgba(143, 7, 231, 1);
 }
 
+.edit_update_picture {
+    display: block;
+    text-align: center;
+    margin: 10px
+        /* font-family: 'Montserrat'; */
+}
 
+.edit_update_picture .upload_pix {
+    background-color: rgba(242, 242, 242, 1);
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.edit_update_picture .upload_pix:hover {
+    background-color: rgba(34, 33, 33, 0.562);
+    color: white;
+    transition: 0.3s;
+}
 
 @media (max-width: 959px) {
     .edit_form_container {
         padding: 10px;
     }
 
-    .heading_section .profle_img_container {
+    .edit_heading_section .profle_img_container {
         justify-content: center;
         display: block;
         width: 100%;
     }
 
-    .heading_section .profle_img_container .profle_img {
+    .edit_heading_section .profle_img_container .profle_img {
         display: block;
         margin: auto;
     }
@@ -141,11 +173,5 @@
         display: none;
     }
 
-    .update_picture {
-        display: block;
-        text-align: center;
-        color: rgba(143, 7, 231, 1);
-        text-decoration: underline;
-        /* font-family: 'Montserrat'; */
-    }
+
 }

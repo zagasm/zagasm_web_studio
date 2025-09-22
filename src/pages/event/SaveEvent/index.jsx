@@ -12,8 +12,8 @@ function SaveEvents() {
             <SideBarNav />
             <div className="page_wrapper overflow-hidden">
                 <div className="row p-0 ">
-                    <div className="col pb-5 mb-5">
-                        <h4 className='mt-3 ml-2'>Save Event</h4>
+                    <div className="col pb-5 mb-5 mt-4">
+                        {/* <h4 className='mt-3 ml-2'>Save Event</h4> */}
                         <div className="row">
                             <SaveEventTemplate />
                         </div>
@@ -26,5 +26,4 @@ function SaveEvents() {
         </div>
     );
 }
-
 export default SaveEvents;

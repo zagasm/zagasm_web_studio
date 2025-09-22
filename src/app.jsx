@@ -42,6 +42,7 @@ import EditPassword from "./pages/Profile/EditPassword/index.jsx";
 import AllNotification from "./pages/Notification/AllNotification/index.jsx";
 import Notification from "./pages/Notification/index.jsx";
 import EventType from "./pages/event/CreateEvent/event_types.jsx";
+import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -89,14 +90,14 @@ export function App() {
             <Route index exact path="/" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
             <Route path="/profile" element={<Profile />} >
-              <Route index exact   path="edit-profile" element={<EditProfile />} />
+              <Route index exact   path=":profileId" element={<ViewProfile />} />
+              <Route path="edit-profile" element={<EditProfile />} />
               <Route path="edit-password" element={<EditPassword />} />
             </Route>
             <Route path="/event" element={<Event />} >
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="select-event-type" element={<EventType />} />
               <Route path="create-event/:eventType" element={<CreateEvent />} />
-
               {/* CreateEvent */}
               <Route path="saved-events" element={<SaveEvents />} />
             </Route>

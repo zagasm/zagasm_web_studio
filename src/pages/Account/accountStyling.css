@@ -4,7 +4,7 @@
 }
 
 .account_section .account_nav_section {
-    margin-top: 50px;
+    /* margin-top: 50px; */
 
 }
 
@@ -81,4 +81,8 @@
     .account_section {
         padding: 20px 10px 100px 10px;
     }
+    .account_section .account_nav_section {
+    margin: 20px;
+
+}
 }
