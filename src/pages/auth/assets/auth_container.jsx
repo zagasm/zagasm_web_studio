@@ -24,7 +24,7 @@ function AuthContainer({ title, description, type, children, footer, header, hav
                 {/* Main Content */}
                 <div className="container-fluid position-relative auth_container mb-5">
                     <div className="row justify-content-center align-items-center d-flex align-center  inner_form_con">
-                        <div className="col-xl-4 col-lg-7 col-md-6  col form_container ">
+                        <div className="col-xl-3 col-lg-7 col-md-6  col form_container ">
                             <div className="osahan-login ">
                                 <div className="text-center mb-4 pr-4 pl-4">
                                     <p style={{ display: 'flex', justifyContent: 'center', marginBottom: '50px' }}>
@@ -32,10 +32,10 @@ function AuthContainer({ title, description, type, children, footer, header, hav
                                             <img src={zagasmLogo} className='zagasm_logo' alt="Zagasm Logo" />
                                         </a>
                                     </p>
-                                    {header && <div className='heading_section' style={{ marginBottom: '50px' }}>
+                                    {header && <div className='heading_section d-block text-center' style={{ marginBottom: '30px' }}>
                                         <motion.h5 initial={{ opacity: 0, x: -70 }}
                                             animate={{ opacity: 1, x: 0 }}
-                                            transition={{ duration: 0.9, ease: "easeOut" }} className="font-weight-bold mt-3 container_heading_text" >{title}</motion.h5>
+                                            transition={{ duration: 0.9, ease: "easeOut" }} className="font-weight-bold mt-3 container_heading_tex text-center " >{title}</motion.h5>
 
                                         <motion.p initial={{ opacity: 0, x: 70 }}
                                             animate={{ opacity: 1, x: 0 }}

@@ -1,71 +1,64 @@
-.heading_section {
-    display: flex;
-    justify-content: space-between;
-    /* padding: 10px 40px; */
+.account_heading_section {
+    text-align: center;
     height: fit-content;
+    width: 100%;
+    padding:0px 40px 30px 40px;
+    /* box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); */
 }
-
-.heading_section .details_display {
+.account_heading_section .details_display {
     padding: none;
     margin: 0px;
-}
-
-.heading_section .details_display div {
-    /* align-items: center;
-    height: 300px; */
-    gap: 20px;
-}
-
-.heading_section .details_display .profle_img {
-    width: 150px;
-}
-
-.heading_section .details_display .profle_img img {
     width: 100%;
+}
+.account_heading_section .details_display .profle_img {
+    width: 200px;
     height: 200px;
+    margin: auto;
+    display: block;
     border-radius: 20px;
+    /* background-color: red; */
 }
-
-.heading_section .details_display .profile_info {
+.account_heading_section .details_display .profle_img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 20%;
+}
+.account_heading_section .details_display .profile_info {}
+.account_heading_section .details_display .profile_info .follow_section {
     display: flex;
-    height: 200px;
+    justify-content: space-between;
+}
+.account_heading_section .details_display .profile_info .follow_section span{
+    color: rgba(143, 7, 231, 1);
+}
+.account_heading_section .View_Profile_button {
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
-.heading_section .details_display .profile_info .follow_section {
-    margin-top: 20px;
-    color: black;
-    font-size: 14px
-}
-
-.heading_section .create_event_section {
-    display: flex;
-    justify-content: right;
-    height: 200px;
-    align-items: center;
-}
-
-.heading_section .create_event_section a {
+.account_heading_section .View_Profile_button a {
     color: rgba(143, 7, 231, 1);
     border: 1px solid rgba(143, 7, 231, 1);
     background-color: white;
-    padding: 12px 20px;
+    padding: 7px 10px;
     border-radius: 20px;
     transition: 0.3s ease-in-out;
-    gap: 10px
+    gap: 10px;
+    width: 100%;
 }
-.heading_section .create_event_section a:hover {
+
+.account_heading_section .View_Profile_button a:hover {
     background: rgba(143, 7, 231, 1);
     color: white;
 }
+
 @media (max-width: 600px) {
-    .heading_section {
-        display: block;
-        height: fit-content;
-        align-items: center;
-        padding: 0px 10px
+    .account_heading_section {
+        padding: 0px 30px
     }
-    .heading_section .create_event_section {
+/* 
+    .account_heading_section .View_Profile_button {
         display: block;
         justify-content: center;
         height: fit-content;
@@ -73,12 +66,12 @@
         margin-top: 20px;
         width: 100%
     }
-    .heading_section .create_event_section div a {
+
+    .account_heading_section .View_Profile_button div a {
         width: 100%;
         display: block;
         text-align: center;
-
-    }
+    } */
 
 
 }

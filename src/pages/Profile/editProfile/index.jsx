@@ -12,7 +12,6 @@ import { showToast } from '../../../component/ToastAlert';
 
 function EditProfile() {
     const { user, login, token } = useAuth();
-
     const [phoneNumber, setPhoneNumber] = useState('');
     const [formData, setFormData] = useState({
         firstName: '',
@@ -136,165 +135,168 @@ function EditProfile() {
             <SideBarNav />
             <div className="page_wrapper overflow-hidden">
                 <div className="row pt-5">
-                    <div className="col-lg-10 offset-lg-1">
-                        <div>
-                             <div className="heading_section mb-5">
-                                <div className="details_display">
-                                    <div className='profle_img_container'>
-                                        <div className='profle_img' style={{ position: 'relative' }}>
-                                            <img
-                                                src={profileImage}
-                                                loading="lazy"
-                                                alt="Profile"
-                                            />
-                                            {uploading && (
-                                                <div className="profile-loader-overlay">
-                                                    <div className="profile-spinner"></div>
-                                                </div>
-                                            )}
-                                            <span className='update_picture'>
-                                                <label htmlFor="upload_pix" style={{textDecoration:'underline'}}>
-                                                    Update Photo
-                                                    <input
-                                                        id='upload_pix'
-                                                        type="file"
-                                                        accept="image/*"
-                                                        style={{ display: 'none' }}
-                                                        onChange={handlePictureChange}
-                                                    />
-                                                </label>
-                                            </span>
-                                        </div>
-                                        <div className='profile_img_info'>
-                                            <div>
-                                                {/* <button className="btn pb-0" style={{cursor:'pointer'}}> */}
-                                                    <label htmlFor="uploading">
+                    <div className="col-lg-10 ">
+                        <div className='row'>
+                            <div className="col-xl-3 col-lg-5 ">
+                                <div className="edit_heading_section  " style={{boxShadow:'none'}} >
+                                    <div className="editdetails_display ">
+                                        <div className='profle_img_container   '>
+                                            <div className='profle_img' style={{ position: 'relative' }}>
+                                                <img
+                                                    src={profileImage}
+                                                    loading="lazy"
+                                                    alt="Profile"
+                                                />
+                                                {uploading && (
+                                                    <div className="profile-loader-overlay">
+                                                        <div className="profile-spinner"></div>
+                                                    </div>
+                                                )}
+                                                <span className='edit_update_picture d-block'>
+                                                    <label htmlFor="upload_pix" className='upload_pix' >
+                                                        Update Photo
                                                         <input
-                                                            id='uploading'
+                                                            id='upload_pix'
                                                             type="file"
                                                             accept="image/*"
                                                             style={{ display: 'none' }}
                                                             onChange={handlePictureChange}
                                                         />
-                                                        Update picture
                                                     </label>
-                                                {/* </button> */}
+                                                </span>
                                             </div>
+                                           
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="edit_form_container">
-                                <div className="row">
-                                    <div className="col-lg-6">
-                                        <div className="form-group">
-                                            <label>First name</label>
-                                            <input
-                                                type="text"
-                                                className='form-control'
-                                                name="firstName"
-                                                value={formData.firstName}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-6">
-                                        <div className="form-group">
-                                            <label>Last name</label>
-                                            <input
-                                                type="text"
-                                                className='form-control'
-                                                name="lastName"
-                                                value={formData.lastName}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='row'>
-                                    <div className="col-lg-6">
-                                        <div className="form-group email-input-group">
-                                            <label>Email</label>
-                                            <div className="input-with-icon">
-                                                <FiMail className="input-icon" />
+                            <div className="col-lg-9 col-lg-7">
+                                <div className="edit_form_container">
+                                    <div className="row">
+                                        <div className="col-lg-6">
+                                            <div className="form-group">
+                                                <label>First name</label>
                                                 <input
-                                                    type="email"
+                                                    type="text"
                                                     className='form-control'
-                                                    name="email"
-                                                    value={formData.email}
+                                                    name="firstName"
+                                                    value={formData.firstName}
                                                     onChange={handleChange}
-                                                    readOnly={emailVerified} // Email not editable if verified
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <div className="form-group">
+                                                <label>Last name</label>
+                                                <input
+                                                    type="text"
+                                                    className='form-control'
+                                                    name="lastName"
+                                                    value={formData.lastName}
+                                                    onChange={handleChange}
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-lg-6">
-                                        <div className="form-group">
-                                            <label>Phone number</label>
-                                            <PhoneInput
-                                                international
-                                                defaultCountry="NG"
-                                                value={phoneNumber}
-                                                onChange={setPhoneNumber}
-                                                className="phone-input"
-                                            />
-                                        </div>
-                                    </div>
 
-                                    <div className="col-lg-6">
-                                        <div className="form-group">
-                                            <label>Date of Birth</label>
-                                            <input
-                                                type="date"
-                                                className='form-control'
-                                                name="dob"
-                                                value={formData.dob}
-                                                onChange={handleChange} disabled
-                                            />
+                                    <div className='row'>
+                                         <div className="col-lg-12">
+                                            <div className="form-group">
+                                                <label>About Me</label>
+                                                <textarea
+                                                    className='form-control'
+                                                    name="aboutMe"
+                                                    value={formData.aboutMe}
+                                                    onChange={handleChange}
+                                                    rows={3}
+                                                    placeholder='Write a description about yourself...'
+                                                ></textarea>
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div className="col-lg-12">
+                                            <div className="form-group email-input-group">
+                                                <label>Email</label>
+                                                <div className="input-with-icon">
+                                                    <FiMail className="input-icon" />
+                                                    <input
+                                                        type="email"
+                                                        className='form-control'
+                                                        name="email"
+                                                        value={formData.email}
+                                                        onChange={handleChange}
+                                                        placeholder='Enter your email here'
+                                                        readOnly={emailVerified} // Email not editable if verified
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-12">
+                                            <div className="form-group">
+                                                <label>Phone number</label>
+                                                <PhoneInput
+                                                    international
+                                                    defaultCountry="NG"
+                                                    value={phoneNumber}
+                                                    onChange={setPhoneNumber}
+                                                    className="phone-input"
+                                                />
+                                            </div>
+                                        </div>
+                                       
+                                        {/* <div className="col-lg-6">
+                                            <div className="form-group">
+                                                <label>Date of Birth</label>
+                                                <input
+                                                    type="date"
+                                                    className='form-control'
+                                                    name="dob"
+                                                    value={formData.dob}
+                                                    onChange={handleChange} disabled
+                                                />
+                                            </div>
+                                        </div>
 
-                                    <div className="col-lg-6">
-                                        <div className="form-group">
-                                            <label>Gender</label>
-                                            <select
-                                                className="form-control"
-                                                name="gender"
-                                                value={formData.gender}
-                                                onChange={handleChange}
-                                                disabled
+                                        <div className="col-lg-6">
+                                            <div className="form-group">
+                                                <label>Gender</label>
+                                                <select
+                                                    className="form-control"
+                                                    name="gender"
+                                                    value={formData.gender}
+                                                    onChange={handleChange}
+                                                    disabled
+                                                >
+                                                    <option value="">Select gender</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </div>
+                                        </div> */}
+
+                                        <div className="col-lg-12 d-flex justify-content-end">
+                                            <button
+                                                className="profile_update_btn"
+                                                onClick={handleUpdateProfile}
+                                                disabled={updating}
                                             >
-                                                <option value="">Select gender</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
-                                            </select>
+                                                {updating ? "Updating..." : "Update"}
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <div className="col-lg-12 d-flex justify-content-end">
-                                        <button
-                                            className="profile_update_btn"
-                                            onClick={handleUpdateProfile}
-                                            disabled={updating}
-                                        >
-                                            {updating ? "Updating..." : "Update"}
-                                        </button>
+                                    <div className="password_tab">
+                                        <Link to={'/profile/edit-password'} className='d-flex justify-content-between'>
+                                            <div>
+                                                <i className='fa fa-lock mr-3'></i>
+                                                <span>Set Password</span>
+                                            </div>
+                                            <div className='arrow_icon'>
+                                                <i className='fa fa-angle-right'></i>
+                                            </div>
+                                        </Link>
                                     </div>
-                                </div>
-
-                                <div className="password_tab">
-                                    <Link to={'/profile/edit-password'} className='d-flex justify-content-between'>
-                                        <div>
-                                            <i className='fa fa-lock mr-3'></i>
-                                            <span>Set Password</span>
-                                        </div>
-                                        <div className='arrow_icon'>
-                                            <i className='fa fa-angle-right'></i>
-                                        </div>
-                                    </Link>
                                 </div>
                             </div>
                         </div>

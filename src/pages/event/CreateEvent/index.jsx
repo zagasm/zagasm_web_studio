@@ -6,12 +6,10 @@ function CreateEvent() {
         <div className="container-flui m-0 p-0">
             <SideBarNav />
             <div className="page_wrapper overflow-hidden">
-                <div className="row p-0 ">
+                <div className="row p-0 mt-5 ">
                     <div className="col ">
                          <EventCreationWizard />
                     </div>
-                    {/* <RightBarComponent>
-                    </RightBarComponent> */}
                 </div>
             </div>
         </div>

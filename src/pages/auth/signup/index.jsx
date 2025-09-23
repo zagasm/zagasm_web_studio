@@ -5,14 +5,14 @@ import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
-import PhoneInput from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
-import { isValidPhoneNumber, getCountryCallingCode } from 'react-phone-number-input';
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import { isValidPhoneNumber, getCountryCallingCode } from "react-phone-number-input";
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth(); // Updated to use login
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
@@ -20,13 +20,15 @@ export function SignUp() {
     label: "",
     class: ""
   });
-  const [countryCode, setCountryCode] = useState("+234"); // Default to Nigeria
+  const [countryCode, setCountryCode] = useState("+234");
   const [phoneError, setPhoneError] = useState("");
+  const [useEmail, setUseEmail] = useState(false); // toggle state
 
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     phone: "",
+    email: "",
     password: "",
     country_code: "+234"
   });
@@ -35,11 +37,7 @@ export function SignUp() {
     if (formData.password) {
       checkPasswordStrength(formData.password);
     } else {
-      setPasswordStrength({
-        score: 0,
-        label: "",
-        class: ""
-      });
+      setPasswordStrength({ score: 0, label: "", class: "" });
     }
   }, [formData.password]);
 
@@ -67,23 +65,19 @@ export function SignUp() {
       strengthClass = "";
     }
 
-    setPasswordStrength({
-      score,
-      label,
-      class: strengthClass
-    });
+    setPasswordStrength({ score, label, class: strengthClass });
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value
     }));
   };
 
   const handlePhoneChange = (value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       phone: value || ""
     }));
@@ -92,7 +86,7 @@ export function SignUp() {
       try {
         const code = `+${getCountryCallingCode(value)}`;
         setCountryCode(code);
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           country_code: code
         }));
@@ -112,49 +106,66 @@ export function SignUp() {
     e.preventDefault();
     setError("");
 
-    // Validate all fields
-    if (!formData.first_name || !formData.last_name || !formData.phone || !formData.password) {
+    if (!formData.first_name || !formData.last_name || !formData.password) {
       showToast.error("Please fill in all fields");
       return;
     }
 
-    if (!isValidPhoneNumber(formData.phone)) {
-      showToast.error("Please enter a valid phone number");
-      return;
+    if (useEmail) {
+      if (!formData.email) {
+        showToast.error("Please enter a valid email");
+        return;
+      }
+    } else {
+      if (!formData.phone || !isValidPhoneNumber(formData.phone)) {
+        showToast.error("Please enter a valid phone number");
+        return;
+      }
     }
 
     setIsLoading(true);
     try {
-      const phoneWithoutCountryCode = formData.phone.replace(new RegExp(`^\\${formData.country_code}`), '');
-      const payload = {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        phone: phoneWithoutCountryCode,
-        password: formData.password,
-        country_code: formData.country_code
-      };
+      let payload;
+      if (useEmail) {
+        payload = {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          password: formData.password
+        };
+      } else {
+        const phoneWithoutCountryCode = formData.phone.replace(
+          new RegExp(`^\\${formData.country_code}`),
+          ""
+        );
+        payload = {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          phone: phoneWithoutCountryCode,
+          password: formData.password,
+          country_code: formData.country_code
+        };
+      }
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/v1/users`,
         payload
       );
 
-      // console.log(response);
-      // Handle successful response
       if (response.data && response.data.token) {
-        // Store user data in context/state
         login({
           token: response.data.token,
           user: response.data.user
         });
-        // Show success message
-        showToast.success(response.data.message || "Account created successfully!");
-        // Navigate to dashboard or appropriate page
-        navigate("/"); // Update this to your desired redirect path
+        showToast.success(
+          response.data.message || "Account created successfully!"
+        );
+        navigate("/");
       }
     } catch (err) {
       console.error("Signup error:", err);
-      const errorMessage = err.response?.data?.message || "Registration failed";
+      const errorMessage =
+        err.response?.data?.message || "Registration failed";
       showToast.error(errorMessage);
       setError(errorMessage);
     } finally {
@@ -163,6 +174,14 @@ export function SignUp() {
   };
 
   const isFormValid = () => {
+    if (useEmail) {
+      return (
+        formData.first_name.trim() !== "" &&
+        formData.last_name.trim() !== "" &&
+        formData.email.trim() !== "" &&
+        formData.password.trim() !== ""
+      );
+    }
     return (
       formData.first_name.trim() !== "" &&
       formData.last_name.trim() !== "" &&
@@ -182,7 +201,9 @@ export function SignUp() {
       haveAccount={false}
     >
       <form autoComplete="off" className="" onSubmit={handleSubmit}>
-        {error && <div className="text-danger mb-3 alert alert-danger">{error}</div>}
+        {error && (
+          <div className="text-danger mb-3 alert alert-danger">{error}</div>
+        )}
 
         <div className="row p-0 m-0">
           <motion.div
@@ -236,28 +257,80 @@ export function SignUp() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-          className="form-group phone-input-section m-2" style={{background:'white'}}
-        >
-          <label htmlFor="PhoneNumber">Phone Number</label>
-          <div className="phone-input-container" style={{background:'white'}}>
-            <PhoneInput
-              id="PhoneNumber"
-              international
-              defaultCountry="NG"
-              value={formData.phone}
-              onChange={handlePhoneChange}
-              className={`phone-input ${phoneError ? 'is-invalid' : ''}`}
-              placeholder="Enter phone number"
-              style={{background:'white'}}
+        {!useEmail ? (
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="form-group phone-input-section m-2"
+            style={{ background: "white" }}
+          >
+            <label htmlFor="PhoneNumber">Phone Number</label>
+            <div
+              className="phone-input-container"
+              style={{ background: "white" }}
+            >
+              <PhoneInput
+                id="PhoneNumber"
+                international
+                defaultCountry="NG"
+                value={formData.phone}
+                onChange={handlePhoneChange}
+                className={`phone-input ${phoneError ? "is-invalid" : ""}`}
+                placeholder="Enter phone number"
+                style={{ background: "white" }}
+              />
+              {phoneError && (
+                <div className="phone-error-message">{phoneError}</div>
+              )}
+            </div>
+            <input
+              style={{ background: "white" }}
+              type="hidden"
+              name="country_code"
+              value={formData.country_code}
             />
-            {phoneError && <div className="phone-error-message">{phoneError}</div>}
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="form-group m-2"
+          >
+            <label htmlFor="email">Email Address</label>
+            <div className="position-relative">
+              <input
+                id="email"
+                type="email"
+                name="email"
+                className="form-control input"
+                style={{ paddingLeft: "50px" }}
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                required={useEmail}
+              />
+              <i className="input-icon feather-mail position-absolute"></i>
+            </div>
+          </motion.div>
+        )}
+
+        {/* switch button */}
+        <div className="form-group m-2 pb-4">
+          <div className="text-center  w-100 ">
+            <button
+              type="button"
+              className="btn btn-link p-0 float-right"
+              onClick={() => setUseEmail(!useEmail)}
+              style={{ fontSize: "14px",color:'rgba(143, 7, 231, 1)',textDecoration:'none' }}
+            >
+              {useEmail
+                ? "Use Phone Number Instead"
+                : "Use Email Instead"}
+            </button>
           </div>
-          <input style={{background:'white'}} type="hidden" name="country_code" value={formData.country_code} />
-        </motion.div>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -279,21 +352,12 @@ export function SignUp() {
               minLength="8"
             />
             <i
-              className={`input-password-icon feather-eye${showPassword ? "" : "-off"} position-absolute`}
+              className={`input-password-icon feather-eye${showPassword ? "" : "-off"
+                } position-absolute`}
               onClick={() => setShowPassword(!showPassword)}
             ></i>
             <i className="input-icon feather-lock position-absolute"></i>
           </div>
-          {/* {formData.password && (
-            <>
-              <div className="password-strength-meter">
-                <div className={`strength-bar ${passwordStrength.class}`}></div>
-              </div>
-              <small className={`text-${passwordStrength.class}`}>
-                {passwordStrength.label}
-              </small>
-            </>
-          )} */}
         </motion.div>
 
         <motion.div
@@ -303,7 +367,8 @@ export function SignUp() {
           className="mt-4 mr-2 ml-2"
         >
           <button
-            className={`${isFormValid() ? 'active_submit_button' : 'inactive_submit_button'}`}
+            className={`${isFormValid() ? "active_submit_button" : "inactive_submit_button"
+              }`}
             type="submit"
             disabled={!isFormValid() || isLoading}
           >

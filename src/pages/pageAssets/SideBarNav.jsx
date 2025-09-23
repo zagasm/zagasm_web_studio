@@ -34,7 +34,7 @@ function SideBarNav() {
                             <span className="link_name">Discover</span>
                         </li>
                     </Link>
-                    <Link to="event/saved-events">
+                    <Link to="/event/saved-events">
                         <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/event/saved-events') ? 'active' : ''}`}>
                             <img src={saved_icon} alt="Saved" />
                             <span className="link_name">Saved Events</span>

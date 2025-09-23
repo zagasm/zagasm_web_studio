@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import SideBarNav from '../../pageAssets/sideBarNav';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import './eventTypeStyling.css';
 import EventCreationWizard from './EventForm';
@@ -12,12 +12,12 @@ function EventType() {
     const [error, setError] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const { user, token } = useAuth();
-
+console.log('user', token);
     useEffect(() => {
         const fetchEventTypes = async () => {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/api/v1/event/type`,
+                    `${import.meta.env.VITE_API_URL}/api/v1/event/type/view`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -65,30 +65,29 @@ function EventType() {
                 <div className="row p-0">
                     <div className="col">
                         <div className="container mt-5 pb-5 event_type_container">
-                            {!selectedEvent ? (
-                                <>
-                                    <h5>What type of events are you creating?</h5>
-                                    <small>This helps us customize your event setup.</small>
-                                    <ul className="p-0 mt-3 col-xl-9  mb-5 pb-5">
-                                        {eventTypes.map((event) => (
-                                            <li
-                                                key={event.id}
-                                                className="type_list d-flex justify-content-between border-bottom pb-2 mb-3 align-items-center"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleEventSelect(event)} >
+                            <>
+                                <h5>What type of events are you creating?</h5>
+                                <small>This helps us customize your event setup.</small>
+                                <ul className="p-0 mt-3 col-xl-9  mb-5 pb-5">
+                                    {eventTypes.map((event) => (
+                                        <li
+                                            key={event.id}
+                                            className="type_list d-flex justify-content-between border-bottom pb-2 mb-3 align-items-center"
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => handleEventSelect(event)} >
+                                            <Link to={`/event/create-event/${event.id}`} className='w-100 d-flex justify-content-between align-items-center text-dark'>
                                                 <div>
                                                     <span>{event.name}</span>
                                                 </div>
                                                 <div>
                                                     <span className="fa fa-angle-right"></span>
                                                 </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </>
-                            ) : (
-                                <EventCreationWizard setSelectedEvent={setSelectedEvent} eventType={selectedEvent} />
-                            )}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+
                         </div>
                     </div>
                 </div>

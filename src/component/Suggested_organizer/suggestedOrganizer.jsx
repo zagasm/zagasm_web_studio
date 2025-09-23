@@ -38,11 +38,10 @@ function SingleOrganizers() {
   const [organizers, setOrganizers] = useState([]);
   const [error, setError] = useState(null);
   const { token } = useAuth();
-
   useEffect(() => {
     const fetchOrganizers = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/organisers`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -53,14 +52,13 @@ function SingleOrganizers() {
           throw new Error('Failed to fetch organizers');
         }
         const data = await response.json();
-
+        console.log('Response___', data);
         // Add "following" property to each organizer
-        const organizersWithFollowState = data.data.map(org => ({
+        const organizersWithFollowState = data.organisers.map(org => ({
           ...org,
           following: org.following || false // default false if not provided
         }));
-
-        setOrganizers(organizersWithFollowState);
+        setOrganizers(data.organisers);
       } catch (err) {
         console.error('Error fetching organizers:', err);
         setError(err.message);
@@ -74,42 +72,39 @@ function SingleOrganizers() {
 
   const [followLoading, setFollowLoading] = useState({}); // Track loading per organizer
 
-const toggleFollow = async (organizerId) => {
-  setFollowLoading((prev) => ({ ...prev, [organizerId]: true }));
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/follow/${organizerId}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+  const toggleFollow = async (organizerId) => {
+    setFollowLoading((prev) => ({ ...prev, [organizerId]: true }));
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/follow/${organizerId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      if (!res.ok) {
+        throw new Error('Failed to toggle follow');
       }
-    });
+      const result = await res.json();
+      // Show alert from API message
+      console.log(result.message);
+      showToast.info(result.message);
+      // Update follow state instantly
+      setOrganizers(prev =>
+        prev.map(org =>
+          org.id === organizerId
+            ? { ...org, following: result.following }
+            : org
+        )
+      );
 
-    if (!res.ok) {
-      throw new Error('Failed to toggle follow');
+    } catch (err) {
+      console.error('Error toggling follow:', err);
+      showToast.error('Something went wrong. Please try again.');
+    } finally {
+      setFollowLoading((prev) => ({ ...prev, [organizerId]: false }));
     }
-
-    const result = await res.json();
-
-    // Show alert from API message
-    // alert(result.message);
-   showToast.info(result.message);
-    // Update follow state instantly
-    setOrganizers(prev =>
-      prev.map(org =>
-        org.id === organizerId
-          ? { ...org, following: result.following }
-          : org
-      )
-    );
-
-  } catch (err) {
-    console.error('Error toggling follow:', err);
-    showToast.error('Something went wrong. Please try again.');
-  } finally {
-    setFollowLoading((prev) => ({ ...prev, [organizerId]: false }));
-  }
-};
+  };
 
 
   if (loading) {
@@ -134,10 +129,10 @@ const toggleFollow = async (organizerId) => {
       </div>
       <div className="box-body p-3">
         {organizers.map((organizer) => {
-          const fullName = `${organizer.firstName} ${organizer.lastName}`;
-          const username = organizer.userName ||
-            `${organizer.firstName?.toLowerCase()}${organizer.lastName?.toLowerCase()}`;
-          const fallbackSeed = `${organizer.firstName}${organizer.lastName}${organizer.id}`;
+          const fullName = `${organizer.organiser} `;
+          const username = organizer.email ||
+            `${organizer.organiser?.toLowerCase()}`;
+          const fallbackSeed = `${fullName}${organizer.id}`;
           const profileImage = organizer.profileUrl?.url ||
             `https://randomuser.me/api/portraits/${organizer.id % 2 === 0 ? 'men' : 'women'}/${organizer.id % 50}.jpg`;
 
@@ -161,7 +156,7 @@ const toggleFollow = async (organizerId) => {
               <span className="ml-auto">
                 <button
                   type="button"
-                  style={{ background: organizer.following ? '#8F07E7' : '#EEDAFB' ,color: organizer.following ? 'white' : 'black' }}
+                  style={{ background: organizer.following ? '#8F07E7' : '#EEDAFB', color: organizer.following ? 'white' : 'black' }}
                   className="btn btn-sm d-flex align-items-center border-0"
                   onClick={() => toggleFollow(organizer.id)}
                   disabled={followLoading[organizer.id]}

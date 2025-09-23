@@ -23,128 +23,112 @@ function Account() {
             <div className="page_wrapper overflow-hidden">
                 <div className="row p-0 ">
                     <div className="col account_section ">
-                        <div>
-                            <AccountHeading />
-                            <div className="account_nav_section">
-                                <div>
-                                    <div className="row">
-                                        <div className="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 Preference_section">
-                                            <div className=" internal_container">
-                                                <h6>Preference</h6>
-                                                <ul>
-                                                    <li>
-                                                        <Link to={"/profile/edit-profile"} className=' account_link'>
-                                                            <div>
-                                                                {/* <img src={rocket} alt="" /> */}
-                                                                <img style={{ marginTop: '-6px' }} className=" rounded-circle" src={Default_user_image} alt="User Profile" />
-                                                                <span>Profile</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link to={"/account/interest"} className=' account_link'>
-                                                            <div>
-                                                                <img src={Users_icon} alt="" />
-                                                                <span>Organizers you follow</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li className='p-0 m-0' style={{ margin: '0px' }}>
-                                                        <Link to={"/account/manage-notification"} className=' account_link'>
-                                                            <div>
-                                                                <img src={Bell} alt="" />
-                                                                <span>Manage notification</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
+                        <div className="row">
+                            <div className="col-xl-3 col-lg-4 col-md-5 col-sm-12 col-12 p-0 m-0">
+                                <AccountHeading />
+                            </div>
+                            <div className="col-xl-9 col-lg-8 col-md-7 col-sm-12 col-12 p-0 m-0">
+                                <div className="account_nav_section">
+                                    <div>
+                                        <div className="row">
+                                            <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 Preference_section">
+                                                <div className=" internal_container">
+                                                    <h6>Preference</h6>
+                                                    <ul>
+                                                        <li>
+                                                            <Link to={"/account/interest"} className=' account_link'>
+                                                                <div>
+                                                                    <img src={rocket} alt="" />
+                                                                    <span>Interest</span>
+                                                                </div>
+                                                                <div>
 
-                                                </ul>
+                                                                    <i className="fa fa-angle-right "></i>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                        <li>
+                                                            <Link to={"/account/interest"} className=' account_link'>
+                                                                <div>
+                                                                    <img src={Users_icon} alt="" />
+                                                                    <span>Organizers you follow</span>
+                                                                </div>
+                                                                <div>
+
+                                                                    <i className="fa fa-angle-right "></i>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                        <li className='p-0 m-0' style={{ margin: '0px' }}>
+                                                            <Link to={"/account/manage-notification"} className=' account_link'>
+                                                                <div>
+                                                                    <img src={Bell} alt="" />
+                                                                    <span>Manage notification</span>
+                                                                </div>
+                                                                <div>
+
+                                                                    <i className="fa fa-angle-right "></i>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
                                             </div>
+
                                         </div>
-                                        <div className="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                            <div className="internal_container">
-                                                <h6>Help</h6>
-                                                <ul>
-                                                    <li>
-                                                        <Link to={""} className=' account_link'>
-                                                            <div>
-                                                                <img src={Info_circle} alt="" />
-                                                                <span>Manage notification</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
+                                        {/* <div className="row mt-5">
+                                            <div className="col">
+                                                <div className="internal_container">
+                                                    <h6>Legal</h6>
+                                                    <ul>
+                                                        <li>
+                                                            <Link to={""} className=' account_link'>
+                                                                <div>
+                                                                    <img src={Document} alt="" />
+                                                                    <span>Tearm of service</span>
+                                                                </div>
+                                                                <div>
+                                                                    <i className="fa fa-angle-right "></i>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                        <li>
+                                                            <Link to={""} className=' account_link'>
+                                                                <div>
+                                                                    <img src={Laptop} alt="" />
+                                                                    <span>Accessibility</span>
+                                                                </div>
+                                                                <div>
+                                                                    
+                                                                    <i className="fa fa-angle-right "></i>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                        <li>
+                                                            <Link to={""} className=' account_link'>
+                                                                <div>
+                                                                    <img src={key} alt="" />
+                                                                    <span>Privacy</span>
+                                                                </div>
+                                                                <div>
+                                                                    
+                                                                    <i className="fa fa-angle-right "></i>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
+                                        </div> */}
+                                        <div className="d-flex justify-content-between mt-3 footer_section p-2 mb-3">
+                                            <span>Version</span>
+                                            <span>120.0382j2.465</span>
                                         </div>
+                                        <Link onClick={() => logout()} className='logout_section p-2 d-inline'>
+                                            <img src={login} alt="" />  <span>Logout </span>
+                                        </Link>
                                     </div>
-                                    <div className="row mt-5">
-                                        <div className="col">
-                                            <div className="internal_container">
-                                                <h6>Legal</h6>
-                                                <ul>
-                                                    <li>
-                                                        <Link to={""} className=' account_link'>
-                                                            <div>
-                                                                <img src={Document} alt="" />
-                                                                <span>Tearm of service</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link to={""} className=' account_link'>
-                                                            <div>
-                                                                <img src={Laptop} alt="" />
-                                                                <span>Accessibility</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link to={""} className=' account_link'>
-                                                            <div>
-                                                                <img src={key} alt="" />
-                                                                <span>Privacy</span>
-                                                            </div>
-                                                            <div>
-                                                                {/* <img src={angle_right} alt="" /> */}
-                                                                <i className="fa fa-angle-right "></i>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="d-flex justify-content-between mt-3 footer_section p-2">
-                                        <span>Version</span>
-                                        <span>120.0382j2.465</span>
-                                    </div>
-                                    <Link onClick={() => logout()} className='logout_section p-2'>
-                                        <img src={login} alt="" />  <span>Logout </span>
-                                    </Link>
                                 </div>
                             </div>
                         </div>
