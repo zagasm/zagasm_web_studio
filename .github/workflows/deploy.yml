@@ -1,144 +1,162 @@
-name: 🚀 Zagasm Studios Web Deployment
+name: 🚀 Zagasm Studios Frontend Deployment
 
 on:
   push:
     branches:
-      - dev
       - main
+      - dev
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-
-    env:
-      # Default to test API for dev branch
-      VITE_API_URL: ${{ secrets.VITE_STUDIOS_TEST_API_URL }}
-      VITE_WEB_SOCKET: ${{ secrets.STUDIOS_WEB_SOCKET_TEST }}
-
     steps:
-      - name: Override API URL for main branch
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "VITE_API_URL=${{ secrets.VITE_STUDIOS_API_URL }}" >> $GITHUB_ENV
-          echo "VITE_WEB_SOCKET=${{ secrets.STUDIOS_WEB_SOCKET }}" >> $GITHUB_ENV
-
       - name: 📦 Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⎔ Set up Node.js
+      - name: 🟢 Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.18.0'
+          node-version: '18'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'  # Only cache if lock file exists
-
-      - name: 📦 Generate package-lock.json if missing
-        run: |
-          if [ ! -f package-lock.json ]; then
-            echo "⚠️ package-lock.json not found, generating one..."
-            npm install --package-lock-only
-            echo "✅ package-lock.json generated"
-          else
-            echo "✅ package-lock.json found"
-          fi
 
       - name: 📦 Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: 🏗️ Build the application
+      - name: 🏗️ Build application
         run: npm run build
 
-      - name: 📦 Archive build files
-        run: tar -czf dist.tar.gz -C dist .
-
-      - name: ⬆️ Upload build artifact
+      - name: 📊 Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifact
-          path: dist.tar.gz
+          name: frontend-build-${{ github.run_number }}
+          path: dist/
+          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
     needs: [build]
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-    
-    # Only deploy on dev and main branches
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
 
     steps:
-      - name: 📥 Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifact
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
 
-      - name: ✅ Verify dist.tar.gz exists
-        run: test -f dist.tar.gz && echo "✅ File exists" || (echo "❌ File not found" && exit 1)
+      - name: 🔧 Install tools
+        run: sudo apt-get update && sudo apt-get install -y sshpass rsync
 
-      - name: 🔐 Install sshpass for password authentication
-        run: sudo apt-get update && sudo apt-get install -y sshpass
-
-      - name: 🔐 Add server to known hosts
+      - name: 🎯 Determine target
+        id: target
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan -H ${{ secrets.STUDIOS_VPS_IP }} >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
-      - name: 🔗 Test SSH connection with password
-        env:
-          VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
-        run: |
-          echo "Testing SSH connection..."
-          sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no -o BatchMode=no root@${{ secrets.STUDIOS_VPS_IP }} 'echo "✅ SSH connection successful to $(hostname)"'
-
-      - name: 🚀 Deploy to VPS using Password
-        env:
-          VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
-        run: |
-          # Set deployment path based on branch
-          if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
-            DEPLOY_PATH="/var/www/studios"
-            echo "🎯 Deploying to PRODUCTION: $DEPLOY_PATH"
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "app_dir=/var/www/studios" >> $GITHUB_OUTPUT
+            echo "env_type=production" >> $GITHUB_OUTPUT
+            echo "🎯 Deploying to PRODUCTION: /var/www/studios"
           else
-            DEPLOY_PATH="/var/www/staging_studios"
-            echo "🧪 Deploying to STAGING: $DEPLOY_PATH"
+            echo "app_dir=/var/www/staging_studios" >> $GITHUB_OUTPUT
+            echo "env_type=staging" >> $GITHUB_OUTPUT
+            echo "🧪 Deploying to STAGING: /var/www/staging_studios"
           fi
 
-          # Upload the archive to the VPS using password
-          echo "📤 Uploading build package to server..."
-          sshpass -p "$VPS_PASSWORD" scp -o StrictHostKeyChecking=no -o BatchMode=no dist.tar.gz root@${{ secrets.STUDIOS_VPS_IP }}:$DEPLOY_PATH/
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build-${{ github.run_number }}
+          path: dist/
 
-          # Run deployment commands on the VPS using password
-          echo "🔄 Starting deployment process on server..."
-          sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no -o BatchMode=no root@${{ secrets.STUDIOS_VPS_IP }} "
-            cd $DEPLOY_PATH
-            
-            echo '🧹 Clearing old build files...'
-            # Remove only what we'll replace, keep other files intact
-            rm -rf assets _netlify.toml _redirects index.html 2>/dev/null || true
-            
-            # Extract new build
-            if [ -f dist.tar.gz ]; then
-              echo '📦 Extracting new build...'
-              tar -xzf dist.tar.gz -C .
-              
-              # Clean up
-              rm -rf dist.tar.gz
-              
-              # Set ownership for web server access
-              chown -R root:www-data ./
-              find . -type d -exec chmod 775 {} \;
-              find . -type f -exec chmod 664 {} \;
-              
-              echo '✅ Deployment complete successfully!'
-              echo '📍 Deployed to: ' $DEPLOY_PATH
-              
-              # Quick test to verify files are there
-              echo '📋 Contents after deployment:'
-              ls -la
-            else
-              echo '❌ Error: dist.tar.gz not found on server!'
-              exit 1
-            fi
+      - name: 🔄 Sync files to server (excludes .git, node_modules, etc.)
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          APP_DIR="${{ steps.target.outputs.app_dir }}"
+          ENV_TYPE="${{ steps.target.outputs.env_type }}"
+
+          echo "📤 Syncing $ENV_TYPE frontend to server..."
+
+          # Excludes for rsync - keep only built files
+          EXCLUDES="--exclude=.git --exclude=.github --exclude=node_modules --exclude=src \
+                    --exclude=public --exclude=.env* --exclude=README.md --exclude=.DS_Store \
+                    --exclude=package*.json --exclude=*.md --exclude=.gitignore"
+
+          # Sync built files to server
+          sshpass -p "$STUDIOS_VPS_PASSWORD" rsync -az --delete -e "ssh -o StrictHostKeyChecking=no" \
+            $EXCLUDES ./ root@$STUDIOS_VPS_IP:$APP_DIR/
+
+          echo "✅ Frontend sync completed"
+
+      - name: 🔐 Set proper permissions and restart web server
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          APP_DIR="${{ steps.target.outputs.app_dir }}"
+          ENV_TYPE="${{ steps.target.outputs.env_type }}"
+
+          echo "🔐 Setting permissions and restarting services on $ENV_TYPE..."
+
+          sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+            set -e
+            cd $APP_DIR
+
+            echo '🔐 Setting file permissions...'
+            chown -R www-data:www-data .
+            find . -type d -exec chmod 755 {} +
+            find . -type f -exec chmod 644 {} +
+
+            echo '🔄 Restarting web server...'
+            # Try different web server restart commands
+            systemctl restart nginx || systemctl restart apache2 || systemctl restart httpd || echo '⚠️ No web server found to restart'
+
+            echo '✅ $ENV_TYPE frontend deployment completed successfully!'
           "
+
+      - name: 🏥 Health Check
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          APP_DIR="${{ steps.target.outputs.app_dir }}"
+          ENV_TYPE="${{ steps.target.outputs.env_type }}"
+
+          echo "🏥 Running health check on $ENV_TYPE..."
+
+          sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+            cd $APP_DIR
+
+            echo '🔍 Checking frontend deployment...'
+            if [ -f index.html ]; then
+              echo '✅ index.html exists'
+              if [ -d assets ]; then
+                echo '✅ Assets directory exists'
+              else
+                echo '⚠️ Assets directory missing'
+              fi
+            else
+              echo '❌ index.html not found'
+            fi
+
+            echo '🏥 Health check completed'
+          "
+
+      - name: 📊 Deployment Summary
+        run: |
+          echo "🎉 **Frontend Deployment Summary**"
+          echo "- **Repository:** Zagasm Studios Frontend"
+          echo "- **Branch:** ${{ github.ref_name }}"
+          echo "- **Environment:** ${{ github.ref == 'refs/heads/main' && 'Production (/var/www/studios)' || 'Staging (/var/www/staging_studios)' }}"
+          echo "- **Server:** ${{ secrets.STUDIOS_VPS_IP }}"
+          echo "- **Commit:** ${{ github.sha }}"
+          echo "- **Triggered by:** ${{ github.actor }}"
+          echo "- **Run Number:** ${{ github.run_number }}"
+          echo ""
+          echo "✅ **Frontend deployment completed successfully!**"
