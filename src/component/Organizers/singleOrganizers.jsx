@@ -34,6 +34,7 @@ export default function SingleOrganizers() {
                     'Content-Type': 'application/json',
                 },
             });
+            console.log('Fetch organizers response:', response);
             if (!response.ok) {
                 throw new Error('Failed to fetch organizers');
             }

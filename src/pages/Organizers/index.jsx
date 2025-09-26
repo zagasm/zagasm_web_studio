@@ -25,10 +25,10 @@ function AllOrganizers() {
             } else {
                 setLoading(true);
             }
-            
+
             // Use the provided URL or the default endpoint
             const fetchUrl = url || `${import.meta.env.VITE_API_URL}/api/v1/events`;
-            
+
             const res = await fetch(fetchUrl, {
                 method: 'GET',
                 headers: {
@@ -42,7 +42,7 @@ function AllOrganizers() {
             }
 
             const data = await res.json();
-            
+
             if (data.data) {
                 if (isLoadMore) {
                     // Append new events to existing ones
@@ -51,7 +51,7 @@ function AllOrganizers() {
                     // Replace events for initial load
                     setEvents(data.data);
                 }
-                
+
                 // Set the next page URL for infinite scroll
                 setNextPageUrl(data.links?.next || null);
                 setHasMore(!!data.links?.next);
@@ -75,11 +75,11 @@ function AllOrganizers() {
     // Set up scroll event listener
     useEffect(() => {
         const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop 
+            if (window.innerHeight + document.documentElement.scrollTop
                 !== document.documentElement.offsetHeight) {
                 return;
             }
-            
+
             loadMoreEvents();
         };
 
@@ -92,37 +92,26 @@ function AllOrganizers() {
         fetchEvents();
     }, [fetchEvents]);
 
-    if (loading && events.length === 0) {
-        return (
-            <div className="container-fluid m-0 p-0">
-                <SideBarNav />
-                <div className="page_wrapper overflow-hidden">
-                    <div className="row p-0 pb-5 mb-5 ">
-                        <div className="col text-center p-5">
-                            <Spinner animation="border" variant="primary" />
-                            <p className="mt-2">Loading events...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+
 
     return (
         <div className="container-fluid m-0 p-0">
             <SideBarNav />
             <div className="page_wrapper overflow-hidden">
                 <div className="row p-0 pb-5 mb-5 ">
-                    <div className="col ">
+                    {loading && events.length === 0 ? <div className="col text-center p-5">
+                        <Spinner animation="border" variant="primary" />
+                        <p className="mt-2">Loading Organizers...</p>
+                    </div> : <div className="col ">
                         <h4 className="organizer_heading">Organizer You May Know</h4>
                         <div className="row">
                             <SingleOrganizers />
                         </div>
-                    </div>
+                    </div>}
                     <RightBarComponent>
                         <div className="m-3 mt-4">
-                            <SuggestedEvent 
-                                myEvent={false} 
+                            <SuggestedEvent
+                                myEvent={false}
                                 events={events}
                                 loading={loading}
                                 loadingMore={loadingMore}
