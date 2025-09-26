@@ -48,7 +48,7 @@ function Account() {
                                                             </Link>
                                                         </li>
                                                         <li>
-                                                            <Link to={"/account/interest"} className=' account_link'>
+                                                            <Link to={"/organizers"} className=' account_link'>
                                                                 <div>
                                                                     <img src={Users_icon} alt="" />
                                                                     <span>Organizers you follow</span>
