@@ -18,7 +18,7 @@ export default function MobileSingleOrganizers() {
 
   const fetchOrganizers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/organiser`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -29,14 +29,14 @@ export default function MobileSingleOrganizers() {
       if (!response.ok) throw new Error('Failed to fetch organizers');
 
       const data = await response.json();
-
+  console.log('Response___', data.organisers);
       // Ensure "following" field exists
-      const updatedData = data.data.map(org => ({
-        ...org,
-        following: org.following || false
-      }));
+      // const updatedData = data.organisers.map(org => ({
+      //   ...org,
+      //   following: org.following || false
+      // }));
 
-      setOrganizers(updatedData);
+      setOrganizers(data.organisers);
     } catch (error) {
       console.error('Error fetching organizers:', error);
     }
