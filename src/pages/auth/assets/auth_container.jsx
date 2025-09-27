@@ -32,7 +32,7 @@ function AuthContainer({ title, description, type, children, footer, header, hav
                                             <img src={zagasmLogo} className='zagasm_logo' alt="Zagasm Logo" />
                                         </a>
                                     </p>
-                                    {header && <div className='heading_section d-block text-center' style={{ marginBottom: '30px' }}>
+                                    {header && <div className='heading_section d-block text-center' style={{ marginBottom: '30px',boxShadow:'none' }}>
                                         <motion.h5 initial={{ opacity: 0, x: -70 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ duration: 0.9, ease: "easeOut" }} className="font-weight-bold mt-3 container_heading_tex text-center " >{title}</motion.h5>
