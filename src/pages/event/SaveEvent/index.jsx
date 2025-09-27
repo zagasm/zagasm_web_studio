@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // import live_camera from '../../assets/navbar_icons/solar_stream-broken.svg';
 import RightBarComponent from '../../../component/RightBarComponent';
 import SaveEventTemplate from '../../../component/Events/saveEvent';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import SuggestedOrganizer from '../../../component/Suggested_organizer/suggestedOrganizer';
 
 function SaveEvents() {

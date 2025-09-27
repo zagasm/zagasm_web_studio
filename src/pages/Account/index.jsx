@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import SideBarNav from '../pageAssets/sideBarNav';
+import SideBarNav from '../pageAssets/SideBarNav';
 import AccountHeading from './AccountHeading';
 import rocket from '../../assets/navbar_icons/rocket.png';
-import angle_right from '../../assets/navbar_icons/angle_right.png';
 import Users_icon from '../../assets/navbar_icons/Users_icon.png';
-import Info_circle from '../../assets/navbar_icons/Info_circle.png';
 import Bell from '../../assets/navbar_icons/Bell.png';
-import key from '../../assets/navbar_icons/key.png';
-import Document from '../../assets/navbar_icons/Document.png';
-import login from '../../assets/navbar_icons/login.png';
-import Laptop from '../../assets/navbar_icons/laptop.png';
+import login from '../../assets/navbar_icons/Login.png';
 import { Link } from 'react-router-dom';
 import './accountStyling.css';
 import { useAuth } from '../auth/AuthContext';

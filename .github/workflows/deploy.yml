@@ -1,0 +1,159 @@
+name: 🚀 Zagasm Studios Frontend Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build application
+        run: npm run build
+
+      - name: ✅ Verify build output
+        run: |
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ Build failed: dist/index.html not found"
+            ls -la
+            exit 1
+          fi
+          echo "✅ Build verification passed"
+
+      - name: 📊 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ github.run_number }}
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+    steps:
+      - name: 🎯 Determine target
+        id: target
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "app_dir=/var/www/studios" >> $GITHUB_OUTPUT
+            echo "env_type=production" >> $GITHUB_OUTPUT
+            echo "🎯 Deploying to PRODUCTION"
+          else
+            echo "app_dir=/var/www/staging_studios" >> $GITHUB_OUTPUT
+            echo "env_type=staging" >> $GITHUB_OUTPUT
+            echo "🧪 Deploying to STAGING"
+          fi
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build-${{ github.run_number }}
+          path: ./deploy-dist/
+
+      - name: 🗂️ Prepare deployment files
+        run: |
+          # Create clean deployment directory
+          rm -rf dist
+          mkdir -p dist
+          cp -r ./deploy-dist/* dist/
+          echo "📁 Deployment files prepared:"
+          ls -la dist/
+
+      - name: 🔧 Install tools
+        run: sudo apt-get update && sudo apt-get install -y sshpass rsync
+
+      - name: 🔐 Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.STUDIOS_VPS_IP }} >> ~/.ssh/known_hosts
+
+      - name: 🔄 Sync built files to server
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          APP_DIR="${{ steps.target.outputs.app_dir }}"
+          
+          echo "📤 Syncing built files to $APP_DIR..."
+          sshpass -p "$STUDIOS_VPS_PASSWORD" rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./dist/ root@$STUDIOS_VPS_IP:$APP_DIR/
+          echo "✅ File sync completed"
+
+      - name: 🔐 Set permissions on server
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          APP_DIR="${{ steps.target.outputs.app_dir }}"
+          
+          sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+            cd $APP_DIR
+            chown -R www-data:www-data .
+            find . -type d -exec chmod 755 {} \;
+            find . -type f -exec chmod 644 {} \;
+            echo '✅ Permissions set'
+          "
+
+      - name: 🚀 Restart web server
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+            systemctl restart nginx 2>/dev/null || 
+            systemctl restart apache2 2>/dev/null || 
+            echo 'ℹ️ No web server restart needed'
+            echo '✅ Services updated'
+          "
+
+      - name: 🏥 Health Check
+        env:
+          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
+          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
+        run: |
+          APP_DIR="${{ steps.target.outputs.app_dir }}"
+          
+          HEALTH_RESULT=$(sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+            cd $APP_DIR
+            echo '=== Essential Files ==='
+            ls -la | grep -E '(index.html|assets|static)'
+            echo '=== File Count ==='
+            find . -type f | wc -l
+          ")
+          echo "$HEALTH_RESULT"
+
+      - name: 📊 Deployment Summary
+        run: |
+          echo "🎉 **Zagasm Studios Frontend Deployment Complete**"
+          echo "**Environment:** ${{ steps.target.outputs.env_type }}"
+          echo "**Directory:** ${{ steps.target.outputs.app_dir }}"
+          echo "**Server:** ${{ secrets.STUDIOS_VPS_IP }}"
+          echo "**Commit:** ${{ github.sha }}"
+          echo "**Deployed by:** ${{ github.actor }}"

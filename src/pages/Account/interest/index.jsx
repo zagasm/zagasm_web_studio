@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import './interestStyling.css';
 
 // Import icons

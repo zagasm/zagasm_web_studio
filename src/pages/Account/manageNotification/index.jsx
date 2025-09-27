@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import { Link } from 'react-router-dom';
 import './manageNotificationStyling.css';
 
