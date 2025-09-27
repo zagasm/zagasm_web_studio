@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './viewProfileSTyling.css';
 import { useAuth } from '../../auth/AuthContext';
 import default_profilePicture from '../../../assets/avater_pix.avif';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import Group from '../../../assets/navbar_icons/Group.svg';
 import SuggestedEvent from '../../../component/Suggested_event/suggestedEvent';
 

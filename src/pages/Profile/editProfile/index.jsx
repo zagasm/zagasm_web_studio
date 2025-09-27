@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './editProfileStyling.css';
 import { Link } from 'react-router-dom';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { FiMail } from 'react-icons/fi';

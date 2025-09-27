@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SingleOrganizers from "../../component/Organizers/singleOrganizers";
 import RightBarComponent from "../../component/RightBarComponent";
-import SideBarNav from "../pageAssets/sideBarNav";
+import SideBarNav from "../pageAssets/SideBarNav";
 import '../../component/Organizers/organizerStyling.css';
 import SuggestedOrganizer from "../../component/Suggested_organizer/suggestedOrganizer";
 import SuggestedEvent from "../../component/Suggested_event/suggestedEvent";

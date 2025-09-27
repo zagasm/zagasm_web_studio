@@ -1,4 +1,5 @@
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
+
 import RightBarComponent from '../../../component/RightBarComponent';
 import EventCreationWizard from './EventForm';
 function CreateEvent() {

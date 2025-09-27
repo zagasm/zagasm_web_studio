@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import SingleNotificationTemplate from '../../../component/Notification/singleNotification';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 
 function AllNotification() {
     return (
