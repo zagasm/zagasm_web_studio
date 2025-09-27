@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import { FiMail, FiEye, FiEyeOff } from 'react-icons/fi';
 import './editPasswordStyling.css';
 

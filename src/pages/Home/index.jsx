@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import SideBarNav from '../pageAssets/sideBarNav.jsx';
 import SideBarNav from "../pageAssets/SideBarNav";
 import live_camera from '../../assets/navbar_icons/solar_stream-broken.svg';
 import './Homestyle.css';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import SideBarNav from '../../pageAssets/sideBarNav';
+import SideBarNav from '../../pageAssets/SideBarNav';
 import RightBarComponent from '../../../component/RightBarComponent';
 import SuggestedOrganizer from '../../../component/Suggested_organizer/suggestedOrganizer';
 import heart_icon from '../../../assets/navbar_icons/heart_icon.png';

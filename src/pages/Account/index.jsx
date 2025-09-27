@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SideBarNav from '../pageAssets/sideBarNav';
+import SideBarNav from '../pageAssets/SideBarNav';
 import AccountHeading from './AccountHeading';
 import rocket from '../../assets/navbar_icons/rocket.png';
 import angle_right from '../../assets/navbar_icons/angle_right.png';
