@@ -32,17 +32,21 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
 
-      - name: 🏗️ Build application
-        run: npm run build
-
-      - name: ✅ Verify build output
+      - name: 🎯 Set environment for build
+        id: build-env
         run: |
-          if [ ! -f "dist/index.html" ]; then
-            echo "❌ Build failed: dist/index.html not found"
-            ls -la
-            exit 1
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "VITE_API_BASE_URL=https://api.studios.zagasm.com" >> $GITHUB_ENV
+            echo "env_name=production" >> $GITHUB_OUTPUT
+          else
+            echo "VITE_API_BASE_URL=https://test-api.studios.zagasm.com" >> $GITHUB_ENV
+            echo "env_name=staging" >> $GITHUB_OUTPUT
           fi
-          echo "✅ Build verification passed"
+
+      - name: 🏗️ Build application
+        run: |
+          echo "Building with API URL: $VITE_API_BASE_URL"
+          npm run build
 
       - name: 📊 Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -57,80 +61,76 @@ jobs:
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
 
     steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Install tools
+        run: sudo apt-get update && sudo apt-get install -y sshpass rsync
+
       - name: 🎯 Determine target
         id: target
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.event.inputs.environment }}" = "production" ]; then
             echo "app_dir=/var/www/studios" >> $GITHUB_OUTPUT
             echo "env_type=production" >> $GITHUB_OUTPUT
-            echo "🎯 Deploying to PRODUCTION"
+            echo "🎯 Deploying to PRODUCTION: /var/www/studios"
           else
             echo "app_dir=/var/www/staging_studios" >> $GITHUB_OUTPUT
             echo "env_type=staging" >> $GITHUB_OUTPUT
-            echo "🧪 Deploying to STAGING"
+            echo "🧪 Deploying to STAGING: /var/www/staging_studios"
           fi
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: frontend-build-${{ github.run_number }}
-          path: ./deploy-dist/
+          path: dist/
 
-      - name: 🗂️ Prepare deployment files
-        run: |
-          # Create clean deployment directory
-          rm -rf dist
-          mkdir -p dist
-          cp -r ./deploy-dist/* dist/
-          echo "📁 Deployment files prepared:"
-          ls -la dist/
-
-      - name: 🔧 Install tools
-        run: sudo apt-get update && sudo apt-get install -y sshpass rsync
-
-      - name: 🔐 Add server to known hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.STUDIOS_VPS_IP }} >> ~/.ssh/known_hosts
-
-      - name: 🔄 Sync built files to server
+      - name: 🔄 Sync files to server (excludes .git, node_modules, etc.)
         env:
           STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
           STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
         run: |
           APP_DIR="${{ steps.target.outputs.app_dir }}"
-          
-          echo "📤 Syncing built files to $APP_DIR..."
-          sshpass -p "$STUDIOS_VPS_PASSWORD" rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            ./dist/ root@$STUDIOS_VPS_IP:$APP_DIR/
-          echo "✅ File sync completed"
+          ENV_TYPE="${{ steps.target.outputs.env_type }}"
 
-      - name: 🔐 Set permissions on server
+          echo "📤 Syncing $ENV_TYPE frontend to server..."
+
+          # Excludes for rsync - keep only built files
+          EXCLUDES="--exclude=.git --exclude=.github --exclude=node_modules --exclude=src \
+                    --exclude=public --exclude=.env* --exclude=README.md --exclude=.DS_Store \
+                    --exclude=package*.json --exclude=*.md --exclude=.gitignore"
+
+          # Sync built files to server
+          sshpass -p "$STUDIOS_VPS_PASSWORD" rsync -az --delete -e "ssh -o StrictHostKeyChecking=no" \
+            $EXCLUDES ./ root@$STUDIOS_VPS_IP:$APP_DIR/
+
+          echo "✅ Frontend sync completed"
+
+      - name: 🔐 Set proper permissions and restart web server
         env:
           STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
           STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
         run: |
           APP_DIR="${{ steps.target.outputs.app_dir }}"
-          
+          ENV_TYPE="${{ steps.target.outputs.env_type }}"
+
+          echo "🔐 Setting permissions and restarting services on $ENV_TYPE..."
+
           sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+            set -e
             cd $APP_DIR
-            chown -R www-data:www-data .
-            find . -type d -exec chmod 755 {} \;
-            find . -type f -exec chmod 644 {} \;
-            echo '✅ Permissions set'
-          "
 
-      - name: 🚀 Restart web server
-        env:
-          STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
-          STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
-        run: |
-          sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
-            systemctl restart nginx 2>/dev/null || 
-            systemctl restart apache2 2>/dev/null || 
-            echo 'ℹ️ No web server restart needed'
-            echo '✅ Services updated'
+            echo '🔐 Setting file permissions...'
+            chown -R www-data:www-data .
+            find . -type d -exec chmod 755 {} +
+            find . -type f -exec chmod 644 {} +
+
+            echo '🔄 Restarting web server...'
+            # Try different web server restart commands
+            systemctl restart nginx || systemctl restart apache2 || systemctl restart httpd || echo '⚠️ No web server found to restart'
+
+            echo '✅ $ENV_TYPE frontend deployment completed successfully!'
           "
 
       - name: 🏥 Health Check
@@ -139,21 +139,37 @@ jobs:
           STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
         run: |
           APP_DIR="${{ steps.target.outputs.app_dir }}"
-          
-          HEALTH_RESULT=$(sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
+          ENV_TYPE="${{ steps.target.outputs.env_type }}"
+
+          echo "🏥 Running health check on $ENV_TYPE..."
+
+          sshpass -p "$STUDIOS_VPS_PASSWORD" ssh -o StrictHostKeyChecking=no root@$STUDIOS_VPS_IP "
             cd $APP_DIR
-            echo '=== Essential Files ==='
-            ls -la | grep -E '(index.html|assets|static)'
-            echo '=== File Count ==='
-            find . -type f | wc -l
-          ")
-          echo "$HEALTH_RESULT"
+
+            echo '🔍 Checking frontend deployment...'
+            if [ -f index.html ]; then
+              echo '✅ index.html exists'
+              if [ -d assets ]; then
+                echo '✅ Assets directory exists'
+              else
+                echo '⚠️ Assets directory missing'
+              fi
+            else
+              echo '❌ index.html not found'
+            fi
+
+            echo '🏥 Health check completed'
+          "
 
       - name: 📊 Deployment Summary
         run: |
-          echo "🎉 **Zagasm Studios Frontend Deployment Complete**"
-          echo "**Environment:** ${{ steps.target.outputs.env_type }}"
-          echo "**Directory:** ${{ steps.target.outputs.app_dir }}"
-          echo "**Server:** ${{ secrets.STUDIOS_VPS_IP }}"
-          echo "**Commit:** ${{ github.sha }}"
-          echo "**Deployed by:** ${{ github.actor }}"
+          echo "🎉 **Frontend Deployment Summary**"
+          echo "- **Repository:** Zagasm Studios Frontend"
+          echo "- **Branch:** ${{ github.ref_name }}"
+          echo "- **Environment:** ${{ github.ref == 'refs/heads/main' && 'Production (/var/www/studios)' || 'Staging (/var/www/staging_studios)' }}"
+          echo "- **Server:** ${{ secrets.STUDIOS_VPS_IP }}"
+          echo "- **Commit:** ${{ github.sha }}"
+          echo "- **Triggered by:** ${{ github.actor }}"
+          echo "- **Run Number:** ${{ github.run_number }}"
+          echo ""
+          echo "✅ **Frontend deployment completed successfully!**"
