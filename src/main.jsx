@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "preact/compat/client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "./assets/vendor/icons/feather.css";
+import "./assets/css/style.css";
 import "./style.css";
 import { AuthProvider, useAuth } from "./pages/auth/AuthContext/index.jsx";
 import { HelmetProvider } from "react-helmet-async";
