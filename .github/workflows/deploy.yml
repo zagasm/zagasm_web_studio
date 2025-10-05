@@ -86,7 +86,7 @@ jobs:
           name: frontend-build-${{ github.run_number }}
           path: dist/
 
-      - name: 🔄 Sync files to server (excludes .git, node_modules, etc.)
+      - name: 🔄 Sync built files to server
         env:
           STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
           STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
@@ -96,14 +96,9 @@ jobs:
 
           echo "📤 Syncing $ENV_TYPE frontend to server..."
 
-          # Excludes for rsync - keep only built files
-          EXCLUDES="--exclude=.git --exclude=.github --exclude=node_modules --exclude=src \
-                    --exclude=public --exclude=.env* --exclude=README.md --exclude=.DS_Store \
-                    --exclude=package*.json --exclude=*.md --exclude=.gitignore"
-
-          # Sync built files to server
+          # Sync ONLY the dist folder contents to server
           sshpass -p "$STUDIOS_VPS_PASSWORD" rsync -az --delete -e "ssh -o StrictHostKeyChecking=no" \
-            $EXCLUDES ./ root@$STUDIOS_VPS_IP:$APP_DIR/
+            dist/ root@$STUDIOS_VPS_IP:$APP_DIR/
 
           echo "✅ Frontend sync completed"
 
