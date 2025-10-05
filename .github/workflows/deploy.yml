@@ -36,16 +36,16 @@ jobs:
         id: build-env
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "VITE_API_BASE_URL=https://api.studios.zagasm.com" >> $GITHUB_ENV
+            echo "VITE_API_URL=https://api.studios.zagasm.com" >> $GITHUB_ENV
             echo "env_name=production" >> $GITHUB_OUTPUT
           else
-            echo "VITE_API_BASE_URL=https://test-api.studios.zagasm.com" >> $GITHUB_ENV
+            echo "VITE_API_URL=https://test-api.studios.zagasm.com" >> $GITHUB_ENV
             echo "env_name=staging" >> $GITHUB_OUTPUT
           fi
 
       - name: 🏗️ Build application
         run: |
-          echo "Building with API URL: $VITE_API_BASE_URL"
+          echo "Building with API URL: $VITE_API_URL"
           npm run build
 
       - name: 📊 Upload build artifacts
@@ -86,7 +86,7 @@ jobs:
           name: frontend-build-${{ github.run_number }}
           path: dist/
 
-      - name: 🔄 Sync built files to server
+      - name: 🔄 Sync files to server (excludes .git, node_modules, etc.)
         env:
           STUDIOS_VPS_PASSWORD: ${{ secrets.STUDIOS_VPS_PASSWORD }}
           STUDIOS_VPS_IP: ${{ secrets.STUDIOS_VPS_IP }}
@@ -96,9 +96,14 @@ jobs:
 
           echo "📤 Syncing $ENV_TYPE frontend to server..."
 
-          # Sync ONLY the dist folder contents to server
+          # Excludes for rsync - keep only built files
+          EXCLUDES="--exclude=.git --exclude=.github --exclude=node_modules --exclude=src \
+                    --exclude=public --exclude=.env* --exclude=README.md --exclude=.DS_Store \
+                    --exclude=package*.json --exclude=*.md --exclude=.gitignore"
+
+          # Sync built files to server
           sshpass -p "$STUDIOS_VPS_PASSWORD" rsync -az --delete -e "ssh -o StrictHostKeyChecking=no" \
-            dist/ root@$STUDIOS_VPS_IP:$APP_DIR/
+            $EXCLUDES ./ root@$STUDIOS_VPS_IP:$APP_DIR/
 
           echo "✅ Frontend sync completed"
 
