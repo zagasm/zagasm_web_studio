@@ -65,7 +65,7 @@ const PostSignupForm = () => {
       // Verify endpoint exists
       const endpoint = `${import.meta.env.VITE_API_URL}/api/v1/gender/dob`;
       console.log("Attempting to reach:", endpoint);
-      const response = await axios.post(  // Changed from PATCH to POST
+      const response = await axios.post(
         endpoint,
         {
           gender: gender,
@@ -73,7 +73,7 @@ const PostSignupForm = () => {
         },
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
           validateStatus: (status) => status < 500 // Accept 4xx as responses
@@ -82,12 +82,10 @@ const PostSignupForm = () => {
       console.log('update data:', response);
       if (response.status === 200 || response.status === 201) {
         showToast.success(response.data.message || "Date of Birth and Gender updated successfully!");
-        // conso
         settosendUserdata(response.data.user);
         setFormSubmitted(true);
       } else if (response.status === 422) {
-        const token = token;
-        const user = user;
+        // User already has gender/dob set, just continue with current auth
         login({ token, user });
       } else {
         throw new Error(response.data?.message || "Update failed");
@@ -96,8 +94,8 @@ const PostSignupForm = () => {
       console.error("API Error:", err);
       setError(
         err.response?.data?.message ||
-        err.message ||
-        "Failed to update profile. Please try again."
+          err.message ||
+          "Failed to update profile. Please try again."
       );
     } finally {
       setIsLoading(false);
