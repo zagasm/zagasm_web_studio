@@ -62,31 +62,46 @@ const PostSignupForm = () => {
 
     setIsLoading(true);
     try {
-      // Verify endpoint exists
       const endpoint = `${import.meta.env.VITE_API_URL}/api/v1/gender/dob`;
       console.log("Attempting to reach:", endpoint);
+      
+      // Use FormData like the editProfile component does
+      const formData = new FormData();
+      formData.append("gender", gender);
+      formData.append("dob", dob);
+      
       const response = await axios.post(
         endpoint,
-        {
-          gender: gender,
-          dob: dob,
-        },
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`,
           },
           validateStatus: (status) => status < 500 // Accept 4xx as responses
         }
       );
       console.log('update data:', response);
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
+      
       if (response.status === 200 || response.status === 201) {
         showToast.success(response.data.message || "Date of Birth and Gender updated successfully!");
         settosendUserdata(response.data.user);
         setFormSubmitted(true);
       } else if (response.status === 422) {
-        // User already has gender/dob set, just continue with current auth
-        login({ token, user });
+        // Log the 422 error details
+        console.error('422 Error details:', response.data);
+        
+        // Check if user already has gender/dob set
+        if (response.data?.message?.includes('already') || response.data?.error?.includes('already')) {
+          login({ token, user });
+        } else {
+          // Show specific validation error from API
+          const errorMsg = response.data?.message || response.data?.error || 'Validation failed';
+          setError(errorMsg);
+          showToast.error(errorMsg);
+        }
       } else {
         throw new Error(response.data?.message || "Update failed");
       }
