@@ -53,12 +53,19 @@ function SingleOrganizers() {
         }
         const data = await response.json();
         console.log('Response___', data);
-        // Add "following" property to each organizer
-        const organizersWithFollowState = data.organisers.map(org => ({
-          ...org,
-          following: org.following || false // default false if not provided
-        }));
-        setOrganizers(data.organisers);
+        
+        // Safely handle potential undefined organisers
+        if (data && Array.isArray(data.organisers)) {
+          // Add "following" property to each organizer
+          const organizersWithFollowState = data.organisers.map(org => ({
+            ...org,
+            following: org.following || false // default false if not provided
+          }));
+          setOrganizers(data.organisers);
+        } else {
+          console.warn('No organisers data received');
+          setOrganizers([]);
+        }
       } catch (err) {
         console.error('Error fetching organizers:', err);
         setError(err.message);

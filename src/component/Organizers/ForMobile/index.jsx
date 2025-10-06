@@ -29,14 +29,15 @@ export default function MobileSingleOrganizers() {
       if (!response.ok) throw new Error('Failed to fetch organizers');
 
       const data = await response.json();
-  console.log('Response___', data.organisers);
-      // Ensure "following" field exists
-      // const updatedData = data.organisers.map(org => ({
-      //   ...org,
-      //   following: org.following || false
-      // }));
-
-      setOrganizers(data.organisers);
+      console.log('Response___', data.organisers);
+      
+      // Safely handle potential undefined organisers
+      if (data && Array.isArray(data.organisers)) {
+        setOrganizers(data.organisers);
+      } else {
+        console.warn('No organisers data received');
+        setOrganizers([]);
+      }
     } catch (error) {
       console.error('Error fetching organizers:', error);
     }
