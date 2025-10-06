@@ -18,7 +18,8 @@ import { showToast } from "../../../ToastAlert";
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
   // Conditionally render the page only if required
-  if (user.gender != null || user.dob != null) return null;
+  // Only hide form if BOTH gender AND dob are already set
+  if (user.gender != null && user.dob != null) return null;
 
   if (!user) {
     return null;
@@ -93,12 +94,20 @@ const PostSignupForm = () => {
         // Log the 422 error details
         console.error('422 Error details:', response.data);
         
+        const message = response.data?.message || '';
+        
         // Check if user already has gender/dob set
-        if (response.data?.message?.includes('already') || response.data?.error?.includes('already')) {
-          login({ token, user });
+        if (message.toLowerCase().includes('already')) {
+          // Data already set, just continue - don't show this form anymore
+          showToast.info(message);
+          // Update user object to reflect that gender/dob are set
+          const updatedUser = { ...user, gender: gender, dob: dob };
+          login({ token, user: updatedUser });
+          // This will trigger the form to hide on next render
+          window.location.reload();
         } else {
           // Show specific validation error from API
-          const errorMsg = response.data?.message || response.data?.error || 'Validation failed';
+          const errorMsg = message || response.data?.error || 'Validation failed';
           setError(errorMsg);
           showToast.error(errorMsg);
         }
