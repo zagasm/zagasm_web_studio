@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/zagasm_logo.png';
+import logo from '../../assets/zagasm_studio_logo.png';
 import bell_icon from '../../assets/navbar_icons/Bell.png';
 import Edit_icon from '../../assets/navbar_icons/Edit_icon.png';
 import search_icon from '../../assets/navbar_icons/search_icon.png';

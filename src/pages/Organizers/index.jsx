@@ -7,6 +7,7 @@ import SuggestedOrganizer from "../../component/Suggested_organizer/suggestedOrg
 import SuggestedEvent from "../../component/Suggested_event/suggestedEvent";
 import Spinner from 'react-bootstrap/Spinner';
 import { useAuth } from '../auth/AuthContext';
+import SEO from '../../component/SEO';
 
 function AllOrganizers() {
     const { token } = useAuth();
@@ -95,8 +96,14 @@ function AllOrganizers() {
 
 
     return (
-        <div className="container-fluid m-0 p-0">
-            <SideBarNav />
+        <>
+            <SEO 
+                title="Event Organizers - Connect with Top Event Hosts"
+                description="Discover and follow the best event organizers at Zagasm Studios. Connect with professional event hosts, venue managers, and entertainment producers for concerts, festivals, parties and more."
+                keywords="zagasm studios, event organizers, event hosts, venue managers, concert organizers, party planners, festival organizers, entertainment producers, follow organizers, professional event management"
+            />
+            <div className="container-fluid m-0 p-0">
+                <SideBarNav />
             <div className="page_wrapper overflow-hidden">
                 <div className="row p-0 pb-5 mb-5 ">
                     {loading && events.length === 0 ? <div className="col text-center p-5">
@@ -123,7 +130,8 @@ function AllOrganizers() {
                     </RightBarComponent>
                 </div>
             </div>
-        </div>
+            </div>
+        </>
     );
 }
 

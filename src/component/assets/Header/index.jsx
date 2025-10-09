@@ -1,5 +1,4 @@
-// import Pokilogo_light from "../../../assets/Pokilogo_light.png";
-// import Pokilogo_dark from "../../../assets/Pokilogo_dark.png";
+import Pokilogo_light from "../../../assets/zagasm_studio_logo.png";
 import "./style.css";
 import RightSlider from "../../rightModal";
 import { useEffect, useState } from "react";
@@ -226,7 +225,7 @@ function Header() {
 
         <div className="topbar stick">
           <div className="logo">
-            <img src={Pokilogo_light} style={{ width: "75%" }} alt="Logo" />
+            <img src={Pokilogo_light} style={{ width: "75%" }} alt="Zagasm Studios Logo" />
           </div>
           <div className="top-area">
             <div className="main-menu">

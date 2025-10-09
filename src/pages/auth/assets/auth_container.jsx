@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import zagasmLogo from "../../../assets/zagasm_logo.png";
+import zagasmLogo from "../../../assets/zagasm_studio_logo.png";
 import './style.css';
 import { motion } from "framer-motion";
 
