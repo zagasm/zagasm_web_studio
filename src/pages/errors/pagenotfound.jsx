@@ -1,5 +1,5 @@
 import { Link, Links } from "react-router-dom";
-import zagasmLogo from "../../assets/ZAGASM_LOGO_ICON_V2_350PX.png";
+import zagasmLogo from "../../assets/zagasm_studio_logo.png";
 export function Error404() {
   return (
    <div className="vh-100">

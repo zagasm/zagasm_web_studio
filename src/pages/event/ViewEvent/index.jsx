@@ -11,6 +11,8 @@ import './eventView.css';
 import { useAuth } from '../../../pages/auth/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SEO from '../../../component/SEO';
+import { Helmet } from 'react-helmet-async';
 
 function ViewEvent() {
     const { eventId } = useParams();
@@ -91,6 +93,53 @@ function ViewEvent() {
     };
     return (
         <>
+            <SEO 
+                title={event?.title ? `${event.title} - Event Details` : 'Event Details'}
+                description={event?.description ? event.description.substring(0, 155) : 'Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!'}
+                keywords={`zagasm studios, ${event?.title || 'event'}, ${event?.eventType || 'event'}, event tickets, ${event?.hostName || 'event organizer'}, live events, entertainment`}
+                image={event?.poster?.[0]?.url || '/zagasm_studio_logo.png'}
+                type="article"
+            />
+            
+            {event && (
+                <Helmet>
+                    <script type="application/ld+json">
+                        {JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "Event",
+                            "name": event.title,
+                            "description": event.description,
+                            "image": event.poster?.[0]?.url,
+                            "startDate": `${event.eventDate}T${event.startTime}`,
+                            "endDate": event.endDate ? `${event.endDate}T${event.endTime}` : undefined,
+                            "eventStatus": "https://schema.org/EventScheduled",
+                            "eventAttendanceMode": event.eventType === 'virtual' ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
+                            "location": {
+                                "@type": event.eventType === 'virtual' ? "VirtualLocation" : "Place",
+                                "name": event.location || "Event Location",
+                                "address": event.address
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "price": event.price || 0,
+                                "priceCurrency": "USD",
+                                "availability": "https://schema.org/InStock",
+                                "url": window.location.href
+                            },
+                            "organizer": {
+                                "@type": "Organization",
+                                "name": event.hostName || "Zagasm Studios",
+                                "url": "https://studios.zagasm.com"
+                            },
+                            "performer": {
+                                "@type": "PerformingGroup",
+                                "name": event.hostName || "Event Host"
+                            }
+                        })}
+                    </script>
+                </Helmet>
+            )}
+            
             <ToastContainer />
             <div className="container-flui m-0 p-0">
                 <SideBarNav />

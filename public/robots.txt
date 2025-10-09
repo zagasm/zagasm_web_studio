@@ -1,0 +1,11 @@
+# Zagasm Studios - Robots.txt
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /account/
+
+# Sitemap
+Sitemap: https://studios.zagasm.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
