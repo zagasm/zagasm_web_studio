@@ -1,316 +1,282 @@
-import React, { useEffect, useState } from 'react';
-import './SavedeventSTyling.css';
-import heart_icon from '../../../assets/navbar_icons/heart_icon.png';
-import { useAuth } from '../../../pages/auth/AuthContext';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import "./SavedeventSTyling.css";
+import heart_icon from "../../../assets/navbar_icons/heart_icon.png";
+import { useAuth } from "../../../pages/auth/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+import { api, authHeaders } from "../../../lib/apiClient";
+import {
+  showError,
+  showPromise,
+  showSuccess,
+} from "../../../component/ui/toast";
 
-// Enhanced shimmer loader
+/* ---------- Shimmer ---------- */
 const ShimmerCard = () => (
-    <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mt-4">
-        <div className="car shadow-s rounded h-100 blog-card border-0 position-relative shimmer-container">
-            <div className="shimmer-heart shimmer-placeholder"></div>
-            <div className="shimmer-image shimmer-placeholder"></div>
-            <div className="save-event-detail d-flex justify-content-between align-items-center w-100 pt-3 pb-0 pr-2 pl-2">
-                <div className="w-100">
-                    <div className="shimmer-line shimmer-title shimmer-placeholder"></div>
-                    <div className="d-flex align-items-center people-list mt-2">
-                        <div className="dropdown-list-image mr-2 position-relative">
-                            <div className="shimmer-avatar shimmer-placeholder"></div>
-                        </div>
-                        <div className="font-weight-bold mt-2 w-75">
-                            <div className="shimmer-line shimmer-author shimmer-placeholder"></div>
-                        </div>
-                    </div>
-                    <div className="shimmer-line shimmer-date shimmer-placeholder mt-2"></div>
-                </div>
+  <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mt-4">
+    <div className="car shadow-s rounded h-100 blog-card border-0 position-relative shimmer-container">
+      <div className="shimmer-heart shimmer-placeholder" />
+      <div className="shimmer-image shimmer-placeholder" />
+      <div className="save-event-detail d-flex justify-content-between align-items-center w-100 pt-3 pb-0 pr-2 pl-2">
+        <div className="w-100">
+          <div className="shimmer-line shimmer-title shimmer-placeholder" />
+          <div className="d-flex align-items-center people-list mt-2">
+            <div className="dropdown-list-image mr-2 position-relative">
+              <div className="shimmer-avatar shimmer-placeholder" />
             </div>
+            <div className="font-weight-bold mt-2 w-75">
+              <div className="shimmer-line shimmer-author shimmer-placeholder" />
+            </div>
+          </div>
+          <div className="shimmer-line shimmer-date shimmer-placeholder mt-2" />
         </div>
+      </div>
     </div>
+  </div>
 );
 
+/* ---------- Utilities ---------- */
+const FALLBACK_IMG = "/images/event-dummy.jpg";
+const FALLBACK_AVATAR = "https://placehold.co/50x50?text=No+Image";
+
+function fmtDateTime(dateStr, timeStr) {
+  if (!dateStr) return "Date not available";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime()))
+    return timeStr ? `${dateStr} . ${timeStr}` : dateStr;
+
+  const day = d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+
+  if (!timeStr) return day;
+
+  // Expecting something like "02:17 PM"
+  const [hm, maybePeriod] = timeStr.split(" ");
+  let [h, m] = hm.split(":").map((x) => parseInt(x, 10));
+  const isPM = (maybePeriod || "").toLowerCase().includes("pm");
+  if (isPM && h < 12) h += 12;
+  if (!isPM && h === 12) h = 0;
+  const hh = String(h).padStart(2, "0");
+  const mm = String(m ?? 0).padStart(2, "0");
+  return `${day} . ${hh}:${mm}`;
+}
+
 export default function SaveEventTemplate() {
-    const [visiblePosts, setVisiblePosts] = useState([]);
-    const [allPosts, setAllPosts] = useState([]);
-    const [selectedPost, setSelectedPost] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const postsPerPage = 80000; // This is extremely high - consider reducing
-    const { token,user } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
-    useEffect(() => {
-        fetchSavedEvents();
-    }, [token]); // Added token as dependency
 
-    useEffect(() => {
-        if (allPosts.length > 0) {
-            loadPosts(1);
-        }
-    }, [allPosts]);
+  const [events, setEvents] = useState([]); // full list
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-const formatDateTime = (dateStr, timeStr) => {
-    if (!dateStr) return 'Date not available';
-    
+  // limit card count if you like; keep your grid performant
+  const pageSize = 40;
+  const visible = useMemo(() => events.slice(0, pageSize), [events, pageSize]);
+
+  const fetchSavedEvents = useCallback(async () => {
+    if (!token) {
+      setError("Authentication required");
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError("");
     try {
-        // If no time is provided, just format the date
-        if (!timeStr) {
-            // Parse the full date string (e.g., "Wednesday, September 24, 2025")
-            const date = new Date(dateStr);
-            
-            if (isNaN(date.getTime())) {
-                return dateStr;
-            }
-            
-            return date.toLocaleDateString('en-US', {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'short' // Changed from 'long' to 'short' for abbreviated month
-            });
-        }
-        
-        // Parse the full date string (e.g., "Wednesday, September 24, 2025")
-        const date = new Date(dateStr);
-        
-        // Check if date is valid
-        if (isNaN(date.getTime())) {
-            return `${dateStr} . ${timeStr}`;
-        }
-        
-        // Format exactly as requested: "Wed, Sep 24 . 02:17"
-        const formattedDate = date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short' // Changed from 'long' to 'short' for abbreviated month
-        });
-        
-        // Convert 12-hour time format to 24-hour format
-        let hours = parseInt(timeStr.split(':')[0]);
-        const minutes = timeStr.split(':')[1].split(' ')[0];
-        const period = timeStr.includes('PM') || timeStr.includes('pm') ? 'PM' : 'AM';
-        
-        if (period === 'PM' && hours < 12) {
-            hours += 12;
-        } else if (period === 'AM' && hours === 12) {
-            hours = 0;
-        }
-        
-        // Format time in 24-hour format with leading zeros
-        const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes}`;
-        
-        return `${formattedDate} . ${formattedTime}`;
-    } catch (error) {
-        console.error('Error formatting date:', error);
-        return `${dateStr}${timeStr ? ' . ' + timeStr : ''}`;
+      const { data } = await api.get(
+        "/api/v1/events/saved/list",
+        authHeaders(token)
+      );
+      const list = Array.isArray(data?.data) ? data.data : [];
+      const mapped = list.map((ev) => ({
+        id: ev.id,
+        title: ev.title || "Untitled Event",
+        image: ev?.poster?.[0]?.url || FALLBACK_IMG,
+        hostImage: ev.hostImage || FALLBACK_AVATAR,
+        hostName: ev.hostName || "Unknown Host",
+        eventDate: ev.eventDate || "",
+        startTime: ev.startTime || "",
+      }));
+      setEvents(mapped);
+      if (!mapped.length) setError("You haven't saved any events yet.");
+    } catch (e) {
+      console.error(e);
+      setError("Failed to load saved events. Please try again.");
+    } finally {
+      setLoading(false);
     }
-};
-    const fetchSavedEvents = async () => {
-        if (!token) {
-            setError('Authentication required');
-            setLoading(false);
-            return;
+  }, [token]);
+
+  useEffect(() => {
+    fetchSavedEvents();
+  }, [fetchSavedEvents]);
+
+  function openEvent(id) {
+    navigate(`/event/view/${id}`);
+  }
+
+  async function handleUnsaveEvent(eventId) {
+    // optimistic remove
+    const prev = events;
+    setEvents((list) => list.filter((e) => e.id !== eventId));
+
+    try {
+      await showPromise(
+        // Prefer toggle if that's the canonical route; if you truly have a dedicated /unsave, swap it here:
+        api.post(`/api/v1/events/${eventId}/toggle`, {}, authHeaders(token)),
+        {
+          loading: "Removing…",
+          success: "Event removed",
+          error: "Failed to remove",
         }
-        
-        setLoading(true);
-        setError(null);
-        try {
-            const res = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/v1/events/saved/list`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            
-            console.log('Saved Events Response:', res.data);
-            
-            if (res.data?.status && Array.isArray(res.data.data)) {
-                const mappedPosts = res.data.data.map(event => ({
-                    id: event.id,
-                    image: event.poster && event.poster.length > 0 
-                        ? event.poster[0].url 
-                        : 'https://placehold.co/300x200?text=No+Image',
-                    title: event.title || 'Untitled Event',
-                    authorAvatar: event.hostImage || 'https://placehold.co/50x50?text=No+Image',
-                    authorName: event.hostName || 'Unknown Host',
-                    price: event.price || 0,
-                    eventDate: event.eventDate || '',
-                    startTime: event.startTime || '',
-                    // Added additional fields that might be useful
-                    description: event.description,
-                    location: event.location,
-                    eventType: event.eventType,
-                    genre: event.genre,
-                    shareable_link: event.shareable_link
-                }));
-                
-                setAllPosts(mappedPosts);
-                
-                // If no saved events
-                if (mappedPosts.length === 0) {
-                    setError('You haven\'t saved any events yet.');
-                }
-            } else {
-                setError('No saved events found');
-            }
-        } catch (error) {
-            console.error('Error fetching saved events:', error);
-            setError('Failed to load saved events. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadPosts = (pageNumber) => {
-        const start = (pageNumber - 1) * postsPerPage;
-        const end = start + postsPerPage;
-        setVisiblePosts(allPosts.slice(start, end));
-    };
-
-    const truncateText = (text, max = 20) => {
-        if (!text) return '';
-        return text.length > max ? `${text.substring(0, max)}...` : text;
-    };
-
-    const handleCardClick = (selectedPost) => {
-      navigate('/event/view/'+selectedPost.id);
-    };
-
-    // Function to handle unsaving an event
-    const handleUnsaveEvent = async (eventId) => {
-        try {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/v1/events/${eventId}/unsave`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            
-            // Remove the unsaved event from the list
-            setAllPosts(prev => prev.filter(post => post.id !== eventId));
-        } catch (error) {
-            console.error('Error unsaving event:', error);
-            alert('Failed to unsave event. Please try again.');
-        }
-    };
-
-    if (error && !loading) {
-        return (
-            <div className="text-center py-5">
-                <p>{error}</p>
-                {error.includes('Authentication') ? (
-                    <p>Please log in to view saved events.</p>
-                ) : (
-                    <button 
-                        className="btn btn-primary mt-3"
-                        onClick={fetchSavedEvents}
-                    >
-                        Try Again
-                    </button>
-                )}
-            </div>
-        );
+      );
+      // Refetch to stay authoritative (if anything changed server-side)
+      fetchSavedEvents();
+    } catch (e) {
+      console.error(e);
+      setEvents(prev); // rollback
+      showError("Failed to unsave event. Please try again.");
     }
+  }
 
+  if (!loading && error) {
     return (
-        <>
-            {loading ? (
-                <div className="row">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <ShimmerCard key={i} />
-                    ))}
-                </div>
-            ) : (
-                <>
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h4>Saved events ({allPosts.length})</h4>
-                    </div>
-                    <div className="row">
-                        {visiblePosts.length > 0 ? (
-                            visiblePosts.map(post => (
-                                <div key={post.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mt-4">
-                                    <div className="car shadow-s rounded h-100 blog-card border-0 position-relative">
-                                        <div 
-                                            className="heart-overlay-icon"
-                                            onClick={() => handleUnsaveEvent(post.id)}
-                                            style={{cursor: 'pointer'}}
-                                            title="Unsave event"
-                                        >
-                                            <img src={heart_icon} alt="heart" />
-                                        </div>
-                                        <div 
-                                            className="text-decoration-none text-dark"
-                                            style={{cursor: 'pointer'}}
-                                           
-                                        >
-                                            <img
-                                                className="card-img-top poster_image"
-                                                src={post.image}
-                                                alt={post.title}
-                                                loading="lazy"
-                                                 onClick={() => handleCardClick(post)}
-                                                onError={(e) => {
-                                                    if (!e.target.dataset.fallback) {
-                                                        e.target.src = 'https://placehold.co/300x200?text=Image+Not+Found';
-                                                        e.target.dataset.fallback = true;
-                                                    }
-                                                }}
-                                            />
-                                            <div className='save-event-detail d-flex justify-content-between align-items-center w-100 pt-3 pb-0 pr-2 pl-2'>
-                                                <div className="w-100">
-                                                    <h6 className="event_titile"  > <span onClick={() => handleCardClick(post)}>{truncateText(post.title, 20)}</span></h6>
-                                                    <Link to={'/profile/'+user.id} className="d-flex align-items-center osahan-post-header people-list">
-                                                        <div className="dropdown-list-image  position-relative">
-                                                            <img
-                                                                className='organizer_image'
-                                                                style={{ borderRadius: '50%', width: '30px', height: '30px', objectFit: 'cover' }}
-                                                                src={post.authorAvatar}
-                                                                alt={post.authorName}
-                                                                onError={(e) => {
-                                                                    if (!e.target.dataset.fallback) {
-                                                                        e.target.src = 'https://placehold.co/50x50?text=No+Image';
-                                                                        e.target.dataset.fallback = true;
-                                                                    }
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="font-weight-bolder" >
-                                                            <p className="author_name ">{truncateText(post.authorName, 25)}</p>
-                                                        </div>
-                                                    </Link>
-                                                    <small className="text-dark d-block font-weight-light mt-2">
-                                                        {formatDateTime(post.eventDate, post.startTime)}
-                                                    </small>
-                                                    {/* {post.location && (
-                                                        <small className="text-muted d-block mt-1">
-                                                            {truncateText(post.location, 30)}
-                                                        </small>
-                                                    )} */}
-                                                    {/* {post.price && post.price !== "0.00" && (
-                                                        <div className="mt-2">
-                                                            <span className="text-primary font-weight-bold">
-                                                                ${post.price}
-                                                            </span>
-                                                        </div>
-                                                    )} */}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="col-12 text-center py-5">
-                                <p>No saved events found.</p>
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
-           
-        </>
+      <div className="text-center tw:py-24 tw:flex tw:justify-center tw:items-center tw:flex-col tw:gap-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="tw:size-56 tw:text-primary"
+        >
+          <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+        </svg>
+
+        <p>{error}</p>
+        {error.includes("Authentication") && (
+          <p>Please log in to view saved events.</p>
+        )}
+      </div>
     );
+  }
+
+  return (
+    <>
+      {loading ? (
+        <div className="row">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ShimmerCard key={i} />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <span className=" tw:text-2xl tw:md:text-3xl tw:font-bold tw:font-sans m-0">
+              Saved events ({events.length})
+            </span>
+          </div>
+
+          <div className="row tw:divide-purple-100 tw:divider-y">
+            {visible.length ? (
+              visible.map((post) => (
+                <div
+                  key={post.id}
+                  className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mt-4"
+                >
+                  <div className="car tw:shadow-sm rounded h-100 blog-card border-0 position-relative">
+                    {/* Unsave button */}
+                    <button
+                      type="button"
+                      className="heart-overlay-icon"
+                      onClick={() => handleUnsaveEvent(post.id)}
+                      title="Unsave event"
+                      aria-label={`Unsave ${post.title}`}
+                      style={{
+                        cursor: "pointer",
+                        background: "transparent",
+                        border: 0,
+                      }}
+                    >
+                      <img src={heart_icon} alt="Unsave" />
+                    </button>
+
+                    {/* Poster */}
+                    <img
+                      className="card-img-top poster_image"
+                      src={post.image}
+                      alt={post.title}
+                      loading="lazy"
+                      onClick={() => openEvent(post.id)}
+                      style={{ cursor: "pointer" }}
+                      onError={(e) => {
+                        if (!e.currentTarget.dataset.fallback) {
+                          e.currentTarget.src = FALLBACK_IMG;
+                          e.currentTarget.dataset.fallback = "1";
+                        }
+                      }}
+                    />
+
+                    <div className="save-event-detail d-flex justify-content-between align-items-center w-100 pt-3 pb-0 pr-2 pl-2">
+                      <div className="w-100 tw:px-4">
+                        <span className="tw:text-lg tw:font-semibold tw:text-black">
+                          <span
+                            style={{ cursor: "pointer" }}
+                            onClick={() => openEvent(post.id)}
+                          >
+                            {post.title.length > 20
+                              ? post.title.slice(0, 20) + "…"
+                              : post.title}
+                          </span>
+                        </span>
+
+                        <Link
+                          to={`/profile/${user?.id || ""}`}
+                          className="d-flex align-items-center gap-2 mt-2 osahan-post-header people-list"
+                        >
+                          <div className="">
+                            <img
+                              className=""
+                              style={{
+                                borderRadius: "50%",
+                                width: 30,
+                                height: 30,
+                                objectFit: "cover",
+                              }}
+                              src={post.hostImage}
+                              alt={post.hostName}
+                              onError={(e) => {
+                                if (!e.currentTarget.dataset.fallback) {
+                                  e.currentTarget.src = FALLBACK_AVATAR;
+                                  e.currentTarget.dataset.fallback = "1";
+                                }
+                              }}
+                            />
+                          </div>
+                          <div className="font-weight-bolder">
+                            <p className="author_name mb-0">
+                              {post.hostName.length > 25
+                                ? post.hostName.slice(0, 25) + "…"
+                                : post.hostName}
+                            </p>
+                          </div>
+                        </Link>
+
+                        <small className="text-dark d-block font-weight-light mt-3">
+                          {fmtDateTime(post.eventDate, post.startTime)}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-center py-5">
+                <p>No saved events found.</p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </>
+  );
 }

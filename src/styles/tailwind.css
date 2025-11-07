@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Just+Another+Hand&display=swap');
+
+@import "tailwindcss" prefix(tw);
+
+@layer theme, base, components, utilities;
+/* Bring in Tailwind theme & utilities ONLY — skip preflight */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  --color-primary: #8F07E7; 
+  --color-lightPurple: #F4E6FD; 
+  --color-primarySecond: #C115B5; 
+  --font-sans: "Geist", sans-serif;
+  --font-cursive: "Just Another Hand", cursive;
+}

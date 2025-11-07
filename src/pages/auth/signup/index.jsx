@@ -160,7 +160,7 @@ export function SignUp() {
         showToast.success(
           response.data.message || "Account created successfully!"
         );
-        navigate("/");
+        navigate("/feed");
       }
     } catch (err) {
       console.error("Signup error:", err);

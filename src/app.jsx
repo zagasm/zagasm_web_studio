@@ -43,6 +43,8 @@ import AllNotification from "./pages/Notification/AllNotification/index.jsx";
 import Notification from "./pages/Notification/index.jsx";
 import EventType from "./pages/event/CreateEvent/event_types.jsx";
 import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
+import Landing from "./pages/LandingPage/index.jsx";
+import { ToastHost } from "./component/ui/toast.jsx";
 
 const MainLayout = () => (
   <>
@@ -70,8 +72,10 @@ export function App() {
       {loading && <FullpagePreloader loading={loading} />}
 
       <ToastContainer />
+      <ToastHost />
       <NetworkStatus />
       <Routes>
+          <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -87,7 +91,7 @@ export function App() {
         {/* location={state?.backgroundLocation || location} */}
         <Route element={<Sessionpage />} >
           <Route element={<MainLayout />}>
-            <Route index exact path="/" element={<Home />} />
+            <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
             <Route path="/profile" element={<Profile />} >
               <Route index exact   path=":profileId" element={<ViewProfile />} />

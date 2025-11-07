@@ -18,7 +18,7 @@ export default function MobileSingleOrganizers() {
 
   const fetchOrganizers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/organiser`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/organisers`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

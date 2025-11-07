@@ -41,7 +41,7 @@ function Header() {
             className="mh-hea   top_nav m-0 "
 
           >
-            <Link to={"/"} className="mh-btns-lef" >
+            <Link to={"/feed"} className="mh-btns-lef" >
               {/* <img src={Pokilogo_light} style={{ width: "40%" }} alt="Logo" /> */}
             </Link>
             <span style={{ fontSize: '20px' }} onClick={() => setIsOpen(!isOpen)} className="mh-btns-right">
@@ -56,7 +56,7 @@ function Header() {
               <li className="col">
                 <Tippy content={'Home'} placement="bottom">
                   <Link
-                    to="/">
+                    to="/feed">
                     <i className="fa-regular fa fa-home"></i>
                   </Link>
                 </Tippy>

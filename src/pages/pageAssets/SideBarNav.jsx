@@ -28,8 +28,8 @@ function SideBarNav() {
         <aside className="shadow-sm side_bar_container bg-white">
             <div className="box mb-3 rounde bg-white list-sidebar">
                 <ul className="list-group list-group-flush side_bar_nav">
-                    <Link to="/">
-                        <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/') ? 'active' : ''}`}>
+                    <Link to="/feed">
+                        <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/feed') ? 'active bg-linear-br tw:from-primary tw:to-primarySecond' : ''}`}>
                             <img src={discover_icon} alt="Home" />
                             <span className="link_name">Discover</span>
                         </li>
@@ -40,10 +40,10 @@ function SideBarNav() {
                             <span className="link_name">Saved Events</span>
                         </li>
                     </Link>
-                    <Link to="/template">
+                    <Link to="/tickets">
                         <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/template') ? 'active' : ''}`}>
                             <img src={template_icon} alt="Template" />
-                            <span className="link_name">Template</span>
+                            <span className="link_name">Tickets</span>
                         </li>
                     </Link>
                 </ul>

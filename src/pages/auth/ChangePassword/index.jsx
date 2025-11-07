@@ -89,7 +89,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
         });
         // Redirect to dashboard or appropriate page
         setTimeout(() => {
-          navigate("/"); // Update this to your desired post-login route
+          navigate("/feed"); // Update this to your desired post-login route
         }, 1000);
       } else {
         // Unexpected response format
