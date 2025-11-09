@@ -6,7 +6,7 @@ export default function StatsStrip({ user }) {
   ];
 
   return (
-    <section className="tw:mt-4 tw:grid tw:grid-cols-3 tw:gap-3 md:tw:gap-5">
+    <section className="tw:mt-4 tw:grid tw:grid-cols-3 tw:gap-3 tw:md:gap-5">
       {tiles.map((t) => (
         <div
           key={t.label}

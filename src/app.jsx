@@ -101,7 +101,7 @@ export function App() {
             <Route path="/event" element={<Event />} >
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="select-event-type" element={<EventType />} />
-              <Route path="create-event/:eventType" element={<CreateEvent />} />
+              <Route path="create-event" element={<CreateEvent />} />
               {/* CreateEvent */}
               <Route path="saved-events" element={<SaveEvents />} />
             </Route>

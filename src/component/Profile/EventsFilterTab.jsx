@@ -27,7 +27,7 @@ export default function EventsFilterTabs({ value, onChange }) {
                 style={{
                   borderRadius: 10,
                 }}
-                className={`tw:flex-1 tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm md:tw:text-base tw:font-medium
+                className={`tw:flex-1 tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:md:text-base tw:font-medium
                 ${
                   selected
                     ? "tw:bg-purple-600 tw:text-white"

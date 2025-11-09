@@ -6,9 +6,12 @@ export const api = axios.create({
 
 /** Helper to attach bearer header per request without piling interceptors */
 export function authHeaders(token) {
+  const brToken = localStorage.getItem('token')
   return token
     ? {
         headers: { Authorization: `Bearer ${token}` },
       }
-    : {};
+    : {
+        headers: { Authorization: `Bearer ${brToken}` },
+    };
 }

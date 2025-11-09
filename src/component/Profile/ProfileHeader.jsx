@@ -8,7 +8,7 @@ export default function ProfileHeader({ user }) {
   const img = user?.profileUrl || defaultProfile;
 
   return (
-    <div className="tw:mt-24 tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full tw:lg:w-200">
+    <div className="tw:mt-24 tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full tw:lg:max-w-7xl tw:lg:mx-auto">
       <div className="tw:flex tw:items-center gap-3 tw:justify-end tw:absolute tw:right-4 tw:top-6 text-white">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -39,16 +39,16 @@ export default function ProfileHeader({ user }) {
         alt=""
         className="tw:absolute tw:inset-0 tw:h-full tw:w-full tw:object-cover tw:opacity-60"
       />
-      <div className="tw:relative tw:px-5 md:tw:px-8 tw:py-6 md:tw:py-8">
-        <div className="tw:flex tw:flex-col md:tw:flex-row md:tw:items-end tw:gap-5">
+      <div className="tw:relative tw:px-5 tw:md:px-8 tw:py-6 tw:md:py-8">
+        <div className="tw:flex tw:flex-col tw:md:flex-row tw:md:items-end tw:gap-5">
           <img
             src={img}
             alt={user?.name || "User"}
-            className="tw:h-20 tw:w-20 md:tw:h-24 md:tw:w-24 tw:rounded-full tw:ring-4 tw:ring-white/20 tw:object-cover"
+            className="tw:h-20 tw:w-20 tw:md:h-24 tw:md:w-24 tw:rounded-full tw:ring-4 tw:ring-white/20 tw:object-cover"
             loading="lazy"
           />
           <div className="tw:flex-1">
-            <h1 className="tw:text-2xl md:tw:text-3xl tw:font-semibold">
+            <h1 className="tw:text-2xl tw:md:text-3xl tw:font-semibold">
               {user?.name || "Your Name"}
             </h1>
             <span className="tw:mt-1 tw:text-white/80">Artist</span>
@@ -69,7 +69,7 @@ export default function ProfileHeader({ user }) {
           </div>
 
           <a
-            href="/event/select-event-type"
+            href="/event/create-event"
             className="tw:inline-flex tw:items-center tw:space-x-2 tw:justify-center tw:rounded-2xl tw:bg-white tw:px-4 tw:py-3 tw:font-medium tw:text-primary hover:tw:shadow"
           >
             <span>Create Event</span>

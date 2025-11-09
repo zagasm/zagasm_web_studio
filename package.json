@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -16,6 +16,7 @@
     "@fontsource/inter": "^5.2.5",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@headlessui/react": "^2.2.9",
+    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.0",
     "@mui/icons-material": "^7.1.2",
     "@mui/material": "^7.1.2",

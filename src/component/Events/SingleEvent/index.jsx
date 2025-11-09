@@ -74,7 +74,9 @@ export default function EventTemplate({
 
   return (
     <>
-      <div className="row">
+      <div style={{
+        margin: '0 0'
+      }} className="row tw:mx-0">
         {loading &&
           Array.from({ length: 8 }).map((_, i) => (
             <EventShimmer key={`s-${i}`} />
@@ -95,8 +97,8 @@ export default function EventTemplate({
                 </div>
 
                 {live && (
-                  <>
-                    <div className="camera-overlay-icon">
+                  <div className="">
+                    <div className="camera-overlay-icon tw:flex tw:items-center tw:gap-1">
                       Live <img src={camera_icon} alt="Live" />
                     </div>
                     <div className="viewers-overlay-icon">
@@ -107,7 +109,7 @@ export default function EventTemplate({
                       />
                       38M Viewers
                     </div>
-                  </>
+                  </div>
                 )}
 
                 <Link

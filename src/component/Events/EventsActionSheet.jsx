@@ -139,7 +139,7 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
     try {
       const origin = window?.location?.origin || "";
       const fullLink =
-        ch?.type === "internal" ? `${origin}${ch?.link || ""}` : ch?.link;
+        ch?.type === "internal" ? `https://studios.zagasm.com/event/share` : ch?.link;
 
       if (ch?.key === "copy_link") {
         navigator.clipboard.writeText(fullLink);
@@ -213,11 +213,11 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
             <Transition.Child
               as={Fragment}
               enter="tw:transition tw:duration-200 tw:ease-out"
-              enterFrom="tw:opacity-0 tw:translate-y-[20%] md:tw:translate-y-0 md:tw:scale-95"
-              enterTo="tw:opacity-100 tw:translate-y-0 md:tw:scale-100"
+              enterFrom="tw:opacity-0 tw:translate-y-[20%] tw:md:translate-y-0 tw:md:scale-95"
+              enterTo="tw:opacity-100 tw:translate-y-0 tw:md:scale-100"
               leave="tw:transition tw:duration-150 tw:ease-in"
-              leaveFrom="tw:opacity-100 tw:translate-y-0 md:tw:scale-100"
-              leaveTo="tw:opacity-0 tw:translate-y-[20%] md:tw:translate-y-0 md:tw:scale-95"
+              leaveFrom="tw:opacity-100 tw:translate-y-0 tw:md:scale-100"
+              leaveTo="tw:opacity-0 tw:translate-y-[20%] tw:md:translate-y-0 tw:md:scale-95"
             >
               <Dialog.Panel
                 className="tw:w-full tw:max-w-md tw:bg-white tw:shadow-xl tw:p-4 tw:pb-[max(env(safe-area-inset-bottom),1rem)] 

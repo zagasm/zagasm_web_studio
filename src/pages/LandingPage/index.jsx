@@ -6,42 +6,22 @@ function DownloadBadge({ platform = "Mac", href = "#", icon = "mac" }) {
   return (
     <a
       href={href}
-      className="tw:inline-flex tw:items-center tw:gap-3 tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:px-4 tw:md:px-8 tw:py-5 tw:rounded-xl tw:shadow-sm tw:ring-1 tw:ring-black/10 hover:tw:translate-y-[-1px] tw:transition tw:select-none"
+      className="tw:inline-flex tw:items-center tw:gap-3 tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:px-2 tw:md:px-8 tw:py-5 tw:rounded-xl tw:shadow-sm tw:ring-1 tw:ring-black/10 hover:tw:translate-y-[-1px] tw:transition tw:select-none"
     >
-      <span className="tw:inline-flex tw:h-9 tw:w-12 tw:items-center tw:justify-center tw:bg-white/10 tw:rounded-lg">
+      <span className="tw:inline-flex tw:items-center tw:justify-center">
         {icon === "mac" ? (
           /* Apple-ish glyph */
-          <svg
-            viewBox="0 0 24 24"
-            className="tw:size-14 text-white"
-            aria-hidden="true"
-          >
-            <path
-              d="M18.7 15.2c-.3.7-.5 1-1 1.7-.6.9-1.4 1.9-2.4 1.9-.9 0-1.2-.6-2.3-.6s-1.4.6-2.3.6c-1 0-1.8-1-2.4-1.9-1.6-2.2-1.8-4.8-.8-6.2.7-1 1.8-1.6 2.8-1.6 1.1 0 1.8.6 2.7.6.9 0 1.5-.6 2.7-.6 1 .1 2 .6 2.7 1.6-.1.1-1.5.9-1.5 2.5 0 1.9 1.8 2.6 1.8 2.6z"
-              fill="currentColor"
-            />
-            <path
-              d="M13.9 4.1c.6-.7 1.6-1.2 2.5-1.2.1 1-.3 2-1 2.8-.7.8-1.6 1.3-2.5 1.2-.1-1 .3-2 1-2.8z"
-              fill="currentColor"
-            />
-          </svg>
+          <img src="/images/icons/as.png" />
         ) : (
           /* Windows-ish glyph */
-          <svg
-            viewBox="0 0 24 24"
-            className="tw:size-14 text-white"
-            aria-hidden="true"
-          >
-            <path
-              d="M3 5l8-1.5v8.1H3V5zm9 0l9-1.9v10h-9V5zM3 13.4h8V21L3 19.5v-6.1zm9 0h9V22.9L12 21v-7.6z"
-              fill="currentColor"
-            />
-          </svg>
+          <img src="/images/icons/ps.png" />
         )}
       </span>
       <span className="tw:text-left">
-        <span className="tw:block tw:text-sm text-white">Download on</span>
-        <span className="tw:block tw:text-2xl text-white tw:font-semibold">
+        <span className="tw:block tw:text-[10px] tw:md:text-sm text-white">
+          Download on
+        </span>
+        <span className="tw:block tw:text-sm tw:md:text-2xl text-white tw:font-semibold">
           {platform}
         </span>
       </span>
@@ -65,7 +45,7 @@ function Avatar({ src, alt }) {
     // Fallback: your old gradient dot
     return (
       <span
-        className="tw:inline-block tw:h-8 tw:w-8 tw:rounded-full tw:ring-2 tw:ring-white tw:bg-linear-to-br tw:from-primary/20 tw:to-primary tw:shadow"
+        className="tw:inline-block tw:h-4 tw:w-4 tw:rounded-full tw:ring-2 tw:ring-white tw:bg-linear-to-br tw:from-primary/20 tw:to-primary tw:shadow"
         aria-hidden="true"
         title={alt}
       />
@@ -94,7 +74,7 @@ function CreatorsStripe() {
           <Avatar key={i} src={u.src} alt={u.alt} />
         ))}
       </div>
-      <span className="tw:text-sm tw:text-gray-700">
+      <span className="tw:text-xs tw:text-gray-700">
         + 1436 Creators and maybe you ✌️
       </span>
     </div>
@@ -105,18 +85,18 @@ export default function Landing() {
   return (
     <div className="tw:relative tw:font-sans tw:min-h-screen tw:bg-white tw:text-gray-900 tw:overflow-hidden">
       {/* Top nav */}
-      <div className="tw:relative tw:z-10 tw:max-w-7xl tw:mx-auto tw:px-4 md:tw:px-6 lg:tw:px-8 tw:py-5 tw:flex tw:items-center tw:justify-between">
+      <div className="tw:relative tw:z-10 tw:max-w-7xl tw:mx-auto tw:px-4 tw:md:px-6 lg:tw:px-8 tw:py-5 tw:flex tw:items-center tw:justify-between">
         <Link to="/" className="tw:inline-flex tw:items-center tw:gap-3">
           <img
             src="/images/logo.png"
             alt="Zagasm Studio"
-            className="tw:w-[150px]"
+            className="tw:w-[100px] tw:md:w-[150px]"
           />
         </Link>
 
         <Link
           to="/auth/signin"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:bg-primary tw:hover:bg-primary/80 text-white tw:px-8 tw:py-3 tw:rounded-full tw:font-medium tw:shadow-sm hover:tw:shadow tw:transition-all tw:duration-300"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:bg-primary tw:hover:bg-primary/80 text-white tw:px-5 tw:md:px-8 tw:py-3 tw:rounded-full tw:font-medium tw:shadow-sm hover:tw:shadow tw:transition-all tw:duration-300"
         >
           Get Started
         </Link>
@@ -139,15 +119,15 @@ export default function Landing() {
 
       {/* HERO */}
       <main className="tw:relative tw:z-10">
-        <section className="tw:max-w-7xl tw:mx-auto tw:px-4 md:tw:px-6 lg:tw:px-8 tw:pt-4 md:tw:pt-8 lg:tw:pt-10 tw:pb-16 md:tw:pb-24">
+        <section className="tw:max-w-7xl tw:mx-auto tw:px-4 tw:md:px-6 lg:tw:px-8 tw:pt-4 tw:md:pt-8 lg:tw:pt-10 tw:pb-16 tw:md:pb-24">
           {/* FLEX CONTAINER (replaces grid) */}
           <div className="tw:flex tw:flex-col lg:tw:flex-row tw:items-center tw:gap-8 lg:tw:gap-10">
             {/* Left: copy (unchanged content) */}
             <div className="tw:max-w-7xl tw:mx-auto tw:flex-1 tw:w-full">
               {/* Download badges */}
-              <div className="tw:flex flex-row tw:items-center tw:justify-center tw:gap-6 md:tw:gap-8">
-                <DownloadBadge platform="Mac" icon="mac" />
-                <DownloadBadge platform="Windows" icon="windows" />
+              <div className="tw:flex flex-row tw:items-center tw:justify-center tw:gap-4 tw:md:gap-8 tw:px-4">
+                <DownloadBadge platform="App Store" icon="mac" />
+                <DownloadBadge platform="Play Store" icon="windows" />
               </div>
 
               {/* Creators stripe */}
@@ -157,7 +137,7 @@ export default function Landing() {
 
               {/* Headline */}
               <div className=" tw:flex tw:flex-col tw:items-center tw:justify-center">
-                <span className="tw:font-sans tw:mt-6 md:tw:mt-8 tw:leading-tight tw:tracking-tight tw:font-bold tw:text-4xl sm:tw:text-5xl lg:tw:text-6xl xl:tw:text-7xl tw:max-w-3xl tw:mx-auto text-center">
+                <span className="tw:font-sans tw:mt-6 tw:md:mt-8 tw:leading-tight tw:tracking-tight tw:font-bold tw:text-4xl sm:tw:text-5xl lg:tw:text-6xl xl:tw:text-7xl tw:max-w-3xl tw:mx-auto text-center">
                   Turn Moments Into Global
                   <br className="tw:hidden tw:md:block" /> Experiences with
                   <br />
