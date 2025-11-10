@@ -11,7 +11,7 @@ const Sidebar = () => {
             <div>
               <Tippy content={'Home'} placement="right">
                 <Link
-                  to="/">
+                  to="/feed">
                   <i className="fa-regular fa fa-home"></i>
                 </Link>
               </Tippy>

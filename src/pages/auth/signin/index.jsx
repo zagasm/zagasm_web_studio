@@ -170,7 +170,7 @@ export function Signin() {
           token: data.token
         });
         showToast.success(data.message || "Login successful!");
-        navigate("/");
+        navigate("/feed");
       } else {
         throw new Error("Invalid response format");
       }

@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Enables dropdown and other JS features
+import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Enables dropdown and other JS features
 
 import { Routes, Route, useLocation } from "react-router-dom";
 import AuthLayout from "./pages/auth/layout";
@@ -43,6 +43,12 @@ import AllNotification from "./pages/Notification/AllNotification/index.jsx";
 import Notification from "./pages/Notification/index.jsx";
 import EventType from "./pages/event/CreateEvent/event_types.jsx";
 import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
+import Landing from "./pages/LandingPage/index.jsx";
+import { ToastHost } from "./component/ui/toast.jsx";
+import Support from "./pages/support/index.jsx";
+import Marketing from "./pages/marketing/index.jsx";
+import StreamingPage from "./pages/Streaming/index.jsx";
+import DataProtectionPage from "./pages/DataProtection/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -69,9 +75,15 @@ export function App() {
     <Fragment>
       {loading && <FullpagePreloader loading={loading} />}
 
+      <ToastHost />
       <ToastContainer />
       <NetworkStatus />
       <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/marketing" element={<Marketing />} />
+        <Route path="/data-protection" element={<DataProtectionPage />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -80,37 +92,46 @@ export function App() {
           <Route path="forget-password" element={<ForgetPassword />} />
           <Route path="code-verification" element={<CodeVerification />} />
           <Route path="change-password" element={<ChangePassword />} />
-          <Route path="change-password-success" element={<ChangePasswordSuccesffully />} />
+          <Route
+            path="change-password-success"
+            element={<ChangePasswordSuccesffully />}
+          />
           {/*
           {/* <Route path="onboarding" element={<Onboarding />} /> */}
         </Route>
         {/* location={state?.backgroundLocation || location} */}
-        <Route element={<Sessionpage />} >
+        <Route element={<Sessionpage />}>
           <Route element={<MainLayout />}>
-            <Route index exact path="/" element={<Home />} />
+            <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
-            <Route path="/profile" element={<Profile />} >
-              <Route index exact   path=":profileId" element={<ViewProfile />} />
+            <Route path="/profile" element={<Profile />}>
+              <Route index exact path=":profileId" element={<ViewProfile />} />
               <Route path="edit-profile" element={<EditProfile />} />
               <Route path="edit-password" element={<EditPassword />} />
             </Route>
-            <Route path="/event" element={<Event />} >
+            <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="select-event-type" element={<EventType />} />
-              <Route path="create-event/:eventType" element={<CreateEvent />} />
+              <Route
+                path="create-event/:eventTypeId"
+                element={<CreateEvent />}
+              />
               {/* CreateEvent */}
               <Route path="saved-events" element={<SaveEvents />} />
             </Route>
-            <Route path="/account" element={<AccountOutlet />} >
+            <Route path="/creator/channel/new" element={<StreamingPage />} />
+            <Route path="/account" element={<AccountOutlet />}>
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
-              <Route path="manage-notification" element={<AccountNotification />} />
+              <Route
+                path="manage-notification"
+                element={<AccountNotification />}
+              />
             </Route>
-            <Route path="/notification" element={<Notification />} >
+            <Route path="/notification" element={<Notification />}>
               <Route index exact element={<AllNotification />} />
             </Route>
           </Route>
-
         </Route>
 
         <Route path="/page-not-found" element={<Error404 />} />
@@ -120,13 +141,8 @@ export function App() {
       {state?.backgroundLocation && (
         <Routes>
           <Route
-            // path="/posts/:postId" 
-            element={
-              <PostViewModal
-                show={true}
-                onHide={() => navigate(-1)}
-              />
-            }
+            // path="/posts/:postId"
+            element={<PostViewModal show={true} onHide={() => navigate(-1)} />}
           />
         </Routes>
       )}

@@ -1,230 +1,191 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import './eventSTyling.css';
-import threeDot from '../../../assets/navbar_icons/threeDot.png';
-import camera_icon from '../../../assets/navbar_icons/camera_icon.png';
-import live_indicator from '../../../assets/navbar_icons/live_indicator.png';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../../../pages/auth/AuthContext';
-import PopupCard from './PopupCard';
+import React, { useMemo, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import "./eventSTyling.css";
+import threeDot from "../../../assets/navbar_icons/threeDot.png";
+import camera_icon from "../../../assets/navbar_icons/camera_icon.png";
+import live_indicator from "../../../assets/navbar_icons/live_indicator.png";
+import { Link } from "react-router-dom";
+import usePaginatedEvents from "../../../hooks/usePaginatedEvents";
+import { Ellipsis, EllipsisVertical } from "lucide-react";
+import EventActionsSheet from "../EventsActionSheet";
 
-// Shimmer placeholder component
-const EventShimmer = () => {
-    return (
-        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-            <div className="shadow-s rounded h-100 blog-card border-0 position-relative">
-                <div className="shimmer-container">
-                    <div className="shimmer-image"></div>
-                    <div className="shimmer-content">
-                        <div className="shimmer-line shimmer-title"></div>
-                        <div className="shimmer-line shimmer-subtitle"></div>
-                        <div className="shimmer-line shimmer-price"></div>
-                    </div>
-                </div>
-            </div>
+/* ---- Shimmer ---- */
+const EventShimmer = () => (
+  <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+    <div className="shadow-s rounded h-100 blog-card border-0 position-relative">
+      <div className="shimmer-container">
+        <div className="shimmer-image"></div>
+        <div className="shimmer-content">
+          <div className="shimmer-line shimmer-title"></div>
+          <div className="shimmer-line shimmer-subtitle"></div>
+          <div className="shimmer-line shimmer-price"></div>
         </div>
-    );
-};
+      </div>
+    </div>
+  </div>
+);
 
-export default function EventTemplate({ live }) {
-    const [events, setEvents] = useState([]);
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [imageLoaded, setImageLoaded] = useState({});
-    const [brokenImages, setBrokenImages] = useState({});
-    const [pagination, setPagination] = useState({
-        current_page: 1,
-        last_page: 1,
-        from: 0,
-        to: 0,
-        total: 0
-    });
-    const { user, token } = useAuth();
+/* ---- Helpers ---- */
+function firstImageFromPoster(poster = []) {
+  const img = poster.find((p) => p?.type === "image" && p?.url);
+  if (img) return img.url;
+  // If there’s a video only, let’s still show a neutral fallback
+  return "/images/event-dummy.jpg";
+}
 
-    const fetchEvents = async (page = 1, append = false) => {
-        try {
-            if (page === 1) {
-                setLoading(true);
-            } else {
-                setLoadingMore(true);
-            }
-            
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/v1/events?page=${page}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            
-            if (append) {
-                setEvents(prevEvents => [...prevEvents, ...response.data.data]);
-            } else {
-                setEvents(response.data.data);
-            }
-            
-            setPagination({
-                current_page: response.data.meta.current_page,
-                last_page: response.data.meta.last_page,
-                from: response.data.meta.from,
-                to: response.data.meta.to,
-                total: response.data.meta.total
-            });
-            
-            const loadedMap = {};
-            response.data.data.forEach(event => {
-                loadedMap[event.id] = false;
-            });
-            setImageLoaded(prev => ({ ...prev, ...loadedMap }));
-            setBrokenImages({});
-        } catch (err) {
-            console.error('Error fetching events:', err);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
-        }
-    };
+function formatMetaLine(event) {
+  // Prefer server ‘eventDate’ if present; otherwise try to compose
+  const datePart = event?.eventDate || "";
+  const timePart = event?.startTime ? `${event.startTime}` : "";
+  const pieces = [datePart, timePart].filter(Boolean);
+  return pieces.join(" • ");
+}
 
-    useEffect(() => {
-        if (!user || !token) return;
-        fetchEvents();
-    }, [user]);
+function priceText(event) {
+  if (event?.price_display) return event.price_display;
+  if (event?.currency?.symbol && event?.price) {
+    return `${event.currency.symbol}${event.price}`;
+  }
+  if (event?.price) return event.price;
+  return "$0.00";
+}
 
-    // Infinite scroll handler
-    const handleScroll = useCallback(() => {
-        if (loadingMore || pagination.current_page >= pagination.last_page) return;
+export default function EventTemplate({
+  endpoint = "/api/v1/events",
+  live = false,
+}) {
+  const {
+    items: events,
+    meta,
+    loading,
+    loadingMore,
+    loadNext,
+  } = usePaginatedEvents(endpoint);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-        // Check if we've scrolled near the bottom
-        const scrollTop = document.documentElement.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = document.documentElement.clientHeight;
+  // intersection observer sentinel
+  const { ref: loadMoreRef, inView } = useInView({ rootMargin: "300px" });
 
-        // Load more when 80% from the bottom
-        if (scrollTop + clientHeight >= scrollHeight * 0.8) {
-            fetchEvents(pagination.current_page + 1, true);
-        }
-    }, [loadingMore, pagination.current_page, pagination.last_page]);
+  React.useEffect(() => {
+    if (inView) loadNext();
+  }, [inView, loadNext]);
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
+  const isDone = useMemo(() => meta.current_page >= meta.last_page, [meta]);
 
-    const handleImageLoad = (eventId) => {
-        setImageLoaded(prev => ({ ...prev, [eventId]: true }));
-    };
+  return (
+    <>
+      <div style={{
+        margin: '0 0'
+      }} className="row tw:mx-0">
+        {loading &&
+          Array.from({ length: 8 }).map((_, i) => (
+            <EventShimmer key={`s-${i}`} />
+          ))}
 
-    const handleImageError = (eventId) => {
-        setBrokenImages(prev => ({ ...prev, [eventId]: true }));
-    };
+        {!loading &&
+          events.map((event) => (
+            <div
+              key={event.id}
+              className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4"
+            >
+              <div className="shadow-s rounded h-100 blog-card border-0 tw:relative tw:shadow-md tw:rounded-xl">
+                <div
+                  className="tw:size-10 tw:rounded-full tw:bg-black/30 tw:grid tw:place-items-center tw:absolute tw:z-40 tw:right-3 tw:top-3"
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  <Ellipsis className="text-white" />
+                </div>
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'short', month: 'short', day: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        });
-    };
-
-    const truncateText = (text, max = 20) => {
-        if (!text) return '';
-        return text.length > max ? `${text.substring(0, max)}...` : text;
-    };
-
-    return (
-        <>
-            <div className="row">
-                {/* Show shimmer placeholders while loading */}
-                {loading && Array.from({ length: 8 }).map((_, index) => (
-                    <EventShimmer key={`shimmer-${index}`} />
-                ))}
-                
-                {/* Display actual events when loaded */}
-                {!loading && events.map(event => (
-                    <div key={event.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-                        <div className="shadow-s rounded h-100 blog-card border-0 position-relative ">
-                            <div className="overlay-icon" onClick={() => setSelectedEvent(event)}>
-                                <img src={threeDot} alt="Options" />
-                            </div>
-
-                            {live && (
-                                <>
-                                    <div className="camera-overlay-icon">Live <img src={camera_icon} alt="Live" /></div>
-                                    <div className="viewers-overlay-icon">
-                                        <img className='viewers_indicator' src={live_indicator} alt="Live indicator" />
-                                        38M Viewers
-                                    </div>
-                                </>
-                            )}
-
-                            <Link to={`/event/view/${event.id}`} className="text-decoration-none text-dark">
-                                <div style={{ position: 'relative', height: '200px' }}>
-                                    <img
-                                        className="card-img-top"
-                                        src={
-                                            brokenImages[event.id]
-                                                ? 'https://source.unsplash.com/random/1000x600'
-                                                : event?.poster?.[0]?.url || 'https://source.unsplash.com/random/1000x600'
-                                        }
-                                        alt={event.title}
-                                        style={{
-                                            height: '200px',
-                                            width: '100%',
-                                            objectFit: 'cover',
-                                        }}
-                                        onLoad={() => handleImageLoad(event.id)}
-                                        onError={() => handleImageError(event.id)}
-                                    />
-                                </div>
-
-                                <div className='d-flex justify-content-between align-items-center w-100 pt-2 pb-0 pr-2 pl-2'>
-                                    <div className='bg-da eventName' style={{ width: '65%' }}>
-                                        <h6 className="pt-2  event_title" style={{ lineHeight: '15px' }}><b>{truncateText(event.title, 20)}</b></h6>
-                                        <small className="event_time text-muted text-truncat" >
-                                            {truncateText(formatDate(event.eventDate), 23)}
-                                        </small>
-                                    </div>
-                                    <div style={{ width: '35%', textAlign: 'right' }}>
-                                        <h6 className="event_price ">
-                                            ${event.price ? event.price : '0.00'}
-                                        </h6>
-                                    </div>
-                                </div>
-                            </Link>
-                        </div>
+                {live && (
+                  <div className="">
+                    <div className="camera-overlay-icon tw:flex tw:items-center tw:gap-1">
+                      Live <img src={camera_icon} alt="Live" />
                     </div>
-                ))}
+                    <div className="viewers-overlay-icon">
+                      <img
+                        className="viewers_indicator"
+                        src={live_indicator}
+                        alt="indicator"
+                      />
+                      38M Viewers
+                    </div>
+                  </div>
+                )}
+
+                <Link
+                  to={`/event/view/${event.id}`}
+                  className="text-decoration-none text-dark"
+                >
+                  <div style={{ position: "relative", height: 200 }}>
+                    <img
+                      className="card-img-top"
+                      src={firstImageFromPoster(event?.poster)}
+                      alt={event?.title || "Event"}
+                      style={{ height: 200, width: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center w-100 pt-2 pb-0 tw:px-4">
+                    <div className="eventName" style={{ width: "65%" }}>
+                      <h6
+                        className="pt-2 event_title tw:first-letter:uppercase"
+                        style={{ lineHeight: "15px" }}
+                      >
+                        <b>
+                          {event?.title?.length > 28
+                            ? event.title.slice(0, 28) + "…"
+                            : event?.title}
+                        </b>
+                      </h6>
+                      <small className="event_time text-muted text-truncate">
+                        {formatMetaLine(event)}
+                      </small>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <span className="tw:text-lg tw:font-bold tw:md:text-sm">{priceText(event)}</span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
+          ))}
+      </div>
 
-            {/* Loading more shimmer */}
-            {loadingMore && (
-                <div className="row">
-                    {Array.from({ length: 4 }).map((_, index) => (
-                        <EventShimmer key={`more-shimmer-${index}`} />
-                    ))}
-                </div>
-            )}
+      {/* loader for next page */}
+      {loadingMore && (
+        <div className="row">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <EventShimmer key={`more-${i}`} />
+          ))}
+        </div>
+      )}
 
-            {/* End of results message */}
-            {!loadingMore && pagination.current_page >= pagination.last_page && events.length > 0 && (
-                <div className="text-center mt-3 mb-4">
-                    <p className="text-muted">You've reached the end of all events</p>
-                </div>
-            )}
+      {/* sentinel for infinite scroll */}
+      {!isDone && !loading && (
+        <div
+          ref={loadMoreRef}
+          className="tw:h-10 tw:w-full tw:flex tw:items-center tw:justify-center"
+        />
+      )}
 
-            {/* Results Count */}
-            {/* {!loading && (
-                <div className="text-center text-muted small mt-2">
-                    Showing {events.length} of {pagination.total} events
-                </div>
-            )} */}
+      {/* end state */}
+      {!loading && events.length === 0 && (
+        <div className="text-center mt-3">
+          <span>No events available</span>
+        </div>
+      )}
+      {!loading && isDone && events.length > 0 && (
+        <div className="text-center mt-3 mb-4 text-muted">
+          You’ve reached the end of all events
+        </div>
+      )}
 
-            {selectedEvent && <PopupCard post={selectedEvent} onClose={() => setSelectedEvent(null)} />}
-
-            {!loading && events.length === 0 && (
-                <div className="text-center mt-3">
-                    <span>No events available</span>
-                </div>
-            )}
-        </>
-    );
+      {/* Action Modal */}
+      <EventActionsSheet
+        open={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        event={selectedEvent}
+      />
+    </>
+  );
 }

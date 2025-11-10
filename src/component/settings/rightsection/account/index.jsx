@@ -382,7 +382,7 @@ export const DeleteAccounttemplate = ({ onClose }) => {
               // Clear user data and redirect after delay
               // setTimeout(() => {
               //   localStorage.clear();
-              //   window.location.href = "/";
+              //   window.location.href = "/feed";
               // }, 2000);
             } else {
               setMessage({

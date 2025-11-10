@@ -1,295 +1,363 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import SideBarNav from '../../pageAssets/SideBarNav';
-import RightBarComponent from '../../../component/RightBarComponent';
-import SuggestedOrganizer from '../../../component/Suggested_organizer/suggestedOrganizer';
-import heart_icon from '../../../assets/navbar_icons/heart_icon.png';
-import userImg from '../../../assets/navbar_icons/users.png';
-import exclamation_circle from '../../../assets/navbar_icons/exclamation_circle.png';
-import Share from '../../../assets/navbar_icons/Share.png';
-import './eventView.css';
-import { useAuth } from '../../../pages/auth/AuthContext';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import SEO from '../../../component/SEO';
-import { Helmet } from 'react-helmet-async';
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import SideBarNav from "../../pageAssets/SideBarNav";
+import SEO from "../../../component/SEO";
+import { Helmet } from "react-helmet-async";
+import { api, authHeaders } from "../../../lib/apiClient";
+import { ToastHost, showSuccess } from "../../../component/ui/toast";
 
-function ViewEvent() {
-    const { eventId } = useParams();
-    const { token } = useAuth();
-    const [event, setEvent] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+import PosterHeader from "../../../component/Events/PostHeader";
+import GuestPerformers from "../../../component/Events/GuestPerformers";
+import OrganizerCard from "../../../component/Events/OrganizerCard";
+import Remarks from "../../../component/Events/Remarks";
+import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
+import MobileStickyBar from "../../../component/Events/MobileStickyBar";
+import ReportModal from "../../../component/Events/ReportModal";
 
-    useEffect(() => {
-        if (eventId) {
-            fetchEventDetails();
-        }
-    }, [eventId]);
+import { formatEventDateTime, randomAvatar } from "../../../utils/ui";
+import { useAuth } from "../../auth/AuthContext";
 
-    const fetchEventDetails = async () => {
-        try {
-            setLoading(true);
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/events/${eventId}/view`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+/* ---------- Page ---------- */
+export default function ViewEvent() {
+  const { eventId } = useParams();
+  const [event, setEvent] = useState(null);
+  const [recs, setRecs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-            if (!res.ok) throw new Error('Failed to fetch event details');
+  // local UI mirrors API
+  const [isSaved, setIsSaved] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
-            const data = await res.json();
-            setEvent(data.data);
-        } catch (err) {
-            setError(err.message);
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+  // report modal
+  const [reportOpen, setReportOpen] = useState(false);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (!eventId) return;
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await api.get(
+          `/api/v1/events/${eventId}/view`,
+          authHeaders(token)
+        );
+        const payload = res?.data?.data || {};
+        if (!mounted) return;
+        const ev = payload.currentEvent || null;
+        setEvent(ev);
+        setRecs(payload.recommendations || []);
+        setIsSaved(!!ev?.is_saved);
+        setIsFollowing(!!ev?.is_following_organizer);
+      } catch (e) {
+        setError(
+          e?.response?.data?.message || e?.message || "Failed to fetch event"
+        );
+        console.error(e);
+      } finally {
+        mounted = false;
+        setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
     };
+  }, [eventId]);
 
-    const getOrganizerImage = (id) => {
-        const randomImageId = id % 50;
-        return `https://randomuser.me/api/portraits/${randomImageId % 2 === 0 ? 'men' : 'women'}/${randomImageId}.jpg`;
-    };
+  const priceDisplay =
+    event?.price_display ||
+    (event?.currency?.symbol || "$") + (event?.price || "0");
 
-    const handleGetTicket = () => {
-        toast.success(`🎟️ Ticket booked for "${event?.title || 'Event'}"!`, {
-            position: 'top-center',
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true
-        });
-    };
+  const posterUrl = useMemo(
+    () =>
+      event?.poster?.[0]?.url
+    [event]
+  );
 
-    if (loading) {
-        return <div className="p-5 text-center">Loading event...</div>;
-    }
+  const handleGetTicket = () => {
+    showSuccess(`🎟️ Ticket booked for “${event?.title || "Event"}”!`);
+  };
 
-    if (error) {
-        return <div className="p-5 text-center text-danger">Error: {error}</div>;
-    }
-    const formatDateTime = (dateStr, timeStr) => {
-        try {
-            const date = new Date(`${dateStr} ${timeStr}`);
-            const formattedDate = date.toLocaleDateString('en-US', {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'long'
-            });
-            const formattedTime = date.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-            return `${formattedDate} · ${formattedTime}`;
-        } catch {
-            return `${dateStr} · ${timeStr}`;
-        }
-    };
+  if (loading) {
     return (
-        <>
-            <SEO 
-                title={event?.title ? `${event.title} - Event Details` : 'Event Details'}
-                description={event?.description ? event.description.substring(0, 155) : 'Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!'}
-                keywords={`zagasm studios, ${event?.title || 'event'}, ${event?.eventType || 'event'}, event tickets, ${event?.hostName || 'event organizer'}, live events, entertainment`}
-                image={event?.poster?.[0]?.url || '/zagasm_studio_logo.png'}
-                type="article"
-            />
-            
-            {event && (
-                <Helmet>
-                    <script type="application/ld+json">
-                        {JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "Event",
-                            "name": event.title,
-                            "description": event.description,
-                            "image": event.poster?.[0]?.url,
-                            "startDate": `${event.eventDate}T${event.startTime}`,
-                            "endDate": event.endDate ? `${event.endDate}T${event.endTime}` : undefined,
-                            "eventStatus": "https://schema.org/EventScheduled",
-                            "eventAttendanceMode": event.eventType === 'virtual' ? "https://schema.org/OnlineEventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
-                            "location": {
-                                "@type": event.eventType === 'virtual' ? "VirtualLocation" : "Place",
-                                "name": event.location || "Event Location",
-                                "address": event.address
-                            },
-                            "offers": {
-                                "@type": "Offer",
-                                "price": event.price || 0,
-                                "priceCurrency": "USD",
-                                "availability": "https://schema.org/InStock",
-                                "url": window.location.href
-                            },
-                            "organizer": {
-                                "@type": "Organization",
-                                "name": event.hostName || "Zagasm Studios",
-                                "url": "https://studios.zagasm.com"
-                            },
-                            "performer": {
-                                "@type": "PerformingGroup",
-                                "name": event.hostName || "Event Host"
-                            }
-                        })}
-                    </script>
-                </Helmet>
-            )}
-            
-            <ToastContainer />
-            <div className="container-flui m-0 p-0">
-                <SideBarNav />
-                <div className="page_wrapper overflow-hidden">
-                    <div className="row p-0 ">
-                        <div className="col ">
-                            <div className="container event_view_container">
-                                <div className="s rounded h-100 blog-car border-0 position-relative">
-
-                                    <div className="text-decoration-none text-dark">
-                                        <img
-                                            className="card-img-top"
-                                            src={event?.poster?.[0]?.url || 'https://via.placeholder.com/800x400'}
-                                            alt={event?.title || 'Event'}
-                                            loading="lazy"
-                                            style={{
-                                                width: '100%',
-                                                height: '300px',
-                                                objectFit: 'contain',
-                                                backgroundColor: '#f8f8f8'
-                                            }}
-                                        />
-                                        <div className='event_detail_content align-items-center w-100 pt-2 pb-2 pr-1 pl-1'>
-                                            <div style={{ lineHeight: '19px' }}>
-                                                <h5>{event?.title || 'Untitled Event'}</h5>
-                                                <span style={{ color: 'rgba(143, 7, 231, 1)' }}>{event?.hostName || 'Unknown Host'}</span>
-                                                <br />
-                                                <small className="event_time text-muted">
-                                                   {formatDateTime(event?.eventDate,event?.startTime)}
-                                                </small>
-                                            </div>
-                                            <div>
-                                                <button className="event_pay_btn text-muted">
-                                                    <span style={{ color: 'rgba(255, 204, 0, 1)' }}>Pay</span>
-                                                    <span className='text-light'>(${event?.price || 0})</span>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="organizers_views border-rounded mt-4">
-                                            <div className="d-flex align-items-center mb-3 job-item-body">
-                                                <div className="overlap-rounded-circle">
-                                                    {[1, 2, 3, 4, 5].map((_, index) => (
-                                                        <img
-                                                            key={index}
-                                                            className="rounded-circle shadow-sm user_template_im"
-                                                            src={getOrganizerImage(index + 1)}
-                                                            alt={`Viewer ${index}`}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <span className="font-weight-lighter">200 others are attending</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="card pt-4 pb-4">
-                                            <div className="quest_performers_section">
-                                                <div className='perfomer_heading'>
-                                                    <img src={userImg} alt="performers" /> <span>Guest Performer</span>
-                                                </div>
-                                                <div>
-                                                    {event?.eventPerformers?.map((performer, index) => (
-                                                        <img
-                                                            key={index}
-                                                            className="rounded-circle shadow-sm user_template_im"
-                                                            src={performer.image_url}
-                                                            alt={performer.name}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="border-top border-bottom p-2 mt-4">
-                                            <h5>Description</h5>
-                                            <p>{event?.description || 'No description available.'}</p>
-                                        </div>
-
-                                        <div className="p-2">
-                                            <div className="quest_performers_section2">
-                                                <div>
-                                                    <h5>Location</h5>
-                                                    <small><b>{event?.location}</b></small><br />
-                                                    <small className='font-weight-lighter'>{event?.location}</small>
-                                                </div>
-                                                <div>
-                                                    <span className='fa fa-copy'></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="shadow-sm contact_section pb-4">
-                                            <div>
-                                                <div className="image_card">
-                                                    <img src={event?.hostImage || getOrganizerImage(1)} alt="host" />
-                                                    <h4>{event?.hostName}</h4>
-                                                </div>
-                                                <div className="btn_card">
-                                                    <button className='follow_btn'>Follow</button>
-                                                    <button className='contact_btn'>Contact</button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="report">
-                                            <p><img src={exclamation_circle} alt="report" /> <u>Report this event</u></p>
-                                        </div>
-
-                                        <div className="remark_section p-4">
-                                            <h5 className='mb-4'>Remarks</h5>
-                                            {event?.remarks?.length > 0 ? event.remarks.map((remark, idx) => (
-                                                <div key={idx} className='d-flex mb-3'>
-                                                    <div>
-                                                        <img className="rounded-circle" src={getOrganizerImage(idx + 1)} alt="remark" />
-                                                    </div>
-                                                    <div className='remarks'>
-                                                        <small><b>{remark.user || 'Anonymous'}</b></small>
-                                                        <p>{remark.text}</p>
-                                                    </div>
-                                                </div>
-                                            )) : <p>No remarks yet.</p>}
-                                        </div>
-
-                                        <div className='event_detail_footer align-items-center shadow-sm'>
-                                            <div style={{ lineHeight: '0px' }}>
-                                                <h5>${event?.price || 0}</h5>
-                                                <small className="event_time text-muted"> {formatDateTime(event?.eventDate,event?.startTime)}</small>
-                                            </div>
-                                            <div>
-                                                <button
-                                                    className="footer_event_pay_btn text-muted"
-                                                    onClick={handleGetTicket}
-                                                >
-                                                    <span className='text-light'>Get ticket</span>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <RightBarComponent>
-                            <SuggestedOrganizer />
-                        </RightBarComponent>
-                    </div>
-                </div>
-            </div>
-        </>
+      <div className="tw:w-full tw:h-[50vh] tw:flex tw:items-center tw:justify-center tw:text-gray-600">
+        Loading event…
+      </div>
     );
-}
+  }
+  if (error) {
+    return (
+      <div className="tw:w-full tw:h-[50vh] tw:flex tw:items-center tw:justify-center tw:text-red-600">
+        {error}
+      </div>
+    );
+  }
+  if (!event) return null;
 
-export default ViewEvent;
+  const remarks = Array.isArray(event.remarks) ? event.remarks : [];
+
+  return (
+    <>
+      <ToastHost />
+
+      <SEO
+        title={
+          event?.title ? `${event.title} - Event Details` : "Event Details"
+        }
+        description={
+          event?.description
+            ? event.description.slice(0, 155)
+            : "Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!"
+        }
+        keywords={`zagasm studios, ${event?.title || "event"}, ${
+          event?.eventType || "event"
+        }, event tickets, ${
+          event?.hostName || "event organizer"
+        }, live events, entertainment`}
+        image={posterUrl}
+        type="article"
+      />
+
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Event",
+            name: event.title,
+            description: event.description,
+            image: posterUrl,
+            startDate: `${event.eventDate} ${event.startTime}`,
+            endDate: event.endDate
+              ? `${event.endDate} ${event.endTime}`
+              : undefined,
+            eventStatus: "https://schema.org/EventScheduled",
+            eventAttendanceMode:
+              event.eventType?.toLowerCase() === "virtual"
+                ? "https://schema.org/OnlineEventAttendanceMode"
+                : "https://schema.org/OfflineEventAttendanceMode",
+            location:
+              event.eventType?.toLowerCase() === "virtual"
+                ? { "@type": "VirtualLocation", url: event.streamUrl || "" }
+                : {
+                    "@type": "Place",
+                    name: event.location || "Event Location",
+                    address: event.address || "",
+                  },
+            offers: {
+              "@type": "Offer",
+              price: event.price || 0,
+              priceCurrency: event.currency?.code || "USD",
+              availability: "https://schema.org/InStock",
+              url: typeof window !== "undefined" ? window.location.href : "",
+            },
+            organizer: {
+              "@type": "Organization",
+              name: event.hostName || "Zagasm Studios",
+            },
+            performer: {
+              "@type": "PerformingGroup",
+              name: event.hostName || "Event Host",
+            },
+          })}
+        </script>
+      </Helmet>
+
+      <div className="container-fluid m-0 p-0">
+        <SideBarNav />
+        <div className="page_wrapper overflow-hidden">
+          <div className="container tw:py-6">
+            <div className="row g-4 tw:pb-36 tw:md:pb-0">
+              {/* MAIN */}
+              <div className="col-12 col-lg-8">
+                <div className="tw:bg-white tw:border tw:border-gray-100 tw:rounded-3xl tw:overflow-hidden tw:shadow-sm">
+                  <PosterHeader
+                    eventId={eventId}
+                    posterUrl={posterUrl}
+                    title={event.title}
+                    isSaved={isSaved}
+                    setIsSaved={setIsSaved}
+                    shareLink={event.shareable_link}
+                  />
+
+                  {/* Title & meta */}
+                  <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4 tw:px-5 tw:md:px-7 tw:py-4">
+                    <div className="tw:min-w-0">
+                      <span className="tw:text-xl tw:md:text-3xl tw:font-semibold tw:text-gray-900 tw:truncate">
+                        {event.title || "Untitled Event"}
+                      </span>
+                      <div className="tw:mt-1 tw:space-x-2">
+                        <span className="tw:text-primary tw:font-medium">
+                          {event.hostName || "Unknown Host"}
+                        </span>
+                        <span className="tw:text-gray-500">·</span>
+                        <span className="tw:text-gray-500">
+                          {formatEventDateTime(
+                            event.eventDate,
+                            event.startTime
+                          )}
+                        </span>
+                      </div>
+                      <div className="tw:mt-2 tw:flex tw:items-center tw:gap-2">
+                        <div className="tw:flex tw:-space-x-2">
+                          {[0, 1, 2, 3, 4].map((i) => (
+                            <img
+                              key={i}
+                              src={randomAvatar(event.id + ":" + i)}
+                              alt=""
+                              className="tw:h-7 tw:w-7 tw:rounded-full tw:ring-2 tw:ring-white tw:object-cover"
+                            />
+                          ))}
+                        </div>
+                        <span className="tw:text-sm tw:text-gray-600">
+                          200 others are attending
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="tw:hidden tw:md:block">
+                      <button
+                      style={{
+                        borderRadius: 20
+                      }}
+                        type="button"
+                        className="tw:h-11 tw:px-6 tw:flex tw:items-center tw:gap-2 tw:bg-primary tw:text-white tw:rounded-full"
+                        onClick={handleGetTicket}
+                      >
+                        <span className="tw:bg-[#FFCC00] tw:text-black tw:font-semibold tw:px-3 tw:py-1 tw:rounded-full">
+                          Pay
+                        </span>
+                        <span className="tw:opacity-90">({priceDisplay})</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <GuestPerformers performers={event.eventPerformers} />
+
+                  {/* Description */}
+                  <div className="tw:border-y tw:border-gray-100 tw:px-5 tw:md:px-7 tw:py-5">
+                    <h3 className="tw:text-base tw:font-semibold tw:mb-2">
+                      Description
+                    </h3>
+                    <p
+                      className={`tw:text-gray-700 ${
+                        expanded ? "" : "tw:line-clamp-3"
+                      }`}
+                    >
+                      {event.description || "No description available."}
+                    </p>
+                    {event.description?.length > 140 && (
+                      <button
+                        className="tw:text-primary tw:text-sm tw:mt-2"
+                        onClick={() => setExpanded(!expanded)}
+                      >
+                        {expanded ? "see less" : "see more…"}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Location */}
+                  <div className="tw:px-5 tw:md:px-7 tw:py-5">
+                    <div className="tw:flex tw:items-start tw:justify-between tw:gap-4">
+                      <div>
+                        <h3 className="tw:text-base tw:font-semibold tw:mb-1">
+                          Location
+                        </h3>
+                        <div className="tw:text-sm tw:text-gray-900 tw:font-medium">
+                          {event.location || "—"}
+                        </div>
+                      </div>
+                      <button
+                        className="tw:text-sm tw:text-gray-600 hover:tw:text-gray-900"
+                        onClick={() => {
+                          navigator.clipboard?.writeText(event.location || "");
+                          showSuccess("Location copied");
+                        }}
+                      >
+                        <span className="fa fa-copy" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <OrganizerCard
+                    hostImage={event.hostImage}
+                    hostId={event.hostId}
+                    hostName={event.hostName}
+                    isFollowing={isFollowing}
+                    setIsFollowing={setIsFollowing}
+                  />
+
+                  <div className="tw:px-5 tw:md:px-7 tw:pb-2">
+                    <button
+                      className="tw:flex tw:items-center tw:gap-2 tw:text-[#F04438]"
+                      onClick={() => setReportOpen(true)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="tw:size-6 tw:text-red-400"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                        />
+                      </svg>
+
+                      <u>Report this event</u>
+                    </button>
+                  </div>
+
+                  <Remarks
+                    eventId={eventId}
+                    remarks={remarks}
+                    onAppend={(r) =>
+                      setEvent((p) => ({
+                        ...p,
+                        remarks: [r, ...(p?.remarks || [])],
+                      }))
+                    }
+                  />
+
+                  {/* Spacer for mobile sticky */}
+                  <div className="tw:block tw:md:hidden tw:h-20" />
+                </div>
+              </div>
+
+              {/* RIGHT rail */}
+              <div className="col-12 col-lg-4 tw:mb-12 tw:md:mb-0">
+                <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile sticky bar */}
+          <MobileStickyBar
+            priceDisplay={priceDisplay}
+            dateTime={formatEventDateTime(event.eventDate, event.startTime)}
+            onGetTickets={handleGetTicket}
+          />
+        </div>
+      </div>
+
+      <ReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        onSubmit={async (reason) => {
+          const url = `/api/v1/report/register?reportable_type=event&reportable_id=${encodeURIComponent(
+            eventId
+          )}&reason=${encodeURIComponent(reason)}`;
+          await api.post(url, null, authHeaders());
+          setReportOpen(false);
+          navigate('/feed');
+          showSuccess("Report submitted. Thank you.");
+        }}
+      />
+    </>
+  );
+}

@@ -10,7 +10,7 @@ export function Error404() {
                   <h1 style={{color:'#8000FF'}} className=" display-3 font-weight-light">Page not <span className="font-weight-bold">found</span></h1>
                   <p className="mb-0 lead">Oops! Looks like you followed a bad link.</p>
                   <p className="lead mb-5">If you think this is a problem with us, please <a href="#">tell us</a>.</p>
-                  <Link to="/" style={{backgroundColor:'#8000FF', color:'white'}}  className="btn  btn-lg">Go Back</Link>
+                  <Link to="/feed" style={{backgroundColor:'#8000FF', color:'white'}}  className="btn  btn-lg">Go Back</Link>
                </div>
              
             </div>

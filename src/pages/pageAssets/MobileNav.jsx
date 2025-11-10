@@ -16,9 +16,9 @@ function MobileNav() {
     const navLinks = [
         {
             name: 'Discover',
-            to: '/',
+            to: '/feed',
             icon: discover_icon,
-            active: currentPath === '/'
+            active: currentPath === '/feed'
         },
         {
             name: 'Saved',

@@ -15,7 +15,7 @@ import { useAuth } from '../auth/AuthContext';
 const Navbar = () => {
     const { user, logout,token } = useAuth();
     const Default_user_image = user.profileUrl != null ? user.profileUrl : default_profilePicture;
- console.log('Token___',token);
+//  console.log('Token___',token);
     // Function to truncate name parts to max 10 characters
     const truncateName = (name) => {
         if (!name) return '';
@@ -30,8 +30,12 @@ const Navbar = () => {
             <MobileNav />
             <nav className="navbar navbar-expand osahan-nav-top p-0 w-100 position-fixed" style={{ background: 'white' }}>
                 <div className="container-fluid p-3">
-                    <Link className="navbar-brand " to="/">
-                        <img src={logo} alt="Zagasm Logo" className="zagasm_logo" />
+                    <Link className="navbar-brand" to="/feed">
+                        <img style={{
+                            width: 120,
+                            height: 120,
+                            objectFit: 'contain'
+                        }}src={'/images/logo.png'} alt="Zagasm Logo" className="" />
                     </Link>
 
                     <form className="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search nav_search"></form>
