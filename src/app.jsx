@@ -48,6 +48,7 @@ import { ToastHost } from "./component/ui/toast.jsx";
 import Support from "./pages/support/index.jsx";
 import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
+import DataProtectionPage from "./pages/DataProtection/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -81,6 +82,7 @@ export function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/support" element={<Support />} />
         <Route path="/marketing" element={<Marketing />} />
+        <Route path="/data-protection" element={<DataProtectionPage />} />
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
