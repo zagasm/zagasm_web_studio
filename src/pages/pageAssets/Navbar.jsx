@@ -48,7 +48,7 @@ const Navbar = () => {
                             </Link>
                         </li>
                         <li className="nav-item dropdown no-arrow mx- osahan-list-dropdown mr-5">
-                            <Link to={'/event/create-event'} className="nav-link dropdown-toggl create_post_btn shadow-sm p-3 text-light">
+                            <Link to={'/event/select-event-type'} className="nav-link dropdown-toggl create_post_btn shadow-sm p-3 text-light">
                                 <img src={Group} alt="notification icon" /> <span>Create Event</span>
                             </Link>
                         </li>

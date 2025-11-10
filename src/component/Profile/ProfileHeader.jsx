@@ -2,36 +2,20 @@ import React from "react";
 import defaultProfile from "../../assets/avater_pix.avif";
 import { Calendar, UserPlus, Users } from "lucide-react";
 import { Edit } from "react-feather";
-import './profile.css'
+import "./profile.css";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileHeader({ user }) {
   const img = user?.profileUrl || defaultProfile;
 
+  const navigate = useNavigate();
+
+  const handleEditClick = () => {};
+
   return (
-    <div className="tw:mt-24 tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full tw:lg:max-w-7xl tw:lg:mx-auto">
-      <div className="tw:flex tw:items-center gap-3 tw:justify-end tw:absolute tw:right-4 tw:top-6 text-white">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="tw:size-6 icon"
-          
-        >
-          <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="tw:size-6 icon"
-          
-        >
-          <path
-            fillRule="evenodd"
-            d="M15.75 4.5a3 3 0 1 1 .825 2.066l-8.421 4.679a3.002 3.002 0 0 1 0 1.51l8.421 4.679a3 3 0 1 1-.729 1.31l-8.421-4.678a3 3 0 1 1 0-4.132l8.421-4.679a3 3 0 0 1-.096-.755Z"
-            clipRule="evenodd"
-          />
-        </svg>
+    <div className="tw:mt-24 tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full">
+      <div onClick={handleEditClick}>
+        <Edit size={25} className="tw:z-20 tw:absolute tw:right-4 tw:top-6" />
       </div>
       {/* decorative background image */}
       <img
@@ -69,7 +53,7 @@ export default function ProfileHeader({ user }) {
           </div>
 
           <a
-            href="/event/create-event"
+            href="/event/select-event-type"
             className="tw:inline-flex tw:items-center tw:space-x-2 tw:justify-center tw:rounded-2xl tw:bg-white tw:px-4 tw:py-3 tw:font-medium tw:text-primary hover:tw:shadow"
           >
             <span>Create Event</span>

@@ -40,9 +40,9 @@ export default function StreamingStep({ defaultValues = {}, onBack, onNext }) {
   return (
     <form
       onSubmit={handleSubmit(submit)}
-      className="tw:bg-white tw:rounded-2xl tw:p-5 sm:tw:p-7 tw:border tw:border-gray-100"
+      className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-[18px] sm:tw:text-lg tw:font-semibold tw:mb-5">
+      <h2 className="tw:text-[18px] tw:sm:text-lg tw:font-semibold tw:mb-5">
         How will you stream this event?
       </h2>
 

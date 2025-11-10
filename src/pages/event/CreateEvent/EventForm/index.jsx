@@ -20,14 +20,16 @@ import {
   flattenLaravelErrors,
 } from "../../../../utils/helpers";
 
-export default function EventCreationWizard() {
+export default function EventCreationWizard({ eventTypeId }) {
   const { token } = useAuth();
   const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);
 
-  const [eventImage, setEventImage] = useState(null);
+  const [posterImages, setPosterImages] = useState([]);
+  const [posterVideos, setPosterVideos] = useState([]);
+
   const [performers, setPerformers] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -69,27 +71,22 @@ export default function EventCreationWizard() {
   };
 
   const goToStep = (n) => {
-    // clamp 1..6 just in case
     const s = Math.max(1, Math.min(6, Number(n) || 1));
     setCurrentStep(s);
-    // optional: scroll to top for good UX
     requestAnimationFrame(() =>
       window.scrollTo({ top: 0, behavior: "smooth" })
     );
   };
 
   const handlePublish = async () => {
-    // Guard: poster must exist (backend requires it in step_3)
-    if (!eventImage) {
-      showError("Please add a poster before publishing.");
-      setCurrentStep(2);
-      return;
-    }
-    // Guard: event_type_id must exist (backend requires it in step_1)
-    const eventTypeId = formData?.step1?.event_type_id;
     if (!eventTypeId) {
       showError("Please select an event type.");
       setCurrentStep(1);
+      return;
+    }
+    if ((posterImages?.length || 0) + (posterVideos?.length || 0) === 0) {
+      showError("Please add at least one poster (image or video).");
+      setCurrentStep(2);
       return;
     }
 
@@ -106,7 +103,7 @@ export default function EventCreationWizard() {
 
       const fd = new FormData();
       // REQUIRED
-      fd.append("event_type_id", String(review.event_type_id));
+      fd.append("event_type_id", eventTypeId);
       fd.append("time_zone_id", String(review.timezone || ""));
       fd.append("title", review.title || "");
       fd.append("description", review.description || "");
@@ -140,13 +137,25 @@ export default function EventCreationWizard() {
       fd.append("post_mature_content", review.matureContent ? "1" : "0");
 
       // media
-      performers.forEach((p, i) => {
+       performers.forEach((p, i) => {
         fd.append(`performers[${i}][name]`, p.name || "");
         if (p.image) fd.append(`performers[${i}][image]`, p.image);
+        if (p.role) fd.append(`performers[${i}][role]`, p.role);
       });
-      fd.append("poster", eventImage); // guaranteed to exist by guard
-      //   fd.append("poster[]", safeFile, safeFile.name || "poster.jpg");
-      console.log(eventImage);
+      posterImages.forEach((file, i) => {
+        fd.append(
+          `poster_images[${i}]`,
+          file,
+          file.name || `poster_image_${i}`
+        );
+      });
+      posterVideos.forEach((file, i) => {
+        fd.append(
+          `poster_videos[${i}]`,
+          file,
+          file.name || `poster_video_${i}`
+        );
+      });
 
       const req = api.post("/api/v1/event/store", fd, {
         headers: {
@@ -167,12 +176,8 @@ export default function EventCreationWizard() {
       if (status === 422) {
         const srv = err.response.data?.errors || {};
         setFormErrors(srv);
-
-        const step = firstErrorStepNumber(srv);
-        if (step) setCurrentStep(step);
-
         const flat = flattenLaravelErrors(srv);
-        if (flat.length) showError(flat[0].messages[0]); // first message
+        if (flat.length) showError(flat[0].messages[0]);
         else showError(err.response.data?.message || "Validation failed.");
         return;
       } else {
@@ -188,8 +193,8 @@ export default function EventCreationWizard() {
   };
 
   return (
-    <div className="tw:mx-auto tw:max-w-5xl tw:pb-24 tw:px-3 sm:tw:px-6">
-      <ToastHost />
+    <div className="tw:mx-auto tw:max-w-5xl tw:pb-24 tw:px-3 tw:sm:px-6">
+      {/* <ToastHost /> */}
 
       <ProgressSteps
         currentStep={currentStep}
@@ -202,14 +207,17 @@ export default function EventCreationWizard() {
 
         {currentStep === 1 && (
           <EventInformationStep
+            eventTypeId={eventTypeId}
             defaultValues={formData.step1}
             onNext={nextStep}
           />
         )}
         {currentStep === 2 && (
           <MediaUploadStep
-            eventImage={eventImage}
-            setEventImage={setEventImage}
+            posterImages={posterImages}
+            setPosterImages={setPosterImages}
+            posterVideos={posterVideos}
+            setPosterVideos={setPosterVideos}
             performers={performers}
             setPerformers={setPerformers}
             onBack={prevStep}
@@ -243,7 +251,8 @@ export default function EventCreationWizard() {
             onBack={prevStep}
             onPublish={handlePublish}
             timezoneLabel={timezone}
-            eventImage={eventImage}
+            posterImages={posterImages}
+            posterVideos={posterVideos}
             performers={performers}
             collected={{
               ...formData.step1,

@@ -80,6 +80,9 @@ const OrganizerCard = ({ org, onToggle, loading }) => {
       <div className="tw:mt-auto tw:flex tw:items-center tw:justify-between tw:gap-3">
         <div className="tw:text-[11px] tw:text-gray-500" />
         <button
+        style={{
+          borderRadius: 20
+        }}
           type="button"
           disabled={loading}
           onClick={() => onToggle(org.userId)}

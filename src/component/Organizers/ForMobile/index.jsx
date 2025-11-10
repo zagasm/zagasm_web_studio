@@ -139,7 +139,7 @@ export default function MobileSingleOrganizers() {
         <Swiper
           modules={[Pagination]}
           spaceBetween={12}
-          pagination={{ clickable: true }}
+          // pagination={{ clickable: true }}
           breakpoints={{
             0: { slidesPerView: 3.2 },
             480: { slidesPerView: 4 },

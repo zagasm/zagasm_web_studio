@@ -25,7 +25,7 @@ const GENRES = [
 ];
 
 const schema = z.object({
-  event_type_id: z.string().min(1, "Please select an event type"),
+  // event_type_id: z.string().min(1, "Please select an event type"),
   title: z.string().min(10, "Event title must be at least 10 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
   location: z.string().min(1, "Please select a location"),
@@ -38,7 +38,11 @@ const schema = z.object({
   timezone: z.string().min(1, "Please select a timezone"),
 });
 
-export default function EventInformationStep({ defaultValues = {}, onNext }) {
+export default function EventInformationStep({
+  defaultValues = {},
+  onNext,
+  eventTypeId,
+}) {
   const { user, token } = useAuth();
   const [timeZones, setTimeZones] = useState([]);
   const [loadingTZ, setLoadingTZ] = useState(true);
@@ -50,12 +54,12 @@ export default function EventInformationStep({ defaultValues = {}, onNext }) {
     handleSubmit,
     register,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      event_type_id: "",
+      // event_type_id: "",
       title: "",
       description: "",
       location: "",
@@ -91,24 +95,24 @@ export default function EventInformationStep({ defaultValues = {}, onNext }) {
   }, [token]);
 
   // Event types
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        setLoadingET(true);
-        const res = await api.get("/api/v1/event/type/view", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const list = res?.data?.events || [];
-        if (mounted) setEventTypes(list);
-      } catch {
-        showError("Error fetching event types");
-      } finally {
-        mounted && setLoadingET(false);
-      }
-    })();
-    return () => (mounted = false);
-  }, [token]);
+  // useEffect(() => {
+  //   let mounted = true;
+  //   (async () => {
+  //     try {
+  //       setLoadingET(true);
+  //       const res = await api.get("/api/v1/event/type/view", {
+  //         headers: token ? { Authorization: `Bearer ${token}` } : {},
+  //       });
+  //       const list = res?.data?.events || [];
+  //       if (mounted) setEventTypes(list);
+  //     } catch {
+  //       showError("Error fetching event types");
+  //     } finally {
+  //       mounted && setLoadingET(false);
+  //     }
+  //   })();
+  //   return () => (mounted = false);
+  // }, [token]);
 
   // Build options
   const tzOptions = useMemo(
@@ -142,14 +146,14 @@ export default function EventInformationStep({ defaultValues = {}, onNext }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="tw:bg-white tw:rounded-2xl tw:p-5 sm:tw:p-7 tw:border tw:border-gray-100"
+      className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-[18px] sm:tw:text-lg tw:font-semibold tw:mb-5">
+      <h2 className="tw:text-[18px] tw:sm:text-lg tw:font-semibold tw:mb-5">
         Basic event details
       </h2>
 
-      <div className="tw:grid tw:grid-cols-1 md:tw:grid-cols-2 tw:gap-5">
-        <SelectField
+      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-5">
+        {/* <SelectField
           label="Event Type*"
           value={watchVals.event_type_id}
           onChange={(v) =>
@@ -159,7 +163,7 @@ export default function EventInformationStep({ defaultValues = {}, onNext }) {
           placeholder={loadingET ? "Loading…" : "Select an event type"}
           disabled={loadingET}
           error={errors?.event_type_id?.message}
-        />
+        /> */}
 
         <div>
           <label className="tw:block tw:text-[15px] tw:mb-1">Event Title</label>
@@ -175,7 +179,7 @@ export default function EventInformationStep({ defaultValues = {}, onNext }) {
           )}
         </div>
 
-        <div className="md:tw:col-span-2">
+        <div className="tw:md:col-span-2">
           <label className="tw:block tw:text-[15px] tw:mb-1">
             Description*
           </label>
@@ -263,16 +267,17 @@ export default function EventInformationStep({ defaultValues = {}, onNext }) {
           placeholder={loadingTZ ? "Loading…" : "Select Timezone"}
           disabled={loadingTZ}
           error={errors?.timezone?.message}
-          className="md:tw:col-span-2"
+          className="tw:md:col-span-2"
         />
       </div>
 
       <div className="tw:flex tw:justify-end tw:mt-6">
         <button
-        style={{
-            borderRadius: 20
-        }}
+          style={{
+            borderRadius: 20,
+          }}
           type="submit"
+          disabled={!isValid}
           className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
         >
           Next

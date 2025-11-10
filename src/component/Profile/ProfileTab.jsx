@@ -10,7 +10,7 @@ export default function ProfileTabs({ user }) {
   const { events, loading, error } = useMyEvents(filter);
 
   return (
-    <Tab.Group as="div" className="tw:mt-6 tw:lg:max-w-7xl tw:lg:mx-auto">
+    <Tab.Group as="div" className="tw:mt-6">
       <div className="tw:flex tw:flex-col tw:gap-4">
         {/* top-level tabs: Events / About */}
         <Tab.List className="tw:flex tw:rounded-2xl tw:bg-gray-50 tw:p-2">

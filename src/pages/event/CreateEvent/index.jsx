@@ -2,8 +2,10 @@ import SideBarNav from '../../pageAssets/SideBarNav';
 import RightBarComponent from '../../../component/RightBarComponent';
 import EventCreationWizard from './EventForm';
 import SEO from '../../../component/SEO';
+import { useParams } from 'react-router-dom';
 
 function CreateEvent() {
+    const { eventTypeId } = useParams();
     return (
         <>
             <SEO 
@@ -16,7 +18,7 @@ function CreateEvent() {
                 <div className="page_wrapper overflow-hidden">
                     <div className="row p-0 mt-5 ">
                         <div className="col ">
-                             <EventCreationWizard />
+                             <EventCreationWizard eventTypeId={eventTypeId} />
                         </div>
                     </div>
                 </div>

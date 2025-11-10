@@ -13,7 +13,7 @@ function AccountHeading() {
   // console.log('User in AccountHeading:', user);
   return (
     <div className="account_heading_section bg-dange">
-      <div className="details_display tw:flex tw:flex-row tw:gap-4 tw:md:flex-col">
+      <div className="details_display tw:flex tw:flex-row tw:items-center tw:gap-4 tw:md:flex-col">
         <div
           style={{
             padding: 0,

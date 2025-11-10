@@ -14,7 +14,7 @@ export default function ProgressSteps({ currentStep, completedSteps, onBack }) {
   return (
     <div className="tw:mb-6">
       {/* Mobile header */}
-      <div className="tw:flex tw:items-center tw:justify-between tw:mb-3 sm:tw:hidden">
+      <div className="tw:flex tw:items-center tw:justify-between tw:mb-3 tw:sm:hidden">
         <button
           style={{
             borderRadius: 20,
@@ -38,7 +38,7 @@ export default function ProgressSteps({ currentStep, completedSteps, onBack }) {
       </div>
 
       {/* Desktop rail */}
-      <div className="tw:hidden sm:tw:flex tw:gap-3 tw:overflow-x-auto">
+      <div className="tw:hidden tw:sm:flex tw:gap-3 tw:overflow-x-auto">
         {STEPS.map((label, i) => {
           const n = i + 1;
           const done = completedSteps.includes(n);

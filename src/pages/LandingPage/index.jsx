@@ -137,17 +137,17 @@ export default function Landing() {
 
               {/* Headline */}
               <div className=" tw:flex tw:flex-col tw:items-center tw:justify-center">
-                <span className="tw:font-sans tw:mt-6 tw:md:mt-8 tw:leading-tight tw:tracking-tight tw:font-bold tw:text-4xl sm:tw:text-5xl lg:tw:text-6xl xl:tw:text-7xl tw:max-w-3xl tw:mx-auto text-center">
+                <span className="tw:font-sans tw:mt-6 tw:md:mt-8 tw:leading-tight tw:tracking-tight tw:font-bold tw:text-4xl tw:sm:text-5xl lg:tw:text-6xl xl:tw:text-7xl tw:max-w-3xl tw:mx-auto text-center">
                   Turn Moments Into Global
                   <br className="tw:hidden tw:md:block" /> Experiences with
                   <br />
-                  <span className="tw:text-primary tw:text-[4rem] sm:tw:text-[4.5rem] lg:tw:text-[4rem] xl:tw:text-[4.5rem] tw:leading-none tw:block tw:mt-1 tw:font-cursive tw:tracking-wide">
+                  <span className="tw:text-primary tw:text-[4rem] tw:sm:text-[4.5rem] lg:tw:text-[4rem] xl:tw:text-[4.5rem] tw:leading-none tw:block tw:mt-1 tw:font-cursive tw:tracking-wide">
                     Zagasm Studio
                   </span>
                 </span>
 
                 {/* Subcopy */}
-                <p className="tw:mt-8 tw:text-base sm:tw:text-lg tw:text-gray-700 tw:max-w-2xl tw:text-center">
+                <p className="tw:mt-8 tw:text-base tw:sm:text-lg tw:text-gray-700 tw:max-w-2xl tw:text-center">
                   Stream electrifying live events from anywhere — concerts,
                   shows, and exclusive sessions by your favorite artists.
                 </p>
@@ -174,7 +174,7 @@ export default function Landing() {
             <div className="tw:relative tw:flex-1 tw:w-full tw:flex tw:justify-center lg:tw:justify-end">
               <div
                 style={{ width: 1000 }}
-                className="tw:max-w-full sm:tw:max-w-3xl lg:tw:max-w-6xl tw:mx-auto lg:tw:mx-0 lg:tw:ml-64"
+                className="tw:max-w-full tw:sm:max-w-3xl lg:tw:max-w-6xl tw:mx-auto lg:tw:mx-0 lg:tw:ml-64"
               >
                 <img
                   src="/images/landingHero.png"
