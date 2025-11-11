@@ -10,6 +10,7 @@ import "./assets/css/style.css";
 import "./style.css";
 import "./styles/tailwind.css"; 
 
+
 import { AuthProvider, useAuth } from "./pages/auth/AuthContext/index.jsx";
 import { HelmetProvider } from "react-helmet-async";
 import { ModalProvider } from "./component/assets/ModalContext/index.jsx";

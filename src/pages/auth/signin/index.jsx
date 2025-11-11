@@ -30,7 +30,7 @@ export function Signin() {
 
   const isCredentialFilled = loginMethod === 'phone'
     ? formData.phone && isValidPhoneNumber(formData.phone)
-    : formData.email && /^\w+@\w+\.\w{2,}$/.test(formData.email);
+    : formData.email && /^[\w.]+@\w+\.\w{2,}$/.test(formData.email);
   const isPasswordFilled = formData.password.length >= 6;
 
   const containerVariants = {

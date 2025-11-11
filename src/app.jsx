@@ -49,6 +49,7 @@ import Support from "./pages/support/index.jsx";
 import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
+import ZagasmLanding from "./pages/LandingPage/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -79,7 +80,7 @@ export function App() {
       <ToastContainer />
       <NetworkStatus />
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<ZagasmLanding />} />
         <Route path="/support" element={<Support />} />
         <Route path="/marketing" element={<Marketing />} />
         <Route path="/data-protection" element={<DataProtectionPage />} />
