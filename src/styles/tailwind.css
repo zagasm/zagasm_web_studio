@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Just+Another+Hand&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Just+Another+Hand&display=swap");
 
 @import "tailwindcss" prefix(tw);
 
@@ -8,9 +8,41 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
-  --color-primary: #8F07E7; 
-  --color-lightPurple: #F4E6FD; 
-  --color-primarySecond: #C115B5; 
+  --color-primary: #8f07e7;
+  --color-lightPurple: #f4e6fd;
+  --color-primarySecond: #c115b5;
   --font-sans: "Geist", sans-serif;
   --font-cursive: "Just Another Hand", cursive;
+}
+:root {
+  font-family: var(--font-sans);
+}
+
+/* Scoped, safe reset */
+[data-tw-reset] {
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+[data-tw-reset] ul,
+[data-tw-reset] ol,
+[data-tw-reset] nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-tw-reset] a {
+  text-decoration: none;
+  color: inherit;
+}
+[data-tw-reset] button {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+[data-tw-reset] img,
+[data-tw-reset] svg {
+  display: block;
 }
