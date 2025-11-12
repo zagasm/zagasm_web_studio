@@ -10,7 +10,9 @@ export default function ProfileHeader({ user }) {
 
   const navigate = useNavigate();
 
-  const handleEditClick = () => {};
+  const handleEditClick = () => {
+    navigate("/profile/edit-profile");
+  };
 
   return (
     <div className="tw:mt-24 tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full">

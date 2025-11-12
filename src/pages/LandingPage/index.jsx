@@ -19,22 +19,24 @@ export default function ZagasmLanding() {
       <main className="tw:relative tw:z-10 tw:mt-10 tw:md:mt-20">
         <Hero />
         <AutomationSection
-          title="Let Zagasm do the busywork"
-          subtitle="Record once. Auto-clip best moments, route RTMP to every platform, and log highlights to your CRM without leaving the player."
-          ctaTo="/signup"
+          title="Stream once. Zagasm does the rest"
+          subtitle="Hit Go Live—Zagasm auto-clips verticals, adds captions & chapters, multistreams via RTMP to every platform, and logs your best moments to the CRM in real time."
+          ctaTo="/auth/signup"
           ctaLabel="Start automating free"
           mediaSrc="/images/zagasm-automation.svg"
-          mediaAlt="Automation workflow preview"
+          mediaAlt="Auto-clip, multistream, and CRM logging powered by Zagasm"
         />
+
         <AutomationSection
-          title="Let Zagasm do the busywork"
-          subtitle="Record once. Auto-clip best moments, route RTMP to every platform, and log highlights to your CRM without leaving the player."
-          ctaTo="/signup"
+          title="Turn live moments into momentum"
+          subtitle="Queue replays, publish highlight cards, syndicate everywhere, and track conversions—without leaving the player. Less busywork, more impact."
+          ctaTo="/auth/signup"
           ctaLabel="Start automating free"
           mediaSrc="/images/cards.png"
-          mediaAlt="Automation workflow preview"
+          mediaAlt="Highlight cards, replays, and cross-posting automation"
           right
         />
+
         <ThreeStepSection />
         <Footer />
       </main>

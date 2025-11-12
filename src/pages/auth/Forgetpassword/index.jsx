@@ -123,12 +123,12 @@ export function ForgetPassword() {
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
-            className="form-group"
+            className="form-group tw:mb-3"
           >
             <div className="position-relative icon-form-control">
               <input
                 type="email"
-                className="form-control input"
+                className="tw:w-full input"
                 placeholder="Enter your email"
                 style={{ paddingLeft: "60px", outline: "none" }}
                 autoComplete="off"

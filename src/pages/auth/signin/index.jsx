@@ -304,7 +304,8 @@ export function Signin() {
                   type="email"
                   id="email"
                   name="email"
-                  className={`form-control input ${errors.email ? 'is-invalid' : ''}`}
+                  
+                  className={`tw:w-full tw:pl-8 tw:pr-6 tw:py-4 tw:rounded-lg tw:border tw:border-gray-200 ${errors.email ? 'is-invalid' : ''}`}
                   // style={{
                   //   paddingLeft: "45px",
                   //   height: "40px",
@@ -346,7 +347,7 @@ export function Signin() {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
-                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                  className={`tw:w-full tw:pl-2 tw:pr-6 tw:py-4 tw:rounded-lg tw:border tw:border-gray-200 ${errors.password ? 'is-invalid' : ''}`}
                   style={{
                     paddingLeft: "45px",
                     paddingRight: "45px",

@@ -1,65 +1,95 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './singleNotification.css';
 
-function SingleNotificationTemplate() {
-    const [isMobile, setIsMobile] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const fullText = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Et architecto quae laborum ipsum cum voluptatem ducimus autem quibusdam, nam blanditiis accusantium aperiam repudiandae sequi est quo tenetur omnis laboriosam ratione.";
-    const previewText = fullText.substring(0, 100) + '...';
+/**
+ * Props:
+ * - notification: {
+ *     id, message, data, read_at, read_at_human, created_at, time_ago
+ *   }
+ * - onClick: () => void   // mark as read (container click)
+ * - onDelete: () => void  // opens confirm modal
+ */
+function SingleNotificationTemplate({ notification, onClick, onDelete }) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-    useEffect(() => {
-        const checkIfMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
+  // Prefer actionable text from data.action; else stringify message
+  const fullText = notification?.data?.action
+    || (notification?.message ? JSON.stringify(notification.message) : 'Notification');
 
-        // Check on mount
-        checkIfMobile();
+  const previewText = fullText.length > 100 ? (fullText.substring(0, 100) + '…') : fullText;
 
-        // Add event listener for window resize
-        window.addEventListener('resize', checkIfMobile);
+  useEffect(() => {
+    const checkIfMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
 
-        // Cleanup
-        return () => window.removeEventListener('resize', checkIfMobile);
-    }, []);
+  const toggleExpand = (e) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
 
-    const toggleExpand = () => {
-        setIsExpanded(!isExpanded);
-    };
+  const isUnread = !notification?.read_at;
 
-    return (
-        <div className="noty_container shadow-sm p-2 mb-3">
-            <div className="d-flex align-items-center osahan-post-header noty_info">
-                <div className="dropdown-list-image mr-2 position-relativ">
-                    <img 
-                        className='organizer_image' 
-                        style={{ borderRadius: '50%' }} 
-                        src={'https://randomuser.me/api/portraits/men/28.jpg'} 
-                        alt="Profile" 
-                    />
-                </div>
-                <div className="font-weight-bold">
-                    <b>Kevin Bae</b>
-                    <p>
-                        <small>
-                            {isMobile && !isExpanded ? previewText : fullText}
-                            {isMobile && (
-                                <button 
-                                    onClick={toggleExpand}
-                                    className="read-more-btn"
-                                >
-                                    {isExpanded ? ' Read Less' : ' Read More'}
-                                </button>
-                            )}
-                        </small>
-                    </p>
-                </div>
+  return (
+    <div
+      className="noty_container shadow-sm p-2 mb-3"
+      onClick={onClick}
+      role="button"
+      style={{
+        cursor: 'pointer',
+        // small visual hint for unread without tailwind restyle:
+        borderLeft: isUnread ? '3px solid #8F07E7' : '3px solid transparent'
+      }}
+    >
+      <div className="d-flex align-items-center osahan-post-header noty_info">
+        {/* Removed random user image as requested */}
+        <div className="font-weight-bold w-100">
+          {/* Top line: a simple title from message.reference if present */}
+          {notification?.message?.reference && (
+            <div className="mb-1">
+              <b>{notification.message.reference}</b>
             </div>
-            <ul className="right_interval_indicator pb-1">
-                <li><span>Dec 12, 2025</span></li>
-                <li className='indicator'></li>
-            </ul>
+          )}
+
+          <p className="mb-1">
+            <small>
+              {isMobile && !isExpanded ? previewText : fullText}
+              {isMobile && fullText.length > 100 && (
+                <button
+                  onClick={toggleExpand}
+                  className="read-more-btn"
+                  style={{ border: 'none', background: 'transparent', color: '#8F07E7' }}
+                >
+                  {isExpanded ? ' Read Less' : ' Read More'}
+                </button>
+              )}
+            </small>
+          </p>
+
+          {/* Meta row: time + unread dot + delete icon */}
+          <ul className="right_interval_indicator pb-1 d-flex align-items-center">
+            <li><span>{notification?.time_ago || notification?.created_at}</span></li>
+            <li className='indicator' />
+            {/* delete button */}
+            <li className="ms-auto">
+              <button
+                type="button"
+                aria-label="Delete notification"
+                onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
+                className="btn btn-sm btn-link text-danger p-0"
+                title="Delete"
+              >
+                &#10005;
+              </button>
+            </li>
+          </ul>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default SingleNotificationTemplate;
