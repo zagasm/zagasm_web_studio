@@ -41,7 +41,7 @@ function SideBarNav() {
                         </li>
                     </Link>
                     <Link to="/tickets">
-                        <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/template') ? 'active' : ''}`}>
+                        <li className={`list-group-item pl-3 pr-3 d-flex align-items-center ${isActive('/tickets') ? 'active' : ''}`}>
                             <img src={template_icon} alt="Template" />
                             <span className="link_name">Tickets</span>
                         </li>

@@ -28,9 +28,9 @@ function MobileNav() {
         },
         {
             name: 'Tickets',
-            to: '#',
+            to: '/tickets',
             icon: template_icon,
-            active: false
+            active: currentPath === '/tickets'
         },
         {
             name: 'Account',
