@@ -15,7 +15,7 @@ export default function Nav() {
           <motion.img
             src="/images/logo.png"
             alt="Zagasm Studios"
-            className="tw:w-24 tw:rounded-sm"
+            className="tw:w-52 tw:rounded-sm"
             initial={{ rotate: -6, scale: 0.9, opacity: 0 }}
             animate={{ rotate: 0, scale: 1, opacity: 1 }}
             transition={{

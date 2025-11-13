@@ -35,19 +35,18 @@ function AuthContainer({
           <div className="row justify-content-center align-items-center d-flex align-center  inner_form_con">
             <div className="col-xl-3 col-lg-7 col-md-6  col form_container ">
               <div className="osahan-login ">
-                <div className="text-center mb-4 pr-4 pl-4">
+                <div className="text-center pr-4 pl-4">
                   <p
                     style={{
                       display: "flex",
                       justifyContent: "center",
-                      marginBottom: "50px",
                     }}
                   >
                     <a href="#">
                       <img
                         style={{
-                          width: 120,
-                          height: 120,
+                          width: 240,
+                          height: 240,
                         }}
                         src={"/images/logo.png"}
                         className="zagasm_logo"
@@ -96,7 +95,10 @@ function AuthContainer({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.9, ease: "easeOut" }}
                             type="button"
-                            className=" btn-sm api_btn btn-block"
+                            style={{
+                              borderRadius: 19
+                            }}
+                            className=" tw:w-full tw:flex tw:items-center tw:justify-center tw:md:gap-1 tw:py-4 tw:border tw:border-gray-100 tw:rounded-xl "
                           >
                             <img
                               src={googleLogo}

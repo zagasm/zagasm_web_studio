@@ -50,6 +50,7 @@ import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
 import ZagasmLanding from "./pages/LandingPage/index.jsx";
+import TicketsPage from "./pages/tickets/TicketsPage.jsx";
 
 const MainLayout = () => (
   <>
@@ -110,6 +111,7 @@ export function App() {
               <Route path="edit-profile" element={<EditProfile />} />
               <Route path="edit-password" element={<EditPassword />} />
             </Route>
+            <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="select-event-type" element={<EventType />} />

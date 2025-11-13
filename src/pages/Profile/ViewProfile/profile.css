@@ -5,8 +5,8 @@
 }
 @media (min-width: 1440px) and (max-width: 2560px) {
     .profile{
-        margin-left: 20rem;
-        max-width: 60rem;
+        margin-left: 40rem;
+        max-width: 80rem;
         margin-left: auto;
         margin-right: auto;
     }
@@ -14,7 +14,7 @@
 @media (min-width: 2560px) and (max-width: 5000px) {
     .profile{
         margin-left: 20rem;
-        max-width: 100rem;
+        max-width: 120rem;
         margin-left: auto;
         margin-right: auto;
     }

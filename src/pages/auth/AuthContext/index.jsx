@@ -1,26 +1,48 @@
+// pages/auth/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  /** persist helpers */
+  const persist = (u, t) => {
+    if (u) localStorage.setItem("userdata", JSON.stringify(u));
+    if (t) localStorage.setItem("token", t);
+  };
+
   useEffect(() => {
-    const user = localStorage.getItem("userdata");
-    const token = localStorage.getItem("token");
-    if (user && token) {
-      setUser(JSON.parse(user));
-      setToken(token);
+    const u = localStorage.getItem("userdata");
+    const t = localStorage.getItem("token");
+    if (u && t) {
+      setUser(JSON.parse(u));
+      setToken(t);
     }
     setIsLoading(false);
   }, []);
 
-  const login = (userData) => {
-    setUser(userData.user);
-    setToken(userData.token);
-    localStorage.setItem("userdata", JSON.stringify(userData.user));
-    localStorage.setItem("token", userData.token); // Optional
+  /** Login (full replace) */
+  const login = ({ user: u, token: t }) => {
+    setUser(u);
+    setToken(t);
+    persist(u, t);
+  };
+
+  /** Update only token and/or user (used after password change, profile edits, etc.) */
+  const setAuth = ({ user: u, token: t }) => {
+    if (typeof t !== "undefined") {
+      setToken(t);
+      if (t) localStorage.setItem("token", t);
+      else localStorage.removeItem("token");
+    }
+    if (typeof u !== "undefined") {
+      setUser(u);
+      if (u) localStorage.setItem("userdata", JSON.stringify(u));
+      else localStorage.removeItem("userdata");
+    }
   };
 
   const logout = () => {
@@ -30,9 +52,21 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
-  const isAuthenticated = !user;
+  /** BUGFIX: this should be true when we HAVE a token/user */
+  const isAuthenticated = !!token; // or !!user
+
   return (
-    <AuthContext.Provider value={{ user,token, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated,
+        isLoading,
+        login,
+        logout,
+        setAuth,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

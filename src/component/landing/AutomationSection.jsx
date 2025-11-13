@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 export default function AutomationSection({
   title = "Save 4+ hours every day",
   subtitle = "Let our intelligent automation tools handle repetitive tasks, so you can reclaim your time and focus on strategic initiatives.",
-  ctaTo = "/signup",
+  ctaTo = "/auth/signup",
   ctaLabel = "Get Started for Free",
   mediaSrc,
   mediaAlt = "Automation preview",

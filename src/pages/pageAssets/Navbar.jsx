@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/zagasm_studio_logo.png';
 import bell_icon from '../../assets/navbar_icons/Bell.png';
 import Edit_icon from '../../assets/navbar_icons/Edit_icon.png';
@@ -24,6 +24,8 @@ const Navbar = () => {
 
     const displayFirstName = truncateName(user.firstName);
     const displayLastName = truncateName(user.lastName);
+
+    const navigate = useNavigate();
 
     return (
         <>
@@ -90,8 +92,8 @@ const Navbar = () => {
                                 <img className="nav_icon_img img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
                                 <img src={bar} alt="notification icon" />
                             </button>
-                            <div style={{ border: 'none' }} className="dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end border-none">
-                                <div className="px-3 d-flex align-items-center">
+                            <div style={{ border: 'none', paddingTop: '1rem', paddingBottom: '1rem' }} className=" dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end border-none">
+                                <div onClick={() => navigate(`/profile/${user.id}`)} className=" tw:hover:bg-lightPurple tw:pt-4 tw:cursor-pointer px-3 d-flex align-items-center">
                                     <div className="dropdown-list-image">
                                         <img className="rounded-circle nav_icon_img" src={Default_user_image} alt="User" />
                                     </div>

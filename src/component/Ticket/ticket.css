@@ -1,0 +1,45 @@
+.ticket-card {
+  position: relative;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  overflow: hidden;
+}
+
+.ticket-card__body {
+  padding: 18px 20px;
+}
+
+.ticket-card__tear {
+  position: relative;
+  width: 72px;
+  background: #f3f4f6;
+}
+
+.ticket-card__tear::before,
+.ticket-card__tear::after {
+  content: "";
+  position: absolute;
+  left: -18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+.ticket-card__tear::before {
+  top: -18px;
+}
+
+.ticket-card__tear::after {
+  bottom: -18px;
+}
+
+.ticket-card__dots {
+  width: 2px;
+  height: 70%;
+  background-image: radial-gradient(circle, #d1d5db 2px, transparent 2px);
+  background-size: 2px 8px;
+  background-repeat: repeat-y;
+}

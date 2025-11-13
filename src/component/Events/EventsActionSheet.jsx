@@ -40,7 +40,12 @@ const CHANNEL_ICON = {
   copy_link: null, // we'll render an inline icon for this
 };
 
-export default function EventActionsSheet({ open, onClose, event = {} }) {
+export default function EventActionsSheet({
+  open,
+  onClose,
+  event = {},
+  onEventReported,
+}) {
   const { token: ctxToken } = useAuth();
   const token =
     ctxToken ||
@@ -139,7 +144,9 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
     try {
       const origin = window?.location?.origin || "";
       const fullLink =
-        ch?.type === "internal" ? `https://studios.zagasm.com/event/share` : ch?.link;
+        ch?.type === "internal"
+          ? `https://studios.zagasm.com/event/share`
+          : ch?.link;
 
       if (ch?.key === "copy_link") {
         navigator.clipboard.writeText(fullLink);
@@ -176,7 +183,14 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
           error: "Could not submit report.",
         }
       );
+
       setReporting(false);
+
+      if (onEventReported && event.id) {
+        onEventReported(event.id);
+      }
+
+      // Close sheet
       onClose();
     } finally {
       setBusy(false);
@@ -256,7 +270,9 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
                     )}
 
                     <div>
-                      <span className="tw:text-base tw:font-medium tw:first-letter:uppercase">{hostName}</span>
+                      <span className="tw:text-base tw:font-medium tw:first-letter:uppercase">
+                        {hostName}
+                      </span>
                     </div>
                   </div>
                   <button
@@ -415,11 +431,11 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
                       </button>
                     </div>
 
-                    <div className="tw:max-h-56 tw:overflow-y-auto tw:space-y-2">
+                    <div className="tw:max-h-56 tw:overflow-y-auto tw:space-y-2 tw:space-x-2">
                       {REASONS.map((r) => (
                         <label
                           key={r}
-                          className={`tw:flex tw:items-center tw:gap-3 tw:p-3 tw:border tw:rounded-xl ${
+                          className={`tw:flex tw:items-center tw:gap-3 tw:p-2 tw:border tw:rounded-xl ${
                             selectedReason === r
                               ? "tw:border-primary tw:bg-lightPurple/50"
                               : "tw:border-gray-100"
@@ -432,7 +448,7 @@ export default function EventActionsSheet({ open, onClose, event = {} }) {
                             checked={selectedReason === r}
                             onChange={() => setSelectedReason(r)}
                           />
-                          <span className="tw:text-sm">{r}</span>
+                          <span className="tw:text-sm tw:ml-1.5">{r}</span>
                         </label>
                       ))}
                     </div>

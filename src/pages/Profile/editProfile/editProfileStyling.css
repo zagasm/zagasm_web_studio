@@ -1,177 +1,54 @@
-.edit_form_container {
-    margin-bottom: 100px;
+/* ===== Page background ===== */
+.page_wrapper {
+  background: #f8f9fb;
+  min-height: 100vh;
 }
 
-.edit_heading_section {
-    box-shadow: none;
-    /* width: 20px; */
-    width: 100%;
+/* ===== Form control resets to avoid Bootstrap fighting Tailwind look ===== */
+.form-control {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  height: auto !important;
 }
 
-.edit_heading_section .profle_img_container {
-    width: 100%;
-
-}
-
-/* Email input with icon */
-.email-input-group {
-    position: relative;
-}
-
-.profile_img_info {
-    /* margin-top: 30px; */
-    position: relative;
-
-}
-
-.editdetails_display {
-    width: 100%;
-    height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 7px 15px -3px rgba(97, 96, 96, 0.1), 0 4px 6px -2px rgba(151, 149, 149, 0.05);
-    border-radius: 20px;
-
-}
-
-.profile_img_info label {
-    background: none;
-    padding: 8px;
-    border-radius: 20px;
-    border: 1px solid rgb(202, 198, 198);
-    position: absolute;
-    bottom: 0px;
-    width: 150px;
-    /* height: 40px; */
-    text-align: center;
-    cursor: pointer;
-}
-
-.input-with-icon {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.input-icon {
-    position: absolute;
-    left: 12px;
-    color: #6c757d;
-    z-index: 10;
-}
-
-.email-input-group .form-control {
-    padding-left: 40px;
-}
-
-/* Phone input styling */
+/* ===== PhoneInput tidy to blend with card ===== */
 .phone-input {
-    /* padding: 8px 12px; */
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Geist, sans-serif;
 }
-
 .PhoneInputInput {
-    border: none;
-    outline: none;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+.PhoneInputCountry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  background: #f4f5f7;
 }
 
-.phone-input:focus {
-    border-color: #80bdff;
-    outline: 0;
-    /* box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); */
+/* Keep Bootstrap link color neutral inside card */
+a { text-decoration: none; }
+
+/* Optional: soften scrollbars on desktop */
+@media (hover: hover) {
+  .tw\\:overflow-y-auto::-webkit-scrollbar,
+  .feed-scroll::-webkit-scrollbar {
+    height: 8px; width: 8px;
+  }
+  .tw\\:overflow-y-auto::-webkit-scrollbar-thumb,
+  .feed-scroll::-webkit-scrollbar-thumb {
+    background: #e5e7eb; border-radius: 999px;
+  }
 }
 
-/* Existing styles */
-.profle_img {
-    width: 150px;
-    margin: auto;
-}
-
-.profle_img img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 20px;
-}
-
-.edit_form_container {
-    background: #fff;
-    border-radius: 8px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-control {
-    height: 40px;
-    border-radius: 4px;
-}
-
-.form-control {
-    height: 45px;
-}
-
-.password_tab {
-    border-bottom: 1px solid rgb(226, 221, 221);
-    padding-bottom: 10px;
-    margin-top: 30px;
-}
-
-.password_tab a {
-    color: black;
-}
-
-.profile_update_btn {
-    border: none;
-    padding: 10px 15px;
-    border-radius: 30px;
-    color: white;
-    background-color: rgba(143, 7, 231, 1);
-}
-
-.edit_update_picture {
-    display: block;
-    text-align: center;
-    margin: 10px
-        /* font-family: 'Montserrat'; */
-}
-
-.edit_update_picture .upload_pix {
-    background-color: rgba(242, 242, 242, 1);
-    padding: 5px 10px;
-    font-size: 12px;
-    cursor: pointer;
-}
-
-.edit_update_picture .upload_pix:hover {
-    background-color: rgba(34, 33, 33, 0.562);
-    color: white;
-    transition: 0.3s;
-}
-
-@media (max-width: 959px) {
-    .edit_form_container {
-        padding: 10px;
-    }
-
-    .edit_heading_section .profle_img_container {
-        justify-content: center;
-        display: block;
-        width: 100%;
-    }
-
-    .edit_heading_section .profle_img_container .profle_img {
-        display: block;
-        margin: auto;
-    }
-
-    .profle_img_container .profile_img_info {
-        display: none;
-    }
-
-
-}

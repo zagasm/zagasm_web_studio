@@ -63,6 +63,54 @@ export default function EventTemplate({
   } = usePaginatedEvents(endpoint);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const cacheKey = React.useMemo(
+    () => `zagasm_events_cache_${endpoint}`,
+    [endpoint]
+  );
+
+  const [visibleEvents, setVisibleEvents] = useState([]);
+
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.events)) {
+        setVisibleEvents(parsed.events);
+      }
+    } catch (err) {
+      console.error("Failed to read events cache", err);
+    }
+  }, [cacheKey]);
+
+  React.useEffect(() => {
+    if (!events || events.length === 0) return;
+    setVisibleEvents(events);
+  }, [events]);
+
+  React.useEffect(() => {
+    if (!visibleEvents || visibleEvents.length === 0) return;
+    try {
+      const payload = { events: visibleEvents, meta };
+      localStorage.setItem(cacheKey, JSON.stringify(payload));
+    } catch (err) {
+      console.error("Failed to write events cache", err);
+    }
+  }, [visibleEvents, meta, cacheKey]);
+
+  const handleEventReported = (eventId) => {
+    setVisibleEvents((prev) => {
+      const updated = prev.filter((ev) => ev.id !== eventId);
+      try {
+        const payload = { events: updated, meta };
+        localStorage.setItem(cacheKey, JSON.stringify(payload));
+      } catch (err) {
+        console.error("Failed to write events cache after report", err);
+      }
+      return updated;
+    });
+  };
+
   // intersection observer sentinel
   const { ref: loadMoreRef, inView } = useInView({ rootMargin: "300px" });
 
@@ -74,16 +122,20 @@ export default function EventTemplate({
 
   return (
     <>
-      <div style={{
-        margin: '0 0'
-      }} className="row tw:mx-0">
+      <div
+        style={{
+          margin: "0 0",
+        }}
+        className="row tw:mx-0"
+      >
         {loading &&
+          visibleEvents.length === 0 &&
           Array.from({ length: 8 }).map((_, i) => (
             <EventShimmer key={`s-${i}`} />
           ))}
 
         {!loading &&
-          events.map((event) => (
+          visibleEvents.map((event) => (
             <div
               key={event.id}
               className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4"
@@ -142,7 +194,9 @@ export default function EventTemplate({
                       </small>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <span className="tw:text-lg tw:font-bold tw:md:text-sm">{priceText(event)}</span>
+                      <span className="tw:text-lg tw:font-bold tw:md:text-sm">
+                        {priceText(event)}
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -169,12 +223,12 @@ export default function EventTemplate({
       )}
 
       {/* end state */}
-      {!loading && events.length === 0 && (
+      {!loading && visibleEvents.length === 0 && (
         <div className="text-center mt-3">
           <span>No events available</span>
         </div>
       )}
-      {!loading && isDone && events.length > 0 && (
+      {!loading && isDone && visibleEvents.length > 0 && (
         <div className="text-center mt-3 mb-4 text-muted">
           You’ve reached the end of all events
         </div>
@@ -185,6 +239,7 @@ export default function EventTemplate({
         open={!!selectedEvent}
         onClose={() => setSelectedEvent(null)}
         event={selectedEvent}
+        onEventReported={handleEventReported}
       />
     </>
   );

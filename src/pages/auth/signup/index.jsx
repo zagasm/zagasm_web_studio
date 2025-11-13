@@ -143,7 +143,7 @@ export function SignUp() {
           last_name: formData.last_name,
           phone: phoneWithoutCountryCode,
           password: formData.password,
-          country_code: formData.country_code
+          country_code_one: formData.country_code
         };
       }
 
@@ -219,7 +219,7 @@ export function SignUp() {
                   id="fName"
                   type="text"
                   name="first_name"
-                  className="form-control input"
+                  className="tw:w-full input"
                   style={{ paddingLeft: "50px" }}
                   placeholder="First Name"
                   value={formData.first_name}
@@ -244,7 +244,7 @@ export function SignUp() {
                   id="lName"
                   type="text"
                   name="last_name"
-                  className="form-control input"
+                  className="tw:w-full input"
                   style={{ paddingLeft: "50px" }}
                   placeholder="Last Name"
                   value={formData.last_name}
@@ -304,7 +304,7 @@ export function SignUp() {
                 id="email"
                 type="email"
                 name="email"
-                className="form-control input"
+                className="tw:w-full input"
                 style={{ paddingLeft: "50px" }}
                 placeholder="Email Address"
                 value={formData.email}
@@ -343,7 +343,7 @@ export function SignUp() {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              className="form-control input"
+              className="tw:w-full input"
               style={{ paddingLeft: "40px", paddingRight: "40px" }}
               placeholder="Password"
               value={formData.password}
