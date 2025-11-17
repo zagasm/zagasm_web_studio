@@ -1,103 +1,99 @@
-import React, { useState } from "react";
-import SideBarNav from "../pageAssets/SideBarNav";
-import live_camera from "../../assets/navbar_icons/solar_stream-broken.svg";
-import "./Homestyle.css";
-import RightBarComponent from "../../component/RightBarComponent";
+// src/page/Home/Home.jsx
+import React, { useState, useEffect, useRef } from "react";
 import EventTemplate from "../../component/Events/SingleEvent";
-import SuggestedOrganizer from "../../component/Suggested_organizer/suggestedOrganizer";
 import MobileSingleOrganizers from "../../component/Organizers/ForMobile";
-import { Link } from "react-router-dom";
 import SEO from "../../component/SEO";
-import { OrganizationStructuredData } from "../../component/SEO/StructuredData";
+import { Link } from "react-router-dom";
+import "./Homestyle.css";
 
-function Home() {
-  const [activeTab, setActiveTab] = useState("ForYou");
+export default function Home() {
+  const [activeTab, setActiveTab] = useState("upcoming");
+  const [showOrganizers, setShowOrganizers] = useState(false);
+  const eventsScrollRef = useRef(null);
 
-  const ENDPOINTS = {
-    ForYou: "/api/v1/events",
-    Live: "/api/v1/events/view/live",
+  useEffect(() => {
+    const area = eventsScrollRef.current;
+    if (!area) return;
+
+    const onScroll = () => {
+      if (area.scrollTop > 200) setShowOrganizers(true);
+    };
+
+    area.addEventListener("scroll", onScroll);
+    return () => area.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleTabChange = (tab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+
+    if (eventsScrollRef.current) {
+      eventsScrollRef.current.scrollTop = 0;
+    }
+
+    setShowOrganizers(false);
   };
 
   return (
     <>
-      <SEO
-        title="Home - Discover Amazing Events"
-        description="Explore trending events, connect with top organizers, and discover entertainment at Zagasm Studios. Find concerts, parties, festivals, and more in your area."
-        keywords="zagasm studios, events near me, discover events, trending events, concert tickets, party events, entertainment, live shows, event discovery, event platform"
-      />
-      <OrganizationStructuredData />
+      <SEO title="Discover Events - Zagasm Studios" />
 
-      <div className="container-flui m-0 p-0">
-        <SideBarNav />
+      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-6 tw:md:pt-24 tw:lg:px-4">
+        {/* TABS */}
+        <div className="tw:flex tw:gap-3 tw:mb-6 tw:ml-2">
+          <button
+            onClick={() => handleTabChange("live")}
+            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
+              activeTab === "live"
+                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+                : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
+            }`}
+          >
+            Live Events
+          </button>
 
-        {/* Page wrapper is now a locked viewport area (no window scroll) */}
-        <div className="page_wrapper with-fixed-nav">
-          <div className="row p-0 h-100 ">
-            {/* Main feed column */}
-            <div className="col d-flex flex-column h-100">
-              {/* Local scroll shell that owns its own scroll */}
-              <div className="scroll-shell">
-                {/* Sticky tab holder INSIDE the scroll area */}
-                <div className="heading_tab_sticky tw:md:pt-4">
-                  <div className="shadow-s mb-0 p-0">
-                    <div className="heading_tab_container">
-                      <button
-                        className={`tab ${
-                          activeTab === "ForYou" ? "active" : ""
-                        }`}
-                        onClick={() => setActiveTab("ForYou")}
-                      >
-                        For You
-                      </button>
+          <button
+            onClick={() => handleTabChange("upcoming")}
+            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
+              activeTab === "upcoming"
+                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+                : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
+            }`}
+          >
+            Upcoming Events
+          </button>
+        </div>
 
-                      <button
-                        className={`tab tw:flex tw:gap-2 ${
-                          activeTab === "Live" ? "active" : ""
-                        }`}
-                        onClick={() => setActiveTab("Live")}
-                        style={{ color: "red" }}
-                      >
-                        <span>Live</span>
-                        <img src={live_camera} alt="" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+        {/* SCROLL AREA */}
+        <div
+          ref={eventsScrollRef}
+          className="tw:h-[calc(100vh-120px)] tw:overflow-y-auto tw-no-scrollbar tw:pr-1 tw:pb-20"
+        >
+          <EventTemplate
+            endpoint={
+              activeTab === "live"
+                ? "/api/v1/events/view/live"
+                : "/api/v1/events"
+            }
+            live={activeTab === "live"}
+            upcoming={activeTab === "upcoming"}
+          />
 
-                {/* Scrollable feed content */}
-                <div className="feed-scroll">
-                  <div className="col mobile_organizer">
-                    <div className="d-flex justify-content-between p-1">
-                      <small>
-                        <b>Organizers you may know</b>
-                      </small>
-                      <Link to={"/organizers"}>View all</Link>
-                    </div>
-                    <MobileSingleOrganizers />
-                  </div>
-
-                  {activeTab === "ForYou" ? (
-                    <div className="row">
-                      <EventTemplate endpoint={ENDPOINTS.ForYou} />
-                    </div>
-                  ) : (
-                    <div className="row">
-                      <EventTemplate endpoint={ENDPOINTS.Live} live />
-                    </div>
-                  )}
-                </div>
+          {showOrganizers && (
+            <div className="tw:mt-12">
+              <div className="tw:flex tw:justify-between tw:px-2 tw:mb-3">
+                <small className="tw:font-semibold">
+                  Organizers you may know
+                </small>
+                <Link to="/organizers" className="tw:text-sm tw:text-black">
+                  View all
+                </Link>
               </div>
+              <MobileSingleOrganizers />
             </div>
-
-            {/* Right bar remains beside; it won’t scroll the window */}
-            <RightBarComponent>
-              <SuggestedOrganizer />
-            </RightBarComponent>
-          </div>
+          )}
         </div>
       </div>
     </>
   );
 }
-
-export default Home;

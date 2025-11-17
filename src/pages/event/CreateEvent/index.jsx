@@ -13,9 +13,8 @@ function CreateEvent() {
                 description="Create and manage your events with Zagasm Studios. Set up concerts, parties, festivals, conferences, and more with our easy-to-use event creation platform. Sell tickets and manage attendees."
                 keywords="zagasm studios, create event, host event, event management, sell tickets, event hosting, organize concert, plan party, festival management, event ticketing platform"
             />
-            <div className="container-flui m-0 p-0">
-                <SideBarNav />
-                <div className="page_wrapper overflow-hidden">
+            <div className="">
+                <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
                     <div className="row p-0 mt-5 ">
                         <div className="col ">
                              <EventCreationWizard eventTypeId={eventTypeId} />

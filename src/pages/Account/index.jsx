@@ -77,9 +77,8 @@ function Account() {
 
   return (
     <Fragment>
-      <div className="container-flui m-0 p-0">
-        <SideBarNav />
-        <div className="page_wrapper overflow-hidden">
+      <div className="">
+        <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
           <div className="row p-0 ">
             <div className="col account_section ">
               <div className="row">

@@ -10,12 +10,9 @@ export default function ViewProfile() {
   const { user, loading, error } = useProfile();
 
   return (
-    <div className="row tw:md:gap-6 tw:lg:gap-6 tw:px-3 tw:md:px-6 tw:py-4">
-      <div className="col-md-1 col-lg-2 col-xl-2 tw:md:hidden tw:lg:block">
-        <SideBarNav />
-      </div>
+    <div className="tw:md:gap-6 tw:lg:gap-6 tw:px-2 tw:md:px-6 tw:py-4">
 
-      <div className="profile col-md-12 col-lg-10 col-xl-10 tw:lg:ml-30 col-lg-9 tw:space-y-4 tw:md:space-y-6">
+      <div className="profile tw:space-y-4 tw:md:space-y-6">
         {/* header */}
         {loading ? (
           <div className="tw:h-44 tw:md:h-56 tw:mt-24 tw:rounded-3xl tw:bg-gray-100 tw:animate-pulse" />

@@ -59,13 +59,12 @@ console.log('user', token);
     }
 
     return (
-        <div className="container-fluid m-0 p-0">
-            <SideBarNav />
-            <div className="page_wrapper overflow-hidden">
+        <div className="">
+            <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-6 tw:md:pt-24 tw:lg:px-4">
                 <div className="row p-0">
                     <div className="col">
                         <div className="container mt-5 pb-5 event_type_container">
-                            <>
+                            <div className="tw:max-w-7xl tw:mx-auto">
                                 <h5>What type of events are you creating?</h5>
                                 <small>This helps us customize your event setup.</small>
                                 <ul className="p-0 mt-3 col-xl-9  mb-5 pb-5">
@@ -86,7 +85,7 @@ console.log('user', token);
                                         </li>
                                     ))}
                                 </ul>
-                            </>
+                            </div>
 
                         </div>
                     </div>

@@ -1,124 +1,205 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/zagasm_studio_logo.png';
-import bell_icon from '../../assets/navbar_icons/Bell.png';
-import Edit_icon from '../../assets/navbar_icons/Edit_icon.png';
-import search_icon from '../../assets/navbar_icons/search_icon.png';
-import search from '../../assets/navbar_icons/search.svg';
-import Group from '../../assets/navbar_icons/Group.svg';
-import bar from '../../assets/navbar_icons/bar.svg';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  HomeIcon,
+  Heart,
+  PlusSquare,
+  User,
+  Search,
+  Bell,
+  Ticket,
+} from "lucide-react";
+import { useAuth } from "../auth/AuthContext";
+import MobileNav from "./MobileNav";
+import logo from "../../assets/zagasm_studio_logo.png";
+import default_profilePicture from "../../assets/avater_pix.avif";
 
-import default_profilePicture from '../../assets/avater_pix.avif';
-import MobileNav from './MobileNav';
-import { useAuth } from '../auth/AuthContext';
+export default function Navbar() {
+  const location = useLocation();
+  const { user } = useAuth();
 
-const Navbar = () => {
-    const { user, logout,token } = useAuth();
-    const Default_user_image = user.profileUrl != null ? user.profileUrl : default_profilePicture;
-//  console.log('Token___',token);
-    // Function to truncate name parts to max 10 characters
-    const truncateName = (name) => {
-        if (!name) return '';
-        return name.length > 10 ? name.slice(0, 10) + '...' : name;
-    };
+  const profile = user?.profileUrl || default_profilePicture;
+  const firstName = user?.firstName || "User";
 
-    const displayFirstName = truncateName(user.firstName);
-    const displayLastName = truncateName(user.lastName);
+  const nav = [
+    { name: "Home", to: "/feed", icon: HomeIcon },
+    { name: "Saved", to: "/event/saved-events", icon: Heart },
+    { name: "Create Event", to: "/event/select-event-type", icon: PlusSquare },
+    { name: "Tickets", to: "/tickets", icon: Ticket },
+    { name: "Account", to: "/account", icon: User },
+  ];
 
-    const navigate = useNavigate();
+  return (
+    <>
+      {/* DESKTOP NAV */}
+      <div className="tw:hidden tw:md:flex tw:w-full tw:h-[85px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-8 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
+        {/* LEFT SECTION */}
+        <div className="tw:flex tw:items-center tw:gap-6">
+          {/* Logo */}
+          <img
+            src={"/images/logo.png"}
+            alt="Zagasm Logo"
+            className="tw:w-[160px] tw:object-contain"
+          />
 
-    return (
-        <>
-            <MobileNav />
-            <nav className="navbar navbar-expand osahan-nav-top p-0 w-100 position-fixed" style={{ background: 'white' }}>
-                <div className="container-fluid p-3">
-                    <Link className="navbar-brand" to="/feed">
-                        <img style={{
-                            width: 120,
-                            height: 120,
-                            objectFit: 'contain'
-                        }}src={'/images/logo.png'} alt="Zagasm Logo" className="" />
-                    </Link>
+          {/* Hi Jessica */}
+          <div className="tw:flex tw:md:hidden tw:flex-col">
+            <h2 className="tw:text-[20px] tw:font-normal tw:text-gray-700">
+              Hi <span className="tw:font-bold">{firstName}</span> 👋
+            </h2>
+            <p className="tw:text-[14px] tw:text-gray-500 -tw:mt-1">
+              Manage your events & audience
+            </p>
+          </div>
+        </div>
 
-                    <form className="d-none d-sm-inline-block form-inline mr-auto my-2 my-md-0 mw-100 navbar-search nav_search"></form>
+        {/* CENTER NAV LINKS */}
+        <div className="tw:flex tw:gap-12 tw:mr-16">
+          {nav.map((item) => {
+            const active = location.pathname === item.to;
+            const Icon = item.icon;
 
-                    <ul className="navbar-nav middle_nav text-center">
-                        <li className="nav-item">
-                            <Link className="nav-link search_form" to="/explore">
-                                <span>Search for events, creators or genres...</span>
-                                <img src={search} alt="search icon" />
-                            </Link>
-                        </li>
-                        <li className="nav-item dropdown no-arrow mx- osahan-list-dropdown mr-5">
-                            <Link to={'/event/select-event-type'} className="nav-link dropdown-toggl create_post_btn shadow-sm p-3 text-light">
-                                <img src={Group} alt="notification icon" /> <span>Create Event</span>
-                            </Link>
-                        </li>
-                    </ul>
+            return (
+              <Link
+                key={item.name}
+                to={item.to}
+                className="tw:flex tw:flex-col tw:items-center tw:gap-1"
+              >
+                <Icon
+                  className={`tw:w-6 tw:h-6 ${
+                    active ? "tw:text-black" : "tw:text-gray-500"
+                  }`}
+                  fill={active ? "black" : "none"}
+                />
+                <span
+                  className={`tw:text-[13px] ${
+                    active
+                      ? "tw:text-black tw:font-semibold"
+                      : "tw:text-gray-500"
+                  }`}
+                >
+                  {item.name}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
 
-                    <ul className="navbar-nav ml-auto d-flex align-items-center">
-                        <li className="nav-item dropdown no-arrow mx-1 osahan-list-dropdown">
-                            <Link to={'/notification'} className="nav-link dropdown-toggle p-2">
-                                <img className='nav_icon_img' src={bell_icon} alt="notification icon" />
-                                <span
-                                    style={{
-                                        background: '#8F07E7',
-                                        fontWeight: '700',
-                                        fontSize: '9px',
-                                        height: "18px",
-                                        top: '5px',
-                                        left: '19px',
-                                        width: '18px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        paddingLeft: '1px'
-                                    }}
-                                    className="badge badge-counter m-0"
-                                >
-                                    0
-                                </span>
-                            </Link>
-                        </li>
+        {/* RIGHT ACTION ICONS */}
+        <div className="tw:flex tw:items-center tw:gap-8">
+          {/* Search */}
+          <Search className="tw:w-6 tw:h-6 tw:text-gray-700 tw:cursor-pointer" />
 
-                        <li className="nav-item dropdown no-arro0 mx-1 osahan-list-dropdown profile_link">
-                            <button
-                                style={{ borderRadius: '20px', padding: '0px 10px', marginLeft: '20px' }}
-                                className="nav-link dropdown-toggl shadow-sm"
-                                data-bs-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                            >
-                                <img className="nav_icon_img img-profile rounded-circle" src={Default_user_image} alt="User Profile" />
-                                <img src={bar} alt="notification icon" />
-                            </button>
-                            <div style={{ border: 'none', paddingTop: '1rem', paddingBottom: '1rem' }} className=" dropdown-list dropdown-menu dropdown-menu-left shadow-sm dropdown-menu dropdown-menu-end border-none">
-                                <div onClick={() => navigate(`/profile/${user.id}`)} className=" tw:hover:bg-lightPurple tw:pt-4 tw:cursor-pointer px-3 d-flex align-items-center">
-                                    <div className="dropdown-list-image">
-                                        <img className="rounded-circle nav_icon_img" src={Default_user_image} alt="User" />
-                                    </div>
-                                    <div className="font-weight-bold" style={{ marginTop: '-20px' }}>
-                                        <div className="text-truncate m-0 p-0" style={{ fontWeight: 'lighter' }}>
-                                            {displayFirstName} {displayLastName}
-                                        </div>
-                                    </div>
-                                </div>
-                                <Link style={{ border: 'none' }} className="dropdown-item border-bottom mb-3" to={"/account"}>
-                                    <i className="feather-settings mr-1"></i> Settings
-                                </Link>
-                                <Link style={{ border: 'none' }} className="dropdown-item border-bottom mb-3" to={"/profile/edit-profile"}>
-                                    <i className="feather-settings mr-1"></i> Edit profile
-                                </Link>
-                                <Link onClick={() => logout()} className="dropdown-item" style={{ border: 'none', color: 'red' }}>
-                                    <i className="feather-log-out mr-1"></i> Sign Out
-                                </Link>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </>
-    );
-};
+          {/* Bell + dot */}
+          <div className="tw:relative tw:cursor-pointer">
+            <Bell className="tw:w-6 tw:h-6 tw:text-gray-700" />
+            <span className="tw:absolute tw:-top-1 tw:-right-1 tw:w-3 tw:h-3 tw:bg-red-500 tw:rounded-full"></span>
+          </div>
 
-export default Navbar;
+          {/* Profile */}
+          <Link
+            to="/account"
+            className="tw:w-[42px] tw:h-[42px] tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
+          >
+            <img
+              src={profile}
+              className="tw:w-full tw:h-full tw:object-cover"
+              alt="Profile"
+            />
+          </Link>
+        </div>
+      </div>
+
+      <div className="tw:md:hidden">
+        <MobileHeader name={firstName} profile={profile} />
+      </div>
+
+      <MobileNav />
+    </>
+  );
+}
+
+function MobileHeader({ name = "Jessica", profile }) {
+  return (
+    <div
+      className="
+      tw:w-full tw:rounded-b-4xl 
+      tw:px-4 tw:pt-10 tw:pb-10
+      tw:bg-linear-to-br
+      tw:from-[#B07CFF] tw:via-[#8F07E7] tw:to-[#4A78FF]
+      tw:text-white
+    "
+    >
+      <div className="tw:flex tw:items-start tw:justify-between">
+        {/* LEFT: TEXT */}
+        <div>
+          <span className="tw:block tw:text-[20px] tw:leading-tight tw:font-light">
+            Hi <span className="tw:font-semibold">{name}</span> 👋
+          </span>
+
+          <span className="tw:text-[14px] tw:opacity-90 tw:mt-2">
+            Manage your events & audience
+          </span>
+        </div>
+
+        {/* RIGHT: ACTION ICONS */}
+        <div className="tw:flex tw:items-center tw:gap-[6.5px]">
+          {/* Search */}
+          <button
+          style={{
+            borderRadius: 50
+          }}
+            className="
+            tw:size-12
+            tw:rounded-full
+            tw:bg-white/20 tw:backdrop-blur-xl
+            tw:flex tw:items-center tw:justify-center
+            tw:border tw:border-white/20
+          "
+          >
+            <Search className="tw:w-4 tw:h-4 tw:text-white" />
+          </button>
+
+          {/* Bell */}
+          <button
+          style={{
+            borderRadius: 50
+          }}
+            className="
+            tw:size-12
+            tw:rounded-full
+            tw:bg-white/20 tw:backdrop-blur-xl
+            tw:flex tw:items-center tw:justify-center
+            tw:border tw:border-white/20
+            tw:relative
+          "
+          >
+            <Bell className="tw:w-4 tw:h-4 tw:text-white" />
+            <span
+              className="
+              tw:absolute tw:top-3 tw:right-3
+              tw:w-3.5 tw:h-3.5 tw:bg-red-500
+              tw:rounded-full
+            "
+            ></span>
+          </button>
+
+          {/* Profile */}
+          <div
+            className="
+            tw:size-12
+            tw:rounded-full tw:border-1 tw:border-white
+            tw:overflow-hidden
+          "
+          >
+            <img
+              src={profile}
+              alt="profile"
+              className="tw:w-full tw:h-full tw:object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

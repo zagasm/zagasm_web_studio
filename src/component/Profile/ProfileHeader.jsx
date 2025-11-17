@@ -15,7 +15,7 @@ export default function ProfileHeader({ user }) {
   };
 
   return (
-    <div className="tw:mt-24 tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full">
+    <div className="tw:md:mt-24 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-linear-to-b tw:from-primary tw:to-primary tw:text-white tw:w-full">
       <div onClick={handleEditClick}>
         <Edit size={25} className="tw:z-20 tw:absolute tw:right-4 tw:top-6" />
       </div>

@@ -1,6 +1,13 @@
 /* ===== General ===== */
 div a { color: #8000ff; }
 
+.tw-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.tw-no-scrollbar {
+  scrollbar-width: none;
+}
+
 .cursor-pointer { cursor: pointer; }
 .cursor-pointer:hover { opacity: 0.9; }
 
