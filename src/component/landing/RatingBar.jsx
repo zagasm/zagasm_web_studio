@@ -41,7 +41,7 @@ export default function RatingBar() {
         ))}
       </div>
       <motion.span
-        className="tw:opacity-80 tw:text-xs"
+        className="tw:opacity-80 tw:text-[8px] tw:md:text-xs"
         initial={{ opacity: 0, x: -6 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.25, duration: 0.35 }}

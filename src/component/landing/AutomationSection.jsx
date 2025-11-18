@@ -30,7 +30,7 @@ export default function AutomationSection({
   };
 
   return (
-    <section className="tw:relative tw:mt-24 tw:md:mt-56">
+    <section className="tw:relative tw:mt-24 tw:mb-44 tw:md:mt-56">
       {/* Section blur backdrops */}
       <div
         aria-hidden
@@ -63,7 +63,7 @@ export default function AutomationSection({
             </motion.div>
 
             <motion.span
-              className="tw:block tw:mb-4 tw:text-4xl tw:md:tw:text-5xl tw:lg:tw:text-6xl tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"
+              className="tw:block tw:mb-4 tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"
               variants={textVariants}
               custom={1}
             >
@@ -71,7 +71,7 @@ export default function AutomationSection({
             </motion.span>
 
             <motion.span
-              className="tw:block tw:text-gray-600 tw:text-sm tw:md:tw:text-lg tw:lg:tw:text-xl tw:mb-8 tw:max-w-[52ch]"
+              className="tw:block tw:text-gray-600 tw:text-sm tw:md:text-lg tw:lg:text-xl tw:mb-8 tw:max-w-[52ch]"
               variants={textVariants}
               custom={2}
             >

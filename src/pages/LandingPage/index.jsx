@@ -8,6 +8,9 @@ import AutomationSection from "../../component/landing/AutomationSection";
 import ThreeStepSection from "../../component/landing/ThreeStepSection";
 import SectionFooterCTA from "../../component/landing/SectionFooterCTA";
 import Footer from "../../component/landing/SectionFooterCTA";
+import ThreeSplineIcon from "../../component/landing/ThreeSplineIcon";
+import LiveHighlightsSection from "../../component/landing/LiveHighlightSection";
+import LivePipelineSection from "../../component/landing/LivePipelineSection";
 
 export default function ZagasmLanding() {
   return (
@@ -18,6 +21,7 @@ export default function ZagasmLanding() {
 
       <main className="tw:relative tw:z-10 tw:mt-10 tw:md:mt-20">
         <Hero />
+        <ThreeSplineIcon />
         <AutomationSection
           title="Stream once. Zagasm does the rest"
           subtitle="Hit Go Live—Zagasm auto-clips verticals, adds captions & chapters, multistreams via RTMP to every platform, and logs your best moments to the CRM in real time."
@@ -26,6 +30,8 @@ export default function ZagasmLanding() {
           mediaSrc="/images/zagasm-automation.svg"
           mediaAlt="Auto-clip, multistream, and CRM logging powered by Zagasm"
         />
+
+        <LiveHighlightsSection />
 
         <AutomationSection
           title="Turn live moments into momentum"
@@ -36,6 +42,8 @@ export default function ZagasmLanding() {
           mediaAlt="Highlight cards, replays, and cross-posting automation"
           right
         />
+
+        <LivePipelineSection />
 
         <ThreeStepSection />
         <Footer />

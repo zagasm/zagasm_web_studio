@@ -204,20 +204,19 @@ function EditProfile() {
   };
 
   return (
-    <div className="container-flui m-0 p-0">
-      <SideBarNav />
+    <div className="">
 
       {/* Page wrapper */}
-      <div className="page_wrapper">
+      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
         {/* Header */}
         <div className="tw:max-w-7xl tw:mx-auto tw:px-4 md:tw:px-6 lg:tw:px-8 tw:py-4">
-          <h1 className="tw:text-[22px] tw:font-semibold tw:text-gray-800 tw:mb-3">
+          <span className="tw:text-[22px] tw:font-semibold tw:text-gray-800 tw:mb-3">
             Profile Settings
-          </h1>
+          </span>
         </div>
 
         {/* Content */}
-        <div className="tw:max-w-7xl tw:mx-auto tw:px-4 md:tw:px-6 lg:tw:px-8 tw:pb-24 tw:md:pb-16">
+        <div className="tw:max-w-7xl tw:mx-auto tw:px-2 tw:md:px-6 tw:lg:px-8 tw:pb-24 tw:md:pb-16">
           <div className="row">
             {/* Left: Photo Card */}
             <div className="col-12 col-lg-3 tw:mb-4 lg:tw:mb-0">

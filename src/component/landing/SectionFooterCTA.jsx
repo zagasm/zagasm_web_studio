@@ -34,22 +34,22 @@ export default function Footer() {
               <img
                 src="/images/logo.png"
                 alt="Zagasm Studios"
-                className="tw:w-28 tw:rounded-sm"
+                className="tw:w-64 tw:rounded-sm tw:-ml-12"
               />
             </Link>
 
             {/* Contact + socials */}
             <div className="tw:flex tw:flex-col md:tw:flex-row tw:items-start md:tw:items-center tw:gap-6">
               <div className="tw:space-y-1 tw:text-sm">
-                <div className="tw:flex tw:items-center tw:gap-2 tw:text-gray-700">
+                <div className="tw:flex tw:items-center tw:gap-2 text-dark">
                   <Phone size={16} className="tw:text-[#8F07E7]" />
                   <span>+356 620 33 03 55</span>
                 </div>
-                <div className="tw:flex tw:items-center tw:gap-2 tw:text-gray-700">
+                <div className="tw:flex tw:items-center tw:gap-2 text-dark">
                   <Mail size={16} className="tw:text-[#8F07E7]" />
                   <span>hello@zagasm.com</span>
                 </div>
-                <address className="tw:not-italic tw:text-gray-700 tw:mt-2">
+                <address className="tw:not-italic tw:text-gray-500 tw:mt-2">
                   Portomaso Business Centre, Portomaso PTM<br />
                   01, St Julian’s STJ 4011, Malta
                 </address>
@@ -70,7 +70,7 @@ export default function Footer() {
                     className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:ring-1 tw:ring-gray-200 hover:tw:ring-[#8F07E7]/40 tw:transition"
                     aria-label="social link"
                   >
-                    <Icon size={18} className="tw:text-gray-700" />
+                    <Icon size={18} className="text-dark" />
                   </motion.a>
                 ))}
               </div>
@@ -89,7 +89,7 @@ export default function Footer() {
                 transition={{ duration: 0.35, delay: 0.05 * (idx + 1) }}
                 className="tw:col-span-1"
               >
-                <h6 className="tw:text-lg tw:font-semibold tw:text-gray-900">{c.title}</h6>
+                <h6 className="tw:text-lg tw:font-semibold text-dark">{c.title}</h6>
                 <ul className="tw:mt-3 tw:space-y-2 tw:-ml-8">
                   {c.items.map((it) => (
                     <li key={it}>
@@ -111,7 +111,7 @@ export default function Footer() {
             <div className="tw:h-px tw:flex-1 tw:bg-gray-200" />
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="tw:ml-4 tw:text-xs tw:font-medium tw:text-gray-700 hover:tw:text-[#8F07E7] tw:transition"
+              className="tw:ml-4 tw:text-xs tw:font-medium text-dark hover:tw:text-[#8F07E7] tw:transition"
             >
               Back to the top ↑
             </button>
