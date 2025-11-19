@@ -42,7 +42,7 @@ function AuthContainer({
                       justifyContent: "center",
                     }}
                   >
-                    <a href="#">
+                    <Link to="/">
                       <img
                         style={{
                           width: 240,
@@ -52,7 +52,7 @@ function AuthContainer({
                         className="zagasm_logo"
                         alt="Zagasm Logo"
                       />
-                    </a>
+                    </Link>
                   </p>
                   {header && (
                     <div

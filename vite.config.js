@@ -1,11 +1,10 @@
 import { defineConfig } from "vite";
-import preact from "@preact/preset-vite";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [preact(), tailwindcss()],
+  plugins: [react(), tailwindcss()],
   base: "/", // Ensures assets are loaded from root in production
   build: {
     outDir: "dist",
@@ -47,5 +46,13 @@ export default defineConfig({
         },
       },
     },
+  },
+
+  resolve: {
+    dedupe: ["react", "react-dom"],
+    // alias: {
+    //   react: "preact/compat",
+    //   "react-dom": "preact/compat",
+    // },
   },
 });

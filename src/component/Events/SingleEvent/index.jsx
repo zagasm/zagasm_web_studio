@@ -27,13 +27,13 @@ export const EventShimmer = () => (
 );
 
 /* ---- Helpers ---- */
-function firstImageFromPoster(poster = []) {
+export function firstImageFromPoster(poster = []) {
   const img = poster.find((p) => p?.type === "image" && p?.url);
   if (img) return img.url;
   return "/images/event-dummy.jpg";
 }
 
-function formatMetaLine(event) {
+export function formatMetaLine(event) {
   const rawDate = getRawDate(event);
   const rawTime = getRawTime(event);
 
@@ -76,7 +76,7 @@ function formatMetaLine(event) {
   return `${shortDate} - ${hr}:${m} ${ampm}`;
 }
 
-function priceText(event) {
+export function priceText(event) {
   if (event?.price_display) return event.price_display;
   if (event?.currency?.symbol && event?.price) {
     return `${event.currency.symbol}${event.price}`;
@@ -85,7 +85,7 @@ function priceText(event) {
   return "Free";
 }
 
-function hostName(event) {
+export function hostName(event) {
   return (
     event?.hostName ||
     event?.organizer_name ||
@@ -94,13 +94,13 @@ function hostName(event) {
   );
 }
 
-function eventLocation(event) {
+export function eventLocation(event) {
   if (event?.is_online) return "Online";
   return event?.location || "Venue TBA";
 }
 
 /** Extract clean raw date like 2025-11-25 */
-function getRawDate(event) {
+export function getRawDate(event) {
   const raw = event?.eventDate || event?.event_date;
   if (!raw) return null;
 
@@ -155,7 +155,7 @@ function getRawTime(event) {
 }
 
 /** Build accurate JS Date considering timezone */
-function eventStartDate(event) {
+export function eventStartDate(event) {
   const date = getRawDate(event);
   const time = getRawTime(event);
 
@@ -173,11 +173,11 @@ function eventStartDate(event) {
 }
 
 /* ---- Countdown pill for upcoming events ---- */
-function CountdownPill({ target }) {
+export function CountdownPill({ target }) {
   if (!target) return null;
 
   return (
-    <div className="tw:absolute tw:bottom-4 tw:right-4 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:rounded-full tw:bg-black/70 tw:text-white tw:text-xs tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
+    <div className=" tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:rounded-full tw:bg-black/70 tw:text-white tw:text-[10px] tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
       <Clock className="tw:w-4 tw:h-4 tw:opacity-80" />
 
       <Countdown
@@ -199,7 +199,7 @@ function CountdownPill({ target }) {
 }
 
 /* ---- Single Card (shared for all variants) ---- */
-function EventCard({ event, variant = "default", onMore }) {
+export function EventCard({ event, variant = "default", onMore }) {
   const startDate = eventStartDate(event);
 
   const isLive = variant === "live";
@@ -231,7 +231,7 @@ function EventCard({ event, variant = "default", onMore }) {
             {/* LIVE badge */}
             {isLive && (
               <>
-                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF3B30] tw:px-3 tw:py-1.5 tw:rounded-full tw:text-xs tw:font-semibold tw:text-white tw:shadow-lg">
+                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF3B30] tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
                   <span>Live</span>
                   <img
                     src={camera_icon}
@@ -251,7 +251,7 @@ function EventCard({ event, variant = "default", onMore }) {
             {/* UPCOMING badge + countdown */}
             {isUpcoming && (
               <>
-                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF9F0A] tw:px-3 tw:py-1.5 tw:rounded-full tw:text-xs tw:font-semibold tw:text-white tw:shadow-lg">
+                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF9F0A] tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
                   <span>Upcoming</span>
                   <img
                     src={camera_icon}
@@ -259,8 +259,6 @@ function EventCard({ event, variant = "default", onMore }) {
                     className="tw:w-4 tw:h-4 tw:object-contain"
                   />
                 </div>
-
-                <CountdownPill target={startDate} />
               </>
             )}
           </div>
@@ -299,31 +297,59 @@ function EventCard({ event, variant = "default", onMore }) {
           </div>
 
           {/* Location + date/time pill */}
-          <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600">
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <MapPin className="tw:w-4 tw:h-4" />
-              <span>{eventLocation(event)}</span>
+          {isUpcoming && (
+            <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600">
+              <div className="tw:flex tw:items-center tw:gap-2">
+                <CountdownPill target={startDate} />
+              </div>
+              <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
+              <div className="tw:flex tw:items-center tw:gap-2">
+                <CalendarDays className="tw:w-4 tw:h-4" />
+                <span>{formatMetaLine(event)}</span>
+              </div>
             </div>
-            <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <CalendarDays className="tw:w-4 tw:h-4" />
-              <span>{formatMetaLine(event)}</span>
-            </div>
-          </div>
+          )}
 
           {/* CTA */}
-          <Link
-            to={`/event/view/${event.id}`}
-            className="tw:mt-2 tw:w-full tw:inline-block"
-          >
+          {isLive ? (
+            // LIVE: show "Join event now" button instead of Buy
+            <Link
+              to={`/event/view/${event.id}`}
+              className="tw:mt-2 tw:w-full tw:inline-block"
+            >
+              <button
+                type="button"
+                style={{ borderRadius: 8 }}
+                className="tw:w-full tw:rounded-2xl tw:bg-red-500 tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
+              >
+                Join event now
+              </button>
+            </Link>
+          ) : isUpcoming && event.hasPaid ? (
+            // UPCOMING + already paid
             <button
               type="button"
               style={{ borderRadius: 8 }}
-              className="tw:w-full tw:rounded-2xl tw:bg-primary tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:hover:bg-primarySecond tw:transition-colors tw:duration-150"
+              disabled={event.hasPaid}
+              className="tw:w-full tw:rounded-2xl tw:disabled:bg-primary/80 tw:disabled:cursor-not-allowed tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
             >
-              {ticketLabel}
+              Paid for this event
             </button>
-          </Link>
+          ) : (
+            // Default: show Buy Ticket
+            <Link
+              to={`/event/view/${event.id}`}
+              className="tw:mt-2 tw:w-full tw:inline-block"
+            >
+              <button
+                type="button"
+                style={{ borderRadius: 8 }}
+                className="tw:w-full tw:rounded-2xl tw:bg-primary tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:hover:bg-primarySecond tw:transition-colors tw:duration-150"
+              >
+                {ticketLabel}
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -449,11 +475,11 @@ export default function EventTemplate({
       )}
 
       {/* END MESSAGE */}
-      {!loading && isDone && visibleEvents.length > 0 && (
+      {/* {!loading && isDone && visibleEvents.length > 0 && (
         <div className="text-center mt-3 mb-4 text-muted">
           You’ve reached the end of all events
         </div>
-      )}
+      )} */}
 
       <EventActionsSheet
         open={!!selectedEvent}

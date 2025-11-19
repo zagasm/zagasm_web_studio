@@ -122,14 +122,16 @@ export default function AutomationSection({
             {/* Card — added continuous bounce */}
             <motion.div
               whileHover={{ y: -4 }}
-              transition={{ type: "spring", stiffness: 200, damping: 14 }}
               className="tw:relative tw:rounded-2xl tw:overflow-hidden "
               animate={{ y: -2 }}
               transition={{
-                duration: 0.3,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: "easeInOut",
+                whileHover: { type: "spring", stiffness: 200, damping: 14 },
+                default: {
+                  duration: 0.3,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  ease: "easeInOut",
+                },
               }}
             >
               {isVideo ? (

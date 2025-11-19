@@ -6,9 +6,6 @@ export default function GuestPerformers({ performers = [] }) {
   return (
     <div className="tw:px-5 tw:md:px-7 tw:py-3">
       <div className="tw:flex tw:items-center tw:justify-between tw:bg-[#fafafa] tw:border tw:border-gray-100 tw:rounded-2xl tw:px-4 tw:py-3">
-        <div className="tw:flex tw:items-center tw:gap-2">
-          <span className="tw:text-sm tw:font-medium">Guest Performer(s)</span>
-        </div>
         <div className="tw:flex tw:items-center tw:gap-3">
           {performers.length > 0 ? (
             performers.slice(0, 4).map((p, i) => (
