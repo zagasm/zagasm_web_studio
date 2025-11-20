@@ -3,8 +3,8 @@ import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
-import PhoneInput from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import "../assets/style.css";
 import { CodeVerification } from "../CodeVerification";
 
@@ -20,9 +20,10 @@ export function ForgetPassword() {
     return re.test(email);
   };
 
-  const isButtonDisabled = activeTab === "email"
-    ? (!input.trim() || !isValidEmail(input)) || isSubmitting
-    : !input.trim() || isSubmitting;
+  const isButtonDisabled =
+    activeTab === "email"
+      ? !input.trim() || !isValidEmail(input) || isSubmitting
+      : !input.trim() || isSubmitting;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,8 +37,8 @@ export function ForgetPassword() {
 
     try {
       const formData = new URLSearchParams();
-      formData.append('input', input);
-      formData.append('country_code', '');
+      formData.append("input", input);
+      formData.append("country_code", "");
       // if (activeTab === "phone") {
       // }
 
@@ -46,7 +47,7 @@ export function ForgetPassword() {
         formData,
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
@@ -58,10 +59,11 @@ export function ForgetPassword() {
         code: data.code,
         input: data.input,
         expiresAt: data.expiresAt,
-        isEmail: activeTab === "email"
+        isEmail: activeTab === "email",
       });
     } catch (err) {
-      const message = err.response?.data?.message ||
+      const message =
+        err.response?.data?.message ||
         "Failed to send verification code. Please try again.";
       showToast.error(message);
     } finally {
@@ -102,7 +104,7 @@ export function ForgetPassword() {
               }}
             >
               <i className="feather-mail mr-2"></i>
-              Email
+              <span className="tw:ml-2">Email</span>
             </button>
             <button
               type="button"
@@ -113,7 +115,8 @@ export function ForgetPassword() {
               }}
             >
               <i className="feather-phone mr-2"></i>
-              Phone
+                            <span className="tw:ml-2">Phone</span>
+
             </button>
           </div>
         </div>
@@ -130,12 +133,15 @@ export function ForgetPassword() {
                 type="email"
                 className="tw:w-full input"
                 placeholder="Enter your email"
-                style={{ paddingLeft: "60px", outline: "none" }}
+                style={{ paddingLeft: "60px", outline: "none", marginBottom: 0 }}
                 autoComplete="off"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
-              <i className="feather-mail position-absolute input-icon " style={{ top: '1px' }}></i>
+              <i
+                className="feather-mail position-absolute input-icon "
+                style={{ top: "1px" }}
+              ></i>
             </div>
           </motion.div>
         ) : (
@@ -145,7 +151,7 @@ export function ForgetPassword() {
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="form-group"
           >
-            <div className="position-relative border-1">
+            <div className="position-relative tw:mb-3">
               <PhoneInput
                 id="PhoneInputInput"
                 international
@@ -154,23 +160,21 @@ export function ForgetPassword() {
                 onChange={(value) => {
                   setInput(value);
                   if (value) {
-                    const code = value.slice(0, value.indexOf(' '));
-                    setCountryCode(code.replace('+', ''));
+                    const code = value.slice(0, value.indexOf(" "));
+                    setCountryCode(code.replace("+", ""));
                   }
                 }}
                 className={`phone-input `}
                 placeholder="Enter phone number"
                 inputStyle={{
-                  outline: 'none',
-                  height: '50px',
-                  width: '100%',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  paddingLeft: '48px'
+                  outline: "none",
+                  height: "50px",
+                  width: "100%",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                  paddingLeft: "48px",
                 }}
               />
-
-
             </div>
           </motion.div>
         )}
@@ -179,8 +183,9 @@ export function ForgetPassword() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9, ease: "easeOut" }}
-          className={`bt submit-button btn-block mb-5 ${isButtonDisabled ? "inactive_submit_button" : "active_submit_button"
-            }`}
+          className={`bt submit-button btn-block mb-5 ${
+            isButtonDisabled ? "inactive_submit_button" : "active_submit_button"
+          }`}
           type="submit"
           disabled={isButtonDisabled}
         >
@@ -229,7 +234,7 @@ export function ForgetPassword() {
           color: #333;
           border-bottom: 2px solid #ddd;
         }
-      
+
         :global(.custom-phone-input) {
           padding-left: 60px !important;
           height: 50px;

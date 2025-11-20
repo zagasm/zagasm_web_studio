@@ -279,7 +279,7 @@ export default function ViewEvent() {
               </svg>
             </div>
           </div>
-          <div className="row g-4 g-lg-4">
+          <div className="">
             {/* MAIN COLUMN */}
             <div
               style={{
@@ -401,6 +401,7 @@ export default function ViewEvent() {
                         {/* avatar */}
                         <div className="tw:h-12 tw:w-12 tw:rounded-full tw:bg-[#E5E7EB] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:text-gray-800">
                           <img
+                            className="tw:size-full"
                             src={event.hostImage || "/images/avater_pix.avif"}
                             alt=""
                           />

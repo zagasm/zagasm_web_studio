@@ -81,10 +81,12 @@ export default function Navbar() {
         {/* RIGHT ACTION ICONS */}
         <div className="tw:flex tw:items-center tw:gap-8">
           {/* Search */}
-          <Search className="tw:w-6 tw:h-6 tw:text-gray-700 tw:cursor-pointer" />
+          <Link to='/search'>
+            <Search className="tw:w-6 tw:h-6 tw:text-gray-700 tw:cursor-pointer" />
+          </Link>
 
           {/* Bell + dot */}
-          <Link className="tw:relative tw:cursor-pointer">
+          <Link to={"/notifications"} className="tw:relative tw:cursor-pointer">
             <Bell className="tw:w-6 tw:h-6 tw:text-gray-700" />
             <span className="tw:absolute tw:-top-1 tw:-right-1 tw:w-3 tw:h-3 tw:bg-red-500 tw:rounded-full"></span>
           </Link>
@@ -102,7 +104,6 @@ export default function Navbar() {
           </Link>
         </div>
       </div>
-
 
       <MobileNav />
     </>

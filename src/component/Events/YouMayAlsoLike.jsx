@@ -14,7 +14,7 @@ export default function YouMayAlsoLike({ recs = [], posterFallback }) {
       <h4 className="tw:text-base tw:font-semibold tw:mb-3">
         You may also like
       </h4>
-      <div className="tw:space-y-3">
+      <div className="tw:space-y-3 row">
         {recs.slice(0, 2).map((event) => {
           const startDate = eventStartDate(event);
           const variant = "upcoming";
@@ -23,7 +23,7 @@ export default function YouMayAlsoLike({ recs = [], posterFallback }) {
 
           const ticketLabel = `Buy Ticket (${priceText(event)})`;
           return (
-            <div key={event.id} className=" mb-4">
+            <div key={event.id} className="col col-12 col-md-6 col-lg-4 mb-4">
               <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full blog-card border-0 tw:relative tw:pb-2">
                 {/* Image & badges */}
                 <Link

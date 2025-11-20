@@ -30,11 +30,7 @@ function AllNotification() {
       try {
         setLoading(true);
         const req = api.get("/api/v1/notifications", authHeaders(token));
-        const res = await showPromise(req, {
-          loading: "Loading notifications…",
-          success: "Notifications loaded",
-          error: "Failed to load notifications",
-        });
+        const res = await req;
         const list = res?.data?.notifications || [];
         if (mounted) setItems(list);
       } catch (e) {
@@ -151,14 +147,12 @@ function AllNotification() {
   };
 
   return (
-    <div className="container-flui m-0 p-0">
-      <ToastHost />
-      <SideBarNav />
-      <div className="page_wrapper overflow-hidden">
-        <div className="row p-0 ">
+    <div className="">
+      <div className="tw:py-16 tw:md:py-20">
+        <div className="">
           <div className="col ">
             <div className="container">
-              <div className="mt-5 p-2">
+              <div className="mt-5 p-md-2">
                 <div className="mb-4 d-flex justify-content-between align-items-center">
                   <h4 className="text-black m-0 d-flex align-items-center gap-2">
                     Notification
@@ -184,7 +178,7 @@ function AllNotification() {
                   <div className="d-flex align-items-center gap-2">
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline-secondary"
+                      className="tw:px-2 tw:py-1 tw:bg-primary text-white tw:text-[8px] tw:md:text-sm"
                       onClick={markAll}
                       disabled={unreadCount === 0 || loading}
                     >

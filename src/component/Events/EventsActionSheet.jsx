@@ -1,3 +1,4 @@
+// src/component/EventsActionSheet/index.jsx (or wherever this lives)
 import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
@@ -5,14 +6,13 @@ import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showSuccess, showError, showPromise } from "../../component/ui/toast";
 import {
-  Info,
-  UserPlus,
   Heart,
   Share2,
   TriangleAlert,
   X,
-  ChevronRight,
   Link as LinkIcon,
+  Shield,
+  Ticket,
 } from "lucide-react";
 
 const REASONS = [
@@ -28,17 +28,51 @@ const REASONS = [
   "Other",
 ];
 
-// co = "/images/avatar-fallback.png";
-
-/** map backend channel keys -> your local public icons */
 const CHANNEL_ICON = {
   whatsapp: "/images/icons/whatsapp.png",
   facebook: "/images/icons/facebook.png",
   x: "/images/icons/x.png",
   linkedIn: "/images/icons/linkedin.png",
   telegram: "/images/icons/telegram.png",
-  copy_link: null, // we'll render an inline icon for this
+  copy_link: null,
 };
+
+function firstImageFromPosterLocal(poster = []) {
+  const arr = Array.isArray(poster) ? poster : [];
+  const img = arr.find((p) => p?.type === "image" && p?.url);
+  return img?.url || "/images/event-dummy.jpg";
+}
+
+function ActionCard({ icon, title, subtitle, onClick, danger = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`tw:w-full tw:text-left`}
+    >
+      <div
+        className={`tw:w-full tw:flex tw:items-center tw:gap-3 tw:px-2 tw:py-3 tw:bg-[#f1f3f5] tw:rounded-lg tw:shadow-[0_1px_3px_rgba(15,23,42,0.06)] ${
+          danger ? "tw:text-red-600" : "tw:text-black"
+        }`}
+      >
+        <span className="tw:flex tw:items-center tw:justify-center tw:w-9 tw:h-9 tw:rounded-full tw:bg-white">
+          {icon}
+        </span>
+
+        <div className="tw:flex-1 tw:flex tw:flex-col">
+          <span className="tw:text-xs tw:sm:text-sm tw:font-semibold">
+            {title}
+          </span>
+          {subtitle && (
+            <span className="tw:text-[10px] tw:sm:text-xs tw:text-zinc-500">
+              {subtitle}
+            </span>
+          )}
+        </div>
+      </div>
+    </button>
+  );
+}
 
 export default function EventActionsSheet({
   open,
@@ -79,24 +113,7 @@ export default function EventActionsSheet({
   const hostId = event?.hostId;
   const hostName = event?.hostName || "Organizer";
   const hostImage = event?.hostImage;
-
-  async function onFollow() {
-    if (!hostId) return;
-    setBusy(true);
-    try {
-      await showPromise(
-        api.post(`/api/v1/follow/${hostId}`, {}, authHeaders(token)),
-        {
-          loading: followed ? "Unfollowing…" : "Following…",
-          success: followed ? "Unfollowed" : "Followed",
-          error: "Could not follow/unfollow",
-        }
-      );
-      setFollowed((f) => !f);
-    } finally {
-      setBusy(false);
-    }
-  }
+  const posterUrl = firstImageFromPosterLocal(event?.poster);
 
   async function onToggleSave() {
     if (!event?.id) return;
@@ -142,7 +159,6 @@ export default function EventActionsSheet({
 
   function openShareLink(ch) {
     try {
-      const origin = window?.location?.origin || "";
       const fullLink =
         ch?.type === "internal"
           ? `https://studios.zagasm.com/event/share`
@@ -190,7 +206,25 @@ export default function EventActionsSheet({
         onEventReported(event.id);
       }
 
-      // Close sheet
+      onClose();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // adjust URL to your real block endpoint
+  async function onBlockOrganiser() {
+    if (!hostId) return;
+    setBusy(true);
+    try {
+      await showPromise(
+        api.post(`/api/v1/organisers/${hostId}/block`, {}, authHeaders(token)),
+        {
+          loading: "Blocking organizer…",
+          success: "Organizer blocked.",
+          error: "Could not block organizer.",
+        }
+      );
       onClose();
     } finally {
       setBusy(false);
@@ -200,6 +234,8 @@ export default function EventActionsSheet({
   function resetShare() {
     setShareState({ loading: false, channels: null, error: null });
   }
+
+  const isMainView = !shareState.channels && !reporting;
 
   return (
     <Transition show={open} as={Fragment} appear>
@@ -221,9 +257,9 @@ export default function EventActionsSheet({
           <div className="tw:fixed tw:inset-0 tw:bg-black/40" />
         </Transition.Child>
 
-        {/* Centered modal */}
+        {/* Panel */}
         <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
-          <div className="tw:flex tw:min-h-full tw:items-end tw:md:items-center tw:justify-center tw:p-0 tw:pb-20 tw:md:pb-0 tw:md:p-4">
+          <div className="tw:flex tw:min-h-full tw:items-end tw:md:items-center tw:justify-center tw:p-0 tw:pb-16 tw:md:pb-0 tw:md:p-4">
             <Transition.Child
               as={Fragment}
               enter="tw:transition tw:duration-200 tw:ease-out"
@@ -233,235 +269,199 @@ export default function EventActionsSheet({
               leaveFrom="tw:opacity-100 tw:translate-y-0 tw:md:scale-100"
               leaveTo="tw:opacity-0 tw:translate-y-[20%] tw:md:translate-y-0 tw:md:scale-95"
             >
-              <Dialog.Panel
-                className="tw:w-full tw:max-w-md tw:bg-white tw:shadow-xl tw:p-4 tw:pb-[max(env(safe-area-inset-bottom),1rem)] 
-            tw:rounded-t-2xl tw:rounded-b-none tw:md:rounded-2xl"
-              >
-                <button
-                  className="tw:absolute tw:right-4 tw:top-3 tw:p-2 tw:rounded-full hover:tw:bg-gray-100"
-                  onClick={() => !busy && onClose()}
-                  aria-label="Close"
-                >
-                  <X className="tw:size-5" />
-                </button>
-
-                {/* Header */}
-                <div className="tw:flex tw:items-center tw:justify-between tw:my-4">
-                  <div className="tw:flex tw:items-center tw:gap-3">
-                    {hostImage !== null ? (
-                      <img
-                        src={hostImage}
-                        alt={hostName}
-                        className="tw:size-10 tw:rounded-full tw:object-cover tw:ring-2 tw:ring-white"
-                      />
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="tw:size-10 tw:text-primary"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-
-                    <div>
-                      <span className="tw:text-base tw:font-medium tw:first-letter:uppercase">
-                        {hostName}
-                      </span>
-                    </div>
-                  </div>
+              <Dialog.Panel className="tw:w-full tw:max-w-md tw:bg-white tw:shadow-xl tw:rounded-t-2xl tw:md:rounded-2xl tw:overflow-hidden tw:flex tw:flex-col tw:max-h-[80vh]">
+                {/* Close button */}
+                <div className="tw:flex tw:justify-end">
                   <button
-                    className="tw:text-primary tw:text-sm tw:underline hover:tw:no-underline"
-                    onClick={() => {
-                      if (hostId) navigate(`/profile/${hostId}`);
-                      onClose();
-                    }}
+                    className=" tw:p-2 tw:rounded-full tw:bg-white tw:hover:bg-gray-100 tw:z-999"
+                    onClick={() => !busy && onClose()}
+                    aria-label="Close"
                   >
-                    View Profile
+                    <X className="tw:size-5" />
                   </button>
                 </div>
 
-                {/* Main list */}
-                {!shareState.channels && !reporting && (
-                  <ul className="tw:divide-y tw:divide-gray-100">
-                    <li>
-                      <button
-                        className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:py-3"
+                {/* Header: event + host */}
+                <div className="tw:px-4 tw:pt-4 tw:pb-3 tw:border-b tw:border-zinc-100">
+                  <div className="tw:flex tw:items-center tw:gap-3">
+                    <div className="tw:size-12 tw:rounded-xl tw:overflow-hidden tw:bg-zinc-200 tw:shrink-0">
+                      <img
+                        src={posterUrl}
+                        alt={event?.title || "Event"}
+                        className="tw:w-full tw:h-full tw:object-cover"
+                      />
+                    </div>
+
+                    <div className="tw:flex tw:flex-col tw:gap-1 tw:min-w-0">
+                      <span className="tw:text-sm tw:sm:text-lg tw:font-semibold tw:text-black tw:truncate">
+                        {event?.title || "Event"}
+                      </span>
+
+                      <div className="tw:flex tw:items-center tw:gap-1 tw:min-w-0">
+                        {hostImage ? (
+                          <img
+                            src={hostImage}
+                            alt={hostName}
+                            className="tw:w-4 tw:h-4 tw:rounded-full tw:object-cover tw:ring-2 tw:ring-white"
+                          />
+                        ) : (
+                          <div className="tw:w-4 tw:h-4 tw:rounded-full tw:bg-primary/10 tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-medium tw:text-primary">
+                            {hostName?.[0]?.toUpperCase() || "O"}
+                          </div>
+                        )}
+                        <span className="tw:text-xs tw:text-black tw:truncate">
+                          {hostName}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scrollable body */}
+                <div className="tw:flex-1 tw:overflow-y-auto tw:px-4 tw:py-4 tw:space-y-4">
+                  {/* Main actions */}
+                  {isMainView && (
+                    <div className="tw:flex tw:flex-col tw:gap-3">
+                      <ActionCard
+                        title="Buy Ticket"
+                        subtitle="Purchase your ticket and watch live."
                         onClick={() => {
-                          navigate(`/event/view/${event?.id}`);
+                          if (event?.id) navigate(`/event/view/${event.id}`);
                           onClose();
                         }}
-                      >
-                        <span className="tw:shrink-0">
-                          <Info className="tw:size-5" />
-                        </span>
-                        <span className="tw:flex-1 tw:text-left">
-                          View Event Detail
-                        </span>
-                        <ChevronRight className="tw:size-4" />
-                      </button>
-                    </li>
+                        icon={
+                          <Ticket className="tw:size-5" />
+                        }
+                      />
 
-                    <li>
-                      <button
-                        disabled={!hostId || busy}
-                        className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:py-3 disabled:tw:opacity-60"
-                        onClick={onFollow}
-                      >
-                        <span className="tw:shrink-0">
-                          <UserPlus className="tw:size-5" />
-                        </span>
-                        <span className="tw:flex-1 tw:text-left">
-                          {followed ? "Unfollow Organizer" : "Follow Organizer"}
-                        </span>
-                        <ChevronRight className="tw:size-4" />
-                      </button>
-                    </li>
-
-                    <li>
-                      <button
-                        disabled={busy}
-                        className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:py-3 disabled:tw:opacity-60"
+                      <ActionCard
+                        title={saved ? "Unsave Event" : "Save Event"}
+                        subtitle="Add this event to your saved list."
                         onClick={onToggleSave}
-                      >
-                        <span className="tw:shrink-0">
+                        icon={
                           <Heart
                             className={`tw:size-5 ${
-                              saved ? "tw:fill-current" : ""
+                              saved ? "tw:fill-current tw:text-primary" : ""
                             }`}
                           />
-                        </span>
-                        <span className="tw:flex-1 tw:text-left">
-                          {saved ? "Unsave Event" : "Save Event"}
-                        </span>
-                        <ChevronRight className="tw:size-4" />
-                      </button>
-                    </li>
+                        }
+                      />
 
-                    <li>
-                      <button
-                        disabled={shareState.loading}
-                        className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:py-3 disabled:tw:opacity-60"
+                      <ActionCard
+                        title="Share Event"
+                        subtitle="Share via WhatsApp, Instagram, X, Copy Link, etc."
                         onClick={onShare}
-                      >
-                        <span className="tw:shrink-0">
-                          <Share2 className="tw:size-5" />
-                        </span>
-                        <span className="tw:flex-1 tw:text-left">
-                          {shareState.loading ? "Loading…" : "Share Event"}
-                        </span>
-                        <ChevronRight className="tw:size-4" />
-                      </button>
-                    </li>
+                        icon={<Share2 className="tw:size-5 tw:text-primary" />}
+                      />
 
-                    <li>
-                      <button
-                        className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:py-3"
+                      <ActionCard
+                        title="Report Event"
+                        subtitle="Report issues like scam, inappropriate content, wrong information."
                         onClick={() => setReporting(true)}
-                      >
-                        <span className="tw:shrink-0">
+                        danger
+                        icon={
                           <TriangleAlert className="tw:size-5 tw:text-red-500" />
-                        </span>
-                        <span className="tw:flex-1 tw:text-left tw:text-red-600">
-                          Report Event
-                        </span>
-                        <ChevronRight className="tw:size-4 tw:text-red-500" />
-                      </button>
-                    </li>
-                  </ul>
-                )}
+                        }
+                      />
 
-                {/* Share view (uses local icons) */}
-                {shareState.channels && (
-                  <div className="tw:mt-1">
-                    <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-                      <p className="tw:text-sm tw:text-gray-600">Share via</p>
-                      <button
-                        className="tw:text-sm tw:text-gray-500 tw:underline"
-                        onClick={resetShare}
-                      >
-                        Back
-                      </button>
+                      <ActionCard
+                        title="Block Organizer"
+                        subtitle="Stop seeing content from this organizer."
+                        onClick={onBlockOrganiser}
+                        danger
+                        icon={<Shield className="tw:size-5 tw:text-red-500" />}
+                      />
                     </div>
-                    <div className="tw:grid tw:grid-cols-3 tw:gap-3">
-                      {shareState.channels.map((ch) => {
-                        const iconSrc = CHANNEL_ICON[ch.key];
-                        return (
-                          <button
-                            key={ch.key}
-                            className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:p-3 tw:border tw:border-gray-100 tw:rounded-xl hover:tw:bg-gray-50"
-                            onClick={() => openShareLink(ch)}
-                          >
-                            {iconSrc ? (
-                              <img
-                                src={iconSrc}
-                                alt={ch.name}
-                                className="tw:size-10 tw:rounded"
-                              />
-                            ) : (
-                              <div className="tw:flex tw:items-center tw:justify-center tw:size-10 tw:rounded tw:bg-gray-100">
-                                <LinkIcon className="tw:size-5 tw:text-gray-700" />
-                              </div>
-                            )}
-                            <span className="tw:text-xs">{ch.name}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Report view */}
-                {reporting && (
-                  <div className="tw:mt-1">
-                    <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-                      <p className="tw:text-sm tw:text-gray-600">
-                        Select a reason
-                      </p>
-                      <button
-                        className="tw:text-sm tw:text-gray-500 tw:underline"
-                        onClick={() => setReporting(false)}
-                      >
-                        Back
-                      </button>
-                    </div>
-
-                    <div className="tw:max-h-56 tw:overflow-y-auto tw:space-y-2 tw:space-x-2">
-                      {REASONS.map((r) => (
-                        <label
-                          key={r}
-                          className={`tw:flex tw:items-center tw:gap-3 tw:p-2 tw:border tw:rounded-xl ${
-                            selectedReason === r
-                              ? "tw:border-primary tw:bg-lightPurple/50"
-                              : "tw:border-gray-100"
-                          }`}
+                  {/* Share view */}
+                  {shareState.channels && (
+                    <div className="tw:space-y-3">
+                      <div className="tw:flex tw:items-center tw:justify-between">
+                        <p className="tw:text-sm tw:text-gray-600">Share via</p>
+                        <button
+                          className="tw:text-sm tw:text-gray-500 tw:underline"
+                          onClick={resetShare}
                         >
-                          <input
-                            type="radio"
-                            name="report-reason"
-                            className="tw:size-4"
-                            checked={selectedReason === r}
-                            onChange={() => setSelectedReason(r)}
-                          />
-                          <span className="tw:text-sm tw:ml-1.5">{r}</span>
-                        </label>
-                      ))}
-                    </div>
+                          Back
+                        </button>
+                      </div>
 
-                    <button
-                      disabled={busy}
-                      onClick={onReport}
-                      className="tw:mt-4 tw:w-full tw:bg-primary tw:text-white tw:rounded-xl tw:py-3 tw:font-medium disabled:tw:opacity-60"
-                    >
-                      {busy ? "Submitting…" : "Submit Report"}
-                    </button>
-                  </div>
-                )}
+                      <div className="tw:grid tw:grid-cols-3 tw:gap-3 tw:pb-2">
+                        {shareState.channels.map((ch) => {
+                          const iconSrc = CHANNEL_ICON[ch.key];
+                          return (
+                            <button
+                              key={ch.key}
+                              className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:p-3 tw:bg-[#F9FAFB] tw:border tw:border-gray-100 tw:rounded-xl hover:tw:bg-gray-50"
+                              onClick={() => openShareLink(ch)}
+                            >
+                              {iconSrc ? (
+                                <img
+                                  src={iconSrc}
+                                  alt={ch.name}
+                                  className="tw:size-10 tw:rounded"
+                                />
+                              ) : (
+                                <div className="tw:flex tw:items-center tw:justify-center tw:size-10 tw:rounded tw:bg-gray-100">
+                                  <LinkIcon className="tw:size-5 tw:text-gray-700" />
+                                </div>
+                              )}
+                              <span className="tw:text-xs">{ch.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Report view */}
+                  {reporting && (
+                    <div className="tw:space-y-3">
+                      <div className="tw:flex tw:items-center tw:justify-between">
+                        <p className="tw:text-sm tw:text-gray-600">
+                          Select a reason
+                        </p>
+                        <button
+                          className="tw:text-sm tw:text-gray-500 tw:underline"
+                          onClick={() => setReporting(false)}
+                        >
+                          Back
+                        </button>
+                      </div>
+
+                      <div className="tw:max-h-56 tw:overflow-y-auto tw:space-y-2">
+                        {REASONS.map((r) => (
+                          <label
+                            key={r}
+                            className={`tw:flex tw:items-center tw:gap-3 tw:p-2 tw:border tw:rounded-xl ${
+                              selectedReason === r
+                                ? "tw:border-primary tw:bg-[#F4E6FD]/40"
+                                : "tw:border-gray-100"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="report-reason"
+                              className="tw:size-4"
+                              checked={selectedReason === r}
+                              onChange={() => setSelectedReason(r)}
+                            />
+                            <span className="tw:text-sm tw:ml-1.5">{r}</span>
+                          </label>
+                        ))}
+                      </div>
+
+                      <button
+                        disabled={busy}
+                        onClick={onReport}
+                        className="tw:w-full tw:bg-primary tw:text-white tw:rounded-xl tw:py-3 tw:font-medium disabled:tw:opacity-60"
+                      >
+                        {busy ? "Submitting…" : "Submit Report"}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

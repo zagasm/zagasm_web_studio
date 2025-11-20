@@ -218,6 +218,10 @@ export function EventCard({ event, variant = "default", onMore }) {
     isDedicatedUpcomingTab ||
     (variant === "all" && event.status === "upcoming");
 
+  const isEnded =
+    event?.status === "ended" ||
+    (startDate && startDate.getTime() < Date.now() && event?.status !== "live");
+
   // We can keep isAll for reference if needed, but it's not strictly necessary for this logic
   // const isAll = variant === "all";
   // --- END OF UPDATED LOGIC ---
@@ -328,7 +332,17 @@ export function EventCard({ event, variant = "default", onMore }) {
           )}
 
           {/* CTA */}
-          {isLive ? (
+          {/* CTA */}
+          {isEnded ? (
+            <button
+              type="button"
+              style={{ borderRadius: 8 }}
+              disabled
+              className="tw:w-full tw:mt-2 tw:rounded-2xl tw:bg-zinc-200 tw:text-zinc-600 tw:py-3 tw:text-sm tw:font-semibold tw:cursor-not-allowed"
+            >
+              Event ended
+            </button>
+          ) : isLive ? (
             // LIVE: show "Join event now" button instead of Buy
             <Link
               to={`/event/view/${event.id}`}
@@ -416,7 +430,7 @@ export default function EventTemplate({
   /* ---- 2. When API loads, override cache ---- */
   React.useEffect(() => {
     // Check if serverEvents is not null/undefined (i.e., data fetch has completed)
-    if (serverEvents === undefined || serverEvents === null) return; 
+    if (serverEvents === undefined || serverEvents === null) return;
 
     // Set the visible events to the latest data from the server (even if it's empty)
     setVisibleEvents(serverEvents);
@@ -472,13 +486,14 @@ export default function EventTemplate({
       )}
 
       {/* LOADING MORE */}
-      {loadingMore && visibleEvents.length > 0 && ( // Added visibleEvents.length check to prevent double shimmer
-        <div className="row">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <EventShimmer key={i} />
-          ))}
-        </div>
-      )}
+      {loadingMore &&
+        visibleEvents.length > 0 && ( // Added visibleEvents.length check to prevent double shimmer
+          <div className="row">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <EventShimmer key={i} />
+            ))}
+          </div>
+        )}
 
       {/* LOAD MORE TRIGGER */}
       {!isDone && (
