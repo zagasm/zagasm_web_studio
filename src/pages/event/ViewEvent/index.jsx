@@ -4,7 +4,7 @@ import SideBarNav from "../../pageAssets/SideBarNav";
 import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
-import { ToastHost, showSuccess } from "../../../component/ui/toast";
+import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
 
 import PosterHeader from "../../../component/Events/PostHeader";
 import GuestPerformers from "../../../component/Events/GuestPerformers";
@@ -80,9 +80,47 @@ export default function ViewEvent() {
 
   const posterUrl = useMemo(() => event?.poster?.[0]?.url, [event]);
 
-  const handleGetTicket = () => {
+  const handleGetTicket = async () => {
     if (event?.is_sold_out) return;
-    showSuccess(`🎟️ Ticket booked for “${event?.title || "Event"}”!`);
+
+    if (!token) {
+      showError("Please log in to purchase a ticket.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await api.post(
+        `/api/v1/payments/${event.id}/initiate`,
+        null,
+        authHeaders(token)
+      );
+
+      const payload = res?.data || {};
+
+      if (payload.status === false && payload.message) {
+        // Already paid scenario
+        showError(payload.message);
+        return;
+      }
+
+      // Check for successful redirection URL
+      if (payload.url) {
+        showSuccess(`Preparing ticket for “${event?.title || "Event"}”…`);
+        // Redirect to Paystack checkout URL
+        window.location.href = payload.url;
+      } else {
+        // Fallback for unexpected success response
+        showError("Payment initiation failed: no redirect URL received.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to initiate payment.";
+      showError(errorMessage);
+      console.error("Payment initiation error:", error);
+    }
   };
 
   const isLiveNow = !!event?.is_live;
@@ -295,7 +333,6 @@ export default function ViewEvent() {
                   </div>
 
                   <div className="tw:flex tw:flex-col tw:xl:flex-row tw:xl:items-center tw:xl:justify-between tw:gap-4">
-                    
                     <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600">
                       <div className="tw:flex tw:items-center tw:gap-2">
                         <CountdownPill target={startDate} />

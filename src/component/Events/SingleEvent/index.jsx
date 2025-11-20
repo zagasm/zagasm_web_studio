@@ -6,7 +6,7 @@ import camera_icon from "../../../assets/navbar_icons/camera_icon.png";
 import live_indicator from "../../../assets/navbar_icons/live_indicator.png";
 import { Link } from "react-router-dom";
 import usePaginatedEvents from "../../../hooks/usePaginatedEvents";
-import { Ellipsis, Clock, MapPin, CalendarDays } from "lucide-react";
+import { Ellipsis, Clock, MapPin, CalendarDays, Frown } from "lucide-react";
 import Countdown from "react-countdown";
 import EventActionsSheet from "../EventsActionSheet";
 
@@ -199,11 +199,28 @@ export function CountdownPill({ target }) {
 }
 
 /* ---- Single Card (shared for all variants) ---- */
+/* ---- Single Card (shared for all variants) ---- */
 export function EventCard({ event, variant = "default", onMore }) {
   const startDate = eventStartDate(event);
 
-  const isLive = variant === "live";
-  const isUpcoming = variant === "upcoming";
+  // --- START OF UPDATED LOGIC ---
+  const isDedicatedLiveTab = variant === "live";
+  const isDedicatedUpcomingTab = variant === "upcoming";
+
+  // The event is 'Live' if we're on the dedicated Live tab OR if we're on the 'all' tab
+  // AND the event's status is 'live'.
+  const isLive =
+    isDedicatedLiveTab || (variant === "all" && event.status === "live");
+
+  // The event is 'Upcoming' if we're on the dedicated Upcoming tab OR if we're on the 'all' tab
+  // AND the event's status is 'upcoming'.
+  const isUpcoming =
+    isDedicatedUpcomingTab ||
+    (variant === "all" && event.status === "upcoming");
+
+  // We can keep isAll for reference if needed, but it's not strictly necessary for this logic
+  // const isAll = variant === "all";
+  // --- END OF UPDATED LOGIC ---
 
   const ticketLabel = `Buy Ticket (${priceText(event)})`;
 
@@ -331,7 +348,7 @@ export function EventCard({ event, variant = "default", onMore }) {
               type="button"
               style={{ borderRadius: 8 }}
               disabled={event.hasPaid}
-              className="tw:w-full tw:rounded-2xl tw:disabled:bg-primary/80 tw:disabled:cursor-not-allowed tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
+              className="tw:w-full tw:rounded-2xl tw:disabled:bg-primary/30 tw:disabled:cursor-not-allowed tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
             >
               Paid for this event
             </button>
@@ -356,11 +373,11 @@ export function EventCard({ event, variant = "default", onMore }) {
   );
 }
 
-/* ---- MAIN TEMPLATE: list + pagination ---- */
 export default function EventTemplate({
   endpoint = "/api/v1/events",
   live = false,
   upcoming = false,
+  all = false,
 }) {
   const {
     items: serverEvents,
@@ -398,11 +415,13 @@ export default function EventTemplate({
 
   /* ---- 2. When API loads, override cache ---- */
   React.useEffect(() => {
-    if (!serverEvents || serverEvents.length === 0) return;
+    // Check if serverEvents is not null/undefined (i.e., data fetch has completed)
+    if (serverEvents === undefined || serverEvents === null) return; 
 
+    // Set the visible events to the latest data from the server (even if it's empty)
     setVisibleEvents(serverEvents);
 
-    // update cache
+    // Update cache only if serverEvents is not null
     try {
       const payload = { events: serverEvents, meta };
       localStorage.setItem(cacheKey, JSON.stringify(payload));
@@ -420,10 +439,11 @@ export default function EventTemplate({
 
   const isDone = useMemo(() => meta?.current_page >= meta?.last_page, [meta]);
 
-  const variant = live ? "live" : upcoming ? "upcoming" : "default";
+  const variant = live ? "live" : upcoming ? "upcoming" : "all";
 
   /* ---- 4. SHOW SHIMMER WHEN: cache not loaded + loading ---- */
-  const showShimmer = !cacheLoaded && loading;
+  // NEW LOGIC: Show shimmer if loading, UNLESS we already have events and are just loading more.
+  const showShimmer = loading && visibleEvents.length === 0; // Show shimmer if loading and no events are visible yet.
 
   return (
     <>
@@ -437,6 +457,7 @@ export default function EventTemplate({
       )}
 
       {/* EVENTS */}
+      {/* Only render events if we are not in the initial shimmer state */}
       {!showShimmer && (
         <div className="row tw:mx-0">
           {visibleEvents.map((event) => (
@@ -451,7 +472,7 @@ export default function EventTemplate({
       )}
 
       {/* LOADING MORE */}
-      {loadingMore && (
+      {loadingMore && visibleEvents.length > 0 && ( // Added visibleEvents.length check to prevent double shimmer
         <div className="row">
           {Array.from({ length: 4 }).map((_, i) => (
             <EventShimmer key={i} />
@@ -468,9 +489,11 @@ export default function EventTemplate({
       )}
 
       {/* EMPTY STATE */}
-      {cacheLoaded && !loading && visibleEvents.length === 0 && (
-        <div className="text-center mt-3">
-          <span>No events available</span>
+      {!loading && visibleEvents.length === 0 && (
+        <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:mt-12 tw:text-gray-500">
+          <Frown className="tw:w-10 tw:h-10 tw:mb-3" />
+          <span className="tw:font-medium">No events available</span>
+          <small>Check back later or try a different filter.</small>
         </div>
       )}
 

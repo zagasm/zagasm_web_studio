@@ -14,6 +14,7 @@ import MobileNav from "./MobileNav";
 import logo from "../../assets/zagasm_studio_logo.png";
 import default_profilePicture from "../../assets/avater_pix.avif";
 
+// src/component/Events/SingleEvent.jsx (Updated Navbar function)
 export default function Navbar() {
   const location = useLocation();
   const { user } = useAuth();
@@ -31,15 +32,17 @@ export default function Navbar() {
 
   return (
     <>
-      {/* DESKTOP NAV */}
-      <div className="tw:flex tw:w-full tw:h-[85px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-1 tw:md:px-8 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
+      {/* DESKTOP NAV (Hidden on Mobile) */}
+      {/* FIX: Use tw:hidden on mobile and tw:flex on md: to prevent it from ever displaying/overflowing on small screens.
+              Also, cleaned up px class to ensure consistency. */}
+      <div className="tw:flex tw:w-full tw:h-[85px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-8 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
         {/* LEFT SECTION */}
         <div className="tw:flex tw:items-center tw:gap-6">
           {/* Logo */}
           <img
             src={"/images/logo.png"}
             alt="Zagasm Logo"
-            className="tw:w-[120px] tw:md:w-40 tw:-ml-5 tw:object-contain"
+            className="tw:w-40 tw:-ml-5 tw:object-contain"
           />
         </div>
 
@@ -76,20 +79,20 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT ACTION ICONS */}
-        <div className="tw:flex tw:items-center tw:gap-3 tw:md:gap-8">
+        <div className="tw:flex tw:items-center tw:gap-8">
           {/* Search */}
-          <Search className="tw:size-4 tw:md:w-6 tw:md:h-6 tw:text-gray-700 tw:cursor-pointer" />
+          <Search className="tw:w-6 tw:h-6 tw:text-gray-700 tw:cursor-pointer" />
 
           {/* Bell + dot */}
           <Link className="tw:relative tw:cursor-pointer">
-            <Bell className="tw:size-4 tw:md:w-6 tw:md:h-6 tw:text-gray-700" />
+            <Bell className="tw:w-6 tw:h-6 tw:text-gray-700" />
             <span className="tw:absolute tw:-top-1 tw:-right-1 tw:w-3 tw:h-3 tw:bg-red-500 tw:rounded-full"></span>
           </Link>
 
           {/* Profile */}
           <Link
             to="/account"
-            className="tw:md:size-[42px] tw:size-8 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
+            className="tw:size-[42px] tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
           >
             <img
               src={profile}
@@ -100,96 +103,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* <div className="tw:md:hidden">
-        <MobileHeader name={firstName} profile={profile} />
-      </div> */}
 
       <MobileNav />
     </>
-  );
-}
-
-function MobileHeader({ name = "Jessica", profile }) {
-  return (
-    <div
-      className="
-      tw:w-full tw:rounded-b-4xl 
-      tw:px-4 tw:pt-10 tw:pb-10
-      tw:bg-linear-to-br
-      tw:from-[#B07CFF] tw:via-[#8F07E7] tw:to-[#4A78FF]
-      tw:text-white
-    "
-    >
-      <div className="tw:flex tw:items-start tw:justify-between">
-        {/* LEFT: TEXT */}
-        <div>
-          <span className="tw:block tw:text-[20px] tw:leading-tight tw:font-light">
-            Hi <span className="tw:font-semibold">{name}</span> 👋
-          </span>
-
-          <span className="tw:text-[14px] tw:opacity-90 tw:mt-2">
-            Manage your events & audience
-          </span>
-        </div>
-
-        {/* RIGHT: ACTION ICONS */}
-        <div className="tw:flex tw:items-center tw:gap-[6.5px]">
-          {/* Search */}
-          <button
-          style={{
-            borderRadius: 50
-          }}
-            className="
-            tw:size-12
-            tw:rounded-full
-            tw:bg-white/20 tw:backdrop-blur-xl
-            tw:flex tw:items-center tw:justify-center
-            tw:border tw:border-white/20
-          "
-          >
-            <Search className="tw:w-4 tw:h-4 tw:text-white" />
-          </button>
-
-          {/* Bell */}
-          <button
-          style={{
-            borderRadius: 50
-          }}
-            className="
-            tw:size-12
-            tw:rounded-full
-            tw:bg-white/20 tw:backdrop-blur-xl
-            tw:flex tw:items-center tw:justify-center
-            tw:border tw:border-white/20
-            tw:relative
-          "
-          >
-            <Bell className="tw:w-4 tw:h-4 tw:text-white" />
-            <span
-              className="
-              tw:absolute tw:top-3 tw:right-3
-              tw:w-3.5 tw:h-3.5 tw:bg-red-500
-              tw:rounded-full
-            "
-            ></span>
-          </button>
-
-          {/* Profile */}
-          <div
-            className="
-            tw:size-12
-            tw:rounded-full tw:border-1 tw:border-white
-            tw:overflow-hidden
-          "
-          >
-            <img
-              src={profile}
-              alt="profile"
-              className="tw:w-full tw:h-full tw:object-cover"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }

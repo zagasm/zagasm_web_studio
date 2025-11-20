@@ -51,6 +51,7 @@ import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
 import ZagasmLanding from "./pages/LandingPage/index.jsx";
 import TicketsPage from "./pages/tickets/TicketsPage.jsx";
+import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
 
 const MainLayout = () => (
   <>
@@ -112,6 +113,7 @@ export function App() {
               <Route path="edit-password" element={<EditPassword />} />
             </Route>
             <Route path="/tickets" element={<TicketsPage />} />
+            <Route path="/payment/callback" element={<PaymentCallback />} />
             <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="select-event-type" element={<EventType />} />

@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import "./Homestyle.css";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("upcoming");
+  const [activeTab, setActiveTab] = useState("all");
   const [showOrganizers, setShowOrganizers] = useState(false);
   const eventsScrollRef = useRef(null);
 
@@ -38,20 +38,19 @@ export default function Home() {
     <>
       <SEO title="Discover Events - Zagasm Studios" />
 
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-6 tw:md:pt-24 tw:lg:px-4">
+      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-24 tw:md:pt-24 tw:lg:px-4">
         {/* TABS */}
         <div className="tw:flex tw:gap-3 tw:mb-6 tw:ml-2">
           <button
-            onClick={() => handleTabChange("live")}
+            onClick={() => handleTabChange("all")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
-              activeTab === "live"
+              activeTab === "all"
                 ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
             }`}
           >
-            Live Events
+            All
           </button>
-
           <button
             onClick={() => handleTabChange("upcoming")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
@@ -60,8 +59,19 @@ export default function Home() {
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
             }`}
           >
-            Upcoming Events
+            Upcoming
           </button>
+          <button
+            onClick={() => handleTabChange("live")}
+            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
+              activeTab === "live"
+                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+                : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
+            }`}
+          >
+            Live
+          </button>
+
         </div>
 
         {/* SCROLL AREA */}
@@ -73,10 +83,13 @@ export default function Home() {
             endpoint={
               activeTab === "live"
                 ? "/api/v1/events/view/live"
+                : activeTab === "all"
+                ? "/api/v1/events/all/get"
                 : "/api/v1/events"
             }
             live={activeTab === "live"}
             upcoming={activeTab === "upcoming"}
+            all={activeTab === "all"}
           />
 
           {showOrganizers && (

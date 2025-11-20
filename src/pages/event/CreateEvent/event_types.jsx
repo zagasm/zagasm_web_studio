@@ -12,7 +12,7 @@ function EventType() {
     const [error, setError] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const { user, token } = useAuth();
-console.log('user', token);
+// console.log('user', token);
     useEffect(() => {
         const fetchEventTypes = async () => {
             try {
@@ -60,8 +60,8 @@ console.log('user', token);
 
     return (
         <div className="">
-            <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-6 tw:md:pt-24 tw:lg:px-4">
-                <div className="row p-0">
+            <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:md:pt-24 tw:lg:px-4">
+                <div className="">
                     <div className="col">
                         <div className="container mt-5 pb-5 event_type_container">
                             <div className="tw:max-w-7xl tw:mx-auto">

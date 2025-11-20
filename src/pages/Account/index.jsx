@@ -79,7 +79,7 @@ function Account() {
     <Fragment>
       <div className="">
         <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
-          <div className="row p-0 ">
+          <div className="">
             <div className="col account_section ">
               <div className="row">
                 <div className="col-xl-3 col-lg-4 col-md-5 col-sm-12 col-12 tw:px-0 tw:pb-0 tw:pt-12 m-0">
