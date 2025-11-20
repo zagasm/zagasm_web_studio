@@ -6,7 +6,7 @@ export default function MobileStickyBar({
   onGetTickets,
 }) {
   return (
-    <div className="tw:md:hidden tw:fixed tw:bottom-20 tw:left-0 tw:right-0 tw:z-50 tw:bg-[#F7EFFE] tw:border-t tw:border-primary/10 tw:px-5 tw:py-3 tw:flex tw:items-center tw:justify-between tw:gap-3">
+    <div className="tw:md:hidden tw:fixed tw:bottom-[70px] tw:left-0 tw:right-0 tw:z-50 tw:bg-[#F7EFFE] tw:border-t tw:border-primary/10 tw:px-5 tw:py-3 tw:flex tw:items-center tw:justify-between tw:gap-3">
       <div>
         <div className="tw:text-lg tw:font-semibold">{priceDisplay}</div>
         <div className="tw:text-xs tw:text-gray-600">{dateTime}</div>

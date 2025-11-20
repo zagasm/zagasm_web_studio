@@ -35,7 +35,7 @@ export default function Remarks({ eventId, remarks = [], onAppend }) {
 
   return (
     <div className="tw:px-5 tw:md:px-7 tw:py-5">
-      <h3 className="tw:text-base tw:font-semibold tw:mb-4">Remarks</h3>
+      <span className="tw:text-base tw:font-semibold tw:mb-4">Remarks</span>
       <div className="row">
         <div className="col-12 col-lg-6 tw:space-y-4">
           {remarks.map((r, i) => {

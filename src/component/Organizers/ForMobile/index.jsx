@@ -35,7 +35,7 @@ export default function MobileSingleOrganizers() {
   const fetchOrganizers = async () => {
     try {
       setLoadingList(true);
-      const res = await api.get("/api/v1/organisers", authHeaders(token));
+      const res = await api.get("/api/v1/organiser/for-you/get", authHeaders(token));
       const data = res?.data;
       if (data && Array.isArray(data.data)) {
         // Normalize: ensure boolean "following"
@@ -174,7 +174,7 @@ export default function MobileSingleOrganizers() {
                         {truncate(name, 14)}
                       </div>
                       <div className="tw:text-[8px] tw:text-gray-500 tw:truncate">
-                        {organizer.phone || "No phone"}
+                        {organizer.totalEventsCreated || "No"} Events created
                       </div>
                     </div>
                   </div>

@@ -19,7 +19,7 @@ export default function MobileNav() {
       to: "/feed",
       icon: (active) => (
         <HomeIcon
-          className={`tw:size-7 ${
+          className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
           fill={active ? "black" : "none"}
@@ -31,7 +31,7 @@ export default function MobileNav() {
       to: "/event/saved-events",
       icon: (active) => (
         <Heart
-          className={`tw:size-7 ${
+          className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
           fill={active ? "black" : "none"}
@@ -43,7 +43,7 @@ export default function MobileNav() {
       to: "/event/select-event-type",
       icon: (active) => (
         <PlusSquare
-          className={`tw:size-7 ${
+          className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
           fill={active ? "black" : "none"}
@@ -55,7 +55,7 @@ export default function MobileNav() {
       to: "/tickets",
       icon: (active) => (
         <Ticket
-          className={`tw:size-7 ${
+          className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
           fill={active ? "black" : "none"}
@@ -67,7 +67,7 @@ export default function MobileNav() {
       to: "/account",
       icon: (active) => (
         <User
-          className={`tw:size-7 ${
+          className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
           fill={active ? "black" : "none"}
@@ -90,7 +90,7 @@ export default function MobileNav() {
             >
               {item.icon(active)}
               <span
-                className={`tw:text-[12px] ${
+                className={`tw:text-[10px] ${
                   active ? "tw:text-black tw:font-semibold" : "tw:text-[#4A4A4A]"
                 }`}
               >
