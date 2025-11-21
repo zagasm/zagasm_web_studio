@@ -217,15 +217,22 @@ export default function EventActionsSheet({
     if (!hostId) return;
     setBusy(true);
     try {
+      const payload = {
+        blockable_type: "user",
+        blockable_id: hostId,
+      };
+
       await showPromise(
-        api.post(`/api/v1/organisers/${hostId}/block`, {}, authHeaders(token)),
+        api.post(`/api/v1/blockUserOrEvent`, payload, authHeaders(token)),
         {
           loading: "Blocking organizer…",
-          success: "Organizer blocked.",
+          success: "Organizer blocked successfully.",
           error: "Could not block organizer.",
         }
       );
       onClose();
+    } catch (e) {
+      console.error("Block error", e);
     } finally {
       setBusy(false);
     }
@@ -329,9 +336,7 @@ export default function EventActionsSheet({
                           if (event?.id) navigate(`/event/view/${event.id}`);
                           onClose();
                         }}
-                        icon={
-                          <Ticket className="tw:size-5" />
-                        }
+                        icon={<Ticket className="tw:size-5" />}
                       />
 
                       <ActionCard

@@ -1,12 +1,34 @@
-import React, { useEffect, useState } from "react";
-import SideBarNav from "../pageAssets/SideBarNav";
+import React, { useEffect, useMemo, useState } from "react";
 import Ticket from "../../component/Ticket/Ticket";
 import TicketReceiptModal from "../../component/Ticket/TicketViewModal";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
+import { TicketIcon } from "lucide-react";
 
 const CACHE_KEY = "zagasm_tickets_cache_v1";
+
+const TABS = [
+  { key: "all", label: "All" },
+  { key: "upcoming", label: "Upcoming" },
+  { key: "live", label: "Live" },
+  { key: "ended", label: "Ended" },
+];
+
+/** Same logic as in Ticket, but kept here for filtering */
+function computePhase(eventDate, startTime) {
+  if (!eventDate) return "upcoming";
+
+  const datePart = eventDate;
+  const timePart = startTime || "00:00:00";
+  const start = new Date(`${datePart}T${timePart}`);
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2h
+  const now = new Date();
+
+  if (now < start) return "upcoming";
+  if (now >= start && now <= end) return "live";
+  return "ended";
+}
 
 function TicketsPage() {
   const { token } = useAuth();
@@ -18,6 +40,8 @@ function TicketsPage() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
 
+  const [activeTab, setActiveTab] = useState("all");
+
   // load from cache first
   useEffect(() => {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -28,6 +52,7 @@ function TicketsPage() {
       } catch (_) {}
     }
     fetchTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTickets = async () => {
@@ -36,7 +61,6 @@ function TicketsPage() {
 
     try {
       const res = await api.get("/api/v1/ticket/list", authHeaders(token));
-
       const list = res?.data?.data || [];
       setTickets(list);
       localStorage.setItem(CACHE_KEY, JSON.stringify(list));
@@ -62,86 +86,149 @@ function TicketsPage() {
 
   const showEmpty = initialLoaded && !loading && tickets.length === 0;
 
+  // Attach phase (upcoming/live/ended) to each ticket for UI + filtering
+  const ticketsWithPhase = useMemo(
+    () =>
+      tickets.map((t) => ({
+        ...t,
+        phase: computePhase(t.event?.event_date, t.event?.start_time || null),
+      })),
+    [tickets]
+  );
+
+  const counts = useMemo(() => {
+    const upcoming = ticketsWithPhase.filter(
+      (t) => t.phase === "upcoming"
+    ).length;
+    const live = ticketsWithPhase.filter((t) => t.phase === "live").length;
+    const ended = ticketsWithPhase.filter((t) => t.phase === "ended").length;
+    return {
+      all: ticketsWithPhase.length,
+      upcoming,
+      live,
+      ended,
+    };
+  }, [ticketsWithPhase]);
+
+  const filteredTickets = useMemo(() => {
+    if (activeTab === "all") return ticketsWithPhase;
+    return ticketsWithPhase.filter((t) => t.phase === activeTab);
+  }, [ticketsWithPhase, activeTab]);
+
   return (
     <div className="">
       <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-20 tw:md:pt-24 tw:lg:px-4">
-        <div className="">
-          <div style={{
-            padding: 0
-          }} className="account_section">
-            <div className="tw:px-4 tw:py-4 tw:md:px-8 tw:md:py-8">
-              <div className="tw:max-w-7xl tw:mx-auto tw:flex tw:flex-col tw:gap-6">
-                {/* Header */}
-                <div className="tw:flex tw:flex-col tw:gap-1">
-                  <span className="tw:text-2xl tw:md:text-3xl tw:font-semibold tw:text-gray-900">
-                    Tickets
-                  </span>
-                  <span className="tw:block tw:text-sm tw:md:text-base tw:text-gray-500">
-                    Access all your event tickets and receipts in one place.
-                  </span>
-                </div>
-
-                {/* Error state */}
-                {error && (
-                  <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-red-50 tw:border tw:border-red-100 tw:px-4 tw:py-3 tw:text-sm tw:text-red-700">
-                    <span>{error}</span>
-                    <button
-                      onClick={fetchTickets}
-                      className="tw:text-xs tw:font-medium tw:underline"
-                    >
-                      Retry
-                    </button>
-                  </div>
-                )}
-
-                {/* Loading state */}
-                {loading && (
-                  <div className="row">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="col-12 col-sm-6 col-lg-4 mb-4">
-                        <div className="tw:animate-pulse tw:h-40 tw:bg-gray-100 tw:rounded-3xl tw:shadow-sm tw:w-full" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Empty state */}
-                {showEmpty && (
-                  <div className="tw:mt-6 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center tw:py-10 tw:bg-gray-50 tw:rounded-3xl">
-                    <div className="tw:text-4xl">🎟️</div>
-                    <p className="tw:text-base tw:font-medium tw:text-gray-900">
-                      No tickets yet
-                    </p>
-                    <p className="tw:text-sm tw:text-gray-500 tw:max-w-md">
-                      When you buy tickets to an event, they will appear here
-                      with their receipt and details.
-                    </p>
-                  </div>
-                )}
-
-                {/* Tickets grid */}
-                {!loading && tickets.length > 0 && (
-                  <div className="row">
-                    {tickets.map((ticket) => (
-                      <div
-                        key={ticket.ticket_id}
-                        className="col-12 col-lg-6 col-xl-6 mb-4"
-                      >
-                        <Ticket
-                          ticket={ticket}
-                          onViewReceipt={() => handleViewReceipt(ticket)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
+        <div className="account_section" style={{ padding: 0 }}>
+          <div className="tw:px-4 tw:py-4 tw:md:px-8 tw:md:py-8">
+            <div className="tw:flex tw:flex-col tw:gap-6">
+              {/* Header */}
+              <div className="tw:flex tw:flex-col tw:gap-1">
+                <span className="tw:text-2xl tw:md:text-3xl tw:font-semibold tw:text-gray-900">
+                  Tickets
+                </span>
+                <span className="tw:block tw:text-sm tw:md:text-base tw:text-gray-500">
+                  Access all your event tickets in one place.
+                </span>
               </div>
+
+              {/* Tabs */}
+              <div className="tw:w-full tw:mt-2 tw:mb-4 tw:overflow-x-auto">
+                <div className="tw:inline-flex tw:bg-white tw:rounded-lg tw:p-1 tw:gap-1">
+                  {TABS.map((tab) => {
+                    const active = activeTab === tab.key;
+                    const count = counts[tab.key] ?? 0;
+                    return (
+                      <button
+                        style={{
+                          borderRadius: 8,
+                        }}
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActiveTab(tab.key)}
+                        className={[
+                          "tw:px-4 tw:py-2 tw:rounded-full tw:text-sm tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150",
+                          active
+                            ? "tw:bg-lightPurple tw:text-gray-900 tw:shadow-sm"
+                            : "tw:text-gray-500 hover:tw:text-gray-900",
+                        ].join(" ")}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Error state */}
+              {error && (
+                <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-red-50 tw:border tw:border-red-100 tw:px-4 tw:py-3 tw:text-sm tw:text-red-700">
+                  <span>{error}</span>
+                  <button
+                    onClick={fetchTickets}
+                    className="tw:text-xs tw:font-medium tw:underline"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {/* Loading state */}
+              {loading && (
+                <div className="row">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="col-12 col-md-12 col-lg-6 mb-4">
+                      <div className="tw:animate-pulse tw:h-40 tw:bg-gray-100 tw:rounded-3xl tw:shadow-sm tw:w-full" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Empty state */}
+              {showEmpty && (
+                <div className="tw:mt-6 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center tw:py-10 tw:bg-gray-50 tw:rounded-3xl">
+                  <div className="tw:text-4xl">
+                    <TicketIcon className="tw:text-primary" size={40} />
+                  </div>
+                  <p className="tw:text-base tw:font-medium tw:text-gray-900">
+                    No tickets yet
+                  </p>
+                  <p className="tw:text-sm tw:text-gray-500 tw:max-w-md">
+                    When you buy tickets to an event, they will appear here with
+                    their receipt and details.
+                  </p>
+                </div>
+              )}
+
+              {/* Tickets grid – Bootstrap columns (1 / 2 / 3) */}
+              {!loading && filteredTickets.length > 0 && (
+                <div className="row">
+                  {filteredTickets.map((ticket) => (
+                    <div
+                      key={ticket.ticket_id}
+                      className="col-12 col-md-12 col-lg-6 col-xl-4 mb-4"
+                    >
+                      <Ticket
+                        ticket={ticket}
+                        phase={ticket.phase}
+                        onViewReceipt={() => handleViewReceipt(ticket)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* No tickets in current tab but there are in others */}
+              {!loading && !showEmpty && filteredTickets.length === 0 && (
+                <div className="tw:py-10 tw:text-center tw:text-gray-500">
+                  No {activeTab} tickets right now.
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* View Ticket / Receipt modal */}
+      {/* View Ticket / Receipt modal (unchanged) */}
       <TicketReceiptModal
         open={receiptOpen}
         onClose={closeReceipt}
