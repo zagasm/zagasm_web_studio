@@ -1,45 +1,78 @@
-.ticket-card {
+/* Container for the whole component */
+.ticket-wrapper {
   position: relative;
-  border-radius: 22px;
-  background: #ffffff;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-  display: flex;
-  overflow: hidden;
+  width: 100%;
+  /* Use max-width to prevent it from getting too wide on desktop */
+  max-width: 500px; 
+  /* Establish aspect ratio or let content define height. 
+     Usually, min-height is good to prevent collapse */
+  min-height: 180px; 
+  border-radius: 24px;
+  /* Ensure no overflow if the image has sharp corners */
+  /* overflow: hidden; */ 
+  isolation: isolate;
 }
 
-.ticket-card__body {
-  padding: 18px 20px;
-}
-
-.ticket-card__tear {
-  position: relative;
-  width: 72px;
-  background: #f3f4f6;
-}
-
-.ticket-card__tear::before,
-.ticket-card__tear::after {
-  content: "";
+/* The Background Image */
+.ticket-bg-image {
   position: absolute;
-  left: -18px;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  background: #f3f4f6;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Puts it behind everything */
+  object-fit: fill; /* Stretches image to match container size */
+  pointer-events: none;
 }
 
-.ticket-card__tear::before {
-  top: -18px;
+/* The Content Layout Overlay */
+.ticket-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
-.ticket-card__tear::after {
-  bottom: -18px;
+/* LEFT SIDE: Main Content Area */
+.ticket-main {
+  flex: 1; /* Takes up all remaining space */
+  padding: 20px 24px; /* Adjust padding to keep text away from edges */
+  /* Ensure content doesn't bleed into the rip line */
+  padding-right: 12px; 
 }
 
-.ticket-card__dots {
-  width: 2px;
-  height: 70%;
-  background-image: radial-gradient(circle, #d1d5db 2px, transparent 2px);
-  background-size: 2px 8px;
-  background-repeat: repeat-y;
+/* RIGHT SIDE: The Stub Area */
+.ticket-stub {
+  /* CRITICAL: Set this width to match the visual width 
+     of the "stub" part in your ticketbg.png 
+  */
+  width: 110px; 
+  min-width: 110px;
+  padding: 0px 1px 8px;
+  margin-left: 4px;
+  /* Flex alignment for content inside stub */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 480px) {
+  .ticket-wrapper {
+    max-width: 100%;
+  }
+  
+  .ticket-main {
+    padding: 16px;
+  }
+  
+  .ticket-stub {
+    width: 90px;
+    min-width: 90px;
+  }
+  
+  .ticket-stub span:last-child {
+    font-size: 16px; /* Smaller price font on mobile */
+  }
 }

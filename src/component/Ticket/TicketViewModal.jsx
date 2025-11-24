@@ -54,7 +54,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
 
         {/* Panel wrapper */}
         <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
-          <div className="tw:flex tw:min-h-full tw:items-center tw:justify-center tw:p-4">
+          <div className="tw:flex tw:min-h-full tw:items-center tw:justify-center tw:p-4 tw:md:pt-20">
             <Transition.Child
               as={Fragment}
               enter="tw:transition tw:duration-200 tw:ease-out"
@@ -66,7 +66,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
             >
               <Dialog.Panel className="tw:w-full tw:max-w-lg tw:bg-linear-to-b tw:from-gray-50 tw:to-white tw:rounded-3xl tw:shadow-2xl tw:overflow-hidden tw:relative">
                 {/* Cover */}
-                <div className="tw:w-full tw:h-40 tw:md:h-48 tw:overflow-hidden tw:bg-gray-200">
+                <div className="tw:w-full tw:h-20 tw:md:h-40 tw:overflow-hidden tw:bg-gray-200">
                   <img
                     src={event.poster || "/images/banner.png"}
                     alt={event.title || "Event cover"}
@@ -79,12 +79,12 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                   {/* Title + close */}
                   <div className="tw:flex tw:items-start tw:justify-between tw:gap-4">
                     <div className="tw:space-y-1">
-                      <Dialog.Title className="tw:text-xl tw:font-semibold tw:text-gray-900 tw:leading-snug">
+                      <span className="tw:block tw:text-sm tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:leading-snug">
                         {event.title || "Event Ticket"}
-                      </Dialog.Title>
-                      <p className="tw:text-xs tw:font-medium tw:tracking-[0.2em] tw:text-gray-500 tw:uppercase">
+                      </span>
+                      <span className="tw:block tw:text-[10px] tw:font-medium tw:tracking-[0.2em] tw:text-gray-500 tw:uppercase">
                         Ticket • {ticket?.status || "active"}
-                      </p>
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -124,17 +124,11 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           <span className="tw:font-medium tw:text-gray-900">
                             {user.name || "You"}
                           </span>
-                          <span className="tw:text-[11px] tw:text-gray-400">
-                            User ID: {user.id || "—"}
-                          </span>
                         </div>
                         <div className="tw:flex tw:flex-col tw:gap-1 tw:text-right">
                           <span className="tw:text-gray-500">Ticket Code</span>
                           <span className="tw:font-mono tw:text-[11px] tw:text-gray-900 tw:break-all">
                             {ticket?.code}
-                          </span>
-                          <span className="tw:text-[11px] tw:text-gray-400">
-                            Ticket ID: {ticket?.ticket_id}
                           </span>
                         </div>
                       </div>
@@ -156,37 +150,11 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           <p className="tw:text-xs tw:text-gray-900 tw:font-medium">
                             {currency.code || ""} {payment.amount || ""}
                           </p>
-                          <p className="tw:text-[11px] tw:text-gray-400">
-                            {payment.created_at &&
-                              new Date(payment.created_at).toLocaleString()}
-                          </p>
                         </div>
-                        <div className="tw:text-right">
-                          <p className="tw:text-[11px] tw:text-gray-500 tw:uppercase tw:tracking-[0.16em] tw:mb-0.5">
-                            Status
-                          </p>
-                          <span className="tw:inline-flex tw:px-2 tw:py-1 tw:rounded-full tw:bg-primary/10 tw:text-primary tw:text-[11px] tw:font-semibold tw:capitalize">
-                            {ticket?.status || "active"}
-                          </span>
-                          <p className="tw:text-[11px] tw:text-gray-400 tw:mt-1">
-                            {ticket?.status_date &&
-                              new Date(ticket.status_date).toLocaleString()}
-                          </p>
-                        </div>
+                        
                       </div>
                     </div>
 
-                    {/* Perforated side */}
-                    <div className="tw:hidden tw:md:flex tw:flex-col tw:items-center tw:justify-center tw:w-24 tw:bg-gray-50 tw:relative">
-                      <div className="tw:absolute tw:-left-4 tw:top-0 tw:w-8 tw:h-8 tw:bg-gray-50 tw:rounded-full" />
-                      <div className="tw:absolute tw:-left-4 tw:bottom-0 tw:w-8 tw:h-8 tw:bg-gray-50 tw:rounded-full" />
-                      <div className="tw:h-full tw:w-px tw:border-l tw:border-dashed tw:border-gray-300" />
-                      <div className="tw:absolute tw:inset-y-4 tw:left-0 tw:right-0 tw:flex tw:flex-col tw:items-center tw:justify-between tw:pointer-events-none">
-                        <span className="tw:text-[10px] tw:text-gray-300 tw:tracking-[0.2em] tw:uppercase tw:rotate-90">
-                          Admit One
-                        </span>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Footer */}

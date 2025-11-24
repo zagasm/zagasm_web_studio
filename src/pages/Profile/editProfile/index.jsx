@@ -33,6 +33,7 @@ function EditProfile() {
   const [uploading, setUploading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -487,6 +488,18 @@ function EditProfile() {
                   <span className="tw:flex tw:items-center tw:gap-2 tw:text-gray-800">
                     <FiLock className="tw:text-gray-500" />
                     <span className="tw:font-medium">Set Password</span>
+                  </span>
+                  <span className="tw:text-gray-400 tw:text-lg">›</span>
+                </button>
+
+                {/* Password Row */}
+                <button
+                  onClick={() => setVerifyOpen(true)}
+                  className="tw:flex tw:items-center tw:justify-between tw:w-full tw:rounded-xl tw:border tw:border-gray-100 hover:tw:border-gray-200 tw:bg-gray-50 hover:tw:bg-gray-100 tw:px-4 tw:py-3 tw:transition"
+                >
+                  <span className="tw:flex tw:items-center tw:gap-2 tw:text-gray-800">
+                    <FiLock className="tw:text-gray-500" />
+                    <span className="tw:font-medium">Verify Account</span>
                   </span>
                   <span className="tw:text-gray-400 tw:text-lg">›</span>
                 </button>

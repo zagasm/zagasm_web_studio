@@ -80,17 +80,16 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
 
       const data = response.data;
       
-      if (data.message && data.token && data.user) {
+      if (data.message && data.user) {
         // Success case
         showToast.success(data.message);
-         login({
-          user: data.user,
-          token: data.token
-        });
-        // Redirect to dashboard or appropriate page
+        //  login({
+        //   user: data.user,
+        //   token: data.token
+        // });
         setTimeout(() => {
-          navigate("/feed"); // Update this to your desired post-login route
-        }, 1000);
+          navigate("/auth/signin");
+        }, 800);
       } else {
         // Unexpected response format
         showToast.error("Password reset successful but unexpected response format.");
@@ -155,11 +154,11 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              className="form-control input"
+              className=" input tw:w-full"
               placeholder="Enter New Password"
               value={formData.password}
               onChange={handleChange}
-              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px" }}
+              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px", marginBottom: 0 }}
             />
             <i
               className={`position-absolute input-password-icon ${showPassword ? "feather-eye" : "feather-eye-off"}`}
@@ -183,11 +182,11 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
             <input
               type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
-              className="form-control input"
+              className="input tw:w-full"
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px" }}
+              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px", marginBottom: 0 }}
             />
             <i
               className={`position-absolute input-password-icon ${showConfirmPassword ? "feather-eye" : "feather-eye-off"}`}

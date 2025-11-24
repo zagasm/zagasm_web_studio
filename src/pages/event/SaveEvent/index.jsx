@@ -21,9 +21,6 @@ export default function SaveEvents() {
                 <SaveEventTemplate />
               </div>
             </div>
-            <RightBarComponent>
-              <SuggestedOrganizer />
-            </RightBarComponent>
           </div>
         </div>
       </div>

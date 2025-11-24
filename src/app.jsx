@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
-import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Enables dropdown and other JS features
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { Routes, Route, useLocation } from "react-router-dom";
 import AuthLayout from "./pages/auth/layout";
@@ -8,9 +8,6 @@ import { Signin } from "./pages/auth/signin";
 import { CodeVerification } from "./pages/auth/CodeVerification";
 import { ForgetPassword } from "./pages/auth/Forgetpassword";
 import { Error404 } from "./pages/errors/pagenotfound";
-// import { Onboarding } from "./pages/onboarding";
-
-// import Header from "./component/assets/Header";
 import Sidebar from "./component/assets/sidebar/sidebar";
 import { Outlet } from "react-router-dom";
 
@@ -52,6 +49,7 @@ import DataProtectionPage from "./pages/DataProtection/index.jsx";
 import ZagasmLanding from "./pages/LandingPage/index.jsx";
 import TicketsPage from "./pages/tickets/TicketsPage.jsx";
 import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
+import SearchPage from "./pages/Search/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -114,6 +112,8 @@ export function App() {
             </Route>
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/payment/callback" element={<PaymentCallback />} />
+            <Route path="/search" element={<SearchPage />} />
+
             <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="select-event-type" element={<EventType />} />
@@ -133,7 +133,7 @@ export function App() {
                 element={<AccountNotification />}
               />
             </Route>
-            <Route path="/notification" element={<Notification />}>
+            <Route path="/notifications" element={<Notification />}>
               <Route index exact element={<AllNotification />} />
             </Route>
           </Route>
