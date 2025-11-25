@@ -104,11 +104,11 @@ export default function ThreeStepSection({
                     delay: i * 0.06,
                   }}
                 >
-                  <div className="tw:relative tw:inline-block">
+                  <div className="tw:font-dela tw:relative tw:inline-block">
                     <div
                       className={[
-                        "tw:font-extrabold tw:leading-tight tw:tracking-tight",
-                        isActive ? "tw:text-gray-900 tw:text-4xl tw:md:text-5xl tw:lg:text-7xl" : "tw:text-gray-400 tw:text-3xl tw:md:text-4xl tw:lg:text-6xl",
+                        "tw:font-extrabold tw:leading-tight tw:tracking-tight tw:transition-all tw:duration-300",
+                        isActive ? "tw:text-gray-900 tw:text-[32px] tw:md:text-5xl tw:lg:text-6xl" : "tw:text-gray-400 tw:text-3xl tw:md:text-4xl tw:lg:text-5xl",
                       ].join(" ")}
                     >
                       {label}
