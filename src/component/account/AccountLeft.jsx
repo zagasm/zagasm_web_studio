@@ -32,11 +32,15 @@ const AccountLeft = ({ user }) => {
     }
   };
 
+  
   return (
     <>
       <div className="tw:flex tw:flex-col tw:gap-4 tw:pt-6 tw:md:pt-10 tw:pb-6">
         {/* 1. Profile Card */}
-        <div className="tw:bg-white tw:rounded-3xl tw:px-3 tw:py-4 tw:flex tw:items-center tw:justify-between tw:shadow-sm hover:tw:shadow-md tw:transition-shadow tw:cursor-pointer">
+        <Link
+          to={`/profile/${user.id}`}
+          className="tw:bg-white tw:rounded-3xl tw:px-3 tw:py-4 tw:flex tw:items-center tw:justify-between tw:shadow-sm hover:tw:shadow-md tw:transition-shadow tw:cursor-pointer"
+        >
           <div className="tw:flex tw:items-center tw:gap-4">
             <div className="tw:h-12 tw:w-12 tw:rounded-full tw:overflow-hidden tw:bg-gray-200">
               <img
@@ -57,7 +61,7 @@ const AccountLeft = ({ user }) => {
             </div>
           </div>
           <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-400" />
-        </div>
+        </Link>
 
         {/* 3. Verification Warning (Shows ONLY if NOT verified) */}
         {!isVerified && (

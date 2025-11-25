@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Bell,
@@ -13,17 +13,15 @@ import {
   Trash,
   LogOut,
 } from "lucide-react";
+import Switch from "@mui/material/Switch";
+import { api, authHeaders } from "../../lib/apiClient";
 
-const MenuSection = ({ title, items }) => (
+const MenuSection = ({ title, children }) => (
   <div className="tw:mb-8">
     <span className="tw:text-[14px] tw:font-medium tw:text-gray-500 tw:mb-4 tw:pl-1">
       {title}
     </span>
-    <div className="tw:flex tw:flex-col tw:gap-3">
-      {items.map((item, index) => (
-        <ItemCard key={index} {...item} />
-      ))}
-    </div>
+    <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-3">{children}</div>
   </div>
 );
 
@@ -68,11 +66,79 @@ const ItemCard = ({ icon: Icon, label, to, onClick, isRed }) => {
 };
 
 const AccountRight = ({ onLogout, onDeactivate }) => {
-  const preferences = [
-    { icon: Bell, label: "Notifications", to: "/account/manage-notification" },
-    { icon: Globe, label: "Language", to: "/account/language" },
-    { icon: Mail, label: "Email & SMS Preference", to: "/account/email-pref" },
-  ];
+  const [notifSettings, setNotifSettings] = useState({
+    push: false,
+    email: false,
+  });
+  const [loadingSettings, setLoadingSettings] = useState(true);
+  const [updatingKey, setUpdatingKey] = useState(null);
+  const [notifError, setNotifError] = useState("");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoadingSettings(true);
+        setNotifError("");
+        const token = localStorage.getItem("token");
+        const res = await api.get(
+          "/api/v1/me/notification-settings",
+          authHeaders(token)
+        );
+        const data = res?.data?.data;
+        if (data) {
+          setNotifSettings({
+            push: !!data.push,
+            email: !!data.email,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load notification settings", err);
+        setNotifError("Could not load your notification preferences.");
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const updateSetting = async (type) => {
+    if (loadingSettings || updatingKey) return;
+
+    const prev = { ...notifSettings };
+    const nextValue = !prev[type];
+    const nextState = {
+      ...prev,
+      [type]: nextValue,
+    };
+
+    setNotifSettings(nextState);
+    setUpdatingKey(type);
+    setNotifError("");
+
+    try {
+      const token = localStorage.getItem("token");
+      await api.put(
+        "/api/v1/me/notification-settings",
+        {
+          push: nextState.push,
+          email: nextState.email,
+        },
+        authHeaders(token)
+      );
+    } catch (err) {
+      console.error("Failed to update notification settings", err);
+      setNotifSettings(prev); // revert
+      setNotifError("Unable to update. Please try again.");
+    } finally {
+      setUpdatingKey(null);
+    }
+  };
+
+  const isPushDisabled =
+    loadingSettings || updatingKey === "push" || !!notifError;
+  const isEmailDisabled =
+    loadingSettings || updatingKey === "email" || !!notifError;
 
   const security = [
     { icon: Lock, label: "Password & Security", to: "/account/security" },
@@ -97,20 +163,86 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       label: "Delete Account",
       onClick: onDeactivate,
       isRed: false,
-    }, // Kept black as per screen, usually delete is separate
+    },
   ];
 
   return (
     <div className="tw:pt-6 tw:md:pt-10 tw:pb-16">
-      <MenuSection title="Preference" items={preferences} />
-      <MenuSection title="Security & Privacy" items={security} />
-      <MenuSection title="Support" items={support} />
+      {/* Preferences section with inline notification switches */}
+      <MenuSection title="Preference">
+        {/* Notifications card with Push / Email toggles */}
+        <div className="tw:bg-white tw:w-full tw:rounded-3xl tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all">
+          <div className="tw:flex tw:items-center tw:justify-between">
+            <div className="tw:flex tw:items-center tw:gap-3">
+              <Bell className="tw:w-5 tw:h-5 tw:text-gray-700" />
+              <div>
+                <span className="tw:text-[15px] tw:font-medium tw:text-gray-900">
+                  Notifications
+                </span>
+                <span className="tw:block tw:text-xs tw:text-gray-500">
+                  Choose how you want to hear from us.
+                </span>
+              </div>
+            </div>
+          </div>
 
-      <div className="tw:mt-6  tw:mb-8 tw:flex tw:justify-center">
+          <div className="tw:mt-1 tw:space-y-2">
+            <div className="tw:flex tw:items-center tw:justify-between">
+              <span className="tw:text-sm tw:text-gray-700">
+                Push Notifications
+              </span>
+              <Switch
+                checked={notifSettings.push}
+                onChange={() => updateSetting("push")}
+                disabled={isPushDisabled}
+                size="small"
+              />
+            </div>
+            <div className="tw:flex tw:items-center tw:justify-between">
+              <span className="tw:text-sm tw:text-gray-700">
+                Email Notifications
+              </span>
+              <Switch
+                checked={notifSettings.email}
+                onChange={() => updateSetting("email")}
+                disabled={isEmailDisabled}
+                size="small"
+              />
+            </div>
+          </div>
+
+          {loadingSettings && (
+            <p className="tw:mt-1 tw:text-xs tw:text-gray-400">
+              Loading your preferences…
+            </p>
+          )}
+          {notifError && (
+            <p className="tw:mt-1 tw:text-xs tw:text-red-500">{notifError}</p>
+          )}
+        </div>
+
+        {/* Language stays as a separate item */}
+        <ItemCard icon={Globe} label="Language" to="/account/language" />
+      </MenuSection>
+
+      {/* Security & Privacy */}
+      <MenuSection title="Security & Privacy">
+        {security.map((item, index) => (
+          <ItemCard key={index} {...item} />
+        ))}
+      </MenuSection>
+
+      {/* Support */}
+      <MenuSection title="Support">
+        {support.map((item, index) => (
+          <ItemCard key={index} {...item} />
+        ))}
+      </MenuSection>
+
+      {/* Logout button */}
+      <div className="tw:mt-6 tw:mb-8 tw:flex tw:justify-center">
         <button
-          style={{
-            borderRadius: 24,
-          }}
+          style={{ borderRadius: 24 }}
           onClick={onLogout}
           className="tw:flex tw:w-full tw:text-center tw:items-center tw:gap-2 tw:bg-white tw:px-8 tw:py-3 tw:rounded-full tw:shadow-sm hover:tw:shadow-md tw:transition-all"
         >
