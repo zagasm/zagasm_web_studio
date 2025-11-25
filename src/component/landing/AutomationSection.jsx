@@ -40,7 +40,7 @@ export default function AutomationSection({
         <div className="tw:absolute tw:-right-28 tw:bottom-0 tw:h-[520px] tw:w-[520px] tw:rounded-full tw:blur-[110px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(193,21,181,0.18),rgba(143,7,231,0.10)_55%,transparent_70%)]" />
       </div>
 
-      <div className="tw:relative tw:z-10 tw:mx-auto tw:max-w-7xl tw:px-5">
+      <div className="tw:relative tw:z-10 tw:mx-auto tw:max-w-6xl tw:px-5">
         <div
           className={`tw:flex tw:flex-col ${
             right ? "tw:md:flex-row-reverse" : "tw:md:flex-row"
@@ -63,7 +63,7 @@ export default function AutomationSection({
             </motion.div>
 
             <motion.span
-              className="tw:block tw:mb-4 tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"
+              className="tw:font-dela tw:block tw:mb-4 tw:text-3xl tw:md:text-[40px] tw:lg:text-5xl tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"
               variants={textVariants}
               custom={1}
             >
