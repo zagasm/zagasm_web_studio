@@ -131,7 +131,7 @@ const AccountLeft = ({ user }) => {
 
           <div className="col-6">
             <Link
-              to="/organizers"
+              to="/me/organisers"
               className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all"
             >
               <img src="/images/following.svg" alt="" />
@@ -143,7 +143,7 @@ const AccountLeft = ({ user }) => {
 
           <div className="col-6">
             <Link
-              to="/followers"
+              to="/me/organisers/followers"
               className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all"
             >
               <img src="/images/followers.svg" alt="" />

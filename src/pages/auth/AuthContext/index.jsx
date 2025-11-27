@@ -1,5 +1,6 @@
 // pages/auth/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { api, authHeaders } from "../../../lib/apiClient";
 
 const AuthContext = createContext();
 
@@ -29,6 +30,17 @@ export const AuthProvider = ({ children }) => {
     setUser(u);
     setToken(t);
     persist(u, t);
+  };
+
+  const refreshUser = async () => {
+    if (!token) return;
+
+    try {
+      const res = await api.get("/api/v1/user/profile", authHeaders(token));
+      setUser(res.data.user);
+    } catch (err) {
+      console.error("Failed to refresh user", err);
+    }
   };
 
   /** Update only token and/or user (used after password change, profile edits, etc.) */
@@ -65,6 +77,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         setAuth,
+        refreshUser,
       }}
     >
       {children}

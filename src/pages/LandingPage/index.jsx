@@ -27,7 +27,7 @@ export default function ZagasmLanding() {
           subtitle="Hit Go Live—Zagasm auto-clips verticals, adds captions & chapters, multistreams via RTMP to every platform, and logs your best moments to the CRM in real time."
           ctaTo="/auth/signup"
           ctaLabel="Start automating free"
-          mediaSrc="/images/zagasm-automation.svg"
+          mediaSrc="/images/z1.png"
           mediaAlt="Auto-clip, multistream, and CRM logging powered by Zagasm"
         />
 
@@ -38,7 +38,7 @@ export default function ZagasmLanding() {
           subtitle="Queue replays, publish highlight cards, syndicate everywhere, and track conversions—without leaving the player. Less busywork, more impact."
           ctaTo="/auth/signup"
           ctaLabel="Start automating free"
-          mediaSrc="/images/cards.png"
+          mediaSrc="/images/z2.png"
           mediaAlt="Highlight cards, replays, and cross-posting automation"
           right
         />

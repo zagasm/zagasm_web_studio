@@ -1,53 +1,31 @@
-import React, { Fragment, useState } from "react";
-import { Tab } from "@headlessui/react";
+import React, { useState } from "react";
 import EventsFilterTabs from "./EventsFilterTab";
 import EventsGrid from "./EventsGrid";
-import AboutPanel from "./AboutPanel";
 import useMyEvents from "../../hooks/useMyEvents";
 
-export default function ProfileTabs({ user }) {
-  const [filter, setFilter] = useState("all");
-  const { events, loading, error } = useMyEvents(filter);
+export default function ProfileTabs() {
+  const [statusTab, setStatusTab] = useState("upcoming");
+
+  // map to your API filter
+  const apiFilter = statusTab === "upcoming" ? "soon" : statusTab;
+  const { events, loading, error } = useMyEvents(apiFilter);
 
   return (
-    <Tab.Group as="div" className="tw:mt-6">
-      <div className="tw:flex tw:flex-col tw:gap-4">
-        {/* top-level tabs: Events / About */}
-        <Tab.List className="tw:flex tw:rounded-2xl tw:bg-gray-50 tw:p-2">
-          {["Events", "About"].map((t) => (
-            <Tab as={Fragment} key={t}>
-              {({ selected }) => (
-                <button
-                  style={{
-                    borderRadius: 20,
-                  }}
-                  className={`tw:flex-1 tw:rounded-xl tw:px-4 tw:py-3 tw:text-sm tw:md:text-base tw:font-medium tw:transition
-                  ${
-                    selected
-                      ? "tw:bg-purple-100 tw:text-purple-700 tw:outline-none tw:border-none"
-                      : "tw:text-gray-700 hover:tw:bg-gray-100"
-                  }`}
-                >
-                  {t}
-                </button>
-              )}
-            </Tab>
-          ))}
-        </Tab.List>
+    <div className="tw:h-full tw:flex tw:flex-col">
+      {/* sticky only on lg+; on mobile/md it scrolls normally */}
+      <div className="tw:lg:sticky tw:lg:top-0 tw:z-20 tw:bg-[#f5f5f7] tw:pb-3">
+        <div className="tw:flex tw:items-center tw:justify-between tw:pt-3 tw:pb-2">
+          <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
+            My Events
+          </span>
+        </div>
 
-        <Tab.Panels>
-          {/* Events */}
-          <Tab.Panel>
-            <EventsFilterTabs value={filter} onChange={setFilter} />
-            <EventsGrid events={events} loading={loading} error={error} />
-          </Tab.Panel>
-
-          {/* About */}
-          <Tab.Panel>
-            <AboutPanel user={user} />
-          </Tab.Panel>
-        </Tab.Panels>
+        <EventsFilterTabs value={statusTab} onChange={setStatusTab} />
       </div>
-    </Tab.Group>
+
+      <div className="tw:flex-1 tw:mt-3 tw:pb-20">
+        <EventsGrid events={events} loading={loading} error={error} />
+      </div>
+    </div>
   );
 }

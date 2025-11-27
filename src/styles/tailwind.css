@@ -24,6 +24,13 @@ html{
   font-family: "Poppins", sans-serif;
 }
 
+.tw-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.tw-no-scrollbar {
+  scrollbar-width: none;
+}
+
 /* Scoped, safe reset */
 [data-tw-reset] {
   font: inherit;
