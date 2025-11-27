@@ -133,35 +133,66 @@ const slideVariants = {
 const slides = [
   {
     id: 0,
-    line1: ["Live", "streaming", "made", "simple"],
-    line2: ["and", "seriously", "fast"],
-    highlightWord: "simple",
+    line1: ["Welcome", "to", "Zagasm", "Studios"],
+    line2: ["Where", "your", "moments", "become", "global", "experiences"],
+    highlightWord: "moments",
     subText:
-      "Zagasm plugs into your workflow; RTMP in, multi-platform out. Ditch the boring setup and focus on your show, music, podcasts, and events.",
+      "Turn every moment into a global experience with reliable, high-quality live streaming built for concerts, shows, and creative events.",
     ctaLabel: "Get Started",
     ctaTo: "/auth/signin",
   },
   {
     id: 1,
-    line1: ["Launch", "events", "your", "audience", "remembers"],
-    line2: ["tickets,", "streams,", "replays", "built-in"],
-    highlightWord: "Launch",
+    line1: ["The", "World", "is", "Your", "Stage"],
+    line2: ["Concerts,", "shows,", "hangouts,", "talk", "shows,", "seminars"],
+    highlightWord: "Stage",
     subText:
-      "From ticketing to live chat, Zagasm handles the plumbing so you can obsess over content, not configs and spreadsheets.",
-    ctaLabel: "Host an Event",
+      "If it’s happening, it can be live. Run concerts, hangouts, talk shows, and seminars from one stage and stream them everywhere.",
+    ctaLabel: "Go Live",
     ctaTo: "/auth/signin",
   },
   {
     id: 2,
-    line1: ["Creators", "first.", "Infrastructure", "handled."],
-    line2: ["Monetize", "without", "touching", "OBS"],
-    highlightWord: "Creators",
+    line1: ["Connect", "Beyond", "Borders"],
+    line2: ["From", "Lagos", "to", "London,", "Abuja", "to", "Abu", "Dhabi"],
+    highlightWord: "Borders",
     subText:
-      "Go live, clip highlights, and ship content to the platforms that matter in one go. No extra cables, no messy dashboards.",
-    ctaLabel: "Join Creators",
+      "Bridge cities and continents in a single click. With Zagasm Studios, your creativity travels farther than your passport.",
+    ctaLabel: "Stream Worldwide",
+    ctaTo: "/auth/signin",
+  },
+  {
+    id: 3,
+    line1: ["Whether", "you're", "a", "pro", "or", "a", "first-time", "streamer"],
+    line2: ["Unleash", "the", "blockbuster", "trapped", "in", "your", "head"],
+    highlightWord: "blockbuster",
+    subText:
+      "No complex setup, no panic. Just a clean studio flow that lets you ship the blockbuster idea you’ve been sitting on.",
+    ctaLabel: "Start Your First Stream",
+    ctaTo: "/auth/signin",
+  },
+  {
+    id: 4,
+    line1: ["Make", "Moments", "Magical"],
+    line2: ["Smooth", "streaming,", "clean", "visuals.", "No", "technical", "glitch"],
+    highlightWord: "Magical",
+    subText:
+      "Enjoy smooth streaming, sharp visuals, and rock-solid stability so your audience remembers the magic, not the glitches.",
+    ctaLabel: "See How It Works",
+    ctaTo: "/auth/signin",
+  },
+  {
+    id: 5,
+    line1: ["Bring", "the", "energy", "to", "Zagasm", "Studios"],
+    line2: ["Your", "creativity", "deserves", "4K,", "Dolby", "Atmos,", "and", "a", "standing", "ovation"],
+    highlightWord: "energy",
+    subText:
+      "Push out 4K streams, cinematic audio, and studio-grade production that makes every session feel like a premiere night.",
+    ctaLabel: "Upgrade Your Streams",
     ctaTo: "/auth/signin",
   },
 ];
+
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
@@ -185,7 +216,7 @@ export default function Hero() {
   const currentSlide = slides[index];
 
   return (
-    <section className="tw:mx-auto tw:max-w-5xl tw:px-5 tw:pt-8 tw:pb-20">
+    <section className="tw:mx-auto tw:max-w-5xl tw:px-5 tw:pt-8 tw:pb-6">
       <RatingBar />
 
       <div className="tw:relative tw:mt-4">

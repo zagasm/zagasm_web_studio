@@ -50,6 +50,9 @@ import ZagasmLanding from "./pages/LandingPage/index.jsx";
 import TicketsPage from "./pages/tickets/TicketsPage.jsx";
 import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
 import SearchPage from "./pages/Search/index.jsx";
+import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
+import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
+import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
 
 const MainLayout = () => (
   <>
@@ -105,6 +108,7 @@ export function App() {
           <Route element={<MainLayout />}>
             <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
+            <Route path="/become-an-organiser" element={<BecomeOrganiser />} />
             <Route path="/profile" element={<Profile />}>
               <Route index exact path=":profileId" element={<ViewProfile />} />
               <Route path="edit-profile" element={<EditProfile />} />
@@ -135,6 +139,10 @@ export function App() {
             </Route>
             <Route path="/notifications" element={<Notification />}>
               <Route index exact element={<AllNotification />} />
+            </Route>
+            <Route path="/me/organisers" element={<Notification />}>
+              <Route index exact element={<OrganisersIFollow />} />
+              <Route path="followers" element={<OrganiserFollowers />} />
             </Route>
           </Route>
         </Route>

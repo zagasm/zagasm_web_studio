@@ -15,7 +15,6 @@ export default function EventsGrid({ events, loading, error }) {
     );
   }
 
-
   if (error) {
     return (
       <p className="tw:mt-4 tw:text-red-600">Failed to load events: {error}</p>
@@ -33,7 +32,7 @@ export default function EventsGrid({ events, loading, error }) {
   }
 
   return (
-    <div className="tw:mt-4 tw:md:mt-10 row tw:mb-20 tw:md:mb-0">
+    <div className="tw:mt-4 tw:md:mt-6 row tw:mb-20 tw:md:mb-0">
       {events.map((e) => (
         <EventCard key={e.id} event={e} />
       ))}

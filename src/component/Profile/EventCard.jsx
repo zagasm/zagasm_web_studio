@@ -67,7 +67,7 @@ export default function EventCard({ event }) {
   };
 
   return (
-    <article className="col-12 col-md-6 col-lg-4 col-xl-4 tw:overflow-hidden tw:rounded-3xl tw:bg-white ">
+    <article className="col-12 col-md-6 col-lg-6 col-xl-6 tw:overflow-hidden tw:rounded-3xl tw:bg-white ">
       {/* Clickable media/title section navigates to streaming page */}
       <div className="tw:cursor-pointer" onClick={goToStreaming}>
         <MediaCarousel items={media} alt={event.title} />
