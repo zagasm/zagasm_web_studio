@@ -357,7 +357,7 @@ const BecomeOrganiser = () => {
         </button>
 
         {/* Crypto method card */}
-        <button
+        {/* <button
           style={{
             borderRadius: 8,
           }}
@@ -388,7 +388,7 @@ const BecomeOrganiser = () => {
           <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[11px] tw:text-gray-700 tw:font-medium tw:mt-3">
             Ideal for international payouts
           </span>
-        </button>
+        </button> */}
       </div>
 
       <div className="tw:flex tw:justify-end tw:mt-2">

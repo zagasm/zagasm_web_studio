@@ -21,7 +21,7 @@ export default function ZagasmLanding() {
 
       <main className="tw:relative tw:z-10 tw:mt-10 tw:md:mt-20">
         <Hero />
-        <ThreeSplineIcon />
+        {/* <ThreeSplineIcon /> */}
         <AutomationSection
           title="Stream once. Zagasm does the rest"
           subtitle="Hit Go Live—Zagasm auto-clips verticals, adds captions & chapters, multistreams via RTMP to every platform, and logs your best moments to the CRM in real time."

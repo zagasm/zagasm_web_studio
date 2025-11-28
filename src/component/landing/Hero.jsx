@@ -2,8 +2,19 @@ import React, { useMemo, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import RatingBar from "./RatingBar";
 import CTAButton from "./CTAButton";
+import {
+  Music,
+  Video,
+  Radio,
+  Tv,
+  Mic,
+  Users,
+  Globe,
+  Sparkles,
+  Film,
+  Zap,
+} from "lucide-react";
 
-/* ---- Word-level variants (unchanged) ---- */
 const word = {
   hidden: { y: 18, opacity: 0, filter: "blur(2px)" },
   show: {
@@ -33,7 +44,7 @@ function FlowHeadline({
   );
 
   return (
-    <div className="tw:relative tw:mb-4 tw:font-dela">
+    <div className="tw:relative tw:mb-4 tw:font-bold tw:font-dela">
       {/* Continuous sheen across the whole headline */}
       <motion.span
         aria-hidden
@@ -58,7 +69,7 @@ function FlowHeadline({
           variants={localSentence}
           initial="hidden"
           animate="show"
-          className="tw:block tw:text-center tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-3xl tw:md:text-[40px] tw:lg:text-5xl tw:text-gray-900"
+          className="tw:block tw:text-center tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-[30px] tw:md:text-[40px] tw:lg:text-[53px] tw:text-gray-900"
         >
           {line1Words.map((w, i) => (
             <motion.span
@@ -69,7 +80,7 @@ function FlowHeadline({
               <span
                 className={
                   highlightWord && w === highlightWord
-                    ? "tw:text-[#8F07E7]"
+                    ? "tw:text-purple-600"
                     : ""
                 }
               >
@@ -79,14 +90,12 @@ function FlowHeadline({
           ))}
         </motion.span>
 
-        {/* <br className="tw:hidden tw:md:block" /> */}
-
         {/* Line 2 */}
         <motion.span
           variants={localSentence}
           initial="hidden"
           animate="show"
-          className="tw:block tw:text-center tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-3xl tw:md:text-[40px] tw:lg:text-5xl tw:text-gray-900"
+          className="tw:block tw:text-center tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-[30px] tw:md:text-[40px] tw:lg:text-[53px] tw:text-gray-900"
         >
           {line2Words.map((w, i) => (
             <motion.span
@@ -116,7 +125,7 @@ const slideVariants = {
     filter: "blur(0px)",
     transition: {
       duration: 0.55,
-      ease: [0.23, 0.9, 0.25, 1], // smooth bezier
+      ease: [0.23, 0.9, 0.25, 1],
     },
   },
   exit: (direction) => ({
@@ -140,6 +149,11 @@ const slides = [
       "Turn every moment into a global experience with reliable, high-quality live streaming built for concerts, shows, and creative events.",
     ctaLabel: "Get Started",
     ctaTo: "/auth/signin",
+    icons: [
+      { Icon: Sparkles, delay: 0.2, yOffset: -20, curve: 30 },
+      { Icon: Video, delay: 0.4, yOffset: 40, curve: -20 },
+      { Icon: Music, delay: 0.6, yOffset: 0, curve: 40 },
+    ],
   },
   {
     id: 1,
@@ -147,9 +161,14 @@ const slides = [
     line2: ["Concerts,", "shows,", "hangouts,", "talk", "shows,", "seminars"],
     highlightWord: "Stage",
     subText:
-      "If it’s happening, it can be live. Run concerts, hangouts, talk shows, and seminars from one stage and stream them everywhere.",
+      "If it's happening, it can be live. Run concerts, hangouts, talk shows, and seminars from one stage and stream them everywhere.",
     ctaLabel: "Go Live",
     ctaTo: "/auth/signin",
+    icons: [
+      { Icon: Mic, delay: 0.2, yOffset: 30, curve: -25 },
+      { Icon: Tv, delay: 0.4, yOffset: -10, curve: 35 },
+      { Icon: Users, delay: 0.6, yOffset: 20, curve: -30 },
+    ],
   },
   {
     id: 2,
@@ -160,39 +179,86 @@ const slides = [
       "Bridge cities and continents in a single click. With Zagasm Studios, your creativity travels farther than your passport.",
     ctaLabel: "Stream Worldwide",
     ctaTo: "/auth/signin",
+    icons: [
+      { Icon: Globe, delay: 0.2, yOffset: -30, curve: 40 },
+      { Icon: Radio, delay: 0.4, yOffset: 25, curve: -35 },
+      { Icon: Zap, delay: 0.6, yOffset: -5, curve: 30 },
+    ],
   },
   {
     id: 3,
-    line1: ["Whether", "you're", "a", "pro", "or", "a", "first-time", "streamer"],
+    line1: [
+      "Whether",
+      "you're",
+      "a",
+      "pro",
+      "or",
+      "a",
+      "first-time",
+      "streamer",
+    ],
     line2: ["Unleash", "the", "blockbuster", "trapped", "in", "your", "head"],
     highlightWord: "blockbuster",
     subText:
-      "No complex setup, no panic. Just a clean studio flow that lets you ship the blockbuster idea you’ve been sitting on.",
+      "No complex setup, no panic. Just a clean studio flow that lets you ship the blockbuster idea you've been sitting on.",
     ctaLabel: "Start Your First Stream",
     ctaTo: "/auth/signin",
+    icons: [
+      { Icon: Film, delay: 0.2, yOffset: 15, curve: -20 },
+      { Icon: Sparkles, delay: 0.4, yOffset: -25, curve: 45 },
+      { Icon: Video, delay: 0.6, yOffset: 35, curve: -25 },
+    ],
   },
   {
     id: 4,
     line1: ["Make", "Moments", "Magical"],
-    line2: ["Smooth", "streaming,", "clean", "visuals.", "No", "technical", "glitch"],
+    line2: [
+      "Smooth",
+      "streaming,",
+      "clean",
+      "visuals.",
+      "No",
+      "technical",
+      "glitch",
+    ],
     highlightWord: "Magical",
     subText:
       "Enjoy smooth streaming, sharp visuals, and rock-solid stability so your audience remembers the magic, not the glitches.",
     ctaLabel: "See How It Works",
     ctaTo: "/auth/signin",
+    icons: [
+      { Icon: Zap, delay: 0.2, yOffset: -15, curve: 35 },
+      { Icon: Music, delay: 0.4, yOffset: 20, curve: -40 },
+      { Icon: Sparkles, delay: 0.6, yOffset: -35, curve: 25 },
+    ],
   },
   {
     id: 5,
     line1: ["Bring", "the", "energy", "to", "Zagasm", "Studios"],
-    line2: ["Your", "creativity", "deserves", "4K,", "Dolby", "Atmos,", "and", "a", "standing", "ovation"],
+    line2: [
+      "Your",
+      "creativity",
+      "deserves",
+      "4K,",
+      "Dolby",
+      "Atmos,",
+      "and",
+      "a",
+      "standing",
+      "ovation",
+    ],
     highlightWord: "energy",
     subText:
       "Push out 4K streams, cinematic audio, and studio-grade production that makes every session feel like a premiere night.",
     ctaLabel: "Upgrade Your Streams",
     ctaTo: "/auth/signin",
+    icons: [
+      { Icon: Film, delay: 0.2, yOffset: 25, curve: -30 },
+      { Icon: Mic, delay: 0.4, yOffset: -20, curve: 40 },
+      { Icon: Tv, delay: 0.6, yOffset: 10, curve: -35 },
+    ],
   },
 ];
-
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
@@ -203,7 +269,7 @@ export default function Hero() {
     const interval = setInterval(() => {
       setDirection(1);
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 9000); // 9s per slide
+    }, 9000);
     return () => clearInterval(interval);
   }, []);
 
@@ -216,10 +282,190 @@ export default function Hero() {
   const currentSlide = slides[index];
 
   return (
-    <section className="tw:mx-auto tw:max-w-5xl tw:px-5 tw:pt-8 tw:pb-6">
+    <section className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:pt-8 tw:pb-6 tw:relative tw:overflow-hidden">
       <RatingBar />
 
-      <div className="tw:relative tw:mt-4">
+      {/* Floating Icons - Right Side */}
+      <div className="tw:absolute tw:right-4 tw:lg:right-12 tw:top-1/2 tw:-translate-y-1/2 tw:w-24 tw:lg:w-32 tw:h-full tw:pointer-events-none tw:hidden tw:md:block">
+        <AnimatePresence mode="wait">
+          {currentSlide.icons.map((iconData, idx) => {
+            const { Icon, delay, yOffset, curve } = iconData;
+            return (
+              <motion.div
+                key={`${currentSlide.id}-icon-${idx}`}
+                initial={{
+                  x: 200,
+                  y: yOffset,
+                  opacity: 0,
+                  scale: 0.3,
+                  rotate: -90,
+                }}
+                animate={{
+                  x: [200, curve, 0],
+                  y: yOffset,
+                  opacity: [0, 0.7, 1],
+                  scale: [0.3, 1.1, 1],
+                  rotate: [-90, 15, 0],
+                }}
+                exit={{
+                  x: [-20, -150],
+                  opacity: [1, 0],
+                  scale: [1, 0.4],
+                  rotate: [0, 90],
+                  transition: {
+                    duration: 0.6,
+                    ease: [0.23, 0.9, 0.25, 1],
+                  },
+                }}
+                transition={{
+                  duration: 1.2,
+                  delay: delay,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="tw:absolute tw:left-0"
+                style={{
+                  top: `${30 + idx * 20}%`,
+                }}
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -10, 0],
+                    rotate: [0, 8, -8, 0],
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: idx * 0.4,
+                  }}
+                  className="tw:relative tw:w-12 tw:h-12 tw:lg:w-16 tw:lg:h-16 tw:rounded-2xl tw:bg-gradient-to-br tw:from-purple-500/20 tw:to-pink-500/20 tw:backdrop-blur-sm tw:border tw:border-purple-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
+                >
+                  <Icon
+                    className="tw:w-6 tw:h-6 tw:lg:w-8 tw:lg:h-8 tw:text-purple-600"
+                    strokeWidth={2}
+                  />
+
+                  {/* Glow effect */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.4, 1],
+                      opacity: [0.4, 0.7, 0.4],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: idx * 0.3,
+                    }}
+                    className="tw:absolute tw:inset-0 tw:rounded-2xl tw:bg-purple-400/30 tw:blur-lg tw:-z-10"
+                  />
+
+                  {/* Sparkle effect */}
+                  <motion.div
+                    animate={{
+                      rotate: [0, 360],
+                    }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="tw:absolute tw:inset-0"
+                  >
+                    <div className="tw:absolute tw:top-1 tw:right-1 tw:w-1 tw:h-1 tw:bg-white tw:rounded-full tw:opacity-80" />
+                    <div className="tw:absolute tw:bottom-2 tw:left-2 tw:w-1 tw:h-1 tw:bg-white tw:rounded-full tw:opacity-60" />
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {/* Floating Icons - Left Side (Mirror) */}
+      <div className="tw:absolute tw:left-4 tw:lg:left-12 tw:top-1/2 tw:-translate-y-1/2 tw:w-24 tw:lg:w-32 tw:h-full tw:pointer-events-none tw:hidden tw:lg:block">
+        <AnimatePresence mode="wait">
+          {currentSlide.icons.map((iconData, idx) => {
+            const { Icon, delay, yOffset, curve } = iconData;
+            return (
+              <motion.div
+                key={`${currentSlide.id}-icon-left-${idx}`}
+                initial={{
+                  x: -200,
+                  y: yOffset + 30,
+                  opacity: 0,
+                  scale: 0.3,
+                  rotate: 90,
+                }}
+                animate={{
+                  x: [-200, -curve, 0],
+                  y: yOffset + 30,
+                  opacity: [0, 0.6, 0.9],
+                  scale: [0.3, 1.1, 1],
+                  rotate: [90, -15, 0],
+                }}
+                exit={{
+                  x: [20, 150],
+                  opacity: [0.9, 0],
+                  scale: [1, 0.4],
+                  rotate: [0, -90],
+                  transition: {
+                    duration: 0.6,
+                    ease: [0.23, 0.9, 0.25, 1],
+                  },
+                }}
+                transition={{
+                  duration: 1.2,
+                  delay: delay + 0.15,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="tw:absolute tw:right-0"
+                style={{
+                  top: `${35 + idx * 20}%`,
+                }}
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -8, 0],
+                    rotate: [0, -8, 8, 0],
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{
+                    duration: 4.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: idx * 0.5,
+                  }}
+                  className="tw:relative tw:w-14 tw:h-14 tw:rounded-2xl tw:bg-gradient-to-br tw:from-pink-500/20 tw:to-purple-500/20 tw:backdrop-blur-sm tw:border tw:border-pink-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
+                >
+                  <Icon
+                    className="tw:w-7 tw:h-7 tw:text-pink-600"
+                    strokeWidth={2}
+                  />
+
+                  {/* Glow effect */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.4, 0.7, 0.4],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: idx * 0.4,
+                    }}
+                    className="tw:absolute tw:inset-0 tw:rounded-2xl tw:bg-pink-400/30 tw:blur-lg tw:-z-10"
+                  />
+                </motion.div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      <div className="tw:relative tw:mt-4 tw:z-10">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentSlide.id}
@@ -237,12 +483,17 @@ export default function Hero() {
               highlightWord={currentSlide.highlightWord}
             />
 
-            {/* Sub text with shimmer – also per slide */}
+            {/* Sub text with shimmer */}
             <motion.span
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 140, damping: 18 }}
-              className="tw:relative tw:block tw:mx-auto tw:max-w-3xl tw:text-center tw:text-sm tw:text-gray-500 tw:mb-4"
+              transition={{
+                type: "spring",
+                stiffness: 140,
+                damping: 18,
+                delay: 0.2,
+              }}
+              className="tw:relative tw:block tw:mx-auto tw:max-w-3xl tw:text-center tw:text-base tw:text-gray-600 tw:mb-4 tw:px-4"
             >
               <motion.span
                 animate={{ backgroundPositionX: ["0%", "100%"] }}
@@ -264,16 +515,24 @@ export default function Hero() {
             <motion.div
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 140, damping: 18 }}
-              className="tw:flex tw:flex-col tw:sm:flex-row tw:items-center tw:justify-center tw:gap-4"
+              transition={{
+                type: "spring",
+                stiffness: 140,
+                damping: 18,
+                delay: 0.3,
+              }}
+              className="tw:flex tw:flex-col sm:tw:flex-row tw:items-center tw:justify-center tw:gap-4"
             >
-              <CTAButton to={currentSlide.ctaTo} label={currentSlide.ctaLabel} />
+              <CTAButton
+                to={currentSlide.ctaTo}
+                label={currentSlide.ctaLabel}
+              />
             </motion.div>
           </motion.div>
         </AnimatePresence>
 
         {/* Slider dots */}
-        <div className="tw:mt-6 tw:flex tw:items-center tw:justify-center tw:gap-3">
+        <div className="tw:mt-8 tw:flex tw:items-center tw:justify-center tw:gap-3">
           {slides.map((slide, i) => {
             const isActive = i === index;
             return (
@@ -281,14 +540,16 @@ export default function Hero() {
                 key={slide.id}
                 type="button"
                 onClick={() => handleDotClick(i)}
-                className="tw:relative tw:h-2.5 tw:rounded-full tw:overflow-hidden tw:bg-gray-200 tw:transition-[width] tw:duration-300"
+                className="tw:relative tw:h-2.5 tw:rounded-full tw:overflow-hidden tw:bg-gray-200 tw:transition-[width] tw:duration-300 tw:cursor-pointer hover:tw:bg-gray-300"
                 style={{ width: isActive ? "32px" : "10px" }}
               >
                 {isActive && (
                   <motion.span
                     layoutId="hero-slider-dot"
                     className="tw:absolute tw:inset-0 tw:rounded-full"
-                    style={{ background: "linear-gradient(90deg,#8F07E7,#C115B5)" }}
+                    style={{
+                      background: "linear-gradient(90deg,#8F07E7,#C115B5)",
+                    }}
                   />
                 )}
               </button>
