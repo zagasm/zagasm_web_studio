@@ -123,7 +123,7 @@ export default function SubscriptionsPage({ }) {
   console.log(plans);
 
   return (
-    <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:text-slate-900 tw:pt-20 tw:md:pt-28 tw:px-4 tw:py-10 tw:flex tw:justify-center">
+    <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:text-slate-900 tw:pt-24 tw:md:pt-28 tw:px-4 tw:pb-20 tw:flex tw:justify-center">
       <div className="tw:w-full tw:max-w-6xl">
         {/* Header */}
         <div className="tw:flex tw:flex-col tw:items-center tw:text-center tw:gap-4 tw:mb-10">
