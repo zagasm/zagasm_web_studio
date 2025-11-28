@@ -151,7 +151,7 @@ const slides = [
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Sparkles, delay: 0.2, yOffset: -20, curve: 30 },
-      { Icon: Video, delay: 0.4, yOffset: 40, curve: -20 },
+      { Icon: Video, delay: 0.4, yOffset: 0, curve: -20 },
       { Icon: Music, delay: 0.6, yOffset: 0, curve: 40 },
     ],
   },
@@ -166,7 +166,7 @@ const slides = [
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Mic, delay: 0.2, yOffset: 30, curve: -25 },
-      { Icon: Tv, delay: 0.4, yOffset: -10, curve: 35 },
+      { Icon: Tv, delay: 0.4, yOffset: 10, curve: 35 },
       { Icon: Users, delay: 0.6, yOffset: 20, curve: -30 },
     ],
   },
@@ -181,7 +181,7 @@ const slides = [
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Globe, delay: 0.2, yOffset: -30, curve: 40 },
-      { Icon: Radio, delay: 0.4, yOffset: 25, curve: -35 },
+      { Icon: Radio, delay: 0.4, yOffset: 0, curve: -35 },
       { Icon: Zap, delay: 0.6, yOffset: -5, curve: 30 },
     ],
   },
@@ -205,7 +205,7 @@ const slides = [
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Film, delay: 0.2, yOffset: 15, curve: -20 },
-      { Icon: Sparkles, delay: 0.4, yOffset: -25, curve: 45 },
+      { Icon: Sparkles, delay: 0.4, yOffset: -5, curve: 45 },
       { Icon: Video, delay: 0.6, yOffset: 35, curve: -25 },
     ],
   },
@@ -228,7 +228,7 @@ const slides = [
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Zap, delay: 0.2, yOffset: -15, curve: 35 },
-      { Icon: Music, delay: 0.4, yOffset: 20, curve: -40 },
+      { Icon: Music, delay: 0.4, yOffset: -30, curve: -40 },
       { Icon: Sparkles, delay: 0.6, yOffset: -35, curve: 25 },
     ],
   },
@@ -254,7 +254,7 @@ const slides = [
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Film, delay: 0.2, yOffset: 25, curve: -30 },
-      { Icon: Mic, delay: 0.4, yOffset: -20, curve: 40 },
+      { Icon: Mic, delay: 0.4, yOffset: 20, curve: 40 },
       { Icon: Tv, delay: 0.6, yOffset: 10, curve: -35 },
     ],
   },
