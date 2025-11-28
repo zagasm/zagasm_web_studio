@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { showError, showSuccess } from "../../../component/ui/toast";
 
 const NetworkStatus = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -7,12 +8,12 @@ const NetworkStatus = () => {
   useEffect(() => {
     const handleOffline = () => {
       setIsOnline(false);
-      toast.error("You lost internet connection!", { autoClose: false });
+      showError("You lost internet connection!");
     };
 
     const handleOnline = () => {
       setIsOnline(true);
-      toast.success("Internet is back!", { autoClose: 3000 });
+      showSuccess("You are back online!");
     };
 
     window.addEventListener("offline", handleOffline);
