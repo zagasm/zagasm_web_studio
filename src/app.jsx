@@ -53,6 +53,7 @@ import SearchPage from "./pages/Search/index.jsx";
 import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
 import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
 import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
+import SubscriptionsPage from "./pages/subscription/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -129,6 +130,7 @@ export function App() {
               <Route path="saved-events" element={<SaveEvents />} />
             </Route>
             <Route path="/creator/channel/new" element={<StreamingPage />} />
+            <Route path="/subscription" element={<SubscriptionsPage />} />
             <Route path="/account" element={<AccountOutlet />}>
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />

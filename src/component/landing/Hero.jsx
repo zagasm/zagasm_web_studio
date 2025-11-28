@@ -339,7 +339,7 @@ export default function Hero() {
                     ease: "easeInOut",
                     delay: idx * 0.4,
                   }}
-                  className="tw:relative tw:w-12 tw:h-12 tw:lg:w-16 tw:lg:h-16 tw:rounded-2xl tw:bg-gradient-to-br tw:from-purple-500/20 tw:to-pink-500/20 tw:backdrop-blur-sm tw:border tw:border-purple-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
+                  className="tw:relative tw:w-12 tw:h-12 tw:lg:w-16 tw:lg:h-16 tw:rounded-2xl tw:bg-linear-to-br tw:from-purple-500/20 tw:to-pink-500/20 tw:backdrop-blur-sm tw:border tw:border-purple-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
                 >
                   <Icon
                     className="tw:w-6 tw:h-6 tw:lg:w-8 tw:lg:h-8 tw:text-purple-600"
@@ -437,7 +437,7 @@ export default function Hero() {
                     ease: "easeInOut",
                     delay: idx * 0.5,
                   }}
-                  className="tw:relative tw:w-14 tw:h-14 tw:rounded-2xl tw:bg-gradient-to-br tw:from-pink-500/20 tw:to-purple-500/20 tw:backdrop-blur-sm tw:border tw:border-pink-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
+                  className="tw:relative tw:w-14 tw:h-14 tw:rounded-2xl tw:bg-linear-to-br tw:from-pink-500/20 tw:to-purple-500/20 tw:backdrop-blur-sm tw:border tw:border-pink-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
                 >
                   <Icon
                     className="tw:w-7 tw:h-7 tw:text-pink-600"
