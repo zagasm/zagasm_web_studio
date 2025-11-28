@@ -18,7 +18,7 @@ export default function DataProtectionPage() {
         <title>Data Protection & Privacy Rights — Zagasm Studios</title>
       </Helmet>
 
-      <div className="tw:relative tw:z-10 tw:max-w-7xl tw:mx-auto tw:px-4 tw:md:px-6 lg:tw:px-8 tw:py-5 tw:flex tw:items-center tw:justify-between">
+      <div className="tw:relative tw:z-10 tw:max-w-7xl tw:mx-auto tw:px-4 tw:md:px-6 tw:lg:px-8 tw:py-5 tw:flex tw:items-center tw:justify-between">
         <Link to="/" className="tw:inline-flex tw:items-center tw:gap-3">
           <img
             src="/images/logo.png"

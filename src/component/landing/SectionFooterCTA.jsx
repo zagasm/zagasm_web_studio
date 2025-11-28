@@ -29,7 +29,7 @@ export default function Footer() {
       <div className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:pt-12 tw:pb-24">
         {/* Brand + grid */}
         <div className="tw:flex tw:flex-col tw:gap-10">
-          <div className="tw:flex tw:flex-col md:tw:flex-row tw:items-start md:tw:items-center tw:justify-between tw:gap-6">
+          <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-6">
             <Link to="/" className="tw:inline-flex tw:items-center tw:gap-3">
               <img
                 src="/images/logo.png"
@@ -39,7 +39,7 @@ export default function Footer() {
             </Link>
 
             {/* Contact + socials */}
-            <div className="tw:flex tw:flex-col md:tw:flex-row tw:items-start md:tw:items-center tw:gap-6">
+            <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:gap-6">
               <div className="tw:space-y-1 tw:text-sm">
                 <div className="tw:flex tw:items-center tw:gap-2 text-dark">
                   <Phone size={16} className="tw:text-[#8F07E7]" />
@@ -78,7 +78,7 @@ export default function Footer() {
           </div>
 
           {/* Links grid */}
-          <div className="tw:grid tw:grid-cols-2 sm:tw:grid-cols-3 lg:tw:grid-cols-5 tw:gap-8">
+          <div className="tw:grid tw:grid-cols-2 sm:tw:grid-cols-3 tw:lg:grid-cols-5 tw:gap-8">
             {/* Disclaimer column (like the screenshot) */}
             {columns.map((c, idx) => (
               <motion.div
@@ -140,11 +140,11 @@ function BottomCTA() {
           {/* Rounded top bar with gradient */}
           <Link
             to="/auth/signup"
-            className="tw:block tw:w-full tw:rounded-t-[28px] tw:bg-linear-to-r tw:from-[#8F07E7] tw:to-[#C115B5] tw:px-6 tw:py-6 sm:tw:py-7 md:tw:py-8 tw:text-center"
+            className="tw:block tw:w-full tw:rounded-t-[28px] tw:bg-linear-to-r tw:from-[#8F07E7] tw:to-[#C115B5] tw:px-6 tw:py-6 sm:tw:py-7 tw:md:py-8 tw:text-center"
           >
             <div className="tw:relative tw:mx-auto tw:max-w-7xl tw:px-5">
               <motion.span
-                className="tw:inline-flex tw:items-center tw:gap-3 tw:text-white tw:font-extrabold tw:text-lg sm:tw:text-xl md:tw:text-2xl"
+                className="tw:inline-flex tw:items-center tw:gap-3 tw:text-white tw:font-extrabold tw:text-lg sm:tw:text-xl tw:md:text-2xl"
                 animate={{ gap: [3, 8, 3] }}
                 transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
               >

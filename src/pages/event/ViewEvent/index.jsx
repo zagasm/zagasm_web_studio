@@ -515,7 +515,7 @@ export default function ViewEvent() {
                         className={
                           expanded
                             ? ""
-                            : "tw:line-clamp-2 tw:md:tw:line-clamp-1"
+                            : "tw:line-clamp-2 tw:tw:md:line-clamp-1"
                         }
                       >
                         {event.description ||

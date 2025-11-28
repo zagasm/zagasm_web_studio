@@ -230,7 +230,7 @@ function EditProfile() {
           >
             <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
           </button>
-          <span className="tw:text-lg md:tw:text-xl tw:font-semibold tw:text-gray-900">
+          <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
             Edit Profile
           </span>
           <div className="tw:size-10" />

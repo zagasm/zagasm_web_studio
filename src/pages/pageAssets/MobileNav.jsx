@@ -77,7 +77,7 @@ export default function MobileNav() {
   ];
 
   return (
-    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-5 tw:z-999 tw:block md:tw:hidden">
+    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-5 tw:z-999 tw:block tw:md:hidden">
       <div className="tw:flex tw:items-center tw:justify-between tw:px-6">
         {navItems.map((item) => {
           const active = location.pathname === item.to;

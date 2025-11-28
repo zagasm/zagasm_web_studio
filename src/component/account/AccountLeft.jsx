@@ -32,7 +32,6 @@ const AccountLeft = ({ user }) => {
     }
   };
 
-  
   return (
     <>
       <div className="tw:flex tw:flex-col tw:gap-4 tw:pt-6 tw:md:pt-10 tw:pb-6">
@@ -62,6 +61,28 @@ const AccountLeft = ({ user }) => {
           </div>
           <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-400" />
         </Link>
+
+        <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-[11.5px] tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
+          <div className="tw:flex tw:items-center tw:gap-3">
+            <div className="tw:shrink-0">
+              <img
+                className="tw:size-6"
+                src="/images/upgrade.png"
+                alt="Warning"
+              />
+            </div>
+            <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
+              Upgrade plan to enjoy premium features
+            </span>
+          </div>
+          <Link
+            to="/subscription"
+            style={{ borderRadius: 8 }}
+            className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[14px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
+          >
+            Upgrade Now
+          </Link>
+        </div>
 
         {/* 3. Verification Warning (Shows ONLY if NOT verified) */}
         {!isVerified && (

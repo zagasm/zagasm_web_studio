@@ -10,7 +10,7 @@ export default function ProfileImageCard({
       </span>
 
       <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
-        <div className="tw:relative tw:w-28 tw:h-28 md:tw:w-32 md:tw:h-32 tw:rounded-full tw:overflow-hidden tw:bg-gray-100">
+        <div className="tw:relative tw:w-28 tw:h-28 tw:md:w-32 tw:md:h-32 tw:rounded-full tw:overflow-hidden tw:bg-gray-100">
           <img
             src={profileImage}
             alt="Profile"
