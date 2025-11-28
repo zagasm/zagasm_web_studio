@@ -86,7 +86,7 @@ const AccountLeft = ({ user }) => {
         )}
 
         {/* 2. Dashboard Banner */}
-        <Link className="tw:block">
+        {/* <Link className="tw:block">
           <div className="tw:bg-[#F3E8FF] tw:rounded-3xl tw:p-5 tw:flex tw:items-center tw:justify-between tw:transition-opacity hover:tw:opacity-90">
             <div className="tw:flex tw:items-center tw:gap-4">
               <img className="tw:size-7" src="/images/dashIcon.svg" alt="" />
@@ -101,7 +101,7 @@ const AccountLeft = ({ user }) => {
             </div>
             <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-500" />
           </div>
-        </Link>
+        </Link> */}
 
         {/* 4. Quick Stats Grid */}
         <div className="row g-3">
