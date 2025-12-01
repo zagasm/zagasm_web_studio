@@ -167,7 +167,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
   ];
 
   return (
-    <div className="tw:pt-6 tw:md:pt-10 tw:pb-16">
+    <div className="tw:pt-6 tw:md:pt-10 tw:pb-16 tw:w-full">
       {/* Preferences section with inline notification switches */}
       <MenuSection title="Preference">
         {/* Notifications card with Push / Email toggles */}

@@ -3,6 +3,7 @@ import {
   ToastHost,
   showError,
   showPromise,
+  showSuccess,
 } from "../../../../component/ui/toast";
 import { api } from "../../../../lib/apiClient";
 import ProgressSteps from "./steps/ProgressSteps";
@@ -126,6 +127,12 @@ export default function EventCreationWizard({ eventTypeId }) {
       }
       fd.append("currency_id", review.currency || "");
 
+      // backstage
+      fd.append("has_backstage", review.hasBackstage ? "1" : "0");
+      if (review.hasBackstage && review.backstagePrice != null) {
+        fd.append("backstage_price", String(review.backstagePrice));
+      }
+
       // streaming
       fd.append("streaming_option", review.streamingOption || "");
       fd.append("enable_replay", review.enableReplay ? "1" : "0");
@@ -137,8 +144,11 @@ export default function EventCreationWizard({ eventTypeId }) {
       fd.append("post_mature_content", review.matureContent ? "1" : "0");
 
       // media
-       performers.forEach((p, i) => {
+      performers.forEach((p, i) => {
         fd.append(`performers[${i}][name]`, p.name || "");
+        if (p.user_name) {
+          fd.append(`performers[${i}][user_name]`, p.user_name);
+        }
         if (p.image) fd.append(`performers[${i}][image]`, p.image);
         if (p.role) fd.append(`performers[${i}][role]`, p.role);
       });
@@ -171,6 +181,7 @@ export default function EventCreationWizard({ eventTypeId }) {
       });
 
       navigate("/feed");
+      showSuccess("Your event has been created successfully.");
     } catch (err) {
       const status = err?.response?.status;
       if (status === 422) {
