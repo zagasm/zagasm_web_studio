@@ -52,7 +52,7 @@ export default function LiveAppDownloadModal({ open, onClose }) {
 
                   <Dialog.Description className="tw:text-sm tw:text-gray-600 tw:max-w-sm">
                     To join this event live right now, download the Zagasm
-                    Studios live app from your preferred app store.
+                    Studios app from your preferred app store.
                   </Dialog.Description>
 
                   <div className="tw:flex tw:flex-col tw:sm:flex-row tw:gap-3 tw:mt-3 tw:w-full">

@@ -142,17 +142,16 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
     loadingSettings || updatingKey === "email" || !!notifError;
 
   const security = [
-    { icon: Lock, label: "Password & Security", to: "/account/security" },
-    {
-      icon: UserX,
-      label: "Blocked Organizers / Users",
-      to: "/account/blocked",
-    },
-    {
-      icon: ShieldCheck,
-      label: "Two-Factor Authentication",
-      to: "/account/2fa",
-    },
+    // {
+    //   icon: UserX,
+    //   label: "Blocked Organizers / Users",
+    //   to: "/account/blocked",
+    // },
+    // {
+    //   icon: ShieldCheck,
+    //   label: "Two-Factor Authentication",
+    //   to: "/account/2fa",
+    // },
   ];
   const events = [
     { icon: User2, label: "Mentions Tag", to: "/mentions" },
@@ -160,9 +159,9 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
   ];
 
   const support = [
-    { icon: HelpCircle, label: "FAQ", to: "/account/faq" },
-    { icon: Headphones, label: "Contact Support", to: "/account/support" },
-    { icon: FileText, label: "Terms & Policy", to: "/account/terms" },
+    { icon: Headphones, label: "Community Guidelines", to: "/community-guidelines" },
+    { icon: FileText, label: "Terms of Service", to: "/terms-of-service" },
+    { icon: FileText, label: "Privacy Policy", to: "/privacy-policy" },
     {
       icon: Trash,
       label: "Delete Account",
@@ -227,7 +226,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
         </div>
 
         {/* Language stays as a separate item */}
-        <ItemCard icon={Globe} label="Language" to="/account/language" />
+        {/* <ItemCard icon={Globe} label="Language" to="/account/language" /> */}
       </MenuSection>
 
       {/* Security & Privacy */}
@@ -236,11 +235,11 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
           <ItemCard key={index} {...item} />
         ))}
       </MenuSection>
-      <MenuSection title="Security & Privacy">
+      {/* <MenuSection title="Security & Privacy">
         {security.map((item, index) => (
           <ItemCard key={index} {...item} />
         ))}
-      </MenuSection>
+      </MenuSection> */}
 
       {/* Support */}
       <MenuSection title="Support">
