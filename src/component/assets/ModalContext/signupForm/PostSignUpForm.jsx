@@ -14,6 +14,7 @@ import { useAuth } from "../../../../pages/auth/AuthContext";
 import axios from "axios";
 import qs from 'qs';
 import { showToast } from "../../../ToastAlert";
+import { showError, showSuccess } from "../../../ui/toast";
 
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
@@ -87,7 +88,7 @@ const PostSignupForm = () => {
       console.log('Response data:', response.data);
       
       if (response.status === 200 || response.status === 201) {
-        showToast.success(response.data.message || "Date of Birth and Gender updated successfully!");
+        showSuccess(response.data.message || "Date of Birth and Gender updated successfully!");
         settosendUserdata(response.data.user);
         setFormSubmitted(true);
       } else if (response.status === 422) {
@@ -109,7 +110,7 @@ const PostSignupForm = () => {
           // Show specific validation error from API
           const errorMsg = message || response.data?.error || 'Validation failed';
           setError(errorMsg);
-          showToast.error(errorMsg);
+          showError(errorMsg);
         }
       } else {
         throw new Error(response.data?.message || "Update failed");

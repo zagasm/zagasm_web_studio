@@ -12,7 +12,7 @@ import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import MobileStickyBar from "../../../component/Events/MobileStickyBar";
 import ReportModal from "../../../component/Events/ReportModal";
 import AccessTypeModal from "../../../component/Events/AccessTypeModal";
-import LiveAppDownloadBanner from "../../../component/Events/LiveAppDownloadBanner";
+import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
 
 import { formatEventDateTime, randomAvatar } from "../../../utils/ui";
 import { useAuth } from "../../auth/AuthContext";
@@ -43,6 +43,8 @@ export default function ViewEvent() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(null);
+
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -179,7 +181,7 @@ export default function ViewEvent() {
     }
   };
 
-  const isLiveNow = !!event?.status === "live";
+  const isLiveNow = event?.status === "live";
   const isSoldOut = !!event?.is_sold_out;
   const hasPaid = !!event?.hasPaid;
 
@@ -205,14 +207,11 @@ export default function ViewEvent() {
   const ctaDisabled = (!hasPaid && isSoldOut) || (hasPaid && !isLiveNow);
 
   const handleEnterLive = () => {
-    // If your backend gives a direct stream URL, use it
-    if (event?.streamUrl) {
-      window.location.href = event.streamUrl;
+    // When event is live and user has paid, show the app download modal
+    if (hasPaid && isLiveNow) {
+      setDownloadModalOpen(true);
       return;
     }
-
-    // Fallback to internal route – adjust as needed
-    navigate(`/events/${event.id}/live`);
   };
 
   if (loading) {
@@ -255,7 +254,7 @@ export default function ViewEvent() {
       ? "Online event"
       : "Location to be announced");
 
-      console.log({event});
+  console.log({ event });
 
   return (
     <>
@@ -547,12 +546,6 @@ export default function ViewEvent() {
                         : "You’ve already paid. We’ll notify you when it’s live."
                       : "Secure checkout • Instant ticket access"}
                   </div>
-
-                  {hasPaid && isLiveNow && (
-                    <div className="tw:mt-3">
-                      <LiveAppDownloadBanner />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -860,6 +853,11 @@ export default function ViewEvent() {
           await handleGetTicket(accessType);
           setAccessModalOpen(false);
         }}
+      />
+
+      <LiveAppDownloadModal
+        open={downloadModalOpen}
+        onClose={() => setDownloadModalOpen(false)}
       />
     </>
   );

@@ -18,7 +18,7 @@ export default function ProcessSteps() {
 
   return (
     <div className="tw:mb-12">
-      <h3 className="tw:text-xl sm:tw:text-2xl tw:font-semibold tw:mb-4">
+      <h3 className="tw:text-xl tw:sm:text-2xl tw:font-semibold tw:mb-4">
         How We Process Your Request
       </h3>
 

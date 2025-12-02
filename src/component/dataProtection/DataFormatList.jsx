@@ -13,7 +13,7 @@ export default function DataFormatList() {
 
   return (
     <div className="tw:mb-12">
-      <h3 className="tw:text-xl sm:tw:text-2xl tw:font-semibold tw:mb-2">
+      <h3 className="tw:text-xl tw:sm:text-2xl tw:font-semibold tw:mb-2">
         Data Format
       </h3>
       <p className="tw:text-gray-600">

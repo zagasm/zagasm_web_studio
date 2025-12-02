@@ -4,6 +4,7 @@ import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { showSuccess, showError } from "../../../component/ui/toast";
 
 export function ChangePassword({ ResetPasswordVerificationData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,17 +46,17 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
 
     // Validation checks
     if (!password || !confirmPassword) {
-      showToast.error("All fields are required.");
+      showError("All fields are required.");
       return;
     }
 
     if (password.length < 8) {
-      showToast.error("Password must be at least 8 characters.");
+      showError("Password must be at least 8 characters.");
       return;
     }
 
     if (password !== confirmPassword) {
-      showToast.error("Passwords do not match.");
+      showError("Passwords do not match.");
       return;
     }
 
@@ -82,7 +83,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
       
       if (data.message && data.user) {
         // Success case
-        showToast.success(data.message);
+        showSuccess(data.message);
         //  login({
         //   user: data.user,
         //   token: data.token
@@ -92,7 +93,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
         }, 800);
       } else {
         // Unexpected response format
-        showToast.error("Password reset successful but unexpected response format.");
+        showError("Password reset successful but unexpected response format.");
         navigate("/auth/signin");
       }
     } catch (err) {
@@ -109,7 +110,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
         errorMessage = "Network error. Please check your internet connection.";
       }
       
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);

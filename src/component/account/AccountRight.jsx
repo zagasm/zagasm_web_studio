@@ -12,6 +12,7 @@ import {
   FileText,
   Trash,
   LogOut,
+  User2,
 } from "lucide-react";
 import Switch from "@mui/material/Switch";
 import { api, authHeaders } from "../../lib/apiClient";
@@ -153,6 +154,10 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       to: "/account/2fa",
     },
   ];
+  const events = [
+    { icon: User2, label: "Mentions Tag", to: "/mentions" },
+    
+  ];
 
   const support = [
     { icon: HelpCircle, label: "FAQ", to: "/account/faq" },
@@ -226,6 +231,11 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       </MenuSection>
 
       {/* Security & Privacy */}
+      <MenuSection title="Events">
+        {events.map((item, index) => (
+          <ItemCard key={index} {...item} />
+        ))}
+      </MenuSection>
       <MenuSection title="Security & Privacy">
         {security.map((item, index) => (
           <ItemCard key={index} {...item} />

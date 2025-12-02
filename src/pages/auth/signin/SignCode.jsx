@@ -9,6 +9,7 @@ import './signInStyle.css';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { showSuccess, showError } from "../../../component/ui/toast";
 
 export function SigninWithCode({ CodeType, CodeSource }) {
   const [errors, setErrors] = useState({});
@@ -170,14 +171,14 @@ export function SigninWithCode({ CodeType, CodeSource }) {
       });
       const data = response.data;
       if (data.success) {
-        showToast.success(data.message || "Verification successful!");
+        showSuccess(data.message || "Verification successful!");
         navigate("/dashboard");
       } else {
         throw new Error(data.message || "Verification failed");
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || "An error occurred during verification";
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setErrors({ server: errorMessage });
     } finally {
       setIsLoading(false);
@@ -195,7 +196,7 @@ export function SigninWithCode({ CodeType, CodeSource }) {
       });
       const data = response.data;
       if (data.success) {
-        showToast.success(data.message || "New code sent successfully!");
+        showSuccess(data.message || "New code sent successfully!");
         setCode(['', '', '', '', '']);
         if (inputsRef.current[0]) inputsRef.current[0].focus();
       } else {
@@ -203,7 +204,7 @@ export function SigninWithCode({ CodeType, CodeSource }) {
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || "Failed to resend verification code";
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setErrors({ server: errorMessage });
     } finally {
       setIsLoading(false);

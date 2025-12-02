@@ -46,7 +46,7 @@ const cards = [
 export default function RightsGrid() {
   return (
     <div className="tw:max-w-5xl tw:mx-auto">
-      <h3 className="tw:text-xl sm:tw:text-2xl tw:font-bold tw:mb-4">
+      <h3 className="tw:text-xl tw:sm:text-2xl tw:font-bold tw:mb-4">
         Your Privacy Rights
       </h3>
 

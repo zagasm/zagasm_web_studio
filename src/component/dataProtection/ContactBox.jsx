@@ -9,7 +9,7 @@ export default function ContactBox() {
         practices and security questions.
       </p>
 
-      <div className="tw:mt-4 tw:grid tw:grid-cols-1 sm:tw:grid-cols-3 tw:gap-3">
+      <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:sm:grid-cols-3 tw:gap-3">
         <div className="tw:bg-gray-50 tw:rounded-xl tw:p-4">
           <div className="tw:text-sm tw:text-gray-500">
             Data Protection Officer

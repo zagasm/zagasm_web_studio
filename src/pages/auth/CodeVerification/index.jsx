@@ -7,6 +7,7 @@ import authCodeImg from "../../../assets/authCode.png";
 import axios from "axios";
 import '../signin/signInStyle.css';
 import { ChangePassword } from "../ChangePassword";
+import { showSuccess, showError } from "../../../component/ui/toast";
 
 export function CodeVerification({ verificationData }) {
   const [errors, setErrors] = useState({});
@@ -193,7 +194,7 @@ export function CodeVerification({ verificationData }) {
        console.log(response);
       const data = response.data;
       if (data.reset_token != null || data.reset_token != undefined) {
-        showToast.success(data.message || "Verification successful!");
+        showSuccess(data.message || "Verification successful!");
         setResetPasswordVerificationData({
             input: data.input,
             message:data.message,
@@ -205,7 +206,7 @@ export function CodeVerification({ verificationData }) {
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || "An error occurred during verification";
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setErrors({ server: errorMessage });
     } finally {
       setIsLoading(false);

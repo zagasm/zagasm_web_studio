@@ -152,19 +152,19 @@ export default function SetPasswordModal({ open, onClose }) {
 
           {/* Panel wrapper (center) */}
           <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
-            <div className="tw:flex tw:min-h-full tw:items-center sm:tw:items-center tw:justify-center tw:p-4">
+            <div className="tw:flex tw:min-h-full tw:items-center tw:sm:items-center tw:justify-center tw:p-4">
               <Transition.Child
                 as={Fragment}
                 enter="tw:transition tw:ease-out tw:duration-200"
-                enterFrom="tw:opacity-0 tw:translate-y-2 sm:tw:translate-y-0 sm:tw:scale-95"
-                enterTo="tw:opacity-100 tw:translate-y-0 sm:tw:scale-100"
+                enterFrom="tw:opacity-0 tw:translate-y-2 tw:sm:translate-y-0 tw:sm:scale-95"
+                enterTo="tw:opacity-100 tw:translate-y-0 tw:sm:scale-100"
                 leave="tw:transition tw:ease-in tw:duration-150"
-                leaveFrom="tw:opacity-100 sm:tw:scale-100"
-                leaveTo="tw:opacity-0 tw:translate-y-2 sm:tw:translate-y-0 sm:tw:scale-95"
+                leaveFrom="tw:opacity-100 tw:sm:scale-100"
+                leaveTo="tw:opacity-0 tw:translate-y-2 tw:sm:translate-y-0 tw:sm:scale-95"
               >
-                <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-2xl tw:bg-white tw:shadow-2xl tw:border tw:border-gray-100 tw:p-4 sm:tw:p-6">
+                <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-2xl tw:bg-white tw:shadow-2xl tw:border tw:border-gray-100 tw:p-4 tw:sm:p-6">
                   {/* Header */}
-                  <Dialog.Title className="tw:text-lg sm:tw:text-xl tw:font-semibold tw:text-gray-900">
+                  <Dialog.Title className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-gray-900">
                     Set Password
                   </Dialog.Title>
                   <p className="tw:mt-1 tw:text-sm tw:text-gray-500">
@@ -172,7 +172,7 @@ export default function SetPasswordModal({ open, onClose }) {
                   </p>
 
                   {/* Form */}
-                  <form onSubmit={handleSubmit} className="tw:mt-4 sm:tw:mt-6">
+                  <form onSubmit={handleSubmit} className="tw:mt-4 tw:sm:mt-6">
                     {/* Current Password */}
                     <div className="tw:mb-4">
                       <label className="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:mb-1">
@@ -278,7 +278,7 @@ export default function SetPasswordModal({ open, onClose }) {
                     </div>
 
                     {/* Footer actions */}
-                    <div className="tw:mt-5 sm:tw:mt-6 tw:flex tw:items-center tw:justify-end tw:gap-2">
+                    <div className="tw:mt-5 tw:sm:mt-6 tw:flex tw:items-center tw:justify-end tw:gap-2">
                       <button
                         style={{
                           borderRadius: 20,

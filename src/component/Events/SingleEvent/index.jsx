@@ -230,6 +230,9 @@ export function EventCard({ event, variant = "default", onMore }) {
       <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full blog-card border-0 tw:relative">
         {/* three dots */}
         <button
+          style={{
+            borderRadius: "50%",
+          }}
           type="button"
           onClick={onMore}
           className="tw:absolute tw:z-40 tw:right-3 tw:top-3 tw:size-9 tw:rounded-full tw:bg-black/35 tw:flex tw:items-center tw:justify-center tw:text-white tw:backdrop-blur"
@@ -313,7 +316,7 @@ export function EventCard({ event, variant = "default", onMore }) {
           </div>
 
           {/* META BLOCK (ALWAYS RENDERED TO KEEP CTA ALIGNED) */}
-          <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600 tw:min-h-[56px]">
+          <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600 tw:min-h-14">
             {isLive ? (
               <>
                 <div className="tw:flex tw:items-center tw:gap-2">
@@ -511,14 +514,13 @@ export default function EventTemplate({
       )}
 
       {/* LOADING MORE */}
-      {loadingMore &&
-        visibleEvents.length > 0 && (
-          <div className="row">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <EventShimmer key={i} />
-            ))}
-          </div>
-        )}
+      {loadingMore && visibleEvents.length > 0 && (
+        <div className="row">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <EventShimmer key={i} />
+          ))}
+        </div>
+      )}
 
       {/* LOAD MORE TRIGGER */}
       {!isDone && (

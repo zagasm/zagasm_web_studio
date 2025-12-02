@@ -193,10 +193,10 @@ export default function SearchPage() {
   const showPeopleSection = peopleToShow.length > 0;
 
   return (
-    <div className="tw:min-h-screen tw:bg-white tw:flex tw:justify-center tw:py-16 tw:md:py-20 tw:px-3 sm:tw:px-4">
+    <div className="tw:min-h-screen tw:bg-white tw:flex tw:justify-center tw:py-16 tw:md:py-20 tw:px-3 tw:sm:px-4">
       <div className="tw:w-full tw:max-w-6xl tw:pt-4 tw:pb-10">
         {/* Top search bar */}
-        <div className="tw:flex tw:items-center tw:gap-3 tw:mb-6 sm:tw:mb-8">
+        <div className="tw:flex tw:items-center tw:gap-3 tw:mb-6 tw:sm:mb-8">
           <button
             type="button"
             onClick={handleBack}
@@ -209,14 +209,14 @@ export default function SearchPage() {
             onSubmit={handleSubmit}
             className="tw:flex-1 tw:relative tw:flex tw:items-center"
           >
-            <div className="tw:flex tw:items-center tw:bg-[#F4E6FD]/60 tw:border tw:border-[#F4E6FD] tw:rounded-full tw:px-3 sm:tw:px-4 tw:py-2 tw:w-full">
+            <div className="tw:flex tw:items-center tw:bg-[#F4E6FD]/60 tw:border tw:border-[#F4E6FD] tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-2 tw:w-full">
               <Search className="tw:w-5 tw:h-5 tw:text-zinc-500 tw:mr-2" />
               <input
                 type="text"
                 value={query}
                 onChange={handleChange}
                 placeholder="Search events, creators or genres..."
-                className="tw:flex-1 tw:bg-transparent tw:border-none tw:outline-none tw:text-sm sm:tw:text-base tw:text-black tw:placeholder:text-zinc-400"
+                className="tw:flex-1 tw:bg-transparent tw:border-none tw:outline-none tw:text-sm tw:sm:text-base tw:text-black tw:placeholder:text-zinc-400"
               />
               {query && (
                 <button
@@ -239,7 +239,7 @@ export default function SearchPage() {
         {/* People / recent searches */}
         {showPeopleSection && (
           <section className="tw:mb-8">
-            <h2 className="tw:text-lg sm:tw:text-xl tw:font-semibold tw:text-black tw:mb-3">
+            <h2 className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
               Recent Searches
             </h2>
 
@@ -260,7 +260,7 @@ export default function SearchPage() {
         {/* Events */}
         {events.length > 0 && (
           <section className="tw:mb-6">
-            <h2 className="tw:text-lg sm:tw:text-xl tw:font-semibold tw:text-black tw:mb-3">
+            <h2 className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
               Events
             </h2>
 

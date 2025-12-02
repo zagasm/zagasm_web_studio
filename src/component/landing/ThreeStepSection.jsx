@@ -71,7 +71,7 @@ export default function ThreeStepSection({
           <img
             src={imageSrc}
             alt={imageAlt}
-            className="tw:block tw:w-full tw:lg:max-w-2xl tw:h-auto tw:aspect-video tw:md:aspect-[4/3] tw:object-cover"
+            className="tw:block tw:w-full tw:lg:max-w-2xl tw:h-auto tw:aspect-video tw:md:aspect-4/3 tw:object-cover"
             loading="lazy"
           />
         </motion.div>

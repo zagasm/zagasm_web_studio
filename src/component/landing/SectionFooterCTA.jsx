@@ -9,27 +9,36 @@ import {
   Linkedin,
   Phone,
   Mail,
+  Youtube,
 } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
 
 /** Helper */
 const col = (title, items) => ({ title, items });
 
 export default function Footer() {
-  const columns = useMemo(
-    () => [
-      col("Documents", ["Terms & Conditions", "Privacy Policy", "Data Protection "]),
-      col("About Company", ["About Zagasm", "Contact us"]),
-    ],
-    []
-  );
+  const links = [
+    {
+      label: "Privacy Policy",
+      url: "/privacy-policy",
+    },
+    {
+      label: "Terms of Service",
+      url: "/terms-of-service",
+    },
+    {
+      label: "Community Guidelines",
+      url: "/community-guidelines",
+    },
+  ];
 
   return (
     <footer className="tw:relative tw:bg-white tw:border-t tw:border-gray-100">
       {/* Top content */}
       <div className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:pt-12 tw:pb-24">
         {/* Brand + grid */}
-        <div className="tw:flex tw:flex-col tw:gap-10">
-          <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-6">
+        <div className="tw:flex tw:flex-col">
+          <div className="tw:flex tw:flex-col tw:lg:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-6">
             <Link to="/" className="tw:inline-flex tw:items-center tw:gap-3">
               <img
                 src="/images/logo.png"
@@ -43,24 +52,40 @@ export default function Footer() {
               <div className="tw:space-y-1 tw:text-sm">
                 <div className="tw:flex tw:items-center tw:gap-2 text-dark">
                   <Phone size={16} className="tw:text-[#8F07E7]" />
-                  <span>+356 620 33 03 55</span>
+                  <span>+234 802 379 7265</span>
                 </div>
                 <div className="tw:flex tw:items-center tw:gap-2 text-dark">
                   <Mail size={16} className="tw:text-[#8F07E7]" />
-                  <span>hello@zagasm.com</span>
+                  <span>support@zagasm.com</span>
                 </div>
                 <address className="tw:not-italic tw:text-gray-500 tw:mt-2">
-                  Portomaso Business Centre, Portomaso PTM<br />
-                  01, St Julian’s STJ 4011, Malta
+                  Portomaso Business Centre, Portomaso PTM
+                  <br />
+                  Adewale Bakare, Yesterday 3:01 PM 16192 Coastal Highway Lewes,{" "}
+                  <br />
+                  Delaware 19958 Sussex County United States
                 </address>
               </div>
 
               <div className="tw:flex tw:items-center tw:gap-3">
                 {[
-                  { Icon: Facebook, href: "#" },
-                  { Icon: Twitter, href: "#" },
-                  { Icon: Instagram, href: "#" },
-                  { Icon: Linkedin, href: "#" },
+                  {
+                    Icon: Facebook,
+                    href: "https://www.facebook.com/share/1DKrHA81wi/?mibextid=wwXIfr ",
+                  },
+                  { Icon: Twitter, href: "https://x.com/zagasmstudios?s=21" },
+                  {
+                    Icon: Instagram,
+                    href: "https://www.instagram.com/zagasm_studios?igsh=MTM5cjZ4ZXlleHJ6bA%3D%3D&utm_source=qr ",
+                  },
+                  {
+                    Icon: Youtube,
+                    href: "https://youtube.com/@zagasmstudios?si=vG0YOv9-6MnSqHom",
+                  },
+                  {
+                    Icon: FaTiktok,
+                    href: "https://www.tiktok.com/@zagasmstudios_hq?_r=1&_t=ZS-91QAAEVGGRO",
+                  },
                 ].map(({ Icon, href }, i) => (
                   <motion.a
                     key={i}
@@ -78,32 +103,28 @@ export default function Footer() {
           </div>
 
           {/* Links grid */}
-          <div className="tw:grid tw:grid-cols-2 sm:tw:grid-cols-3 tw:lg:grid-cols-5 tw:gap-8">
+          <div className="tw:grid tw:grid-cols-2 tw:sm:grid-cols-3 tw:lg:grid-cols-5 tw:gap-8">
             {/* Disclaimer column (like the screenshot) */}
-            {columns.map((c, idx) => (
-              <motion.div
-                key={c.title}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.35, delay: 0.05 * (idx + 1) }}
-                className="tw:col-span-1"
-              >
-                <h6 className="tw:text-lg tw:font-semibold text-dark">{c.title}</h6>
-                <ul className="tw:mt-3 tw:space-y-2 tw:-ml-8">
-                  {c.items.map((it) => (
-                    <li key={it}>
-                      <a
-                        href="#"
-                        className="tw:text-sm text-dark tw:hover:text-[#8F07E7] tw:transition"
-                      >
-                        {it}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.35, delay: 0.05 }}
+              className="tw:col-span-1"
+            >
+              <ul className="tw:mt-3 tw:space-y-2 tw:-ml-8">
+                {links.map((it) => (
+                  <li key={it.url}>
+                    <a
+                      href={it.url}
+                      className="tw:text-sm text-dark tw:hover:text-[#8F07E7] tw:transition"
+                    >
+                      {it.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </div>
 
           {/* Back to top + divider */}
@@ -140,18 +161,26 @@ function BottomCTA() {
           {/* Rounded top bar with gradient */}
           <Link
             to="/auth/signup"
-            className="tw:block tw:w-full tw:rounded-t-[28px] tw:bg-linear-to-r tw:from-[#8F07E7] tw:to-[#C115B5] tw:px-6 tw:py-6 sm:tw:py-7 tw:md:py-8 tw:text-center"
+            className="tw:block tw:w-full tw:rounded-t-[28px] tw:bg-linear-to-r tw:from-[#8F07E7] tw:to-[#C115B5] tw:px-6 tw:py-6 tw:sm:py-7 tw:md:py-8 tw:text-center"
           >
             <div className="tw:relative tw:mx-auto tw:max-w-7xl tw:px-5">
               <motion.span
-                className="tw:inline-flex tw:items-center tw:gap-3 tw:text-white tw:font-extrabold tw:text-lg sm:tw:text-xl tw:md:text-2xl"
+                className="tw:inline-flex tw:items-center tw:gap-3 tw:text-white tw:font-extrabold tw:text-lg tw:sm:text-xl tw:md:text-2xl"
                 animate={{ gap: [3, 8, 3] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2.2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               >
                 Get Started Now
                 <motion.span
                   animate={{ x: [0, 6, 0] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 1.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 >
                   <ArrowRight size={22} />
                 </motion.span>
@@ -174,7 +203,6 @@ function BottomCTA() {
           </Link>
         </motion.div>
       </div>
-
     </div>
   );
 }
