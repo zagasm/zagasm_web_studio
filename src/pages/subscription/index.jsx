@@ -10,8 +10,7 @@ import SmallSupportCard from "../../component/subscription/SmallSupportCard";
 import PlansSkeleton from "../../component/subscription/PlansSkeleton";
 import { useAuth } from "../auth/AuthContext";
 
-
-export default function SubscriptionsPage({ }) {
+export default function SubscriptionsPage({}) {
   const { token: authToken } = useAuth();
   const [plans, setPlans] = useState([]);
   const [plansMeta, setPlansMeta] = useState(null);
@@ -84,8 +83,12 @@ export default function SubscriptionsPage({ }) {
       setInitializingPlanId(plan.id);
 
       const promise = api.post(
-        `/api/v1/user/subscription/paystack/${plan.id}/initialize`,
-        {},
+        `/api/v1/user/subscription/paystack/start`,
+        {
+          plan_id: plan.id,
+          billing_interval: billingInterval,
+          channel: "card",
+        },
         authHeaders(authToken)
       );
 

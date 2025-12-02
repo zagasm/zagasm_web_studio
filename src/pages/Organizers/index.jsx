@@ -3,7 +3,8 @@ import SideBarNav from "../pageAssets/SideBarNav";
 import SEO from "../../component/SEO";
 import { useAuth } from "../auth/AuthContext";
 import { useInView } from "react-intersection-observer";
-import { showSuccess, showError } from "../../component/ui/toast"; // <-- updated
+import { showSuccess, showError } from "../../component/ui/toast";
+import { useNavigate } from "react-router-dom";
 
 // ---- tiny util (word-safe)
 const truncate = (text, max = 48) => {
@@ -15,81 +16,95 @@ const truncate = (text, max = 48) => {
   return safe.replace(/[.,:;!?-]*$/, "") + "…";
 };
 
-// ---- stable, random fallback avatar
-const randomAvatar = (id) => {
-  const safeId = String(id || "");
-  let hash = 0;
-  for (let i = 0; i < safeId.length; i++) {
-    hash = (hash * 31 + safeId.charCodeAt(i)) >>> 0;
-  }
-  const n = hash % 50;
-  const gender = n % 2 === 0 ? "men" : "women";
-  return `https://randomuser.me/api/portraits/${gender}/${n}.jpg`;
+// initials from organiser name
+const getInitials = (name) => {
+  if (!name || typeof name !== "string") return "Z";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const second = parts.length > 1 ? parts[1][0] : "";
+  return (first + second).toUpperCase();
 };
 
-const StatPill = ({ label, value }) => (
-  <div className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[11px] tw:px-2 tw:py-1 tw:bg-gray-50 tw:text-gray-700 tw:rounded-full tw:ring-1 tw:ring-gray-200">
-    <span className="tw:font-semibold">{value ?? 0}</span>
-    <span className="tw:text-gray-500">{label}</span>
-  </div>
-);
+const hasProfileImage = (profileImage) => {
+  if (!profileImage) return false;
+  if (profileImage === "null") return false;
+  if (profileImage === "undefined") return false;
+  return true;
+};
 
 const OrganizerCard = ({ org, onToggle, loading }) => {
   const name = org.organiser || "Organizer";
-  const imgSrc =
-    !org.profileImage ||
-    org.profileImage === "null" ||
-    org.profileImage === "undefined"
-      ? randomAvatar(org.id)
-      : org.profileImage;
-
+  const initials = getInitials(name);
+  const showImage = hasProfileImage(org.profileImage);
   const isFollowing = !!org.following;
+  const followersCount = org.numberOfFollowers ?? 0;
+  const navigate = useNavigate();
 
   return (
-    <div className="tw:h-full tw:bg-white tw:border tw:border-gray-100 tw:rounded-2xl tw:p-4 tw:flex tw:flex-col tw:gap-3 tw:shadow-sm">
-      <div className="tw:flex tw:items-center tw:gap-3">
-        <img
-          src={imgSrc}
-          alt={name}
-          className="tw:w-14 tw:h-14 tw:rounded-full tw:object-cover tw:ring-2 tw:ring-white tw:shadow-sm"
-          loading="lazy"
-        />
-        <div className="tw:min-w-0 tw:flex-1">
-          <div className="tw:text-sm tw:font-medium tw:truncate" title={name}>
-            {truncate(name, 28)}
+    <div onClick={() => navigate(`/profile/${org.id}`)} className="tw:h-full tw:bg-white tw:border tw:border-gray-100 tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:gap-3 tw:shadow-sm">
+      {/* Top image / initials block */}
+      <div className="tw:rounded-3xl tw:overflow-hidden tw:bg-gray-200 tw:aspect-4/3">
+        {showImage ? (
+          <img
+            src={org.profileImage}
+            alt={name}
+            className="tw:w-full tw:h-full tw:object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="tw:w-full tw:h-full tw:flex tw:items-center tw:justify-center tw:bg-[#F4E6FD] tw:text-[#500481] tw:text-xl tw:font-semibold">
+            {initials}
           </div>
+        )}
+      </div>
+
+      {/* Name + rank pill */}
+      <div className="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:justify-between tw:gap-2">
+        <div className="tw:min-w-0">
           <div
-            className="tw:text-xs tw:text-gray-500 tw:truncate"
-            title={org.email}
+            className="tw:text-xs tw:md:text-base tw:font-semibold tw:text-gray-900 tw:truncate"
+            title={name}
           >
-            {org.email || "No email"}
-          </div>
-          <div className="tw:text-xs tw:text-gray-500 tw:truncate">
-            {org.phone || "No phone"}
+            {truncate(name, 24)}
           </div>
         </div>
+
+        {typeof org.rank === "number" && (
+          <div className="tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:bg-black tw:text-white tw:px-2.5 tw:py-1 tw:rounded-2xl">
+            <span className="tw:text-[8px]">🌍</span>
+            <span className="tw:text-[8px] tw:font-semibold"># {org.rank}</span>
+          </div>
+        )}
       </div>
 
-      <div className="tw:flex tw:flex-wrap tw:gap-2">
-        <StatPill label="events" value={org.totalEventsCreated} />
-        <StatPill label="followers" value={org.numberOfFollowers} />
-        <StatPill label="views" value={org.total_views} />
+      {/* Category pill */}
+      <div className="tw:mt-1">
+        <span className="tw:inline-flex tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:rounded-full tw:bg-lightPurple tw:text-gray-900">
+          Organizer
+        </span>
       </div>
 
-      <div className="tw:mt-auto tw:flex tw:items-center tw:justify-between tw:gap-3">
-        <div className="tw:text-[11px] tw:text-gray-500" />
+      {/* Followers row */}
+      <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2 tw:bg-lightPurple tw:rounded-lg tw:py-2 tw:justify-center">
+        <span className="tw:text-xs tw:text-gray-700">
+          +{followersCount} <span className="tw:text-gray-500">followers</span>
+        </span>
+      </div>
+
+      {/* Follow / Unfollow button */}
+      <div className="tw:mt-auto">
         <button
-          style={{
-            borderRadius: 20,
-          }}
+          style={{ borderRadius: 20, fontSize: 11 }}
           type="button"
           disabled={loading}
           onClick={() => onToggle(org.userId)}
-          className={`tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-xl tw:px-3 tw:py-1.5 tw:text-sm tw:font-medium tw:ring-1 tw:transition ${
-            isFollowing
-              ? "tw:bg-primary tw:text-white tw:ring-primary"
-              : "tw:bg-lightPurple tw:text-black tw:ring-transparent hover:tw:bg-primary/10"
-          } ${loading ? "tw:opacity-70 tw:cursor-not-allowed" : ""}`}
+          className={`tw:w-full tw:flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:text-sm tw:font-medium tw:ring-1 tw:transition
+            ${
+              isFollowing
+                ? "tw:bg-white tw:text-black tw:ring-gray-200"
+                : "tw:bg-primary tw:text-white"
+            }
+            ${loading ? "tw:opacity-70 tw:cursor-not-allowed" : ""}`}
         >
           {loading ? (
             <svg className="tw:size-4 tw:animate-spin" viewBox="0 0 24 24">
@@ -162,7 +177,15 @@ function AllOrganizers() {
         const data = await res.json();
         const list = Array.isArray(data?.data) ? data.data : [];
 
-        setOrganizers((prev) => (isMore ? [...prev, ...list] : list));
+        // normalise following to boolean if present
+        const normalized = list.map((o) => ({
+          ...o,
+          following: !!o.following,
+        }));
+
+        setOrganizers((prev) =>
+          isMore ? [...prev, ...normalized] : normalized
+        );
 
         const next = data?.links?.next ?? null;
         setNextPageUrl(next);
@@ -170,7 +193,6 @@ function AllOrganizers() {
 
         if (!isMore) setInitialError(null);
       } catch (e) {
-        // If this happened during "load more", stop further loading and show “No more organizers”
         if (isMore) {
           setHasMore(false);
           setNextPageUrl(null);
@@ -198,11 +220,13 @@ function AllOrganizers() {
 
   const [followLoading, setFollowLoading] = useState({});
 
-  const toggleFollow = async (organizerId) => {
-    setFollowLoading((p) => ({ ...p, [organizerId]: true }));
+  const toggleFollow = async (organizerUserId) => {
+    if (!organizerUserId) return;
+
+    setFollowLoading((p) => ({ ...p, [organizerUserId]: true }));
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/follow/${organizerId}`,
+        `${import.meta.env.VITE_API_URL}/api/v1/follow/${organizerUserId}`,
         {
           method: "POST",
           headers: {
@@ -215,24 +239,28 @@ function AllOrganizers() {
       if (!res.ok) throw new Error("Failed to toggle follow");
 
       const result = await res.json();
-      // result = { message: "...", following: true|false }
+      // result = { message: "...", following: true|false } or similar
+      const isNowFollowing =
+        typeof result.following === "boolean"
+          ? result.following
+          : !!result?.data?.following;
+
       setOrganizers((prev) =>
         prev.map((o) =>
-          o.id === organizerId ? { ...o, following: result.following } : o
+          o.userId === organizerUserId ? { ...o, following: isNowFollowing } : o
         )
       );
 
-      // Success toast from server message
       showSuccess(
         result?.message ||
-          (result.following
+          (isNowFollowing
             ? "User followed successfully"
             : "User unfollowed successfully")
       );
     } catch (e) {
       showError("Something went wrong. Try again.");
     } finally {
-      setFollowLoading((p) => ({ ...p, [organizerId]: false }));
+      setFollowLoading((p) => ({ ...p, [organizerUserId]: false }));
     }
   };
 
@@ -244,7 +272,7 @@ function AllOrganizers() {
         keywords="zagasm studios, event organizers, event hosts, venue managers, concert organizers, party planners, festival organizers, entertainment producers, follow organizers, professional event management"
       />
 
-      <div className="container-fluid tw:pt-20 tw:md:pt-28">
+      <div className=" tw:pt-20 tw:md:pt-28">
         <div className="">
           {/* Header */}
           <div className="tw:px-4">
@@ -258,8 +286,8 @@ function AllOrganizers() {
 
           {/* Grid */}
           <div className="">
-            <div className="row g-4">
-              <div className="col-12">
+            <div className="">
+              <div className="">
                 <div className="tw:bg-white tw:border tw:border-gray-100 tw:rounded-2xl tw:p-4 tw:md:p-6">
                   {/* Initial loading */}
                   {loadingList && organizers.length === 0 ? (
@@ -311,7 +339,7 @@ function AllOrganizers() {
                             <OrganizerCard
                               org={org}
                               onToggle={toggleFollow}
-                              loading={!!followLoading[org.id]}
+                              loading={!!followLoading[org.userId]}
                             />
                           </div>
                         ))}

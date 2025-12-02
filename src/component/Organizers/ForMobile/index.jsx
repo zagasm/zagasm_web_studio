@@ -15,16 +15,27 @@ export default function MobileSingleOrganizers() {
 
   // ---- helpers: stable id + image pickers
   const getId = (org) => org?.userId ?? org?.id; // support either shape
-  const getOrganizerImage = (id) => {
-    const safeId = Number(id) || Math.floor(Math.random() * 50) + 1;
-    const randomImageId = safeId % 50;
-    const gender = randomImageId % 2 === 0 ? "men" : "women";
-    return `https://randomuser.me/api/portraits/${gender}/${randomImageId}.jpg`;
+
+  const getInitials = (organizer) => {
+    const name =
+      organizer.organiser ||
+      [organizer.firstName, organizer.lastName].filter(Boolean).join(" ") ||
+      "";
+
+    if (!name) return "Z";
+
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] ?? "";
+    const second = parts.length > 1 ? parts[1][0] : "";
+
+    return (first + second).toUpperCase();
   };
-  const pickProfileImage = (profileImage, id) => {
-    const bad =
-      !profileImage || profileImage === "null" || profileImage === "undefined";
-    return bad ? getOrganizerImage(id) : profileImage;
+
+  const hasValidProfileImage = (profileImage) => {
+    if (!profileImage) return false;
+    if (profileImage === "null") return false;
+    if (profileImage === "undefined") return false;
+    return true;
   };
 
   useEffect(() => {
@@ -35,7 +46,10 @@ export default function MobileSingleOrganizers() {
   const fetchOrganizers = async () => {
     try {
       setLoadingList(true);
-      const res = await api.get("/api/v1/organiser/for-you/get", authHeaders(token));
+      const res = await api.get(
+        "/api/v1/organiser/for-you/get",
+        authHeaders(token)
+      );
       const data = res?.data;
       if (data && Array.isArray(data.data)) {
         // Normalize: ensure boolean "following"
@@ -155,20 +169,28 @@ export default function MobileSingleOrganizers() {
                 .filter(Boolean)
                 .join(" ") ||
               "Organizer";
-            const imgSrc = pickProfileImage(organizer.profileImage, id);
-            const isFollowing = !!organizer.following; // ← TRUE/FALSE drives label
+            const isFollowing = !!organizer.following;
             const isBusy = !!followLoading[id];
+            const showImage = hasValidProfileImage(organizer.profileImage);
+            const initials = getInitials(organizer);
 
             return (
               <SwiperSlide key={id}>
                 <div className="tw:h-full tw:bg-white tw:border tw:border-gray-100 tw:rounded-2xl tw:p-3 tw:flex tw:flex-col tw:items-stretch tw:gap-2">
                   <div className="tw:flex tw:flex-col tw:items-center tw:text-center tw:gap-3">
-                    <img
-                      src={imgSrc}
-                      alt={name}
-                      className="tw:w-14 tw:h-14 tw:rounded-full tw:object-cover tw:ring-2 tw:ring-white tw:shadow-sm"
-                      loading="lazy"
-                    />
+                    <div className="tw:w-14 tw:h-14 tw:rounded-full tw:ring-2 tw:ring-white tw:shadow-sm tw:flex tw:items-center tw:justify-center tw:bg-[#F4E6FD] tw:text-xs tw:font-semibold tw:text-[#500481] tw:overflow-hidden">
+                      {showImage ? (
+                        <img
+                          src={organizer.profileImage}
+                          alt={name}
+                          className="tw:w-full tw:h-full tw:object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="tw:text-sm">{initials}</span>
+                      )}
+                    </div>
+
                     <div className="tw:min-w-0 tw:flex-1">
                       <div className="tw:text-xs tw:font-medium tw:truncate">
                         {truncate(name, 14)}

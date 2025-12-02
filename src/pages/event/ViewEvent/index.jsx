@@ -648,8 +648,8 @@ export default function ViewEvent() {
 
                     <Link
                       to={
-                        event.hostId
-                          ? `/organizer/${event.hostId}`
+                        event.organiserId
+                          ? `/profile/${event.organiserId}`
                           : "/organizers"
                       }
                       className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-primary text-white tw:rounded-[10px] hover:tw:bg-primarySecond"
