@@ -13,10 +13,16 @@ const schema = z
     maxTickets: z.enum(["limited", "unlimited"]),
     ticketLimit: z.number().min(1).optional(),
     currency: z.string().min(1, "Please select a currency"),
+    hasBackstage: z.boolean().optional(),
+    backstagePrice: z.number().min(1).optional(),
   })
   .refine((d) => d.maxTickets !== "limited" || d.ticketLimit, {
     message: "Ticket limit is required when tickets are limited",
     path: ["ticketLimit"],
+  })
+  .refine((d) => !d.hasBackstage || !!d.backstagePrice, {
+    message: "Backstage price is required when backstage is enabled",
+    path: ["backstagePrice"],
   });
 
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
@@ -36,12 +42,15 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       price: 0,
       maxTickets: "unlimited",
       currency: "",
+      hasBackstage: false,
+      backstagePrice: undefined,
       ...defaultValues,
     },
   });
 
   const maxTickets = watch("maxTickets");
   const currencyVal = watch("currency");
+  const hasBackstage = watch("hasBackstage");
 
   useEffect(() => {
     let mounted = true;
@@ -136,6 +145,41 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
             {errors.ticketLimit && (
               <p className="tw:text-red-500 tw:text-xs tw:mt-1">
                 {errors.ticketLimit.message}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Backstage access */}
+        <div className="tw:flex tw:items-center tw:gap-3">
+          <input
+            id="has_backstage"
+            type="checkbox"
+            {...register("hasBackstage")}
+            className="tw:h-4 tw:w-4 tw:rounded tw:border-gray-300"
+          />
+          <label
+            htmlFor="has_backstage"
+            className="tw:text-[15px] tw:select-none"
+          >
+            Offer backstage access
+          </label>
+        </div>
+
+        {hasBackstage && (
+          <div>
+            <label className="tw:block tw:text-[15px] tw:mb-1">
+              Backstage Price*
+            </label>
+            <input
+              type="number"
+              min="1"
+              {...register("backstagePrice", { valueAsNumber: true })}
+              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+            />
+            {errors.backstagePrice && (
+              <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+                {errors.backstagePrice.message}
               </p>
             )}
           </div>

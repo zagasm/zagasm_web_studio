@@ -8,6 +8,9 @@ import { showError } from "../../../../../component/ui/toast";
 import SelectField from "../../../../../component/form/SelectField";
 import countries from "i18n-iso-countries";
 import enLocale from "i18n-iso-countries/langs/en.json";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+
 countries.registerLocale(enLocale);
 
 const countryList = Object.entries(
@@ -148,9 +151,9 @@ export default function EventInformationStep({
       onSubmit={handleSubmit(onSubmit)}
       className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-[18px] tw:sm:text-lg tw:font-semibold tw:mb-5">
+      <span className="tw:text-lg tw:md:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
         Basic event details
-      </h2>
+      </span>
 
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-5">
         {/* <SelectField
@@ -259,16 +262,31 @@ export default function EventInformationStep({
           )}
         </div>
 
-        <SelectField
-          label="Timezone*"
-          value={watchVals.timezone}
-          onChange={(v) => setValue("timezone", v, { shouldValidate: true })}
-          options={tzOptions}
-          placeholder={loadingTZ ? "Loading…" : "Select Timezone"}
-          disabled={loadingTZ}
-          error={errors?.timezone?.message}
-          className="tw:md:col-span-2"
-        />
+        <div className="tw:md:col-span-2">
+          <label className="tw:block tw:text-[15px] tw:mb-1">Timezone*</label>
+          <Autocomplete
+            options={tzOptions}
+            getOptionLabel={(option) => option.label || ""}
+            value={
+              tzOptions.find((opt) => opt.value === watchVals.timezone) || null
+            }
+            onChange={(event, newValue) => {
+              setValue("timezone", newValue ? newValue.value : "", {
+                shouldValidate: true,
+              });
+            }}
+            disabled={loadingTZ}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder={loadingTZ ? "Loading…" : "Select Timezone"}
+                size="small"
+                error={!!errors.timezone}
+                helperText={errors.timezone?.message}
+              />
+            )}
+          />
+        </div>
       </div>
 
       <div className="tw:flex tw:justify-end tw:mt-6">

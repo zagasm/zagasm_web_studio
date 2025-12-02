@@ -54,6 +54,10 @@ import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
 import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
 import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
 import SubscriptionsPage from "./pages/subscription/index.jsx";
+import PrivacyPolicyPage from "./pages/privacy/index.jsx";
+import CommunityGuidelinesPage from "./pages/communityGuideline/index.jsx";
+import TermsOfServicePage from "./pages/terms/index.jsx";
+import TaggedMentionsPage from "./pages/mentions/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -85,6 +89,9 @@ export function App() {
       <NetworkStatus />
       <Routes>
         <Route path="/" element={<ZagasmLanding />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/community-guidelines" element={<CommunityGuidelinesPage />} />
+        <Route path="/terms-of-service" element={<TermsOfServicePage />} />
         <Route path="/support" element={<Support />} />
         <Route path="/marketing" element={<Marketing />} />
         <Route path="/data-protection" element={<DataProtectionPage />} />
@@ -118,6 +125,7 @@ export function App() {
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/payment/callback" element={<PaymentCallback />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/mentions" element={<TaggedMentionsPage />} />
 
             <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />

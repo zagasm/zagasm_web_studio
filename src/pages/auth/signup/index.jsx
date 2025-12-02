@@ -8,6 +8,7 @@ import axios from "axios";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { isValidPhoneNumber, getCountryCallingCode } from "react-phone-number-input";
+import { showError, showSuccess } from "../../../component/ui/toast";
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -107,18 +108,18 @@ export function SignUp() {
     setError("");
 
     if (!formData.first_name || !formData.last_name || !formData.password) {
-      showToast.error("Please fill in all fields");
+      showError("Please fill in all fields");
       return;
     }
 
     if (useEmail) {
       if (!formData.email) {
-        showToast.error("Please enter a valid email");
+        showError("Please enter a valid email");
         return;
       }
     } else {
       if (!formData.phone || !isValidPhoneNumber(formData.phone)) {
-        showToast.error("Please enter a valid phone number");
+        showError("Please enter a valid phone number");
         return;
       }
     }
@@ -157,7 +158,7 @@ export function SignUp() {
           token: response.data.token,
           user: response.data.user
         });
-        showToast.success(
+        showSuccess(
           response.data.message || "Account created successfully!"
         );
         navigate("/feed");
@@ -166,7 +167,7 @@ export function SignUp() {
       console.error("Signup error:", err);
       const errorMessage =
         err.response?.data?.message || "Registration failed";
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setError(errorMessage);
     } finally {
       setIsLoading(false);

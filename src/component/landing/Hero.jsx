@@ -521,7 +521,7 @@ export default function Hero() {
                 damping: 18,
                 delay: 0.3,
               }}
-              className="tw:flex tw:flex-col sm:tw:flex-row tw:items-center tw:justify-center tw:gap-4"
+              className="tw:flex tw:flex-col tw:sm:flex-row tw:items-center tw:justify-center tw:gap-4"
             >
               <CTAButton
                 to={currentSlide.ctaTo}

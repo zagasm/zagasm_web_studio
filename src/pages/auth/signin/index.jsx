@@ -9,6 +9,7 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { SigninWithCode } from "./SignCode";
+import { showError, showSuccess } from "../../../component/ui/toast";
 
 export function Signin() {
   const [loginMethod, setLoginMethod] = useState('phone');
@@ -163,13 +164,13 @@ export function Signin() {
       );
 
       const data = response.data;
-      console.log(data);
+      // console.log(data);
       if (data.token) {
         login({
           user: data.user,
           token: data.token
         });
-        showToast.success(data.message || "Login successful!");
+        showSuccess(data.message || "Login successful!");
         navigate("/feed");
       } else {
         throw new Error("Invalid response format");
@@ -180,7 +181,7 @@ export function Signin() {
         err.message ||
         "The provided credentials are incorrect.";
 
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setErrors({ server: errorMessage });
     } finally {
       setIsLoading(false);

@@ -6,6 +6,7 @@ import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
 import MediaCarousel from "./MediaCarousel";
 import ObsInstructionsModal from "./ObsInstructionModal"; // ← spelling fixed
+import StartStreamAppDownloadModal from "../Events/StartStreamAppDownloadModal";
 
 function collectMedia(poster = []) {
   const imgs = poster.filter((p) => p.type === "image");
@@ -18,6 +19,7 @@ export default function EventCard({ event }) {
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [obsOpen, setObsOpen] = useState(false);
   const [obsPayload, setObsPayload] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -26,18 +28,20 @@ export default function EventCard({ event }) {
   };
 
   const onCreateChannel = async () => {
-    const run = api.post(
-      `/api/v1/event/${event.id}/scalstream/channel-create`,
-      {},
-      authHeaders(token)
-    );
-    const res = await showPromise(run, {
-      loading: "Creating channel…",
-      success: "Channel created!",
-      error: "Failed to create channel",
-    });
-    setObsPayload(res?.data?.data || res?.data);
-    setObsOpen(true);
+    // const run = api.post(
+    //   `/api/v1/event/${event.id}/scalstream/channel-create`,
+    //   {},
+    //   authHeaders(token)
+    // );
+    // const res = await showPromise(run, {
+    //   loading: "Creating channel…",
+    //   success: "Channel created!",
+    //   error: "Failed to create channel",
+    // });
+    // setObsPayload(res?.data?.data || res?.data);
+    // setObsOpen(true);
+    setOpenModal(true);
+    return;
   };
 
   const onProceed = () => {
@@ -138,7 +142,6 @@ export default function EventCard({ event }) {
               0{" "}
             </span>{" "}
           </div>{" "}
-          
         </div>
 
         {/* Create Channel (only if not yet created) */}
@@ -163,11 +166,15 @@ export default function EventCard({ event }) {
         )}
       </div>
 
-      <ObsInstructionsModal
+      {/* <ObsInstructionsModal
         open={obsOpen}
         payload={obsPayload}
         onProceed={onProceed}
         onClose={onCancelModal}
+      /> */}
+      <StartStreamAppDownloadModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
       />
     </article>
   );

@@ -5,7 +5,6 @@ import { useAuth } from "../auth/AuthContext";
 import { useInView } from "react-intersection-observer";
 import { showSuccess, showError } from "../../component/ui/toast"; // <-- updated
 
-
 // ---- tiny util (word-safe)
 const truncate = (text, max = 48) => {
   if (!text || typeof text !== "string") return "";
@@ -80,9 +79,9 @@ const OrganizerCard = ({ org, onToggle, loading }) => {
       <div className="tw:mt-auto tw:flex tw:items-center tw:justify-between tw:gap-3">
         <div className="tw:text-[11px] tw:text-gray-500" />
         <button
-        style={{
-          borderRadius: 20
-        }}
+          style={{
+            borderRadius: 20,
+          }}
           type="button"
           disabled={loading}
           onClick={() => onToggle(org.userId)}
@@ -245,26 +244,16 @@ function AllOrganizers() {
         keywords="zagasm studios, event organizers, event hosts, venue managers, concert organizers, party planners, festival organizers, entertainment producers, follow organizers, professional event management"
       />
 
-      <div className="container-fluid m-0 p-0">
-        <SideBarNav />
-
-        <div className="page_wrapper overflow-hidden tw:text-black">
+      <div className="container-fluid tw:pt-20 tw:md:pt-28">
+        <div className="">
           {/* Header */}
-          <div className="">
-            <div className="row">
-              <div className="col-12">
-                <div className="tw:flex tw:items-end tw:justify-between tw:gap-4 tw:py-5">
-                  <div className="tw:px-4">
-                    <span className="tw:text-xl tw:md:text-3xl tw:font-semibold">
-                      Organizers
-                    </span>
-                    <p className="tw:text-sm tw:text-gray-600">
-                      Browse and follow creators & event hosts.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="tw:px-4">
+            <span className="tw:text-xl tw:md:text-3xl tw:font-semibold">
+              Organizers
+            </span>
+            <p className="tw:text-sm tw:text-gray-600">
+              Browse and follow creators & event hosts.
+            </p>
           </div>
 
           {/* Grid */}

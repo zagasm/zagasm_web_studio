@@ -6,13 +6,13 @@ import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
 
-import PosterHeader from "../../../component/Events/PostHeader";
 import GuestPerformers from "../../../component/Events/GuestPerformers";
-import OrganizerCard from "../../../component/Events/OrganizerCard";
 import Remarks from "../../../component/Events/Remarks";
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import MobileStickyBar from "../../../component/Events/MobileStickyBar";
 import ReportModal from "../../../component/Events/ReportModal";
+import AccessTypeModal from "../../../component/Events/AccessTypeModal";
+import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
 
 import { formatEventDateTime, randomAvatar } from "../../../utils/ui";
 import { useAuth } from "../../auth/AuthContext";
@@ -22,7 +22,18 @@ import {
   formatMetaLine,
   priceText,
 } from "../../../component/Events/SingleEvent";
-import { CalendarDays } from "lucide-react";
+import {
+  CalendarDays,
+  Share2,
+  Flag,
+  Star,
+  Users,
+  Share,
+  ArrowLeft,
+  Ticket,
+  MapPin,
+  Bookmark,
+} from "lucide-react";
 
 /* ---------- Page ---------- */
 export default function ViewEvent() {
@@ -32,19 +43,28 @@ export default function ViewEvent() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(null);
+
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   // local UI mirrors API
   const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   // report modal
   const [reportOpen, setReportOpen] = useState(false);
-  const { token } = useAuth();
+
+  // access-type modal
+  const [accessModalOpen, setAccessModalOpen] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
+
     let mounted = true;
+
     (async () => {
       try {
         setLoading(true);
@@ -54,6 +74,7 @@ export default function ViewEvent() {
         );
         const payload = res?.data?.data || {};
         if (!mounted) return;
+
         const ev = payload.currentEvent || null;
         setEvent(ev);
         setRecs(payload.recommendations || []);
@@ -65,10 +86,10 @@ export default function ViewEvent() {
         );
         console.error(e);
       } finally {
-        mounted = false;
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
@@ -80,7 +101,7 @@ export default function ViewEvent() {
 
   const posterUrl = useMemo(() => event?.poster?.[0]?.url, [event]);
 
-  const handleGetTicket = async () => {
+  const handleGetTicket = async (accessType = "main") => {
     if (event?.is_sold_out) return;
 
     if (!token) {
@@ -92,25 +113,22 @@ export default function ViewEvent() {
     try {
       const res = await api.post(
         `/api/v1/payments/${event.id}/initiate`,
-        null,
+        { access_type: accessType },
         authHeaders(token)
       );
 
       const payload = res?.data || {};
 
       if (payload.status === false && payload.message) {
-        // Already paid scenario
+        // Already paid scenario, or backend-specific error
         showError(payload.message);
         return;
       }
 
-      // Check for successful redirection URL
       if (payload.url) {
         showSuccess(`Preparing ticket for “${event?.title || "Event"}”…`);
-        // Redirect to Paystack checkout URL
         window.location.href = payload.url;
       } else {
-        // Fallback for unexpected success response
         showError("Payment initiation failed: no redirect URL received.");
       }
     } catch (error) {
@@ -123,27 +141,100 @@ export default function ViewEvent() {
     }
   };
 
-  const isLiveNow = !!event?.is_live;
-  const isSoldOut = !!event?.is_sold_out;
+  const handleToggleFollow = async () => {
+    if (!event?.hostId) return;
 
-  let primaryCtaLabel = "Buy Ticket";
-  if (isSoldOut) primaryCtaLabel = "Sold Out";
-  else if (isLiveNow) primaryCtaLabel = "Join Live";
+    if (!token) {
+      showError("Please log in to follow organizers.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setFollowLoading(true);
+
+      // Using the endpoint pattern: /api/v1/follow/{organizerId}
+      const res = await api.post(
+        `/api/v1/follow/${event.hostId}`,
+        null,
+        authHeaders(token)
+      );
+
+      // Try different response shapes, fallback to toggling locally
+      const isNowFollowing =
+        res?.data?.data?.is_following ??
+        res?.data?.is_following ??
+        !isFollowing;
+
+      setIsFollowing(isNowFollowing);
+
+      if (isNowFollowing) {
+        showSuccess("You’re now following this organizer.");
+      } else {
+        showSuccess("You’ve unfollowed this organizer.");
+      }
+    } catch (e) {
+      console.error(e);
+      showError("Unable to update follow status. Please try again.");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  const isLiveNow = event?.status === "live";
+  const isSoldOut = !!event?.is_sold_out;
+  const hasPaid = !!event?.hasPaid;
+
+  // When user has paid and event is live -> "Enter Live Room"
+  // When user has paid and event not live yet -> "Ticket Purchased"
+  // Else fall back to normal states
+  let primaryCtaLabel;
+  if (hasPaid && isLiveNow) {
+    primaryCtaLabel = "Enter Live Room";
+  } else if (hasPaid && !isLiveNow) {
+    primaryCtaLabel = "Ticket Purchased";
+  } else if (isSoldOut) {
+    primaryCtaLabel = "Sold Out";
+  } else if (isLiveNow) {
+    primaryCtaLabel = "Join Live";
+  } else {
+    primaryCtaLabel = "Buy Ticket";
+  }
+
+  // Disable CTA when:
+  // - Sold out and user hasn't paid
+  // - User has paid but event is not live yet
+  const ctaDisabled = (!hasPaid && isSoldOut) || (hasPaid && !isLiveNow);
+
+  const handleEnterLive = () => {
+    // When event is live and user has paid, show the app download modal
+    if (hasPaid && isLiveNow) {
+      setDownloadModalOpen(true);
+      return;
+    }
+  };
 
   if (loading) {
     return (
-      <div className="tw:w-full tw:h-[50vh] tw:flex tw:items-center tw:justify-center tw:text-gray-600">
-        Loading event…
+      <div className="tw:w-full tw:h-[60vh] tw:flex tw:items-center tw:justify-center tw:bg-[#F5F5F7]">
+        <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
+          <div className="tw:h-8 tw:w-8 tw:border-2 tw:border-primary/30 tw:border-t-primary tw:rounded-full tw:animate-spin" />
+          <p className="tw:text-sm tw:text-gray-600">Loading event details…</p>
+        </div>
       </div>
     );
   }
+
   if (error) {
     return (
-      <div className="tw:w-full tw:h-[50vh] tw:flex tw:items-center tw:justify-center tw:text-red-600">
-        {error}
+      <div className="tw:w-full tw:h-[60vh] tw:flex tw:items-center tw:justify-center tw:bg-[#FEF2F2]">
+        <p className="tw:text-sm tw:text-red-600 tw:px-4 tw:text-center">
+          {error}
+        </p>
       </div>
     );
   }
+
   if (!event) return null;
 
   const remarks = Array.isArray(event.remarks) ? event.remarks : [];
@@ -154,13 +245,16 @@ export default function ViewEvent() {
   );
 
   const startDate = eventStartDate(event);
-  const variant = "upcoming";
-  const isLive = variant === "live";
-  const isUpcoming = variant === "upcoming";
-
   const ticketLabel = `Buy Ticket (${priceText(event)})`;
 
-  console.log(event);
+  const formattedLocation =
+    event.location ||
+    event.address ||
+    (event.eventType?.toLowerCase() === "virtual"
+      ? "Online event"
+      : "Location to be announced");
+
+  console.log({ event });
 
   return (
     <>
@@ -229,405 +323,510 @@ export default function ViewEvent() {
       </Helmet>
 
       {/* PAGE BG */}
-      <div className="tw:w-full tw:min-h-screen tw:bg-white tw:mt-24 tw:md:mt-0 tw:md:pt-20 tw:lg:px-4 tw:text-black">
-        <div className="tw:pb-10">
-          {/* EVENT HEADER */}
-          <div className="tw:max-w-[500px] tw:mx-auto tw:flex tw:justify-between tw:items-center tw:my-4. tw:px-2">
-            <div
+      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:pb-10 tw:text-black">
+        <div className="tw:max-w-6xl tw:mx-auto tw:px-4 tw:md:px-6 tw:lg:px-8">
+          {/* TOP BAR */}
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-5 tw:mt-10">
+            <button
+              type="button"
               onClick={() => navigate(-1)}
-              className=" tw:bg-[#E6E6E6] tw:rounded-full tw:p-2"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-700 tw:shadow-sm hover:tw:bg-gray-50"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="tw:size-3 tw:mdsize-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-                />
-              </svg>
-            </div>
+              <ArrowLeft className="tw:w-4 tw:h-4" />
+              <span>Back</span>
+            </button>
 
-            <div className="tw:flex tw:justify-center tw:items-center tw:flex-col tw:my-2 tw:gap-2">
-              <span className="tw:text-xs tw:md:text-xl tw:font-semibold">
+            <div className="tw:flex tw:flex-col tw:items-center tw:flex-1 tw:min-w-0">
+              <span className="tw:text-sm tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate">
                 {event.title}
               </span>
-              <div className="tw:bg-[#E6E6E6] tw:text-[10px] tw:px-2 tw:py-1.5 tw:inline-block tw:rounded-lg">
-                <span>{event.eventType}</span>
+              <div className="tw:mt-1 tw:inline-flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
+                <span className="tw:bg-[#E5E7EB] tw:text-[10px] tw:px-2.5 tw:py-1 tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:text-gray-700">
+                  <Ticket className="tw:w-3 tw:h-3" />
+                  <span>{event.eventType}</span>
+                </span>
+                {event.genre && (
+                  <span className="tw:bg-[#EEF2FF] tw:text-[10px] tw:px-2.5 tw:py-1 tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:text-[#4F46E5]">
+                    {event.genre}
+                  </span>
+                )}
+                {isLiveNow && (
+                  <span className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2.5 tw:py-1 tw:rounded-full tw:bg-red-500/10 tw:text-[10px] tw:text-red-600">
+                    <span className="tw:inline-block tw:size-2 tw:rounded-full tw:bg-red-500 tw:animate-pulse" />
+                    Live now
+                  </span>
+                )}
               </div>
             </div>
 
-            <div className="tw:grid tw:place-items-center tw:bg-[#E6E6E6] tw:rounded-full tw:p-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="tw:size-3 tw:mdsize-6"
+            <div className="tw:flex tw:items-center tw:gap-2">
+              {/* <button
+                type="button"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:p-2 tw:shadow-sm hover:tw:bg-gray-50"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+                <Share2 className="tw:w-4 tw:h-4 tw:text-gray-700" />
+              </button>
+              <button
+                type="button"
+                className={`tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:p-2 tw:shadow-sm ${
+                  isSaved
+                    ? "tw:bg-primary/10 tw:text-primary"
+                    : "tw:bg-white tw:text-gray-700 hover:tw:bg-gray-50"
+                }`}
+                // hook up to your "save event" endpoint later if needed
+              >
+                <Bookmark
+                  className={`tw:w-4 tw:h-4 ${
+                    isSaved ? "tw:fill-primary tw:text-primary" : ""
+                  }`}
                 />
-              </svg>
+              </button> */}
             </div>
           </div>
-          <div className="">
-            {/* MAIN COLUMN */}
-            <div
-              style={{
-                padding: 0,
-              }}
-              className="col-12"
-            >
-              <div className="tw:bg-white tw:border tw:border-gray-100 tw:rounded-lg tw:overflow-hidden tw:shadow-sm tw:mb-6">
-                {/* HERO POSTER */}
-                <div className="tw:relative tw:h-[220px] tw:md:h-[488px] tw:w-full tw:overflow-hidden">
-                  {posterUrl ? (
-                    <img
-                      src={posterUrl}
-                      alt={event.title}
-                      className="tw:w-full tw:h-full tw:object-cover"
-                    />
-                  ) : (
-                    <div className="tw:w-full tw:h-full tw:bg-gray-200" />
+
+          {/* MAIN CARD */}
+          <div className="tw:bg-white tw:border tw:border-gray-100 tw:rounded-3xl tw:overflow-hidden tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+            {/* HERO POSTER */}
+            <div className="tw:relative tw:h-[230px] tw:md:h-[430px] tw:w-full tw:overflow-hidden">
+              {posterUrl ? (
+                <img
+                  src={posterUrl}
+                  alt={event.title}
+                  className="tw:w-full tw:h-full tw:object-cover"
+                />
+              ) : (
+                <div className="tw:w-full tw:h-full tw:bg-linear-to-br tw:from-[#E5E7EB] tw:to-[#E0ECFF]" />
+              )}
+
+              {/* Soft linear overlay bottom */}
+              <div className="tw:absolute tw:inset-x-0 tw:bottom-0 tw:h-28 tw:bg-linear-to-t tw:from-black/60 tw:via-black/20 tw:to-transparent" />
+
+              {/* Live / Upcoming / Sold out badge */}
+              <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
+                <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:bg-black/70 tw:text-white tw:text-[11px] tw:rounded-full tw:backdrop-blur-sm">
+                  <span
+                    className={`tw:inline-block tw:size-2 tw:rounded-full ${
+                      isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
+                    } tw:animate-pulse`}
+                  />
+                  <span>{isLiveNow ? "Live" : event.status || "Upcoming"}</span>
+                </div>
+                {isSoldOut && !hasPaid && (
+                  <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:bg-red-600 tw:text-white tw:text-[11px] tw:rounded-full">
+                    Sold Out
+                  </div>
+                )}
+              </div>
+
+              {/* Meta strip at bottom of poster */}
+              <div className="tw:absolute tw:bottom-4 tw:left-4 tw:right-4">
+                <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:px-3.5 tw:py-3 tw:bg-black/70 tw:rounded-2xl tw:text-xs tw:text-gray-100 tw:backdrop-blur-sm">
+                  <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+                    <div className="tw:inline-flex tw:items-center tw:gap-1.5">
+                      <CalendarDays className="tw:w-4 tw:h-4" />
+                      <span>{formatMetaLine(event)}</span>
+                    </div>
+                    <div className="tw:inline-flex tw:items-center tw:gap-1.5">
+                      <MapPin className="tw:w-4 tw:h-4" />
+                      <span className="tw:max-w-[220px] tw:truncate">
+                        {formattedLocation}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:text-[11px] tw:text-gray-300">
+                      From
+                    </span>
+                    <span className="tw:text-base tw:font-semibold">
+                      {priceDisplay}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SUMMARY STRIP */}
+            <div className="tw:px-4 tw:md:px-8 tw:py-4 tw:border-b tw:border-gray-100 tw:bg-[#F9FAFB]">
+              <div className="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:justify-between tw:gap-4">
+                {/* Left: Organizer + countdown */}
+                <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-3">
+                  <div className="tw:flex tw:items-center tw:gap-3">
+                    <div className="tw:h-12 tw:w-12 tw:rounded-full tw:bg-gray-200 tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
+                      <img
+                        src={event.hostImage || "/images/avater_pix.avif"}
+                        alt={event.hostName || "Organizer"}
+                        className="tw:w-full tw:h-full tw:object-cover"
+                      />
+                    </div>
+                    <div>
+                      <div className="tw:text-[11px] tw:text-gray-500">
+                        Hosted by
+                      </div>
+                      <div className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
+                        {event.hostName || "Event Organizer"}
+                      </div>
+                      <div className="tw:text-[11px] tw:text-gray-400 tw:mt-0.5">
+                        {event.organizer_since
+                          ? `Active since ${event.organizer_since}`
+                          : "Trusted host"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:text-zinc-600">
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <CountdownPill target={startDate} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Price + CTA */}
+                <div className="tw:flex tw:flex-col tw:items-stretch tw:md:items-end tw:gap-2 tw:w-full tw:max-w-xs">
+                  {hasPaid && (
+                    <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1.5 tw:text-[11px] tw:text-emerald-700">
+                      <span className="tw:inline-block tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-500" />
+                      <span>You already paid for this event</span>
+                    </div>
                   )}
 
-                  {/* Live / Upcoming badge */}
-                  <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:items-center tw:gap-2">
-                    <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1 tw:bg-[#111827]/80 tw:text-white tw:text-xs tw:rounded-full tw:backdrop-blur">
-                      <span
-                        className={`tw:inline-block tw:size-2 tw:rounded-full ${
-                          isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-500"
-                        }  tw:animate-pulse`}
-                      />
-                      <span>{isLiveNow ? "Live" : "Upcoming"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SUMMARY STRIP (Organizer / Location / Date / Price / CTA) */}
-                <div className="tw:px-5 tw:md:px-8 tw:py-4 tw:border-b tw:border-gray-100">
-                  <div className="">
-                    {/* Organizer + title */}
-                    <div className="tw:flex tw:items-center tw:gap-3 tw:min-w-[200px]">
-                      <div className="tw:h-9 tw:w-9 tw:rounded-full tw:bg-gray-200 tw:flex tw:items-center tw:justify-center tw:text-xs tw:font-semibold">
-                        <img
-                          src={event.hostImage || "/images/avater_pix.avif"}
-                          alt=""
-                        />
-                      </div>
-                      <div>
-                        <div className="tw:text-sm tw:text-gray-500">
-                          {event.hostName || "Event Organizer"}
-                        </div>
-                      </div>
-                    </div>
+                  <div className="tw:flex tw:items-baseline tw:gap-2">
+                    <span className="tw:text-[11px] tw:text-gray-500">
+                      Ticket price
+                    </span>
+                    <span className="tw:text-2xl tw:font-semibold tw:text-gray-900">
+                      {priceDisplay}
+                    </span>
                   </div>
 
-                  <div className="tw:flex tw:flex-col tw:xl:flex-row tw:xl:items-center tw:xl:justify-between tw:gap-4">
-                    <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600">
-                      <div className="tw:flex tw:items-center tw:gap-2">
-                        <CountdownPill target={startDate} />
-                      </div>
-                      <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
-                      <div className="tw:flex tw:items-center tw:gap-2">
-                        <CalendarDays className="tw:w-4 tw:h-4" />
-                        <span>{formatMetaLine(event)}</span>
-                      </div>
-                    </div>
-
-                    {/* Price + CTA */}
-                    <div className="tw:hidden tw:md:flex tw:xl:flex-1 tw:items-center tw:justify-between tw:gap-4">
-                      <div className="tw:flex tw:gap-2 tw:items-center">
-                        <div className="tw:text-[11px] tw:text-gray-500">
-                          Price
-                        </div>
-                        <div className="tw:text-2xl tw:font-semibold tw:text-gray-900">
-                          {priceDisplay}
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        disabled={isSoldOut}
-                        onClick={handleGetTicket}
-                        style={{ borderRadius: 999 }}
-                        className={`tw:h-11 tw:px-6 tw:min-w-[140px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 ${
-                          isSoldOut
-                            ? "tw:bg-gray-200 tw:text-gray-500 tw:cursor-not-allowed"
-                            : "tw:bg-primary tw:hover:tw:bg-primarySecond tw:text-white"
-                        }`}
-                      >
-                        {primaryCtaLabel}
-                        {!isSoldOut && (
-                          <span className="tw:ml-1 tw:text-xs tw:opacity-80">
-                            ({priceDisplay})
-                          </span>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* REPORT ROW */}
-                <div className="tw:px-5 tw:md:px-8 tw:py-3 tw:border-b tw:border-[#FEE2E2]">
                   <button
                     style={{
-                      borderRadius: 30,
+                      borderRadius: "12px",
                     }}
                     type="button"
-                    onClick={() => setReportOpen(true)}
-                    className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:bg-red-100 tw:px-4 tw:py-2 tw:rounded-2xl tw:text-[#F04438]"
+                    disabled={ctaDisabled}
+                    onClick={() => {
+                      if (ctaDisabled) return;
+
+                      if (hasPaid && isLiveNow) {
+                        // user has paid and event is live -> enter live
+                        handleEnterLive();
+                        return;
+                      }
+
+                      // normal purchase flow
+                      if (
+                        isLiveNow &&
+                        !event.hasBackstage &&
+                        !event.combined_price
+                      ) {
+                        handleGetTicket("main");
+                      } else {
+                        setAccessModalOpen(true);
+                      }
+                    }}
+                    className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${
+                      ctaDisabled
+                        ? "tw:bg-gray-200 tw:text-gray-500 tw:cursor-not-allowed"
+                        : "tw:bg-primary tw:hover:tw:bg-primarySecond tw:text-white"
+                    }`}
                   >
-                    <span className="fa fa-flag-o" />
-                    <span>Report this event</span>
+                    {primaryCtaLabel}
+                    {!ctaDisabled && !hasPaid && (
+                      <span className="tw:ml-1 tw:text-xs tw:opacity-80">
+                        ({priceDisplay})
+                      </span>
+                    )}
                   </button>
-                </div>
 
-                {/* ORGANIZER CARD BLOCK (centered like screenshot) */}
-                <div className="tw:relative tw:px-5 tw:md:px-2 tw:pt-5 tw:pb-6 tw:bg-[rgb(247,247,249)]">
-                  <div className="tw:w-full tw:bg-white tw:rounded-lg tw:px-4 tw:md:px-10 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
-                    {/* top row: organiser summary + small badge on the right */}
-                    <div className="tw:flex tw:items-center tw:justify-between tw:gap-4">
-                      <div className="tw:flex-1 tw:flex tw:flex-col tw:items-center tw:gap-2">
-                        {/* avatar */}
-                        <div className="tw:h-12 tw:w-12 tw:rounded-full tw:bg-[#E5E7EB] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:text-gray-800">
-                          <img
-                            className="tw:size-full"
-                            src={event.hostImage || "/images/avater_pix.avif"}
-                            alt=""
-                          />
-                        </div>
-
-                        {/* name */}
-                        <div className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
-                          {event.hostName || "Juv Academy"}
-                        </div>
-
-                        {/* followers chip */}
-                        <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-1 tw:bg-[#F3F4FF] tw:rounded-full">
-                          <div className="tw:flex tw:-space-x-2">
-                            {[0, 1, 2].map((i) => (
-                              <img
-                                key={i}
-                                src={randomAvatar(
-                                  (event.id || "host") + ":" + i
-                                )}
-                                alt=""
-                                className="tw:h-5 tw:w-5 tw:rounded-full tw:ring-2 tw:ring-white tw:object-cover"
-                              />
-                            ))}
-                          </div>
-                          <span className="tw:text-[11px] tw:text-gray-700 tw:whitespace-nowrap">
-                            {event.organizer_followers_label ||
-                              "+200k followers"}
-                          </span>
-                        </div>
-
-                        {/* active since */}
-                        <div className="tw:text-[11px] tw:text-gray-400 tw:mt-1">
-                          Active since {event.organizer_since || "2025"}
-                        </div>
-                      </div>
-
-                      {/* small badge at the far right */}
-                      <div className="tw:absolute tw:right-8 tw:md:right-4 tw:top-8 tw:flex tw:items-center tw:justify-center">
-                        <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:bg-black tw:text-white tw:text-xs tw:rounded-2xl">
-                          <span className="tw:inline-flex tw:h-6 tw:w-6 tw:items-center tw:justify-center tw:bg-[#111827] tw:rounded-full">
-                            <img
-                              className="w-4"
-                              src="/images/icons/globe.png"
-                              alt=""
-                            />
-                          </span>
-                          <span>#{event.organizer_rank || 2}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* follow / view profile buttons */}
-                    <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-                      <button
-                        style={{
-                          borderRadius: 10,
-                        }}
-                        type="button"
-                        className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-[#F3F4F6] tw:text-gray-800"
-                      >
-                        Follow Organizer
-                      </button>
-
-                      <Link
-                        to={
-                          event.hostId
-                            ? `/organizer/${event.hostId}`
-                            : "/organizers"
-                        }
-                        className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-primary text-white tw:rounded-[10px]"
-                      >
-                        View Profile
-                      </Link>
-                    </div>
+                  <div className="tw:text-[11px] tw:text-gray-400 tw:mt-0.5 tw:text-right">
+                    {hasPaid
+                      ? isLiveNow
+                        ? "You already have access. Tap “Enter Live Room” to join."
+                        : "You’ve already paid. We’ll notify you when it’s live."
+                      : "Secure checkout • Instant ticket access"}
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* SPECIAL GUESTS */}
-                <div className="tw:px-5 tw:md:px-2 tw:pt-4 tw:pb-6 tw:bg-[#F7F7F9]">
-                  {/* card container */}
-                  <div className="tw:bg-white tw:rounded-lg tw:px-3 tw:md:px-4 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                    <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:text-gray-900 tw:mb-3">
-                      Special Guest
-                    </span>
-                    {/* horizontal scroll on small / medium screens */}
-                    <div
-                      className="
-        tw:overflow-x-auto tw:pb-1
-        tw:[&::-webkit-scrollbar]:hidden
-        tw:[-ms-overflow-style:'none']
-        tw:[scrollbar-width:'none']
-      "
-                    >
-                      <div className="tw:flex tw:flex-nowrap tw:gap-4 tw:min-w-max">
-                        <GuestPerformers performers={event.eventPerformers} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            {/* REPORT ROW */}
+            <div className="tw:px-4 tw:md:px-8 tw:py-3 tw:border-b tw:border-[#FEE2E2] tw:bg-[#FFFBFB]">
+              <button
+                type="button"
+                onClick={() => setReportOpen(true)}
+                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:md:text-sm tw:bg-red-50 tw:px-4 tw:py-2 tw:rounded-full tw:text-[#F04438] hover:tw:bg-red-100"
+              >
+                <Flag className="tw:w-4 tw:h-4" />
+                <span>Report this event</span>
+              </button>
+            </div>
 
-                {/* DESCRIPTION */}
-                <div className="tw:px-5 tw:md:px-2 tw:pt-2 tw:pb-6 tw:bg-[#F7F7F9]">
-                  <div className="tw:bg-white tw:rounded-lg tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                    <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:mb-3">
-                      Event Description
-                    </span>
-
-                    {/* light-grey strip like screenshot */}
-                    <div className="tw:w-full tw:bg-[#F3F4F6] tw:rounded-xl tw:px-4 tw:py-3 tw:text-sm tw:text-gray-700 tw:leading-relaxed">
-                      <p
-                        className={
-                          expanded
-                            ? ""
-                            : "tw:line-clamp-2 tw:tw:md:line-clamp-1"
-                        }
-                      >
-                        {event.description ||
-                          "No description available for this event yet."}
-                      </p>
-
-                      {event.description?.length > 140 && (
-                        <button
-                          className="tw:text-primary tw:text-xs tw:font-medium tw:mt-1"
-                          onClick={() => setExpanded(!expanded)}
-                        >
-                          {expanded ? "Read less" : "Read more…"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* AGE RESTRICTION BANNER */}
-                <div className="tw:px-5 tw:md:px-2 tw:pb-6 tw:bg-[#F7F7F9]">
-                  <div className="tw:bg-white tw:rounded-lg tw:px-4 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                    <div className="tw:w-full tw:bg-[#111111] tw:text-white tw:text-center tw:text-xs tw:md:text-sm tw:py-3 tw:rounded-[14px] tw:font-medium">
-                      {event.ageRestrictionText || "+18 (not for children)"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* EVENT STATS */}
-                <div className="tw:px-5 tw:md:px-2 tw:pb-6 tw:bg-[#F7F7F9]">
-                  <div className="tw:bg-white tw:rounded-lg tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                    <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:mb-3">
-                      Event Stats
-                    </span>
-
-                    <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-                      {/* rating pill */}
-                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:bg-[#F3F4F6] tw:rounded-full tw:text-xs tw:text-gray-800">
-                        <span className="fa fa-star tw:text-[#FACC15]" />
-                        <span>
-                          {event.rating || "4.9"}{" "}
-                          <span className="tw:text-gray-500">
-                            ({event.reviews_count || "1,240"} reviews)
-                          </span>
-                        </span>
+            {/* BODY SECTIONS */}
+            <div className="tw:bg-[#F7F7F9]">
+              {/* ORGANIZER CARD */}
+              <div className="tw:px-4 tw:md:px-6 tw:pt-5 tw:pb-6">
+                <div className="tw:w-full tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-8 tw:py-5 tw:shadow-[0_10px_30px_rgba(15,23,42,0.06)] tw:relative">
+                  <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-center tw:md:items-start tw:gap-4">
+                    {/* avatar + meta */}
+                    <div className="tw:flex-1 tw:flex tw:flex-col tw:items-center tw:md:items-start tw:gap-2">
+                      <div className="tw:h-14 tw:w-14 tw:rounded-full tw:bg-[#E5E7EB] tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
+                        <img
+                          className="tw:w-full tw:h-full tw:object-cover"
+                          src={event.hostImage || "/images/avater_pix.avif"}
+                          alt={event.hostName || "Organizer"}
+                        />
                       </div>
 
-                      {/* attending pill */}
-                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:bg-[#F3F4F6] tw:rounded-full tw:text-xs tw:text-gray-800">
+                      <div className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900 tw:text-center tw:md:text-left">
+                        {event.hostName || "Organizer"}
+                      </div>
+
+                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-1 tw:bg-[#EEF2FF] tw:rounded-full">
                         <div className="tw:flex tw:-space-x-2">
                           {[0, 1, 2].map((i) => (
                             <img
                               key={i}
-                              src={randomAvatar(
-                                (event.id || "attending") + ":" + i
-                              )}
+                              src={randomAvatar((event.id || "host") + ":" + i)}
                               alt=""
                               className="tw:h-5 tw:w-5 tw:rounded-full tw:ring-2 tw:ring-white tw:object-cover"
                             />
                           ))}
                         </div>
-                        <span>{event.attending_count || "+60k"} attending</span>
+                        <span className="tw:text-[11px] tw:text-[#4B5563] tw:whitespace-nowrap">
+                          {event.organizer_followers_label || "+200k followers"}
+                        </span>
                       </div>
 
-                      {/* shares pill */}
-                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:bg-[#F3F4F6] tw:rounded-full tw:text-xs tw:text-gray-800">
-                        <span className="fa fa-share-alt" />
-                        <span>{event.shares_count || "+60k"} Shares</span>
+                      <div className="tw:text-[11px] tw:text-gray-400 tw:mt-1">
+                        {event.organizer_since
+                          ? `On Zagasm since ${event.organizer_since}`
+                          : "Part of Zagasm Studios community"}
+                      </div>
+                    </div>
+
+                    {/* Rank badge */}
+                    <div className="tw:md:absolute tw:md:right-6 tw:md:top-6 tw:flex tw:items-center tw:justify-center tw:mt-4 tw:md:mt-0">
+                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:bg-black tw:text-white tw:text-xs tw:rounded-2xl">
+                        <span className="tw:inline-flex tw:h-6 tw:w-6 tw:items-center tw:justify-center tw:bg-[#111827] tw:rounded-full">
+                          <img
+                            className="tw:w-4"
+                            src="/images/icons/globe.png"
+                            alt=""
+                          />
+                        </span>
+                        <span>#{event.organizer_rank || 2} Organizer</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-3">
+                    <button
+                      style={{
+                        borderRadius: "12px",
+                      }}
+                      type="button"
+                      onClick={handleToggleFollow}
+                      disabled={followLoading || !event.hostId}
+                      className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${
+                        isFollowing
+                          ? "tw:bg-white tw:border-primary/30 tw:text-primary"
+                          : "tw:bg-[#F3F4F6] tw:border-transparent tw:text-gray-800 hover:tw:bg-[#E5E7EB]"
+                      } ${
+                        followLoading
+                          ? "tw:opacity-70 tw:cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      {followLoading
+                        ? "Updating…"
+                        : isFollowing
+                        ? "Following"
+                        : "Follow Organizer"}
+                    </button>
+
+                    <Link
+                      to={
+                        event.hostId
+                          ? `/organizer/${event.hostId}`
+                          : "/organizers"
+                      }
+                      className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-primary text-white tw:rounded-[10px] hover:tw:bg-primarySecond"
+                    >
+                      View Profile
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* SPECIAL GUESTS */}
+              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
+                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+                  <div className="tw:flex tw:items-center tw:justify-between tw:mb-3">
+                    <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:text-gray-900">
+                      Special Guests
+                    </span>
+                  </div>
+
+                  <div
+                    className="
+                      tw:overflow-x-auto tw:pb-1
+                      tw:[&::-webkit-scrollbar]:hidden
+                      tw:[-ms-overflow-style:'none']
+                      tw:[scrollbar-width:'none']
+                    "
+                  >
+                    <div className="tw:flex tw:flex-nowrap tw:gap-4 tw:min-w-max">
+                      <GuestPerformers performers={event.eventPerformers} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* DESCRIPTION */}
+              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
+                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+                  <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:mb-3 tw:block">
+                    Event Description
+                  </span>
+
+                  <div className="tw:w-full tw:bg-[#F3F4F6] tw:rounded-xl tw:px-4 tw:py-3 tw:text-sm tw:text-gray-700 tw:leading-relaxed">
+                    <p
+                      className={
+                        expanded ? "" : "tw:line-clamp-3 tw:md:line-clamp-4"
+                      }
+                    >
+                      {event.description ||
+                        "No description available for this event yet."}
+                    </p>
+
+                    {event.description?.length > 140 && (
+                      <button
+                        className="tw:text-primary tw:text-xs tw:font-medium tw:mt-1"
+                        onClick={() => setExpanded(!expanded)}
+                      >
+                        {expanded ? "Read less" : "Read more…"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* AGE RESTRICTION */}
+              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
+                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+                  <div className="tw:w-full tw:bg-[#FEF3C7] tw:text-[#92400E] tw:text-center tw:text-xs tw:md:text-sm tw:py-3 tw:rounded-[14px] tw:font-medium">
+                    {event.ageRestrictionText || "+18 (not for children)"}
+                  </div>
+                </div>
+              </div>
+
+              {/* EVENT STATS */}
+              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
+                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+                  <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:mb-4 tw:block">
+                    Event Stats
+                  </span>
+
+                  <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-3">
+                    {/* Rating */}
+                    <div className="tw:flex tw:items-center tw:gap-3 tw:bg-[#F3F4F6] tw:rounded-xl tw:px-3 tw:py-2.5">
+                      <div className="tw:flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:rounded-full tw:bg-white">
+                        <Star className="tw:w-4 tw:h-4 tw:text-[#FACC15] tw:fill-[#FACC15]" />
+                      </div>
+                      <div>
+                        <div className="tw:text-xs tw:text-gray-500">
+                          Rating
+                        </div>
+                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
+                          {event.rating || "4.9"}{" "}
+                          <span className="tw:text-[11px] tw:text-gray-500">
+                            ({event.reviews_count || "1,240"} reviews)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Attending */}
+                    <div className="tw:flex tw:items-center tw:gap-3 tw:bg-[#F3F4F6] tw:rounded-xl tw:px-3 tw:py-2.5">
+                      <div className="tw:flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:rounded-full tw:bg-white">
+                        <Users className="tw:w-4 tw:h-4 tw:text-gray-700" />
+                      </div>
+                      <div>
+                        <div className="tw:text-xs tw:text-gray-500">
+                          Attending
+                        </div>
+                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
+                          {event.attending_count || "+60k"} people
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Shares */}
+                    <div className="tw:flex tw:items-center tw:gap-3 tw:bg-[#F3F4F6] tw:rounded-xl tw:px-3 tw:py-2.5">
+                      <div className="tw:flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:rounded-full tw:bg-white">
+                        <Share className="tw:w-4 tw:h-4 tw:text-gray-700" />
+                      </div>
+                      <div>
+                        <div className="tw:text-xs tw:text-gray-500">
+                          Shares
+                        </div>
+                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
+                          {event.shares_count || "+60k"} shares
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* TOP COMMENT REVIEW + REMARK BOX */}
-                <div className="tw:px-5 tw:md:px-8 tw:py-6">
-                  <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:my-3 tw:pt-2">
-                    Top Comment Review
-                  </span>
-
-                  {/* Existing remarks list / input – styled to resemble screenshot */}
-                  <Remarks
-                    eventId={eventId}
-                    remarks={remarks}
-                    onAppend={(r) =>
-                      setEvent((p) => ({
-                        ...p,
-                        remarks: [r, ...(p?.remarks || [])],
-                      }))
-                    }
-                  />
-                </div>
-
-                {/* Spacer for mobile sticky bar */}
-                <div className="tw:block tw:md:hidden tw:h-20" />
               </div>
-            </div>
-            {/* MORE FROM ORGANIZER */}
-            <div
-              style={{
-                padding: 0,
-              }}
-              className="tw:mt-4 tw:px-6"
-            >
-              <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
+
+              {/* TOP COMMENT REVIEW + REMARK BOX */}
+              <div className="tw:px-4 tw:md:px-8 tw:py-6 tw:bg-white">
+                <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:my-3 tw:pt-2 tw:block">
+                  Top Comment Review
+                </span>
+
+                <Remarks
+                  eventId={eventId}
+                  remarks={remarks}
+                  onAppend={(r) =>
+                    setEvent((p) => ({
+                      ...p,
+                      remarks: [r, ...(p?.remarks || [])],
+                    }))
+                  }
+                />
+              </div>
+
+              {/* Spacer for mobile sticky bar */}
+              <div className="tw:block tw:md:hidden tw:h-20" />
             </div>
           </div>
-          <div className="tw:block tw:md:hidden tw:h-20" />
+
+          {/* MORE FROM ORGANIZER / RECS */}
+          <div className="tw:mt-6 tw:px-1">
+            <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
+          </div>
 
           {/* Mobile sticky bar (bottom) */}
           <MobileStickyBar
             priceDisplay={priceDisplay}
             dateTime={formattedDateTime}
-            onGetTickets={handleGetTicket}
+            onGetTickets={() => {
+              if (ctaDisabled) return;
+
+              if (hasPaid && isLiveNow) {
+                handleEnterLive();
+                return;
+              }
+
+              if (isLiveNow && !event.hasBackstage && !event.combined_price) {
+                handleGetTicket("main");
+              } else {
+                setAccessModalOpen(true);
+              }
+            }}
           />
         </div>
       </div>
@@ -639,11 +838,26 @@ export default function ViewEvent() {
           const url = `/api/v1/report/register?reportable_type=event&reportable_id=${encodeURIComponent(
             eventId
           )}&reason=${encodeURIComponent(reason)}`;
-          await api.post(url, null, authHeaders());
+          await api.post(url, null, authHeaders(token));
           setReportOpen(false);
           navigate("/feed");
           showSuccess("Report submitted. Thank you.");
         }}
+      />
+
+      <AccessTypeModal
+        open={accessModalOpen}
+        onClose={() => setAccessModalOpen(false)}
+        event={event}
+        onConfirm={async (accessType) => {
+          await handleGetTicket(accessType);
+          setAccessModalOpen(false);
+        }}
+      />
+
+      <LiveAppDownloadModal
+        open={downloadModalOpen}
+        onClose={() => setDownloadModalOpen(false)}
       />
     </>
   );

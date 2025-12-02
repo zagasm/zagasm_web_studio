@@ -40,11 +40,11 @@ export default function PopupCard({ post, onClose }) {
             if (response.data && response.data.status) {
                 showToast.info(response.data.message);
             } else {
-                showToast.error(response.data.message);
+                showError(response.data.message);
             }
         } catch (error) {
             console.error("Error toggling event save:", error);
-            showToast.error("Something went wrong while saving the event.");
+            showError("Something went wrong while saving the event.");
         } finally {
             setLoading(false);
         }

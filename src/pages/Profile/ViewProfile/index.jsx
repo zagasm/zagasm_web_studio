@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import useProfile from "../../../hooks/useProfile";
 import ProfileHeader from "../../../component/Profile/ProfileHeader";
 import AboutPanel from "../../../component/Profile/AboutPanel";
@@ -7,21 +7,145 @@ import ProfileTabs from "../../../component/Profile/ProfileTab";
 import "./profile.css";
 import { ChevronLeft } from "lucide-react";
 
+import { useAuth } from "../../auth/AuthContext";
+import { api, authHeaders } from "../../../lib/apiClient";
+import { showError, showSuccess } from "../../../component/ui/toast";
+
 export default function ViewProfile() {
-  const { user, loading, error } = useProfile();
   const navigate = useNavigate();
+  const { profileId: routeUserId } = useParams();
 
-  // organiser / kyc logic (only meaningful once user is loaded)
+  // logged-in user (you)
+  const { user: me, token } = useAuth() || {};
+
+  // existing hook for "my profile"
+  const {
+    user: myProfile,
+    loading: myProfileLoading,
+    error: myProfileError,
+  } = useProfile();
+
+  // generic "profile being viewed" state (could be you or another organiser)
+  const [profileUser, setProfileUser] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  // follow state (only meaningful when viewing another organiser)
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+
+  // are we viewing our own profile or another user's?
+  const isOwnProfile =
+    !routeUserId || (me?.id && routeUserId && routeUserId === me.id);
+
+  /* ------------------ load profile data ------------------ */
+  useEffect(() => {
+    // if it's your own profile, reuse the existing hook result
+    if (isOwnProfile) {
+      setProfileUser(myProfile || null);
+      setProfileLoading(myProfileLoading);
+      setProfileError(myProfileError || null);
+
+      if (myProfile?.is_following !== undefined) {
+        setIsFollowing(!!myProfile.is_following);
+      }
+      return;
+    }
+
+    // viewing another organiser profile
+    if (!routeUserId) return;
+
+    let cancelled = false;
+
+    async function fetchProfile() {
+      try {
+        setProfileLoading(true);
+        setProfileError(null);
+
+        const res = await api.get(
+          `/api/v1/organiser/${routeUserId}`,
+          authHeaders(token)
+        );
+
+        const data = res?.data?.data || res?.data?.user || res?.data || null;
+
+        if (cancelled) return;
+
+        setProfileUser(data);
+        if (data?.is_following !== undefined) {
+          setIsFollowing(!!data.is_following);
+        }
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) {
+          setProfileError("Unable to load profile.");
+        }
+      } finally {
+        if (!cancelled) {
+          setProfileLoading(false);
+        }
+      }
+    }
+
+    fetchProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOwnProfile, routeUserId, myProfile, myProfileLoading, myProfileError, token]);
+
+  /* ------------------ organiser / KYC logic (only for own profile) ------------------ */
   const isOrganiser =
-    user?.is_organiser_verified ||
-    user?.roles?.includes("organiser") ||
-    user?.roles?.includes("organizer");
+    isOwnProfile &&
+    (profileUser?.is_organiser_verified ||
+      profileUser?.roles?.includes("organiser") ||
+      profileUser?.roles?.includes("organizer"));
 
-  const kycStatus = user?.kyc?.status || null;
+  const kycStatus = isOwnProfile ? profileUser?.kyc?.status || null : null;
   const isKycVerified = kycStatus === "verified";
+  const shouldShowBecomeOrganiser =
+    isOwnProfile && !isOrganiser && !isKycVerified;
 
-  // "not organiser + KYC not verified"
-  const shouldShowBecomeOrganiser = !isOrganiser && !isKycVerified;
+  /* ------------------ follow / unfollow organiser ------------------ */
+  const handleToggleFollow = async () => {
+    if (isOwnProfile) return; // no follow button for your own profile
+    if (!profileUser?.id) return;
+
+    if (!token) {
+      showError("Please log in to follow organizers.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setFollowLoading(true);
+
+      // endpoint: /api/v1/follow/{organizerId}
+      const res = await api.post(
+        `/api/v1/follow/${profileUser.id}`,
+        null,
+        authHeaders(token)
+      );
+
+      const isNowFollowing =
+        res?.data?.data?.is_following ??
+        res?.data?.is_following ??
+        !isFollowing;
+
+      setIsFollowing(isNowFollowing);
+
+      if (isNowFollowing) {
+        showSuccess("You’re now following this organizer.");
+      } else {
+        showSuccess("You’ve unfollowed this organizer.");
+      }
+    } catch (e) {
+      console.error(e);
+      showError("Unable to update follow status. Please try again.");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   return (
     <div className="tw:bg-[#f5f5f7] tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
@@ -37,7 +161,7 @@ export default function ViewProfile() {
             <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
           </button>
           <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
-            Profile
+            {isOwnProfile ? "Profile" : "Organizer Profile"}
           </span>
           <div className="tw:size-10" />
         </div>
@@ -45,7 +169,7 @@ export default function ViewProfile() {
 
       {/* content */}
       <div className="tw:mt-4 tw:px-2 tw:md:px-6 tw:h-auto tw:lg:h-[calc(100vh-140px)]">
-        {loading ? (
+        {profileLoading ? (
           // SKELETON
           <div className="tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
             {/* LEFT skeleton */}
@@ -68,35 +192,37 @@ export default function ViewProfile() {
               </div>
             </div>
           </div>
-        ) : error ? (
+        ) : profileError ? (
           <p className="tw-text-red-600 tw:mt-10">
-            Failed to load profile: {error}
+            Failed to load profile: {profileError}
           </p>
-        ) : !user ? (
+        ) : !profileUser ? (
           <p className="tw-text-gray-600 tw-mt-10">No profile data found.</p>
-        ) : // 1) NOT organiser + KYC not verified → "Become an Organizer"
-        shouldShowBecomeOrganiser ? (
+        ) : isOwnProfile && shouldShowBecomeOrganiser ? (
+          // 1) Your own profile + NOT organiser + KYC not verified → "Become an Organiser"
           <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:px-4 tw:lg:px-4">
             <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
               <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
                 <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
                   <img
-                    src={user?.profileUrl || "/images/avater_pix.avif"}
+                    src={profileUser?.profileUrl || "/images/avater_pix.avif"}
                     alt=""
                     className="tw:w-full tw:h-full tw:object-cover"
                   />
                 </div>
                 <div className="tw:mt-1 tw:text-center">
                   <span className="tw:block tw:font-semibold tw:text-[16px]">
-                    {user?.name}
+                    {profileUser?.name}
                   </span>
-                  <span className="tw:block tw:text-xs">{user?.email}</span>
+                  <span className="tw:block tw:text-xs">
+                    {profileUser?.email}
+                  </span>
                 </div>
                 <div className="tw:bg-[#f5f5f5] tw:relative tw:px-4 tw:py-3 tw:rounded-2xl tw:mt-6 tw:w-full">
                   <div>
                     <span className="tw:block tw:text-xs">Following</span>
                     <span className="tw:block tw:font-semibold tw:text-[20px]">
-                      {user?.followings_count ?? 0}
+                      {profileUser?.followings_count ?? 0}
                     </span>
                   </div>
                   <img
@@ -110,7 +236,9 @@ export default function ViewProfile() {
 
             <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-2 tw:rounded-2xl tw:px-4 tw:py-3">
               <span className="tw:block tw:font-semibold">About Me</span>
-              <span className="tw:block tw:text-xs">{user?.about}</span>
+              <span className="tw:block tw:text-xs">
+                {profileUser?.about}
+              </span>
             </div>
 
             <div className="tw:bg-linear-to-r tw:from-[#8F07E7] tw:via-[#9105B4] tw:to-[#500481] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
@@ -132,42 +260,106 @@ export default function ViewProfile() {
               </Link>
             </div>
           </div>
-        ) : // 2) Organiser but KYC not verified → notice block
-        isOrganiser && !isKycVerified ? (
-          <div className="tw:w-full tw:min-h-[calc(100vh-140px)] tw:flex tw-items-start tw:justify-center">
-            <div className="tw:max-w-3xl tw:w-full tw-mx-auto tw-bg-white tw:rounded-3xl tw-px-4 tw:py-5 tw:mt-4 tw-shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
-              <span className="tw-inline-flex tw-items-center tw-gap-2 tw-text-[11px] tw-font-medium tw-uppercase tw-tracking-[0.16em] tw-text-amber-700 tw-bg-amber-50 tw-px-3 tw-py-1 tw-rounded-full tw-mb-3">
-                <span className="tw-w-1.5 tw-h-1.5 tw-rounded-full tw-bg-amber-500" />
-                KYC in progress
-              </span>
-              <span className="tw-block tw:text-lg tw:md:text-xl tw:font-semibold tw-mb-2">
-                Your organiser account is under review
-              </span>
-              <span className="tw-block tw:text-sm tw:mb-2 tw:text-gray-700">
-                We&apos;re currently verifying your KYC details. You&apos;ll be
-                able to create events as soon as your verification is completed.
-              </span>
-              <span className="tw-block tw:text-sm tw:text-gray-500">
-                You can always check your status from your profile page. If this
-                takes longer than expected, contact support with your registered
-                email.
-              </span>
+        ) : isOwnProfile && isOrganiser && !isKycVerified ? (
+          // 2) Your own profile + organiser but KYC not verified → notice block
+          <div className="tw:h-full tw:flex tw:items-start tw:lg:items-center tw:justify-center tw:py-6">
+            <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:space-y-6">
+              {/* Top: icon + badge */}
+              <div className="tw:flex tw:items-center tw:flex-col tw:gap-4">
+                <div className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/5">
+                  <div className="tw:h-6 tw:w-6 tw:rounded-full tw:border-[3px] tw:border-primary tw:border-t-transparent tw:animate-spin" />
+                </div>
+
+                <div className="tw:flex-1 tw:text-center">
+                  <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1">
+                    <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500 tw:animate-pulse" />
+                    <span className="tw:text-[11px] tw:font-semibold tw:tracking-[0.16em] tw:uppercase tw:text-emerald-700">
+                      KYC in progress
+                    </span>
+                  </div>
+
+                  <span className="tw:block tw:mt-3 tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                    Your organiser account is under review
+                  </span>
+
+                  <p className="tw:mt-2 tw:text-sm tw:text-slate-600">
+                    We&apos;re currently verifying the details you submitted.
+                    Once your KYC is approved, you&apos;ll unlock organiser
+                    tools like event creation, payouts and more.
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress bar + copy */}
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:space-y-3">
+                <div className="tw:flex tw:items-center tw:justify-between">
+                  <span className="tw:text-xs tw:font-medium tw:text-slate-700">
+                    Verification status
+                  </span>
+                  <span className="tw:text-[11px] tw:font-semibold tw:text-slate-500 tw:uppercase tw:tracking-[0.16em]">
+                    Under review
+                  </span>
+                </div>
+
+                <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-slate-200">
+                  <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-primary tw:transition-all tw:duration-500" />
+                </div>
+
+                <ul className="tw:mt-1 tw:space-y-1.5 tw:text-[12px] tw:text-slate-600">
+                  <li className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
+                    ID & bank details submitted
+                  </li>
+                  <li className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
+                    Our compliance team is reviewing your information
+                  </li>
+                  <li className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-slate-300" />
+                    You&apos;ll be notified once a decision is made
+                  </li>
+                </ul>
+              </div>
+
+              {/* Info + actions */}
+              <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
+                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                  <button
+                    style={{ borderRadius: 12 }}
+                    type="button"
+                    className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 hover:tw:bg-slate-50 tw:transition"
+                    onClick={() => navigate("/")}
+                  >
+                    Go to home
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
-          // 3) Normal profile layout (organiser + KYC verified OR regular user where you still want full profile)
+          // 3) Normal profile layout
+          // (own profile with KYC verified OR viewing another organiser)
           <div className="tw:flex tw:flex-col tw:lg:flex-row tw:lg:gap-6 tw:lg:h-full">
             {/* LEFT: profile card + about */}
             <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
               <div className="tw:space-y-4 tw:pb-6">
-                <ProfileHeader user={user} />
-                <AboutPanel user={user} />
+                <ProfileHeader
+                  user={profileUser}
+                  isOwnProfile={isOwnProfile}
+                  isFollowing={isFollowing}
+                  followLoading={followLoading}
+                  onToggleFollow={handleToggleFollow}
+                />
+                <AboutPanel user={profileUser} />
               </div>
             </div>
 
             {/* RIGHT: events */}
             <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:pb-20 tw:pr-1 tw:lg:overflow-y-auto">
-              <ProfileTabs user={user} />
+              <ProfileTabs
+                user={profileUser}
+                isOwnProfile={isOwnProfile}
+              />
             </div>
           </div>
         )}

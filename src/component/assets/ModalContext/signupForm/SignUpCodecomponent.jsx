@@ -6,6 +6,7 @@ import axios from "axios";
 import { useAuth } from "../../../../pages/auth/AuthContext";
 import Alert from 'react-bootstrap/Alert';
 import { showToast } from "../../../ToastAlert";
+import { showSuccess, showError } from "../../../ui/toast";
 
 const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
     const inputRefs = useRef([]);
@@ -90,7 +91,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
             console.log(error)
             // const message = error.response?.data?.message || "Failed to resend verification code. Please try again.";
             // setErrorMessage(message);
-            // showToast.error(message);
+            // showError(message);
         } finally {
             setIsLoading(false);
         }
@@ -139,7 +140,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
             const result = response.data;
             // console.log(result);
             if (result) {
-                showToast.success(response.message || "Verification successful!");
+                showSuccess(response.message || "Verification successful!");
 
                 // setSuccessMessage(result.message || "Verification successful!");
                 const user = userupdate;

@@ -50,7 +50,7 @@ function saveBanksToCache(banks) {
 }
 
 const BecomeOrganiser = () => {
-  const { user, token, refreshUser } = useAuth();
+  const { user, token, refreshUser, login } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
@@ -258,7 +258,8 @@ const BecomeOrganiser = () => {
         error: "Failed to submit BVN",
       });
 
-      await refreshUser();
+      await refreshUser, login();
+      login({ user, token });
 
       setProcessingOpen(true);
 

@@ -2,6 +2,11 @@ import React, { useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { useAuth } from "../../../../../pages/auth/AuthContext";
+import { api } from "../../../../../lib/apiClient";
+import { showError } from "../../../../../component/ui/toast";
 
 // ✅ Zod: at least one poster (image or video)
 const schema = z
@@ -20,6 +25,7 @@ const schema = z
               message: "Image must be ≤ 5MB",
             }),
           role: z.string().optional(),
+          // extra fields (user_name, userId, avatar) are ignored by zod
         })
       )
       .min(1, "At least one performer is required"),
@@ -47,6 +53,13 @@ export default function MediaUploadStep({
   const [isDraggingImg, setIsDraggingImg] = useState(false);
   const [isDraggingVid, setIsDraggingVid] = useState(false);
 
+  const { token } = useAuth();
+
+  // mention search state
+  const [mentionOptions, setMentionOptions] = useState([]);
+  const [mentionLoading, setMentionLoading] = useState(false);
+  const mentionDebounceRef = useRef(null);
+
   const {
     handleSubmit,
     formState: { errors },
@@ -61,6 +74,15 @@ export default function MediaUploadStep({
     setValue("posterVideos", posterVideos);
     setValue("performers", performers);
   }, [posterImages, posterVideos, performers, setValue]);
+
+  useEffect(
+    () => () => {
+      if (mentionDebounceRef.current) {
+        clearTimeout(mentionDebounceRef.current);
+      }
+    },
+    []
+  );
 
   // ---- Poster helpers
   const addPosterImages = (files) => {
@@ -88,13 +110,33 @@ export default function MediaUploadStep({
   const addPerformer = () => {
     setPerformers((p) => [
       ...p,
-      { id: Date.now(), name: "", image: null, role: "speaker" },
+      {
+        id: Date.now(),
+        name: "",
+        image: null,
+        role: "speaker",
+        user_name: "",
+        userId: null,
+        avatar: null,
+      },
     ]);
   };
+
   const updatePerformerName = (id, name) =>
     setPerformers((list) =>
       list.map((p) => (p.id === id ? { ...p, name } : p))
     );
+
+  const updatePerformerRole = (id, role) =>
+    setPerformers((list) =>
+      list.map((p) => (p.id === id ? { ...p, role } : p))
+    );
+
+  const updatePerformerTag = (id, patch) =>
+    setPerformers((list) =>
+      list.map((p) => (p.id === id ? { ...p, ...patch } : p))
+    );
+
   const setPerformerImage = (id, file) => {
     if (!file || !/^image\//.test(file.type) || file.size > 5 * 1024 * 1024)
       return;
@@ -102,8 +144,47 @@ export default function MediaUploadStep({
       list.map((p) => (p.id === id ? { ...p, image: file } : p))
     );
   };
+
   const removePerformer = (id) =>
     setPerformers((list) => list.filter((p) => p.id !== id));
+
+  // ---- Mention search (debounced)
+  const searchTaggedUsers = (raw) => {
+    const value = raw || "";
+    const atIndex = value.indexOf("@");
+
+    if (atIndex === -1) {
+      setMentionOptions([]);
+      return;
+    }
+
+    const query = value.slice(atIndex + 1).trim();
+    if (query.length < 2) {
+      setMentionOptions([]);
+      return;
+    }
+
+    if (mentionDebounceRef.current) {
+      clearTimeout(mentionDebounceRef.current);
+    }
+
+    mentionDebounceRef.current = setTimeout(async () => {
+      try {
+        setMentionLoading(true);
+        const res = await api.get("/api/v1/tag", {
+          params: { q: query }, // backend example: /api/v1/tag?q=Ebi
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const list = res?.data?.data || res?.data || [];
+        setMentionOptions(Array.isArray(list) ? list : []);
+      } catch (e) {
+        console.error(e);
+        showError("Failed to fetch performer suggestions");
+      } finally {
+        setMentionLoading(false);
+      }
+    }, 400);
+  };
 
   const onSubmit = (vals) => onNext(vals);
 
@@ -241,7 +322,7 @@ export default function MediaUploadStep({
         </p>
       )}
 
-      {/* Performers (unchanged except optional role) */}
+      {/* Performers */}
       <div className="tw:mb-4">
         <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
           Performer(s) / Speaker(s)*
@@ -259,12 +340,98 @@ export default function MediaUploadStep({
               key={p.id}
               className="tw:border tw:border-gray-200 tw:rounded-2xl tw:p-3"
             >
+              {/* Tag by username */}
+              <div className="tw:mb-2">
+                <Autocomplete
+                  options={mentionOptions}
+                  loading={mentionLoading}
+                  getOptionLabel={(option) =>
+                    option.user_name || option.name || ""
+                  }
+                  value={
+                    p.user_name
+                      ? {
+                          user_name: p.user_name,
+                          name: p.name,
+                          avatar: p.avatar,
+                        }
+                      : null
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    option.user_name === value.user_name
+                  }
+                  onChange={(event, newValue) => {
+                    if (newValue) {
+                      updatePerformerTag(p.id, {
+                        user_name: newValue.user_name,
+                        userId: newValue.id,
+                        avatar: newValue.avatar,
+                        // auto-fill name if empty
+                        name: p.name || newValue.name || newValue.user_name,
+                      });
+                    } else {
+                      updatePerformerTag(p.id, {
+                        user_name: "",
+                        userId: null,
+                        avatar: null,
+                      });
+                    }
+                  }}
+                  onInputChange={(event, newInput) => {
+                    searchTaggedUsers(newInput);
+                  }}
+                  renderOption={(props, option) => (
+                    <li {...props}>
+                      <div className="tw:flex tw:items-center tw:gap-2">
+                        <img
+                          src={option.avatar}
+                          alt={option.user_name}
+                          className="tw:h-7 tw:w-7 tw:rounded-full tw:object-cover"
+                        />
+                        <div>
+                          <div className="tw:text-sm">
+                            {option.user_name || ""}
+                          </div>
+                          <div className="tw:text-[11px] tw:text-gray-500">
+                            {option.name || ""}
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Tag by @username"
+                      placeholder="@username"
+                      size="small"
+                    />
+                  )}
+                />
+              </div>
+
+              {/* Display name */}
               <input
                 defaultValue={p.name}
                 onBlur={(e) => updatePerformerName(p.id, e.target.value)}
                 placeholder="Performer name"
                 className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:mb-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
               />
+
+              {/* Role */}
+              <input
+                defaultValue={p.role || "speaker"}
+                onBlur={(e) => updatePerformerRole(p.id, e.target.value)}
+                placeholder="Role (e.g. speaker, artist)"
+                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:mb-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+              />
+
+              {p.user_name && (
+                <p className="tw:text-[11px] tw:text-gray-500 tw:mb-2 tw:truncate">
+                  Tagged: {p.user_name}
+                </p>
+              )}
+
               <div className="tw:flex tw:items-end tw:justify-between tw:gap-3">
                 <button
                   type="button"
@@ -296,6 +463,7 @@ export default function MediaUploadStep({
                   Remove
                 </button>
               </div>
+
               {p.image && (
                 <p className="tw:text-xs tw:text-gray-500 tw:mt-2 tw:truncate">
                   {p.image.name}

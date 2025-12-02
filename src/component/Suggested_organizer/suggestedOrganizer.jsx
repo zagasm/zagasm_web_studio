@@ -107,7 +107,7 @@ function SingleOrganizers() {
 
     } catch (err) {
       console.error('Error toggling follow:', err);
-      showToast.error('Something went wrong. Please try again.');
+      showError('Something went wrong. Please try again.');
     } finally {
       setFollowLoading((prev) => ({ ...prev, [organizerId]: false }));
     }

@@ -177,7 +177,7 @@ export function CountdownPill({ target }) {
   if (!target) return null;
 
   return (
-    <div className=" tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:rounded-full tw:bg-black/70 tw:text-white tw:text-[10px] tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
+    <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:rounded-full tw:bg-black/70 tw:text-white tw:text-[10px] tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
       <Clock className="tw:w-4 tw:h-4 tw:opacity-80" />
 
       <Countdown
@@ -199,21 +199,15 @@ export function CountdownPill({ target }) {
 }
 
 /* ---- Single Card (shared for all variants) ---- */
-/* ---- Single Card (shared for all variants) ---- */
 export function EventCard({ event, variant = "default", onMore }) {
   const startDate = eventStartDate(event);
 
-  // --- START OF UPDATED LOGIC ---
   const isDedicatedLiveTab = variant === "live";
   const isDedicatedUpcomingTab = variant === "upcoming";
 
-  // The event is 'Live' if we're on the dedicated Live tab OR if we're on the 'all' tab
-  // AND the event's status is 'live'.
   const isLive =
     isDedicatedLiveTab || (variant === "all" && event.status === "live");
 
-  // The event is 'Upcoming' if we're on the dedicated Upcoming tab OR if we're on the 'all' tab
-  // AND the event's status is 'upcoming'.
   const isUpcoming =
     isDedicatedUpcomingTab ||
     (variant === "all" && event.status === "upcoming");
@@ -222,17 +216,23 @@ export function EventCard({ event, variant = "default", onMore }) {
     event?.status === "ended" ||
     (startDate && startDate.getTime() < Date.now() && event?.status !== "live");
 
-  // We can keep isAll for reference if needed, but it's not strictly necessary for this logic
-  // const isAll = variant === "all";
-  // --- END OF UPDATED LOGIC ---
-
   const ticketLabel = `Buy Ticket (${priceText(event)})`;
+
+  // FLEXIBLE FLAG FOR "MY" EVENTS (back-end should set one of these)
+  const isMyEvent =
+    event?.is_owner ||
+    event?.is_my_event ||
+    event?.isMine ||
+    event?.is_current_user_event;
 
   return (
     <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
       <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full blog-card border-0 tw:relative">
         {/* three dots */}
         <button
+          style={{
+            borderRadius: "50%",
+          }}
           type="button"
           onClick={onMore}
           className="tw:absolute tw:z-40 tw:right-3 tw:top-3 tw:size-9 tw:rounded-full tw:bg-black/35 tw:flex tw:items-center tw:justify-center tw:text-white tw:backdrop-blur"
@@ -269,18 +269,16 @@ export function EventCard({ event, variant = "default", onMore }) {
               </>
             )}
 
-            {/* UPCOMING badge + countdown */}
+            {/* UPCOMING badge */}
             {isUpcoming && (
-              <>
-                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF9F0A] tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
-                  <span>Upcoming</span>
-                  <img
-                    src={camera_icon}
-                    alt="Upcoming"
-                    className="tw:w-4 tw:h-4 tw:object-contain"
-                  />
-                </div>
-              </>
+              <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF9F0A] tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
+                <span>Upcoming</span>
+                <img
+                  src={camera_icon}
+                  alt="Upcoming"
+                  className="tw:w-4 tw:h-4 tw:object-contain"
+                />
+              </div>
             )}
           </div>
         </Link>
@@ -317,23 +315,58 @@ export function EventCard({ event, variant = "default", onMore }) {
             </div>
           </div>
 
-          {/* Location + date/time pill */}
-          {isUpcoming && (
-            <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600">
-              <div className="tw:flex tw:items-center tw:gap-2">
-                <CountdownPill target={startDate} />
-              </div>
-              <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
-              <div className="tw:flex tw:items-center tw:gap-2">
-                <CalendarDays className="tw:w-4 tw:h-4" />
-                <span>{formatMetaLine(event)}</span>
-              </div>
-            </div>
-          )}
+          {/* META BLOCK (ALWAYS RENDERED TO KEEP CTA ALIGNED) */}
+          <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600 tw:min-h-14">
+            {isLive ? (
+              <>
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <span className="tw:inline-flex tw:h-6 tw:px-2 tw:items-center tw:rounded-full tw:bg-red-50 tw:text-[10px] tw:font-semibold tw:text-red-600">
+                    Live now
+                  </span>
+                </div>
+                <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <CalendarDays className="tw:w-4 tw:h-4" />
+                  <span>{formatMetaLine(event)}</span>
+                </div>
+              </>
+            ) : isUpcoming ? (
+              <>
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <CountdownPill target={startDate} />
+                </div>
+                <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <CalendarDays className="tw:w-4 tw:h-4" />
+                  <span>{formatMetaLine(event)}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <CalendarDays className="tw:w-4 tw:h-4" />
+                  <span>{formatMetaLine(event)}</span>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* CTA */}
-          {/* CTA */}
-          {isEnded ? (
+          {isMyEvent ? (
+            // For events created by me
+            <Link
+              to={`/event/view/${event.id}`}
+              className="tw:mt-2 tw:w-full tw:inline-block"
+            >
+              <button
+                type="button"
+                style={{ borderRadius: 8 }}
+                className="tw:w-full tw:rounded-2xl tw:bg-black tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
+              >
+                View event
+              </button>
+            </Link>
+          ) : isEnded ? (
             <button
               type="button"
               style={{ borderRadius: 8 }}
@@ -429,13 +462,10 @@ export default function EventTemplate({
 
   /* ---- 2. When API loads, override cache ---- */
   React.useEffect(() => {
-    // Check if serverEvents is not null/undefined (i.e., data fetch has completed)
     if (serverEvents === undefined || serverEvents === null) return;
 
-    // Set the visible events to the latest data from the server (even if it's empty)
     setVisibleEvents(serverEvents);
 
-    // Update cache only if serverEvents is not null
     try {
       const payload = { events: serverEvents, meta };
       localStorage.setItem(cacheKey, JSON.stringify(payload));
@@ -456,8 +486,7 @@ export default function EventTemplate({
   const variant = live ? "live" : upcoming ? "upcoming" : "all";
 
   /* ---- 4. SHOW SHIMMER WHEN: cache not loaded + loading ---- */
-  // NEW LOGIC: Show shimmer if loading, UNLESS we already have events and are just loading more.
-  const showShimmer = loading && visibleEvents.length === 0; // Show shimmer if loading and no events are visible yet.
+  const showShimmer = loading && visibleEvents.length === 0;
 
   return (
     <>
@@ -471,7 +500,6 @@ export default function EventTemplate({
       )}
 
       {/* EVENTS */}
-      {/* Only render events if we are not in the initial shimmer state */}
       {!showShimmer && (
         <div className="row tw:mx-0">
           {visibleEvents.map((event) => (
@@ -486,14 +514,13 @@ export default function EventTemplate({
       )}
 
       {/* LOADING MORE */}
-      {loadingMore &&
-        visibleEvents.length > 0 && ( // Added visibleEvents.length check to prevent double shimmer
-          <div className="row">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <EventShimmer key={i} />
-            ))}
-          </div>
-        )}
+      {loadingMore && visibleEvents.length > 0 && (
+        <div className="row">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <EventShimmer key={i} />
+          ))}
+        </div>
+      )}
 
       {/* LOAD MORE TRIGGER */}
       {!isDone && (
@@ -511,13 +538,6 @@ export default function EventTemplate({
           <small>Check back later or try a different filter.</small>
         </div>
       )}
-
-      {/* END MESSAGE */}
-      {/* {!loading && isDone && visibleEvents.length > 0 && (
-        <div className="text-center mt-3 mb-4 text-muted">
-          You’ve reached the end of all events
-        </div>
-      )} */}
 
       <EventActionsSheet
         open={!!selectedEvent}

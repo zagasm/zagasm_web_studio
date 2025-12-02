@@ -7,6 +7,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "../assets/style.css";
 import { CodeVerification } from "../CodeVerification";
+import { showError, showSuccess } from "../../../component/ui/toast";
 
 export function ForgetPassword() {
   const [input, setInput] = useState("");
@@ -29,7 +30,7 @@ export function ForgetPassword() {
     e.preventDefault();
 
     if (activeTab === "email" && !isValidEmail(input)) {
-      showToast.error("Please enter a valid email address format.");
+      showError("Please enter a valid email address format.");
       return;
     }
 
@@ -54,7 +55,7 @@ export function ForgetPassword() {
 
       const data = response.data;
       // console.log(data);
-      showToast.success(data.message || "Verification code sent successfully!");
+      showSuccess(data.message || "Verification code sent successfully!");
       setVerificationData({
         code: data.code,
         input: data.input,
@@ -65,7 +66,7 @@ export function ForgetPassword() {
       const message =
         err.response?.data?.message ||
         "Failed to send verification code. Please try again.";
-      showToast.error(message);
+      showError(message);
     } finally {
       setIsSubmitting(false);
     }

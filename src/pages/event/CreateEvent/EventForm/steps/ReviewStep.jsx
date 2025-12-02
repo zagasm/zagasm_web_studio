@@ -16,7 +16,7 @@ export default function ReviewStep({
   posterImages = [],
   posterVideos = [],
 }) {
-  const {
+    const {
     title,
     organizer,
     date,
@@ -33,7 +33,10 @@ export default function ReviewStep({
     streamingDuration,
     visibility,
     matureContent,
+    hasBackstage,
+    backstagePrice,
   } = collected || {};
+
 
   const flat = React.useMemo(
     () => flattenLaravelErrors(formErrors),
@@ -206,6 +209,11 @@ export default function ReviewStep({
                 <div className="tw:text-xs tw:mt-1 tw:truncate">
                   {p.name || "Unnamed"}
                 </div>
+                {p.user_name && (
+                  <div className="tw:text-[11px] tw:text-gray-500 tw:truncate">
+                    {p.user_name}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -281,6 +289,14 @@ export default function ReviewStep({
             <div className="tw:text-xs tw:text-gray-500">Price</div>
             <div>
               {typeof price === "number" ? price.toFixed(2) : price || "0.00"}
+            </div>
+          </div>
+          <div>
+            <div className="tw:text-xs tw:text-gray-500">Backstage</div>
+            <div>
+              {hasBackstage
+                ? `Yes${backstagePrice ? ` - ${backstagePrice}` : ""}`
+                : "No"}
             </div>
           </div>
         </div>

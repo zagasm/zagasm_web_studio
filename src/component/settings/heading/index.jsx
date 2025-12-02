@@ -14,6 +14,7 @@ import { useVillage } from "../../villageSqare/VillageContext";
 import { usePost } from "../../posts/PostContext";
 import NumberFormatter from "../../assets/ContentSettings";
 import { useComment } from "../../Comments/commentContext";
+import { showSuccess, showError } from "../../ui/toast";
 // Set app element for react-modal (required for accessibility)
 ReactModal.setAppElement("#root");
 
@@ -83,7 +84,7 @@ const ProfilePageHeading = () => {
                 setIsModalOpen(true);
             };
             reader.onerror = () => {
-                showToast.error("Failed to read the file.");
+                showError("Failed to read the file.");
             };
             reader.readAsDataURL(file);
         }
@@ -101,7 +102,7 @@ const ProfilePageHeading = () => {
                 setIsModalOpen(true);
             };
             reader.onerror = () => {
-                showToast.error("Failed to read the file.");
+                showError("Failed to read the file.");
             };
             reader.readAsDataURL(file);
         }
@@ -161,7 +162,7 @@ const ProfilePageHeading = () => {
     // Handle upload of the cropped image (for cover picture)
     const handleCoverUpload = () => {
         if (!user) {
-            showToast.error("Please login to proceed.");
+            showError("Please login to proceed.");
             return;
         }
 
@@ -182,7 +183,7 @@ const ProfilePageHeading = () => {
                 success: function (response) {
                     const responseData = JSON.parse(response);
                     if (responseData.status === "OK") {
-                        showToast.success("Cover picture updated successfully!");
+                        showSuccess("Cover picture updated successfully!");
                         setImageSrc(croppedImage); // Update the actual cover image
                         setIsModalOpen(false);
                         setPreviewImageSrc(null);
@@ -194,7 +195,7 @@ const ProfilePageHeading = () => {
                 },
                 error: function (xhr, status, error) {
                     console.error("Upload failed:", error);
-                    showToast.error("Failed to upload cover picture.");
+                    showError("Failed to upload cover picture.");
                 },
                 complete: function () {
                     setLoading(false); // Stop loading
@@ -207,7 +208,7 @@ const ProfilePageHeading = () => {
     // Handle upload of the cropped image (for profile picture)
     const handleProfileUpload = () => {
         if (!user) {
-            showToast.error("Please login to proceed.");
+            showError("Please login to proceed.");
             return;
         }
 
@@ -240,7 +241,7 @@ const ProfilePageHeading = () => {
                 },
                 error: function (xhr, status, error) {
                     console.error("Upload failed:", error);
-                    showToast.error("Failed to upload profile picture.");
+                    showError("Failed to upload profile picture.");
                 },
                 complete: function () {
                     setLoading(false); // Stop loading
