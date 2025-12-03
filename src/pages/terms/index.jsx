@@ -62,46 +62,9 @@ export default function TermsOfServicePage() {
 
         {/* Layout: sidebar + main */}
         <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:lg:grid-cols-[260px,minmax(0,1fr)] tw:gap-8">
-          {/* Sidebar */}
-          <aside className="tw:sticky tw:top-6 tw:h-fit tw:hidden tw:lg:block">
-            <div className="tw:rounded-2xl tw:bg-white tw:p-4 tw:border tw:border-slate-200 tw:shadow-sm">
-              <span className="tw:block tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wide tw:text-slate-500">
-                On this page
-              </span>
-              <nav className="tw:mt-3 tw:space-y-1 tw:text-sm">
-                {[
-                  { id: "intro", label: "Overview" },
-                  { id: "sec-1", label: "1. Eligibility & Accounts" },
-                  { id: "sec-2", label: "2. Service & Permitted Use" },
-                  { id: "sec-3", label: "3. Creator Obligations" },
-                  { id: "sec-4", label: "4. Viewer Obligations" },
-                  { id: "sec-5", label: "5. Payments & Fees" },
-                  { id: "sec-6", label: "6. Cancellations & Data" },
-                  { id: "sec-7", label: "7. Prohibited Conduct" },
-                  { id: "sec-8", label: "8. IP Rights & Licenses" },
-                  { id: "sec-9", label: "9. Takedowns & Complaints" },
-                  { id: "sec-10", label: "10. Termination & Survival" },
-                  { id: "sec-11", label: "11. Disclaimers" },
-                  { id: "sec-12", label: "12. Limitation of Liability" },
-                  { id: "sec-13", label: "13. Indemnification" },
-                  { id: "sec-14", label: "14. Governing Law" },
-                  { id: "sec-15", label: "15. Amendments & Misc." },
-                  { id: "sec-16", label: "16. FAQs" },
-                ].map((item) => (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    className="tw:flex tw:items-center tw:justify-between tw:rounded-lg tw:px-2 tw:py-1.5 tw:text-slate-600 hover:tw:bg-slate-50 hover:tw:text-slate-900"
-                  >
-                    <span>{item.label}</span>
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </aside>
 
           {/* Main content */}
-          <main>
+          <div>
             <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:md:p-8 tw:border tw:border-slate-200 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)] tw:space-y-10">
               {/* Intro */}
               <div
@@ -1203,7 +1166,7 @@ export default function TermsOfServicePage() {
                 </span>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>

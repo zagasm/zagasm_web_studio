@@ -58,6 +58,8 @@ import PrivacyPolicyPage from "./pages/privacy/index.jsx";
 import CommunityGuidelinesPage from "./pages/communityGuideline/index.jsx";
 import TermsOfServicePage from "./pages/terms/index.jsx";
 import TaggedMentionsPage from "./pages/mentions/index.jsx";
+import LandingLayout from "./layouts/LandingLayout.jsx";
+import AboutPage from "./pages/LandingPage/about.jsx";
 
 const MainLayout = () => (
   <>
@@ -88,14 +90,16 @@ export function App() {
       <ToastContainer />
       <NetworkStatus />
       <Routes>
+        <Route element={<LandingLayout />}>
         <Route path="/" element={<ZagasmLanding />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/community-guidelines" element={<CommunityGuidelinesPage />} />
         <Route path="/terms-of-service" element={<TermsOfServicePage />} />
         <Route path="/support" element={<Support />} />
         <Route path="/marketing" element={<Marketing />} />
         <Route path="/data-protection" element={<DataProtectionPage />} />
-        <Route path="/" element={<Landing />} />
+      </Route>
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />

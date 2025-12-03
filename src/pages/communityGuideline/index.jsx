@@ -62,43 +62,6 @@ export default function CommunityGuidelinesPage() {
 
         {/* Layout: sidebar + main */}
         <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[260px,minmax(0,1fr)] tw:gap-8 tw:mt-6">
-          {/* Sidebar */}
-          <aside className="tw:sticky tw:top-6 tw:h-fit tw:hidden tw:lg:block">
-            <div className="tw:rounded-2xl tw:bg-white tw:p-4 tw:border tw:border-slate-200 tw:shadow-sm">
-              <span className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wide tw:text-slate-500 tw:block">
-                On this page
-              </span>
-              <nav className="tw:mt-3 tw:space-y-1 tw:text-sm">
-                {[
-                  { id: "intro", label: "Overview" },
-                  { id: "principles", label: "Foundational Principles" },
-                  { id: "rule-1", label: "1. Adult Sexual Content" },
-                  { id: "rule-2", label: "2. Illegal & Dangerous Acts" },
-                  { id: "rule-3", label: "3. Harassment & Hate Speech" },
-                  { id: "rule-4", label: "4. Violence & Graphic Media" },
-                  { id: "rule-5", label: "5. Child Safety" },
-                  { id: "rule-6", label: "6. Intellectual Property" },
-                  { id: "rule-7", label: "7. Spam & Platform Integrity" },
-                  { id: "rule-8", label: "8. Events & Monetization" },
-                  { id: "rule-9", label: "9. Privacy & Data Stewardship" },
-                  { id: "rule-10", label: "10. Enforcement & Appeals" },
-                  { id: "reporting", label: "Reporting & Community Vigilance" },
-                  { id: "support", label: "Supplementary Guidance" },
-                  { id: "faqs", label: "FAQs" },
-                  { id: "legal", label: "Legal Framework" },
-                ].map((item) => (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    className="tw:flex tw:items-center tw:justify-between tw:rounded-lg tw:px-2 tw:py-1.5 tw:text-slate-600 hover:tw:bg-slate-50 hover:tw:text-slate-900"
-                  >
-                    <span>{item.label}</span>
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </aside>
-
           {/* Main content */}
           <main>
             <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:md:p-8 tw:border tw:border-slate-200 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)] tw:space-y-10">

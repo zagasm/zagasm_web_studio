@@ -11,9 +11,9 @@ export default function PrivacyPolicyPage() {
             <span>Zagasm Studio App · Privacy</span>
           </div>
 
-          <h1 className="tw:mt-4 tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900">
+          <span className="tw:block tw:mt-4 tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900">
             Privacy Policy for Zagasm Studio App
-          </h1>
+          </span>
 
           <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:md:text-base tw:text-slate-600">
             This Privacy Policy explains how Zagasm Inc. collects, uses, shares,
@@ -52,50 +52,8 @@ export default function PrivacyPolicyPage() {
 
         {/* Main layout */}
         <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[260px,minmax(0,1fr)] tw:gap-8 tw:mt-6">
-          {/* Sidebar / section navigation */}
-          <aside className="tw:sticky tw:top-6 tw:h-fit tw:hidden tw:lg:block">
-            <div className="tw:rounded-2xl tw:bg-white tw:p-4 tw:border tw:border-slate-200 tw:shadow-sm">
-              <h2 className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wide tw:text-slate-500">
-                On this page
-              </h2>
-              <nav className="tw:mt-3 tw:space-y-1 tw:text-sm">
-                {[
-                  { id: "info-we-collect", label: "1. Information We Collect" },
-                  {
-                    id: "how-we-use",
-                    label: "2. How We Use Your Information",
-                  },
-                  { id: "legal-bases", label: "3. Legal Bases" },
-                  { id: "sharing", label: "4. Sharing & Disclosure" },
-                  {
-                    id: "transfers",
-                    label: "5. International Data Transfers",
-                  },
-                  { id: "retention", label: "6. Data Retention" },
-                  { id: "rights", label: "7. Your Privacy Rights" },
-                  { id: "children", label: "8. Children’s Privacy" },
-                  { id: "security", label: "9. Information Security" },
-                  { id: "cookies", label: "10. Cookies" },
-                  { id: "updates", label: "11. Policy Updates" },
-                  { id: "breach", label: "12. Data Breach Response" },
-                  { id: "contact", label: "13. Contact & Disputes" },
-                  { id: "faqs", label: "14. FAQs" },
-                  { id: "governing-law", label: "15. Governing Law" },
-                ].map((item) => (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    className="tw:flex tw:items-center tw:justify-between tw:rounded-lg tw:px-2 tw:py-1.5 tw:text-slate-600 hover:tw:bg-slate-50 hover:tw:text-slate-900"
-                  >
-                    <span>{item.label}</span>
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </aside>
-
           {/* Content */}
-          <main>
+          <div>
             <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:md:p-8 tw:border tw:border-slate-200 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
               <section className="tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700">
                 <p>
@@ -149,9 +107,9 @@ export default function PrivacyPolicyPage() {
                 id="info-we-collect"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   1. Information We Collect: A Detailed Overview
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   At Zagasm, data collection is purposeful and limited. We
                   collect information necessary to deliver core functionalities
@@ -162,9 +120,9 @@ export default function PrivacyPolicyPage() {
                   principles.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.1 Account and Registration Data
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   When you create an account or log in via third-party
                   providers, we collect identifiers to establish and maintain
@@ -189,9 +147,9 @@ export default function PrivacyPolicyPage() {
                   a 30-day grace period for recovery.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.2 Identity Verification and Compliance Information
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   For users engaging in monetized features, we implement KYC and
                   AML processes to comply with financial regulations.
@@ -219,9 +177,9 @@ export default function PrivacyPolicyPage() {
                   <em>Legal Basis:</em> Legal obligation.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.3 Financial and Transactional Data
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We process limited financial metadata and delegate sensitive
                   details to certified payment processors.
@@ -244,9 +202,9 @@ export default function PrivacyPolicyPage() {
                   obligation. We do not store full card or banking credentials.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.4 Usage, Technical, and Device Data
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   To optimize performance and personalize the experience, we log
                   anonymized or pseudonymized operational data.
@@ -272,9 +230,9 @@ export default function PrivacyPolicyPage() {
                   improvement) with opt-out options.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.5 User-Generated Content and Metadata
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We store and process your content as instructed by you.
                 </p>
@@ -296,9 +254,9 @@ export default function PrivacyPolicyPage() {
                   Service.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.6 Communication and Interaction Records
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We keep records needed to provide support and collaboration
                   features.
@@ -318,9 +276,9 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.7 Cookies, Local Storage, and Similar Technologies
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   These technologies support persistent functionality and
                   analytics, as described further in Section 10.
@@ -342,10 +300,10 @@ export default function PrivacyPolicyPage() {
                 id="how-we-use"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   2. How We Use Your Information: Purposeful and Transparent
                   Processing
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We process personal data in line with our mission to
                   democratize content creation. Each use is tied to a specific
@@ -354,9 +312,9 @@ export default function PrivacyPolicyPage() {
                   produces legal effects without human oversight.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   2.1 Enabling and Enhancing Service Delivery
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <strong>Account Management:</strong> Authenticating users,
@@ -373,9 +331,9 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   2.2 Financial Operations and Compliance
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <strong>Payment Processing:</strong> Authorizing charges,
@@ -391,9 +349,9 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   2.3 Communication and User Engagement
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <strong>Transactional Messaging:</strong> Upload
@@ -409,9 +367,9 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   2.4 Analytics, Research, and Improvement
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <strong>Performance Metrics:</strong> Analyzing load times
@@ -427,9 +385,9 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   2.5 Legal, Security, and Ethical Compliance
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <strong>Regulatory Adherence:</strong> Retaining records for
@@ -451,9 +409,9 @@ export default function PrivacyPolicyPage() {
                 id="legal-bases"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   3. Legal Bases for Processing: Grounded in Law
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We process personal data only where we have a valid legal
                   basis under NDPR, GDPR, and similar frameworks.
@@ -487,18 +445,18 @@ export default function PrivacyPolicyPage() {
                 id="sharing"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   4. Sharing and Disclosure: Controlled and Accountable
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   Data sharing is limited to subprocessors bound by data
                   processing agreements. We maintain a public register of these
                   subprocessors on our website.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   4.1 Third-Party Service Providers
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <strong>Payment and Finance:</strong> Stripe, Paystack.
@@ -518,9 +476,9 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   4.2 Regulatory and Law Enforcement Disclosures
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     Disclosures to authorities such as NDPC, EFCC, or Interpol
@@ -532,18 +490,18 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   4.3 Corporate Transactions
-                </h3>
+                </span>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   In the event of a merger, acquisition, or asset sale, data may
                   transfer to a successor under equivalent protections, with
                   notice where required.
                 </p>
 
-                <h3 className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   4.4 Public and Aggregated Disclosures
-                </h3>
+                </span>
                 <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     Public profiles such as creator handles, bios, and public
@@ -565,9 +523,9 @@ export default function PrivacyPolicyPage() {
                 id="transfers"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   5. International Data Transfers: Safeguarded Global Operations
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We may transfer data to processors outside Nigeria, including
                   in the US, EU, and other regions, using appropriate
@@ -591,10 +549,10 @@ export default function PrivacyPolicyPage() {
                 id="retention"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   6. Data Retention and Deletion: Principled Lifecycle
                   Management
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We retain data only as long as necessary for the purposes
                   described in this Policy or as required by law.
@@ -687,9 +645,9 @@ export default function PrivacyPolicyPage() {
                 id="rights"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   7. Your Privacy Rights: Comprehensive Exercise Guide
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   Depending on your jurisdiction, you may have the following
                   rights:
@@ -746,9 +704,9 @@ export default function PrivacyPolicyPage() {
                 id="children"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   8. Protection of Children&apos;s Privacy
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   The Studio App is intended for users aged 18 and above. We do
                   not knowingly collect personal data from children under 18 (or
@@ -763,9 +721,9 @@ export default function PrivacyPolicyPage() {
                 id="security"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   9. Information Security: Robust and Proactive Measures
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We implement technical and organizational measures designed to
                   protect your data, including encryption in transit and at
@@ -789,9 +747,9 @@ export default function PrivacyPolicyPage() {
                 id="cookies"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   10. Cookies and Tracking Technologies: Detailed Management
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   Cookies and similar technologies help us provide core
                   features, remember preferences, and understand how the App is
@@ -899,9 +857,9 @@ export default function PrivacyPolicyPage() {
                 id="updates"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   11. Policy Updates: Commitment to Ongoing Transparency
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   We may update this Privacy Policy to reflect changes in our
                   practices, technology, or legal requirements. When we make
@@ -915,9 +873,9 @@ export default function PrivacyPolicyPage() {
                 id="breach"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   12. Data Breach Response: Swift and Accountable
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   In the unlikely event of a data breach, we will investigate,
                   contain, and remediate the incident, and notify affected users
@@ -930,9 +888,9 @@ export default function PrivacyPolicyPage() {
                 id="contact"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   13. Contact Information and Dispute Resolution
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   If you have questions or concerns about this Policy or how we
                   handle your data, please contact:
@@ -967,9 +925,9 @@ export default function PrivacyPolicyPage() {
                 id="faqs"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   14. Frequently Asked Questions (FAQs)
-                </h2>
+                </span>
                 <dl className="tw:mt-4 tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <div>
                     <dt className="tw:font-semibold tw:text-slate-900">
@@ -1019,9 +977,9 @@ export default function PrivacyPolicyPage() {
                 id="governing-law"
                 className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
               >
-                <h2 className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
                   15. Governing Law and Miscellaneous Provisions
-                </h2>
+                </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
                   This Privacy Policy and any disputes arising from it are
                   governed by the laws of the Federal Republic of Nigeria,
@@ -1046,7 +1004,7 @@ export default function PrivacyPolicyPage() {
                 </span>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>
