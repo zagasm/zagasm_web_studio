@@ -62,7 +62,7 @@ const AccountLeft = ({ user }) => {
           <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-400" />
         </Link>
 
-        {/* <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-[11.5px] tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
+        <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-[11.5px] tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
           <div className="tw:flex tw:items-center tw:gap-3">
             <div className="tw:shrink-0">
               <img
@@ -82,7 +82,7 @@ const AccountLeft = ({ user }) => {
           >
             Upgrade Now
           </Link>
-        </div> */}
+        </div>
 
         {/* 3. Verification Warning (Shows ONLY if NOT verified) */}
         {!isVerified && (
