@@ -15,15 +15,15 @@ export default function FreeEligibilityCard({ eligibility, loading }) {
 
   if (!eligibility) {
     return (
-      <div className="tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:flex tw:gap-3 tw:text-sm tw:text-white tw:shadow-sm">
+      <div className="tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-linear-to-br tw:from-black tw:to-primary tw:p-5 tw:space-y-4 tw:shadow-[0_20px_55px_rgba(15,23,42,0.08)]">
         <AlertTriangle className="tw:w-5 tw:h-5 tw:text-amber-500 tw:mt-0.5" />
         <div>
           <span className="tw:block tw:font-medium tw:text-white">
             Free cycles
           </span>
           <span className="tw:block tw:text-xs tw:mt-1 tw:text-white">
-            We couldn’t load your free-plan metrics. You can still subscribe to
-            any plan normally.
+            Become an organiser to be eligible for free subscription time by
+            hitting your targets.
           </span>
         </div>
       </div>

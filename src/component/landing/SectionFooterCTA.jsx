@@ -43,7 +43,7 @@ export default function Footer() {
               <img
                 src="/images/logo.png"
                 alt="Zagasm Studios"
-                className="tw:w-64 tw:rounded-sm tw:-ml-12"
+                className="tw:w-28 tw:rounded-sm"
               />
             </Link>
 
@@ -59,9 +59,7 @@ export default function Footer() {
                   <span>support@zagasm.com</span>
                 </div>
                 <address className="tw:not-italic tw:text-gray-500 tw:mt-2">
-                  Portomaso Business Centre, Portomaso PTM
-                  <br />
-                  Adewale Bakare, Yesterday 3:01 PM 16192 Coastal Highway Lewes,{" "}
+                  16192 Coastal Highway Lewes,{" "}
                   <br />
                   Delaware 19958 Sussex County United States
                 </address>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
-import { api, authHeaders } from "../../lib/apiClient"; // adjust path
-import { showError, showPromise } from "../../component/ui/toast"; // adjust path
+import { api, authHeaders } from "../../lib/apiClient";
+import { showError, showPromise } from "../../component/ui/toast";
 
 import BillingToggle from "../../component/subscription/BillingToggle";
 import PlanCard from "../../component/subscription/PlanCard";
@@ -9,9 +9,12 @@ import FreeEligibilityCard from "../../component/subscription/FreeEligibility";
 import SmallSupportCard from "../../component/subscription/SmallSupportCard";
 import PlansSkeleton from "../../component/subscription/PlansSkeleton";
 import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function SubscriptionsPage({}) {
-  const { token: authToken } = useAuth();
+  const { token: authToken, user, refreshUser } = useAuth();
+  const navigate = useNavigate();
+
   const [plans, setPlans] = useState([]);
   const [plansMeta, setPlansMeta] = useState(null);
   const [loadingPlans, setLoadingPlans] = useState(true);
@@ -23,6 +26,15 @@ export default function SubscriptionsPage({}) {
   const [initializingPlanId, setInitializingPlanId] = useState(null);
 
   const isAuthenticated = !!authToken;
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (!user) return;
+
+    if (user.subscription != null) {
+      navigate("/account", { replace: true });
+    }
+  }, [user, isAuthenticated, navigate]);
 
   useEffect(() => {
     fetchPlans();
@@ -83,7 +95,7 @@ export default function SubscriptionsPage({}) {
       setInitializingPlanId(plan.id);
 
       const promise = api.post(
-        `/api/v1/user/subscription/paystack/start`,
+        `/api/v1/user/subscription/create`,
         {
           plan_id: plan.id,
           billing_interval: billingInterval,
@@ -115,15 +127,12 @@ export default function SubscriptionsPage({}) {
       window.location.href = redirectUrl;
     } catch (err) {
       console.error(err);
-      // toast is handled by showPromise
     } finally {
       setInitializingPlanId(null);
     }
   }
 
   const isFreeEligibleGlobal = eligibility?.eligible === true;
-
-  console.log(plans);
 
   return (
     <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:text-slate-900 tw:pt-24 tw:md:pt-28 tw:px-4 tw:pb-20 tw:flex tw:justify-center">

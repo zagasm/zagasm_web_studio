@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { showError, showSuccess } from "../ui/toast";
@@ -8,9 +8,15 @@ import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 
 const AccountLeft = ({ user }) => {
-  const { token, setAuth } = useAuth();
+  const { token, setAuth, refreshUser } = useAuth();
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // const { refreshUser } = useAuth();
+
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
 
   const Default_user_image = user?.profileUrl
     ? user.profileUrl
@@ -49,11 +55,20 @@ const AccountLeft = ({ user }) => {
               />
             </div>
             <div className="tw:flex tw:flex-col">
-              <span className="tw:text-[16px] tw:font-bold tw:text-gray-900">
-                {user?.firstName
-                  ? `${user.firstName} ${user.lastName}`
-                  : "User"}
-              </span>
+              <div className="tw:flex tw:items-center tw:gap-0.5">
+                <span className="tw:text-[16px] tw:font-bold tw:text-gray-900">
+                  {user?.firstName
+                    ? `${user.firstName} ${user.lastName}`
+                    : "User"}
+                </span>
+                {user.subscription?.isActive && (
+                  <img
+                    className="tw:size-5"
+                    src="/images/verifiedIcon.svg"
+                    alt=""
+                  />
+                )}
+              </div>
               <span className="tw:text-[13px] tw:text-gray-500">
                 {user?.email || "user@example.com"}
               </span>
@@ -65,23 +80,47 @@ const AccountLeft = ({ user }) => {
         <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-[11.5px] tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
           <div className="tw:flex tw:items-center tw:gap-3">
             <div className="tw:shrink-0">
-              <img
-                className="tw:size-6"
-                src="/images/upgrade.png"
-                alt="Warning"
-              />
+              {user.subscription?.isActive ? (
+                <img
+                  className="tw:size-7"
+                  src="/images/basic.svg"
+                  alt="Verified"
+                />
+              ) : (
+                <img
+                  className="tw:size-6"
+                  src="/images/upgrade.png"
+                  alt="Upgrade"
+                />
+              )}
             </div>
-            <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-              Upgrade plan to enjoy premium features
-            </span>
+            <div>
+              {user.subscription?.isActive ? (
+                <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
+                  You are on the {user.subscription?.plan?.name} plan
+                </span>
+              ) : (
+                <div>
+                  <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
+                    You are on a free plan
+                  </span>
+                  <br />
+                  <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
+                    Upgrade plan to enjoy premium features
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-          <Link
-            to="/subscription"
-            style={{ borderRadius: 8 }}
-            className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[14px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
-          >
-            Upgrade Now
-          </Link>
+          {user.subscription?.isActive ? null : (
+            <Link
+              to="/subscription"
+              style={{ borderRadius: 8 }}
+              className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[14px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
+            >
+              Upgrade Now
+            </Link>
+          )}
         </div>
 
         {/* 3. Verification Warning (Shows ONLY if NOT verified) */}

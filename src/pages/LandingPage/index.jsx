@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./zagasm-landing.css";
 import BlurBackdrop from "../../component/landing/BlurBackdrop";
-import Nav from "../../component/landing/Nav";
 import Hero from "../../component/landing/Hero";
-import QuickFacts from "../../component/landing/QuickFacts";
 import AutomationSection from "../../component/landing/AutomationSection";
 import ThreeStepSection from "../../component/landing/ThreeStepSection";
-import SectionFooterCTA from "../../component/landing/SectionFooterCTA";
-import Footer from "../../component/landing/SectionFooterCTA";
-import ThreeSplineIcon from "../../component/landing/ThreeSplineIcon";
 import LiveHighlightsSection from "../../component/landing/LiveHighlightSection";
 import LivePipelineSection from "../../component/landing/LivePipelineSection";
 
@@ -17,7 +12,6 @@ export default function ZagasmLanding() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // show after ~250px scroll
       setShowBackToTop(window.scrollY > 250);
     };
 
@@ -32,14 +26,12 @@ export default function ZagasmLanding() {
   };
 
   return (
-    <div className="tw:relative tw:min-h-screen tw:overflow-hidden tw:text-gray-800 tw:bg-[#faf7ff]">
+    <div className="tw:relative tw:min-h-screen tw:overflow-hidden">
       <BlurBackdrop />
 
-      <Nav />
-
-      <main className="tw:relative tw:z-10 tw:pt-8 tw:md:pt-52">
+      <div className="tw:relative tw:z-10 tw:pt-8 tw:md:pt-52">
         <Hero />
-        {/* <ThreeSplineIcon /> */}
+
         <AutomationSection
           title="Stream once. Zagasm does the rest"
           subtitle="Hit Go Live—Zagasm auto-clips verticals, adds captions & chapters, multistreams via RTMP to every platform, and logs your best moments to the CRM in real time."
@@ -62,17 +54,12 @@ export default function ZagasmLanding() {
         />
 
         <LivePipelineSection />
-
         <ThreeStepSection />
-        <Footer />
-      </main>
+      </div>
 
-      {/* Back to top FAB */}
       {showBackToTop && (
         <button
-          style={{
-            borderRadius: "50%",
-          }}
+          style={{ borderRadius: "50%" }}
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"

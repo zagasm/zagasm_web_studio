@@ -36,8 +36,14 @@ export const AuthProvider = ({ children }) => {
     if (!token) return;
 
     try {
-      const res = await api.get("/api/v1/user/profile", authHeaders(token));
-      setUser(res.data.user);
+      const res = await api.get("/api/v1/profile", authHeaders(token));
+
+      // Adjust this depending on how your backend wraps it
+      const payload = res?.data?.data || res?.data || {};
+      const freshUser = payload.user || payload;
+
+      setUser(freshUser);
+      localStorage.setItem("userdata", JSON.stringify(freshUser));
     } catch (err) {
       console.error("Failed to refresh user", err);
     }

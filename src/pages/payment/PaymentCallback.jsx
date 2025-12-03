@@ -12,7 +12,7 @@ export default function PaymentCallback() {
   const paymentReference = reference || trxref;
 
   const handleReturnHome = () => {
-    navigate("/feed");
+    navigate(-1);
   };
 
   return (
@@ -71,7 +71,7 @@ export default function PaymentCallback() {
             }}
             className="tw:w-full tw:py-3 tw:px-4 tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:rounded-lg tw:font-semibold tw:transition tw:duration-200 hover:tw:bg-primarySecond"
           >
-            Return to Home
+            Proceed
           </button>
         </div>
       </div>

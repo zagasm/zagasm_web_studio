@@ -67,7 +67,14 @@ export default function ProfileHeader({
         {/* name + meta */}
         <div className="tw:text-center tw:w-full">
           <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900">
-            {displayName}
+            {displayName}{" "}
+            {user.subscription?.isActive && (
+              <img
+                className="tw:inline-block tw:ml-1 tw:size-5"
+                src="/images/verifiedIcon.svg"
+                alt="Verified"
+              />
+            )}
           </span>
 
           {user?.userName && !isOrganiserProfileData && (
