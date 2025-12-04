@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { showError } from "../../../../../component/ui/toast";
-import SelectField from "../../../../../component/form/SelectField";
+// import SelectField from "../../../../../component/form/SelectField"; // no longer needed
 import countries from "i18n-iso-countries";
 import enLocale from "i18n-iso-countries/langs/en.json";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -28,7 +28,6 @@ const GENRES = [
 ];
 
 const schema = z.object({
-  // event_type_id: z.string().min(1, "Please select an event type"),
   title: z.string().min(10, "Event title must be at least 10 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
   location: z.string().min(1, "Please select a location"),
@@ -62,7 +61,6 @@ export default function EventInformationStep({
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      // event_type_id: "",
       title: "",
       description: "",
       location: "",
@@ -73,6 +71,8 @@ export default function EventInformationStep({
       timezone: "",
       ...defaultValues,
     },
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
   const watchVals = watch();
@@ -96,26 +96,6 @@ export default function EventInformationStep({
     })();
     return () => (mounted = false);
   }, [token]);
-
-  // Event types
-  // useEffect(() => {
-  //   let mounted = true;
-  //   (async () => {
-  //     try {
-  //       setLoadingET(true);
-  //       const res = await api.get("/api/v1/event/type/view", {
-  //         headers: token ? { Authorization: `Bearer ${token}` } : {},
-  //       });
-  //       const list = res?.data?.events || [];
-  //       if (mounted) setEventTypes(list);
-  //     } catch {
-  //       showError("Error fetching event types");
-  //     } finally {
-  //       mounted && setLoadingET(false);
-  //     }
-  //   })();
-  //   return () => (mounted = false);
-  // }, [token]);
 
   // Build options
   const tzOptions = useMemo(
@@ -151,41 +131,29 @@ export default function EventInformationStep({
       onSubmit={handleSubmit(onSubmit)}
       className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <span className="tw:text-lg tw:md:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
+      <span className="tw:block tw:text-lg tw:md:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
         Basic event details
       </span>
 
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-5">
-        {/* <SelectField
-          label="Event Type*"
-          value={watchVals.event_type_id}
-          onChange={(v) =>
-            setValue("event_type_id", v, { shouldValidate: true })
-          }
-          options={typeOptions}
-          placeholder={loadingET ? "Loading…" : "Select an event type"}
-          disabled={loadingET}
-          error={errors?.event_type_id?.message}
-        /> */}
-
-        <div>
-          <label className="tw:block tw:text-[15px] tw:mb-1">Event Title</label>
+        {/* Title */}
+        <div className="tw:md:col-span-2">
+          <span className="tw:block tw:text-[15px] tw:mb-1">Event Title</span>
           <input
             {...register("title")}
             placeholder="Enter event title"
             className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
           />
           {errors.title && (
-            <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
               {errors.title.message}
-            </p>
+            </span>
           )}
         </div>
 
+        {/* Description */}
         <div className="tw:md:col-span-2">
-          <label className="tw:block tw:text-[15px] tw:mb-1">
-            Description*
-          </label>
+          <span className="tw:block tw:text-[15px] tw:mb-1">Description*</span>
           <textarea
             {...register("description")}
             rows={4}
@@ -193,48 +161,85 @@ export default function EventInformationStep({
             className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
           />
           {errors.description && (
-            <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
               {errors.description.message}
-            </p>
+            </span>
           )}
         </div>
 
-        <SelectField
-          label="Location*"
-          value={watchVals.location}
-          onChange={(v) => setValue("location", v, { shouldValidate: true })}
-          options={countryOptions}
-          placeholder="Select Country"
-          error={errors?.location?.message}
-        />
-
+        {/* Location as Autocomplete */}
         <div>
-          <label className="tw:block tw:text-[15px] tw:mb-1">
+          <span className="tw:block tw:text-[15px] tw:mb-1">Location*</span>
+          <Autocomplete
+            options={countryOptions}
+            getOptionLabel={(option) => option.label || ""}
+            value={
+              countryOptions.find((opt) => opt.value === watchVals.location) ||
+              null
+            }
+            onChange={(event, newValue) => {
+              setValue("location", newValue ? newValue.value : "", {
+                shouldValidate: true,
+              });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Select Country"
+                size="small"
+                error={!!errors.location}
+                helperText={errors.location?.message}
+              />
+            )}
+          />
+        </div>
+
+        {/* Organizer */}
+        <div>
+          <span className="tw:block tw:text-[15px] tw:mb-1">
             Organizer’s Name
-          </label>
+          </span>
           <input
             {...register("organizer")}
             readOnly
             className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-[15px]"
           />
           {errors.organizer && (
-            <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
               {errors.organizer.message}
-            </p>
+            </span>
           )}
         </div>
 
-        <SelectField
-          label="Genre*"
-          value={watchVals.genre}
-          onChange={(v) => setValue("genre", v, { shouldValidate: true })}
-          options={genreOptions}
-          placeholder="Select Genre"
-          error={errors?.genre?.message}
-        />
-
+        {/* Genre as Autocomplete */}
         <div>
-          <label className="tw:block tw:text-[15px] tw:mb-1">Event Date*</label>
+          <span className="tw:block tw:text-[15px] tw:mb-1">Genre*</span>
+          <Autocomplete
+            options={genreOptions}
+            getOptionLabel={(option) => option.label || ""}
+            value={
+              genreOptions.find((opt) => opt.value === watchVals.genre) || null
+            }
+            onChange={(event, newValue) => {
+              setValue("genre", newValue ? newValue.value : "", {
+                shouldValidate: true,
+              });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Select Genre"
+                size="small"
+                error={!!errors.genre}
+                helperText={errors.genre?.message}
+              />
+            )}
+          />
+        </div>
+
+        {/* Date */}
+        <div>
+          <span className="tw:block tw:text-[15px] tw:mb-1">Event Date*</span>
           <input
             type="date"
             min={new Date().toISOString().split("T")[0]}
@@ -242,28 +247,30 @@ export default function EventInformationStep({
             className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
           />
           {errors.date && (
-            <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
               {errors.date.message}
-            </p>
+            </span>
           )}
         </div>
 
+        {/* Time */}
         <div>
-          <label className="tw:block tw:text-[15px] tw:mb-1">Event Time*</label>
+          <span className="tw:block tw:text-[15px] tw:mb-1">Event Time*</span>
           <input
             type="time"
             {...register("time")}
             className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
           />
           {errors.time && (
-            <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
               {errors.time.message}
-            </p>
+            </span>
           )}
         </div>
 
+        {/* Timezone Autocomplete */}
         <div className="tw:md:col-span-2">
-          <label className="tw:block tw:text-[15px] tw:mb-1">Timezone*</label>
+          <span className="tw:block tw:text-[15px] tw:mb-1">Timezone*</span>
           <Autocomplete
             options={tzOptions}
             getOptionLabel={(option) => option.label || ""}
@@ -291,9 +298,7 @@ export default function EventInformationStep({
 
       <div className="tw:flex tw:justify-end tw:mt-6">
         <button
-          style={{
-            borderRadius: 20,
-          }}
+          style={{ borderRadius: 20 }}
           type="submit"
           disabled={!isValid}
           className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"

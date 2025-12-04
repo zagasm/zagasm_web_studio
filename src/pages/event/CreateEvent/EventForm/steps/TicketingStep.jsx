@@ -6,15 +6,23 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showError } from "../../../../../component/ui/toast";
 import SelectField from "../../../../../component/form/SelectField";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
 
 const schema = z
   .object({
-    price: z.number().min(0),
+    price: z.number().min(0, "Ticket price must be at least 0"),
     maxTickets: z.enum(["limited", "unlimited"]),
-    ticketLimit: z.number().min(1).optional(),
+    ticketLimit: z
+      .number()
+      .min(1, "Ticket limit must be at least 1")
+      .optional(),
     currency: z.string().min(1, "Please select a currency"),
     hasBackstage: z.boolean().optional(),
-    backstagePrice: z.number().min(1).optional(),
+    backstagePrice: z
+      .number()
+      .min(1, "Backstage price must be at least 1")
+      .optional(),
   })
   .refine((d) => d.maxTickets !== "limited" || d.ticketLimit, {
     message: "Ticket limit is required when tickets are limited",
@@ -28,7 +36,12 @@ const schema = z
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const { token } = useAuth();
   const [currencies, setCurrencies] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingCurrencies, setLoadingCurrencies] = useState(true);
+
+  // FX preview state
+  const [fxPreview, setFxPreview] = useState(null); // holds API payload
+  const [fxLoading, setFxLoading] = useState(false);
+  const [fxError, setFxError] = useState(null);
 
   const {
     handleSubmit,
@@ -51,12 +64,14 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const maxTickets = watch("maxTickets");
   const currencyVal = watch("currency");
   const hasBackstage = watch("hasBackstage");
+  const priceVal = watch("price");
 
+  // Fetch currencies
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        setLoading(true);
+        setLoadingCurrencies(true);
         const res = await api.get("/api/v1/currency", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
@@ -65,10 +80,12 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       } catch {
         showError("Failed to load currencies");
       } finally {
-        mounted && setLoading(false);
+        mounted && setLoadingCurrencies(false);
       }
     })();
-    return () => (mounted = false);
+    return () => {
+      mounted = false;
+    };
   }, [token]);
 
   const currencyOptions = useMemo(
@@ -80,18 +97,85 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     [currencies]
   );
 
-  const onSubmit = (vals) => onNext(vals);
+  // FX rate preview: price → USD using backend endpoint
+  useEffect(() => {
+    const numericPrice =
+      typeof priceVal === "number" ? priceVal : Number(priceVal);
+
+    // reset when no currency or invalid price
+    if (
+      !currencyVal ||
+      !numericPrice ||
+      isNaN(numericPrice) ||
+      numericPrice <= 0
+    ) {
+      setFxPreview(null);
+      setFxError(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setFxLoading(true);
+        setFxError(null);
+
+        const res = await api.get("/api/v1/fx/rate-to-usd", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          params: {
+            currency_id: currencyVal,
+            price: numericPrice,
+          },
+        });
+
+        const payload = res?.data?.data || res?.data;
+        if (!cancelled) {
+          setFxPreview(payload || null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setFxPreview(null);
+          setFxError("Could not fetch USD equivalent right now.");
+        }
+      } finally {
+        !cancelled && setFxLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currencyVal, priceVal, token]);
+
+  const onSubmit = async (vals) => {
+    // Enforce the $1 minimum using the FX endpoint result
+    const priceInUsd = fxPreview ? Number(fxPreview.price_in_usd) : null;
+
+    if (priceInUsd !== null && !isNaN(priceInUsd) && priceInUsd < 1) {
+      showError("Ticket price is below $1. Please increase the amount.");
+      return;
+    }
+
+    // If we don’t have FX data but we have a price & currency, you can either:
+    // - trust backend to enforce it, or
+    // - optionally fire a quick check here before calling onNext.
+    // For now, we let the backend double-check.
+
+    onNext(vals);
+  };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-[18px] tw:sm:text-lg tw:font-semibold tw:mb-5">
-        Ticketing & Pricing
-      </h2>
+      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
+        Ticketing &amp; Pricing
+      </span>
 
       <div className="tw:space-y-5">
+        {/* Ticket price + USD helper */}
         <div>
           <label className="tw:block tw:text-[15px] tw:mb-1">
             Ticket Price*
@@ -108,18 +192,66 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
               {errors.price.message}
             </p>
           )}
+
+          {/* FX preview line */}
+          {currencyVal && priceVal > 0 && (
+            <>
+              {fxLoading && (
+                <span className="tw:block tw:text-[11px] tw:text-slate-500 tw:mt-1">
+                  Checking USD equivalent…
+                </span>
+              )}
+              {fxError && (
+                <span className="tw:block tw:text-[11px] tw:text-red-500 tw:mt-1">
+                  {fxError}
+                </span>
+              )}
+              {fxPreview && !fxError && (
+                <span className="tw:block tw:text-[11px] tw:mt-1">
+                  ≈{" "}
+                  <span className="tw:font-semibold">
+                    ${Number(fxPreview.price_in_usd || 0).toFixed(2)}
+                  </span>{" "}
+                  USD{" "}
+                  {Number(fxPreview.price_in_usd || 0) < 1 && (
+                    <span className="tw:text-amber-700 tw:ml-1">
+                      (minimum allowed is $1.00)
+                    </span>
+                  )}
+                </span>
+              )}
+            </>
+          )}
         </div>
 
-        <SelectField
-          label="Currency*"
-          value={currencyVal}
-          onChange={(v) => setValue("currency", v, { shouldValidate: true })}
-          options={currencyOptions}
-          placeholder={loading ? "Loading…" : "Select Currency"}
-          disabled={loading}
-          error={errors?.currency?.message}
-        />
+        {/* Currency as Autocomplete combo box */}
+        <div>
+          <label className="tw:block tw:text-[15px] tw:mb-1">Currency*</label>
+          <Autocomplete
+            options={currencyOptions}
+            getOptionLabel={(option) => option.label || ""}
+            value={
+              currencyOptions.find((opt) => opt.value === currencyVal) || null
+            }
+            onChange={(event, newValue) => {
+              setValue("currency", newValue ? newValue.value : "", {
+                shouldValidate: true,
+              });
+            }}
+            disabled={loadingCurrencies}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder={loadingCurrencies ? "Loading…" : "Select Currency"}
+                size="small"
+                error={!!errors.currency}
+                helperText={errors.currency?.message}
+              />
+            )}
+          />
+        </div>
 
+        {/* Ticket availability */}
         <SelectField
           label="Ticket Availability*"
           value={watch("maxTickets")}
@@ -188,9 +320,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
 
       <div className="tw:flex tw:justify-between tw:mt-6">
         <button
-          style={{
-            borderRadius: 20,
-          }}
+          style={{ borderRadius: 20 }}
           type="button"
           onClick={onBack}
           className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 hover:tw:bg-gray-50"
@@ -198,9 +328,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           Back
         </button>
         <button
-          style={{
-            borderRadius: 20,
-          }}
+          style={{ borderRadius: 20 }}
           type="submit"
           className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
         >

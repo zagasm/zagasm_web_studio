@@ -32,6 +32,7 @@ export default function Nav() {
   const navLinks = [
     { to: "/", label: "Home" },
     { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
   ];
 
   const linkBase =
@@ -60,7 +61,7 @@ export default function Nav() {
             <motion.img
               src="/images/logo.png"
               alt="Zagasm Studios"
-              className="tw:w-28 tw:rounded-sm"
+              className="tw:w-16 tw:md:w-28 tw:rounded-sm"
               initial={{ rotate: -6, scale: 0.9, opacity: 0 }}
               animate={{ rotate: 0, scale: 1, opacity: 1 }}
               transition={{
@@ -142,97 +143,86 @@ export default function Nav() {
       </div>
 
       {/* Mobile glassmorphic menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            className="tw:fixed tw:inset-0 tw:z-50 tw:bg-black/20 tw:backdrop-blur-md tw:md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeMenu}
+      {menuOpen && (
+        <div
+          className="tw:fixed tw:inset-0 tw:z-50 tw:bg-black/20 tw:backdrop-blur-md tw:md:hidden"
+          onClick={closeMenu}
+        >
+          <div
+            className="tw:absolute tw:top-4 tw:left-4 tw:right-4 tw:rounded-2xl tw:border tw:border-white/60 tw:bg-[rgba(250,247,255,0.95)] tw:shadow-[0_18px_50px_rgba(15,23,42,0.28)] tw:p-4 tw:space-y-3"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              className="tw:absolute tw:top-4 tw:left-4 tw:right-4 tw:rounded-2xl tw:border tw:border-white/60 tw:bg-[rgba(250,247,255,0.95)] tw:shadow-[0_18px_50px_rgba(15,23,42,0.28)] tw:p-4 tw:space-y-3"
-              initial={{ y: -16, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -16, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="tw:flex tw:items-center tw:justify-between tw:mb-1">
-                <span className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                  Navigation
-                </span>
-                <button
-                  type="button"
+            <div className="tw:flex tw:items-center tw:justify-between tw:mb-1">
+              <button
+                type="button"
+                onClick={closeMenu}
+                className="tw:inline-flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:border tw:border-slate-200"
+              >
+                <X className="tw:w-4 tw:h-4" />
+              </button>
+            </div>
+
+            <nav className="tw:flex tw:flex-col tw:gap-1.5">
+              {navLinks.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
                   onClick={closeMenu}
-                  className="tw:inline-flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:border tw:border-slate-200"
+                  className={({ isActive }) =>
+                    `tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:px-3 tw:py-2 ${
+                      isActive
+                        ? "tw:bg-primary/10 tw:text-primary"
+                        : "tw:text-slate-800 tw:hover:bg-slate-100/70"
+                    }`
+                  }
                 >
-                  <X className="tw:w-4 tw:h-4" />
-                </button>
-              </div>
+                  <span className="tw:text-sm tw:font-medium">
+                    {item.label}
+                  </span>
+                </NavLink>
+              ))}
+            </nav>
 
-              <nav className="tw:flex tw:flex-col tw:gap-1.5">
-                {navLinks.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={closeMenu}
-                    className={({ isActive }) =>
-                      `tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:px-3 tw:py-2 ${
-                        isActive
-                          ? "tw:bg-primary/10 tw:text-primary"
-                          : "tw:text-slate-800 tw:hover:bg-slate-100/70"
-                      }`
-                    }
-                  >
-                    <span className="tw:text-sm tw:font-medium">
-                      {item.label}
-                    </span>
-                  </NavLink>
-                ))}
-              </nav>
-
-              <div className="tw:pt-2 tw:border-t tw:border-slate-100 tw:mt-2">
-                {token ? (
-                  <Link
-                    to="/feed"
-                    onClick={closeMenu}
-                    className="tw:flex tw:items-center tw:gap-3 tw:rounded-xl tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:text-slate-800 tw:border tw:border-slate-200 tw:shadow-[0_10px_30px_rgba(15,23,42,0.14)]"
-                  >
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt={displayName}
-                        className="tw:h-8 tw:w-8 tw:rounded-full tw:object-cover tw:border tw:border-slate-200/70"
-                      />
-                    ) : (
-                      <div className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/10 tw:text-[11px] tw:font-semibold tw:text-primary">
-                        {initials}
-                      </div>
-                    )}
-                    <div className="tw:flex tw:flex-col tw:text-left">
-                      <span className="tw:text-[13px] tw:font-medium">
-                        {displayName}
-                      </span>
-                      <span className="tw:text-[11px] tw:text-slate-500">
-                        Go to feed
-                      </span>
+            <div className="tw:pt-2 tw:border-t tw:border-slate-100 tw:mt-2">
+              {token ? (
+                <Link
+                  to="/feed"
+                  onClick={closeMenu}
+                  className="tw:flex tw:items-center tw:gap-3 tw:rounded-xl tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:text-slate-800 tw:border tw:border-slate-200 tw:shadow-[0_10px_30px_rgba(15,23,42,0.14)]"
+                >
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={displayName}
+                      className="tw:h-8 tw:w-8 tw:rounded-full tw:object-cover tw:border tw:border-slate-200/70"
+                    />
+                  ) : (
+                    <div className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/10 tw:text-[11px] tw:font-semibold tw:text-primary">
+                      {initials}
                     </div>
-                  </Link>
-                ) : (
-                  <Link
-                    to="/auth/signin"
-                    onClick={closeMenu}
-                    className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(143,7,231,0.45)]"
-                  >
-                    Sign in
-                  </Link>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  )}
+                  <div className="tw:flex tw:flex-col tw:text-left">
+                    <span className="tw:text-[13px] tw:font-medium">
+                      {displayName}
+                    </span>
+                    <span className="tw:text-[11px] tw:text-slate-500">
+                      Go to feed
+                    </span>
+                  </div>
+                </Link>
+              ) : (
+                <Link
+                  to="/auth/signin"
+                  onClick={closeMenu}
+                  className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(143,7,231,0.45)]"
+                >
+                  Sign in
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

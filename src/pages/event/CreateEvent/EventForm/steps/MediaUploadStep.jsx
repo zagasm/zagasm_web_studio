@@ -193,7 +193,7 @@ export default function MediaUploadStep({
       onSubmit={handleSubmit(onSubmit)}
       className="tw:bg-white tw:rounded-2xl tw:p-4 tw:sm:p-6 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-lg tw:font-semibold tw:mb-4">Event Media</h2>
+      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-4">Event Media</span>
 
       {/* Poster IMAGES */}
       <div className="tw:mb-6">
@@ -216,7 +216,7 @@ export default function MediaUploadStep({
             ${
               isDraggingImg
                 ? "tw:border-primary tw:bg-lightPurple"
-                : "tw:border-gray-300 hover:tw:border-primary"
+                : "tw:border-gray-300 tw:hover:border-primary"
             }`}
         >
           <div className="tw:text-primary tw:font-medium">
@@ -278,7 +278,7 @@ export default function MediaUploadStep({
             ${
               isDraggingVid
                 ? "tw:border-primary tw:bg-lightPurple"
-                : "tw:border-gray-300 hover:tw:border-primary"
+                : "tw:border-gray-300 tw:hover:border-primary"
             }`}
         >
           <div className="tw:text-primary tw:font-medium">
@@ -477,7 +477,7 @@ export default function MediaUploadStep({
           <button
             type="button"
             onClick={addPerformer}
-            className="tw:px-3 tw:py-2 tw:rounded-xl tw:border tw:border-primary tw:text-primary hover:tw:bg-lightPurple"
+            className="tw:px-3 tw:py-2 tw:rounded-xl tw:border tw:border-primary tw:text-primary tw:hover:bg-lightPurple"
           >
             Add Guest Artiste +
           </button>
@@ -495,14 +495,14 @@ export default function MediaUploadStep({
         <button
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 hover:tw:bg-gray-50"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
           style={{ borderRadius: 20 }}
         >
           Back
         </button>
         <button
           type="submit"
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
           style={{ borderRadius: 20 }}
         >
           Next

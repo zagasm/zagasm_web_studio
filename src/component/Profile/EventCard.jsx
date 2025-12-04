@@ -151,7 +151,7 @@ export default function EventCard({ event }) {
               e.stopPropagation();
               onCreateChannel();
             }}
-            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white hover:tw:bg-primary/90"
+            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -90,7 +90,7 @@ export default function Footer() {
                     href={href}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.96 }}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:ring-1 tw:ring-gray-200 hover:tw:ring-[#8F07E7]/40 tw:transition"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:ring-1 tw:ring-gray-200 tw:hover:ring-[#8F07E7]/40 tw:transition"
                     aria-label="social link"
                   >
                     <Icon size={18} className="text-dark" />
@@ -130,7 +130,7 @@ export default function Footer() {
             <div className="tw:h-px tw:flex-1 tw:bg-gray-200" />
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="tw:ml-4 tw:text-xs tw:font-medium text-dark hover:tw:text-[#8F07E7] tw:transition"
+              className="tw:ml-4 tw:text-xs tw:font-medium text-dark tw:hover:text-[#8F07E7] tw:transition"
             >
               Back to the top ↑
             </button>

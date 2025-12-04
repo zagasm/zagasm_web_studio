@@ -21,7 +21,7 @@ export default function EventsFilterTabs({ value, onChange }) {
             ${
               value === f.key
                 ? "tw:bg-primary tw:text-white"
-                : "tw:text-gray-700 hover:tw:bg-gray-100"
+                : "tw:text-gray-700 tw:hover:bg-gray-100"
             }`}
         >
           {f.label}

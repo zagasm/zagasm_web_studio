@@ -204,7 +204,7 @@ export default function EventCreationWizard({ eventTypeId }) {
   };
 
   return (
-    <div className="tw:mx-auto tw:max-w-5xl tw:pb-24 tw:px-3 tw:sm:px-6">
+    <div className="tw:mx-auto tw:max-w-5xl tw:pt-16 tw:md:pt-0 tw:pb-24 tw:px-3 tw:sm:px-6">
       {/* <ToastHost /> */}
 
       <ProgressSteps

@@ -48,7 +48,7 @@ function PersonRow({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl hover:tw:bg-zinc-50 tw:transition-colors"
+      className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:hover:bg-zinc-50 tw:transition-colors"
     >
       <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-zinc-200">
         <img

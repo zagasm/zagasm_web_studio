@@ -210,7 +210,7 @@ export default function MobileSingleOrganizers() {
                       ${
                         isFollowing
                           ? "tw:bg-primary tw:text-white tw:ring-primary"
-                          : "tw:bg-[#F4E6FD] tw:text-black tw:ring-transparent hover:tw:bg-primary/10"
+                          : "tw:bg-[#F4E6FD] tw:text-black tw:ring-transparent tw:hover:bg-primary/10"
                       }`}
                   >
                     {isBusy ? (

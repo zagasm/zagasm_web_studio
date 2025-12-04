@@ -5,12 +5,12 @@ import SectionFooterCTA from "../component/landing/SectionFooterCTA";
 
 export default function LandingLayout() {
   return (
-    <div className="tw:min-h-screen tw:bg-[#faf7ff] tw:text-gray-800 tw:flex tw:flex-col">
+    <div className="tw:min-h-screen tw:bg-[#faf7ff] tw:text-gray-800 tw:flex tw:flex-col tw:overflow-x-hidden">
       {/* Top navigation */}
       <Nav />
 
       {/* Page content */}
-      <main className="tw:flex-1 tw:pt-20">
+      <main className="tw:flex-1 tw:lg:pt-20">
         <Outlet />
       </main>
 

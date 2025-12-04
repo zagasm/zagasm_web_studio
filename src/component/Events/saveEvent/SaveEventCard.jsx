@@ -191,9 +191,9 @@ export default function SavedEventCard({
         className={[
           "tw:mt-3 tw:w-full tw:h-12 tw:rounded-[18px] tw:text-[14px] tw:font-semibold tw:flex tw:items-center tw:justify-center tw:gap-2 tw:transition tw:duration-150",
           variant === "upcoming" &&
-            "tw:bg-primary tw:text-white hover:tw:opacity-90",
+            "tw:bg-primary tw:text-white tw:hover:opacity-90",
           variant === "live" &&
-            "tw:bg-[#FF3B30] tw:text-white hover:tw:brightness-110",
+            "tw:bg-[#FF3B30] tw:text-white tw:hover:brightness-110",
           variant === "ended" &&
             "tw:bg-gray-300 tw:text-gray-600 tw:cursor-not-allowed",
         ]

@@ -42,7 +42,7 @@ export default function Navbar() {
           <img
             src={"/images/logo.png"}
             alt="Zagasm Logo"
-            className="tw:w-40 tw:-ml-5 tw:object-contain"
+            className="tw:w-24 tw:md:w-40 tw:-ml-5 tw:object-contain"
           />
         </div>
 

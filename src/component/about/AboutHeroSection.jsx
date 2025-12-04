@@ -25,7 +25,7 @@ export default function AboutHeroSection() {
           About Zagasm Studios
         </span>
 
-        <span className="tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-4">
+        <span className="tw:font-dela tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-4">
           Turning{" "}
           <span className="tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:bg-clip-text tw:text-transparent">
             live streams

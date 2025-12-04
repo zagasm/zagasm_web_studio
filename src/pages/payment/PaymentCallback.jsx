@@ -69,7 +69,7 @@ export default function PaymentCallback() {
             style={{
               borderRadius: 20,
             }}
-            className="tw:w-full tw:py-3 tw:px-4 tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:rounded-lg tw:font-semibold tw:transition tw:duration-200 hover:tw:bg-primarySecond"
+            className="tw:w-full tw:py-3 tw:px-4 tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:rounded-lg tw:font-semibold tw:transition tw:duration-200 tw:hover:bg-primarySecond"
           >
             Proceed
           </button>

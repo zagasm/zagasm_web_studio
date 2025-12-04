@@ -32,7 +32,7 @@ export default function AboutPipelineSection() {
           Pipeline
         </span>
 
-        <span className="tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+        <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
           From first frame to final highlight, on autopilot.
         </span>
 

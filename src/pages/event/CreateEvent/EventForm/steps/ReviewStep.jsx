@@ -60,7 +60,7 @@ export default function ReviewStep({
               <li key={path}>
                 <button
                   type="button"
-                  className="tw:underline tw:underline-offset-2 tw:text-red-700 hover:tw:text-red-800"
+                  className="tw:underline tw:underline-offset-2 tw:text-red-700 tw:hover:text-red-800"
                   onClick={() => {
                     const match = path.match(/^step_(\d+)/);
                     if (match && onGoToStep) onGoToStep(Number(match[1]));
@@ -84,7 +84,7 @@ export default function ReviewStep({
       {/* ✅ Poster Media (images + videos) */}
       <section className="tw:mb-6">
         <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <h3 className="tw:text-base tw:font-semibold">
+          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">
             Poster Media{" "}
             {hasAnyPoster && (
               <span className="tw:text-gray-500 tw:font-normal tw:ml-1">
@@ -103,7 +103,7 @@ export default function ReviewStep({
                 )
               </span>
             )}
-          </h3>
+          </span>
           <button
             type="button"
             className="tw:text-primary"
@@ -183,7 +183,7 @@ export default function ReviewStep({
       {performers?.length > 0 && (
         <section className="tw:mb-6">
           <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-            <h3 className="tw:text-base tw:font-semibold">Guest Performers</h3>
+            <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Guest Performers</span>
             <button
               type="button"
               className="tw:text-primary"
@@ -223,7 +223,7 @@ export default function ReviewStep({
       {/* Details */}
       <section className="tw:mb-6">
         <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <h3 className="tw:text-base tw:font-semibold">Event Details</h3>
+          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Event Details</span>
           <button
             type="button"
             className="tw:text-primary"
@@ -267,7 +267,7 @@ export default function ReviewStep({
       {/* Ticketing */}
       <section className="tw:mb-6">
         <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <h3 className="tw:text-base tw:font-semibold">Ticketing</h3>
+          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Ticketing</span>
           <button
             type="button"
             className="tw:text-primary"
@@ -305,7 +305,7 @@ export default function ReviewStep({
       {/* Streaming */}
       <section className="tw:mb-6">
         <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <h3 className="tw:text-base tw:font-semibold">Streaming</h3>
+          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Streaming</span>
           <button
             type="button"
             className="tw:text-primary"
@@ -331,7 +331,7 @@ export default function ReviewStep({
       {/* Access */}
       <section className="tw:mb-2">
         <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <h3 className="tw:text-base tw:font-semibold">Access & Visibility</h3>
+          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Access & Visibility</span>
           <button
             type="button"
             className="tw:text-primary"
@@ -356,7 +356,7 @@ export default function ReviewStep({
         <button
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 hover:tw:bg-gray-50"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
           style={{ borderRadius: 20 }}
         >
           Back
@@ -365,7 +365,7 @@ export default function ReviewStep({
           type="button"
           onClick={onPublish}
           disabled={isSubmitting}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white hover:tw:bg-primarySecond disabled:tw:opacity-70"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:hover:bg-primarySecond tw:disabled:opacity-70"
           style={{ borderRadius: 20 }}
         >
           {isSubmitting ? "Creating…" : "Create Event"}

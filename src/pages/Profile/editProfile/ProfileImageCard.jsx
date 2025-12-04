@@ -25,7 +25,7 @@ export default function ProfileImageCard({
 
         <label
           htmlFor="upload_pix"
-          className="tw:mt-5 tw:inline-flex tw:items-center tw:justify-center tw:px-4 tw:py-2.5 tw:rounded-full tw:bg-black tw:text-xs tw:font-medium tw:text-white tw:cursor-pointer hover:tw:bg-gray-900 tw:transition"
+          className="tw:mt-5 tw:inline-flex tw:items-center tw:justify-center tw:px-4 tw:py-2.5 tw:rounded-full tw:bg-black tw:text-xs tw:font-medium tw:text-white tw:cursor-pointer tw:hover:bg-gray-900 tw:transition"
         >
           Upload new photo
           <input

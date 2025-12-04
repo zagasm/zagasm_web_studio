@@ -22,7 +22,7 @@ export default function LiveAppDownloadBanner() {
           href={PLAYSTORE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded-full tw:bg-black tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white hover:tw:bg-[#111827]"
+          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded-full tw:bg-black tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:hover:bg-[#111827]"
         >
           <span>Get on Play Store</span>
           <ExternalLink className="tw:w-3 tw:h-3 tw:text-white/80" />
@@ -32,7 +32,7 @@ export default function LiveAppDownloadBanner() {
           href={APPSTORE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-gray-800 hover:tw:bg-gray-50"
+          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50"
         >
           <span>Get on App Store</span>
           <ExternalLink className="tw:w-3 tw:h-3 tw:text-gray-400" />

@@ -25,7 +25,7 @@ export default function AboutEcosystemSection() {
           Ecosystem
         </span>
 
-        <span className="tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+        <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
           A live studio built around real organisers, performers, and audiences.
         </span>
 

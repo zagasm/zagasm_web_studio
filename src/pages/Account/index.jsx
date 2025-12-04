@@ -167,7 +167,7 @@ function Account() {
                   <div className="tw:mt-6 tw:flex tw:justify-end tw:gap-3">
                     <button
                       type="button"
-                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-gray-700 hover:tw:bg-gray-50"
+                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-gray-700 tw:hover:bg-gray-50"
                       onClick={() => setIsConfirmOpen(false)}
                       disabled={isSubmitting}
                     >
@@ -175,7 +175,7 @@ function Account() {
                     </button>
                     <button
                       type="button"
-                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-red-500 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white hover:tw:bg-red-600 disabled:tw:opacity-60 disabled:tw:cursor-not-allowed"
+                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-red-500 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-red-600 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
                       onClick={handleDeactivate}
                       disabled={isSubmitting}
                     >
@@ -231,7 +231,7 @@ function Account() {
                   <div className="tw:mt-6 tw:flex tw:justify-end tw:gap-3">
                     <button
                       type="button"
-                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-purple-600 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white hover:tw:bg-purple-700"
+                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-purple-600 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-purple-700"
                       onClick={handleForceLogout}
                     >
                       OK

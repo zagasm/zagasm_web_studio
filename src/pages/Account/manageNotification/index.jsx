@@ -522,7 +522,7 @@ function AccountNotification() {
                       }}
                       type="button"
                       onClick={handleUpdate}
-                      className="tw:inline-flex tw:w-full tw:justify-center tw:md:w-auto tw:items-center tw:rounded-xl tw:bg-primary tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white hover:tw:bg-primarySecond tw:transition tw:shadow-sm"
+                      className="tw:inline-flex tw:w-full tw:justify-center tw:md:w-auto tw:items-center tw:rounded-xl tw:bg-primary tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-primarySecond tw:transition tw:shadow-sm"
                     >
                       Update preferences
                     </button>

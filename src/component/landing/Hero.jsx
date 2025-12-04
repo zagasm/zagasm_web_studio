@@ -540,7 +540,7 @@ export default function Hero() {
                 key={slide.id}
                 type="button"
                 onClick={() => handleDotClick(i)}
-                className="tw:relative tw:h-2.5 tw:rounded-full tw:overflow-hidden tw:bg-gray-200 tw:transition-[width] tw:duration-300 tw:cursor-pointer hover:tw:bg-gray-300"
+                className="tw:relative tw:h-2.5 tw:rounded-full tw:overflow-hidden tw:bg-gray-200 tw:transition-[width] tw:duration-300 tw:cursor-pointer tw:hover:bg-gray-300"
                 style={{ width: isActive ? "32px" : "10px" }}
               >
                 {isActive && (

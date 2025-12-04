@@ -12,12 +12,15 @@ import SignUpCodecomponent from "./SignUpCodecomponent";
 import "./postSignupStyle.css";
 import { useAuth } from "../../../../pages/auth/AuthContext";
 import axios from "axios";
-import qs from 'qs';
+import qs from "qs";
 import { showToast } from "../../../ToastAlert";
 import { showError, showSuccess } from "../../../ui/toast";
+import { api } from "../../../../lib/apiClient";
+import { useNavigate } from "react-router-dom";
 
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
+  const navigate = useNavigate();
   // Conditionally render the page only if required
   // Only hide form if BOTH gender AND dob are already set
   if (user.gender != null && user.dob != null) return null;
@@ -42,7 +45,10 @@ const PostSignupForm = () => {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age >= 15;
@@ -64,41 +70,44 @@ const PostSignupForm = () => {
 
     setIsLoading(true);
     try {
-      const endpoint = `${import.meta.env.VITE_API_URL}/api/v1/gender/dob`;
+      const endpoint = `/api/v1/gender/dob`;
       console.log("Attempting to reach:", endpoint);
-      
+
       // Use FormData like the editProfile component does
       const formData = new FormData();
       formData.append("gender", gender);
       formData.append("dob", dob);
-      
-      const response = await axios.post(
-        endpoint,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
-          },
-          validateStatus: (status) => status < 500 // Accept 4xx as responses
-        }
-      );
-      console.log('update data:', response);
-      console.log('Response status:', response.status);
-      console.log('Response data:', response.data);
-      
+
+      const response = await api.post(endpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+        validateStatus: (status) => status < 500, // Accept 4xx as responses
+      });
+      console.log("update data:", response);
+      if (response.status === 401) {
+        localStorage.clear();
+        navigate("/auth/signin");
+      }
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+
       if (response.status === 200 || response.status === 201) {
-        showSuccess(response.data.message || "Date of Birth and Gender updated successfully!");
+        showSuccess(
+          response.data.message ||
+            "Date of Birth and Gender updated successfully!"
+        );
         settosendUserdata(response.data.user);
         setFormSubmitted(true);
       } else if (response.status === 422) {
         // Log the 422 error details
-        console.error('422 Error details:', response.data);
-        
-        const message = response.data?.message || '';
-        
+        console.error("422 Error details:", response.data);
+
+        const message = response.data?.message || "";
+
         // Check if user already has gender/dob set
-        if (message.toLowerCase().includes('already')) {
+        if (message.toLowerCase().includes("already")) {
           // Data already set, just continue - don't show this form anymore
           showToast.info(message);
           // Update user object to reflect that gender/dob are set
@@ -108,7 +117,8 @@ const PostSignupForm = () => {
           window.location.reload();
         } else {
           // Show specific validation error from API
-          const errorMsg = message || response.data?.error || 'Validation failed';
+          const errorMsg =
+            message || response.data?.error || "Validation failed";
           setError(errorMsg);
           showError(errorMsg);
         }
@@ -128,7 +138,13 @@ const PostSignupForm = () => {
   };
 
   if (formSubmitted) {
-    return <SignUpCodecomponent token={token} userupdate={tosendUserdata} type="phone" />;
+    return (
+      <SignUpCodecomponent
+        token={token}
+        userupdate={tosendUserdata}
+        type="phone"
+      />
+    );
   }
 
   return (
@@ -139,20 +155,17 @@ const PostSignupForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <motion.h2
+        <motion.span
+          className="tw:lg tw:md:text-xl tw:lg:text-2xl tw:font-bold"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
           Complete your Profile
-        </motion.h2>
+        </motion.span>
         <p>Just a few more details to complete your profile</p>
 
-        {error && (
-          <div className="alert alert-danger mb-3">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert alert-danger mb-3">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           {/* Date of Birth Field */}
@@ -190,9 +203,13 @@ const PostSignupForm = () => {
                   className={`gender-btn ${gender === g ? "selected" : ""}`}
                   onClick={() => setGender(g)}
                 >
-                  {g === "male" ? <FaMars size={20} /> :
-                    g === "female" ? <FaVenus size={20} /> :
-                      <FaGenderless size={20} />}
+                  {g === "male" ? (
+                    <FaMars size={20} />
+                  ) : g === "female" ? (
+                    <FaVenus size={20} />
+                  ) : (
+                    <FaGenderless size={20} />
+                  )}
                   {g.charAt(0).toUpperCase() + g.slice(1)}
                 </motion.button>
               ))}
