@@ -194,7 +194,7 @@ export default function SetPasswordModal({ open, onClose }) {
                             show.current ? "Hide password" : "Show password"
                           }
                           onClick={() => toggle("current")}
-                          className="tw:absolute tw:right-3 tw:top-[38%] -tw:translate-y-1/2 tw:text-gray-500 hover:tw:text-gray-700"
+                          className="tw:absolute tw:right-3 tw:top-[38%] -tw:translate-y-1/2 tw:text-gray-500 tw:hover:text-gray-700"
                         >
                           {show.current ? <FiEyeOff /> : <FiEye />}
                         </button>
@@ -227,7 +227,7 @@ export default function SetPasswordModal({ open, onClose }) {
                             show.new ? "Hide password" : "Show password"
                           }
                           onClick={() => toggle("new")}
-                          className="tw:absolute tw:right-3 tw:top-[38%] -tw:translate-y-1/2 tw:text-gray-500 hover:tw:text-gray-700"
+                          className="tw:absolute tw:right-3 tw:top-[38%] -tw:translate-y-1/2 tw:text-gray-500 tw:hover:text-gray-700"
                         >
                           {show.new ? <FiEyeOff /> : <FiEye />}
                         </button>
@@ -265,7 +265,7 @@ export default function SetPasswordModal({ open, onClose }) {
                             show.confirm ? "Hide password" : "Show password"
                           }
                           onClick={() => toggle("confirm")}
-                          className="tw:absolute tw:right-3 tw:top-[38%] -tw:translate-y-1/2 tw:text-gray-500 hover:tw:text-gray-700"
+                          className="tw:absolute tw:right-3 tw:top-[38%] -tw:translate-y-1/2 tw:text-gray-500 tw:hover:text-gray-700"
                         >
                           {show.confirm ? <FiEyeOff /> : <FiEye />}
                         </button>
@@ -285,7 +285,7 @@ export default function SetPasswordModal({ open, onClose }) {
                         }}
                         type="button"
                         onClick={onClose}
-                        className="tw:inline-flex tw:h-11 tw:px-4 tw:items-center tw:justify-center tw:rounded-xl tw:bg-gray-100 hover:tw:bg-gray-200 tw:text-gray-800 tw:font-medium tw:transition"
+                        className="tw:inline-flex tw:h-11 tw:px-4 tw:items-center tw:justify-center tw:rounded-xl tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-800 tw:font-medium tw:transition"
                       >
                         Cancel
                       </button>
@@ -295,7 +295,7 @@ export default function SetPasswordModal({ open, onClose }) {
                         }}
                         type="submit"
                         disabled={!isValid || isLoading}
-                        className="tw:inline-flex tw:h-11 tw:px-5 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary hover:tw:bg-primary/90 tw:text-white tw:font-medium tw:transition disabled:tw:opacity-60"
+                        className="tw:inline-flex tw:h-11 tw:px-5 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary tw:hover:bg-primary/90 tw:text-white tw:font-medium tw:transition tw:disabled:opacity-60"
                       >
                         {isLoading ? "Updating…" : "Update Password"}
                       </button>

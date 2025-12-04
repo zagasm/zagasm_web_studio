@@ -60,6 +60,8 @@ import TermsOfServicePage from "./pages/terms/index.jsx";
 import TaggedMentionsPage from "./pages/mentions/index.jsx";
 import LandingLayout from "./layouts/LandingLayout.jsx";
 import AboutPage from "./pages/LandingPage/about.jsx";
+import ContactPage from "./pages/LandingPage/contact.jsx";
+import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -91,15 +93,19 @@ export function App() {
       <NetworkStatus />
       <Routes>
         <Route element={<LandingLayout />}>
-        <Route path="/" element={<ZagasmLanding />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/community-guidelines" element={<CommunityGuidelinesPage />} />
-        <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-        <Route path="/support" element={<Support />} />
-        <Route path="/marketing" element={<Marketing />} />
-        <Route path="/data-protection" element={<DataProtectionPage />} />
-      </Route>
+          <Route path="/" element={<ZagasmLanding />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route
+            path="/community-guidelines"
+            element={<CommunityGuidelinesPage />}
+          />
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/marketing" element={<Marketing />} />
+          <Route path="/data-protection" element={<DataProtectionPage />} />
+        </Route>
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -146,6 +152,7 @@ export function App() {
             <Route path="/account" element={<AccountOutlet />}>
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
+              <Route path="blocked" element={<BlockedUsersPage />} />
               <Route
                 path="manage-notification"
                 element={<AccountNotification />}

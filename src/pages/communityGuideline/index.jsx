@@ -45,7 +45,7 @@ export default function CommunityGuidelinesPage() {
               Contact:{" "}
               <a
                 href="mailto:support@zagasm.com"
-                className="tw:font-medium tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
               >
                 support@zagasm.com
               </a>
@@ -616,7 +616,7 @@ export default function CommunityGuidelinesPage() {
                     <em>Note:</em> These expectations work alongside our{" "}
                     <a
                       href="/legal/privacy"
-                      className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                      className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
                       Privacy Policy
                     </a>
@@ -666,7 +666,7 @@ export default function CommunityGuidelinesPage() {
                         decisions by emailing{" "}
                         <a
                           href="mailto:support@zagasm.com"
-                          className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                          className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                         >
                           support@zagasm.com
                         </a>{" "}
@@ -691,7 +691,7 @@ export default function CommunityGuidelinesPage() {
                     please report it. Use the in-app report controls or email{" "}
                     <a
                       href="mailto:abuse@zagasm.com"
-                      className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                      className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
                       abuse@zagasm.com
                     </a>{" "}

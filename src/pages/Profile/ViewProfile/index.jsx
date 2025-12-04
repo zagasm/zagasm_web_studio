@@ -43,7 +43,7 @@ export default function ViewProfile() {
     // if it's your own profile, reuse the existing hook result
     if (isOwnProfile) {
       setProfileUser(myProfile || null);
-      setProfileLoading(myProfileLoading);
+      // setProfileLoading(myProfileLoading);
       setProfileError(myProfileError || null);
 
       if (myProfile?.is_following !== undefined) {
@@ -92,7 +92,14 @@ export default function ViewProfile() {
     return () => {
       cancelled = true;
     };
-  }, [isOwnProfile, routeUserId, myProfile, myProfileLoading, myProfileError, token]);
+  }, [
+    isOwnProfile,
+    routeUserId,
+    myProfile,
+    myProfileLoading,
+    myProfileError,
+    token,
+  ]);
 
   /* ------------------ organiser / KYC logic (only for own profile) ------------------ */
   const isOrganiser =
@@ -147,15 +154,19 @@ export default function ViewProfile() {
     }
   };
 
+  const isLoading = isOwnProfile
+    ? !profileUser && !profileError 
+    : profileLoading;
+
   return (
     <div className="tw:bg-[#f5f5f7] tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
       {/* top bar */}
-      <div className="tw:bg-white tw:w-full tw:pt-16 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
+      <div className="tw:bg-white tw:w-full tw:pt-20 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
         <div className="tw:max-w-2xl tw:mx-auto tw:flex tw:items-center tw:justify-between tw:px-4">
           <button
             style={{ borderRadius: 20 }}
             type="button"
-            className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:bg-white tw:border tw:border-gray-200 hover:tw:bg-gray-50 tw:transition"
+            className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50 tw:transition"
             onClick={() => navigate(-1)}
           >
             <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
@@ -169,7 +180,7 @@ export default function ViewProfile() {
 
       {/* content */}
       <div className="tw:mt-4 tw:px-2 tw:md:px-6 tw:h-auto tw:lg:h-[calc(100vh-140px)]">
-        {profileLoading ? (
+        {isLoading ? (
           // SKELETON
           <div className="tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
             {/* LEFT skeleton */}
@@ -182,7 +193,7 @@ export default function ViewProfile() {
             <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:lg:overflow-y-auto">
               <div className="tw:h-10 tw:w-40 tw:mt-6 tw:rounded-full tw:bg-gray-100 tw:animate-pulse" />
               <div className="tw:mt-4 tw:h-11 tw:rounded-2xl tw:bg-gray-100 tw:animate-pulse" />
-              <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:md:grid-cols-2 xl:tw:grid-cols-3 tw:gap-5">
+              <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-5">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
@@ -236,9 +247,7 @@ export default function ViewProfile() {
 
             <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-2 tw:rounded-2xl tw:px-4 tw:py-3">
               <span className="tw:block tw:font-semibold">About Me</span>
-              <span className="tw:block tw:text-xs">
-                {profileUser?.about}
-              </span>
+              <span className="tw:block tw:text-xs">{profileUser?.about}</span>
             </div>
 
             <div className="tw:bg-linear-to-r tw:from-[#8F07E7] tw:via-[#9105B4] tw:to-[#500481] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
@@ -327,7 +336,7 @@ export default function ViewProfile() {
                   <button
                     style={{ borderRadius: 12 }}
                     type="button"
-                    className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 hover:tw:bg-slate-50 tw:transition"
+                    className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 tw:transition"
                     onClick={() => navigate("/")}
                   >
                     Go to home
@@ -356,10 +365,7 @@ export default function ViewProfile() {
 
             {/* RIGHT: events */}
             <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:pb-20 tw:pr-1 tw:lg:overflow-y-auto">
-              <ProfileTabs
-                user={profileUser}
-                isOwnProfile={isOwnProfile}
-              />
+              <ProfileTabs user={profileUser} isOwnProfile={isOwnProfile} />
             </div>
           </div>
         )}

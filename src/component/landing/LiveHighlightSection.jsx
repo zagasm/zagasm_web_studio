@@ -99,7 +99,7 @@ export default function LiveHighlightsSection() {
                 y: -6,
                 scale: 1.02,
               }}
-              className="tw:relative tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:p-5 tw:backdrop-blur-xl tw:overflow-hidden tw:flex tw:flex-col tw:gap-3 tw:transition-shadow hover:tw:shadow-[0_0_40px_rgba(255,255,255,0.12)]"
+              className="tw:relative tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:p-5 tw:backdrop-blur-xl tw:overflow-hidden tw:flex tw:flex-col tw:gap-3 tw:transition-shadow tw:hover:shadow-[0_0_40px_rgba(255,255,255,0.12)]"
             >
               {/* Glow accent */}
               <div className="tw:absolute tw:-right-10 tw:-top-10 tw:h-24 tw:w-24 tw:bg-primary/30 tw:blur-3xl tw:opacity-70" />

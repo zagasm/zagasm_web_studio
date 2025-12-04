@@ -45,7 +45,7 @@ export default function TermsOfServicePage() {
               Contact:{" "}
               <a
                 href="mailto:support@zagasm.com"
-                className="tw:font-medium tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
               >
                 support@zagasm.com
               </a>
@@ -94,14 +94,14 @@ export default function TermsOfServicePage() {
                   our{" "}
                   <a
                     href="/privacy-policy"
-                    className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
                     Privacy Policy
                   </a>{" "}
                   and{" "}
                   <a
                     href="/community-guidelines"
-                    className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
                     Community Guidelines
                   </a>{" "}
@@ -275,7 +275,7 @@ export default function TermsOfServicePage() {
                       comply with our{" "}
                       <a
                         href="/community-guidelines"
-                        className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
                         Community Guidelines
                       </a>
@@ -442,7 +442,7 @@ export default function TermsOfServicePage() {
                       the{" "}
                       <a
                         href="/community-guidelines"
-                        className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
                         Community Guidelines
                       </a>{" "}
@@ -656,7 +656,7 @@ export default function TermsOfServicePage() {
                       <strong>Guideline infractions:</strong> Violations of the{" "}
                       <a
                         href="/legal/community-guidelines"
-                        className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
                         Community Guidelines
                       </a>{" "}
@@ -693,7 +693,7 @@ export default function TermsOfServicePage() {
                       depending on severity and history. Appeals can be sent to{" "}
                       <a
                         href="mailto:support@zagasm.com"
-                        className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
                         support@zagasm.com
                       </a>
@@ -795,7 +795,7 @@ export default function TermsOfServicePage() {
                       complaints to{" "}
                       <a
                         href="mailto:support@zagasm.com"
-                        className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
                         support@zagasm.com
                       </a>{" "}

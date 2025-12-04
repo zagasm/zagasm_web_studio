@@ -225,7 +225,7 @@ function EditProfile() {
           <button
             style={{ borderRadius: 20 }}
             type="button"
-            className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:bg-white tw:border tw:border-gray-200 tw:hover:tw:bg-gray-50 tw:transition"
+            className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:bg-white tw:border tw:border-gray-200 tw:tw:hover:bg-gray-50 tw:transition"
             onClick={() => window.history.back()}
           >
             <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
@@ -273,7 +273,7 @@ function EditProfile() {
           type="button"
           onClick={handleUpdateProfile}
           disabled={updating}
-          className="tw:w-full tw:rounded-full tw:h-11 tw:text-sm tw:font-medium tw:text-white tw:bg-primary hover:tw:bg-[var(--color-primarySecond)] tw:transition disabled:tw:opacity-60"
+          className="tw:w-full tw:rounded-full tw:h-11 tw:text-sm tw:font-medium tw:text-white tw:bg-primary tw:hover:bg-[var(--color-primarySecond)] tw:transition tw:disabled:opacity-60"
         >
           {updating ? "Updating..." : "Update Information"}
         </button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
@@ -61,7 +61,7 @@ function OrganiserFollowers() {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-5 xl:tw:grid-cols-6 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
+        <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-5 tw:xl:grid-cols-6 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
           {Array.from({ length: 8 }).map((_, idx) => (
             <div key={idx} className="tw:flex tw:pb-1">
               <SkeletonCard />
@@ -86,7 +86,7 @@ function OrganiserFollowers() {
     }
 
     return (
-      <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-5 xl:tw:grid-cols-6 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
+      <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-5 tw:xl:grid-cols-6 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
         {organisers.map((org) => (
           <div key={org.id} className="tw:flex tw:pb-1">
             <OrganiserCard organiser={org} />
@@ -106,7 +106,7 @@ function OrganiserFollowers() {
               type="button"
               style={{ borderRadius: "50%" }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:hover:tw:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
@@ -142,12 +142,12 @@ function OrganiserFollowers() {
 /* ---------- Card Components ---------- */
 
 function OrganiserCard({ organiser }) {
-  const { organiser: name, profileImage, numberOfFollowers, rank } = organiser;
+  const { organiser: name, profileImage, numberOfFollowers, rank, subscription } = organiser;
 
   const followersLabel = formatFollowers(numberOfFollowers);
 
   return (
-    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
+    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
       {/* Image */}
       <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-gray-100">
         <img
@@ -162,6 +162,9 @@ function OrganiserCard({ organiser }) {
         <span className="tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
           {name}
         </span>
+        {/* {subscription.isActive && (
+          <img className="tw:size-5" src="/images/verifiedIcon.svg" alt="" />
+        )} */}
         <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-1 tw:rounded-lg tw:bg-black tw:text-[10px] tw:text-white tw:shrink-0">
           <img width={21} height={21} src="/images/globe.svg" alt="" />
           <span className="tw:font-semibold tw:text-[10px]">
@@ -178,12 +181,12 @@ function OrganiserCard({ organiser }) {
       </div>
 
       {/* Optional: a subtle CTA, no API attached for now */}
-      <button
-        type="button"
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-[11px] tw:font-medium tw:text-gray-800 tw:hover:tw:bg-gray-50 tw:transition"
+      <Link
+        to={`/profile/${organiser.id}`}
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-[11px] tw:font-medium tw:tw:hover:bg-gray-50 tw:transition text-dark"
       >
         View organizer
-      </button>
+      </Link>
     </div>
   );
 }

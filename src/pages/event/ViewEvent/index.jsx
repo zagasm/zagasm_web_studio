@@ -330,7 +330,7 @@ export default function ViewEvent() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-700 tw:shadow-sm hover:tw:bg-gray-50"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-700 tw:shadow-sm tw:hover:bg-gray-50"
             >
               <ArrowLeft className="tw:w-4 tw:h-4" />
               <span>Back</span>
@@ -362,7 +362,7 @@ export default function ViewEvent() {
             <div className="tw:flex tw:items-center tw:gap-2">
               {/* <button
                 type="button"
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:p-2 tw:shadow-sm hover:tw:bg-gray-50"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:p-2 tw:shadow-sm tw:hover:bg-gray-50"
               >
                 <Share2 className="tw:w-4 tw:h-4 tw:text-gray-700" />
               </button>
@@ -371,7 +371,7 @@ export default function ViewEvent() {
                 className={`tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:p-2 tw:shadow-sm ${
                   isSaved
                     ? "tw:bg-primary/10 tw:text-primary"
-                    : "tw:bg-white tw:text-gray-700 hover:tw:bg-gray-50"
+                    : "tw:bg-white tw:text-gray-700 tw:hover:bg-gray-50"
                 }`}
                 // hook up to your "save event" endpoint later if needed
               >
@@ -528,7 +528,7 @@ export default function ViewEvent() {
                     className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${
                       ctaDisabled
                         ? "tw:bg-gray-200 tw:text-gray-500 tw:cursor-not-allowed"
-                        : "tw:bg-primary tw:hover:tw:bg-primarySecond tw:text-white"
+                        : "tw:bg-primary tw:tw:hover:bg-primarySecond tw:text-white"
                     }`}
                   >
                     {primaryCtaLabel}
@@ -555,7 +555,7 @@ export default function ViewEvent() {
               <button
                 type="button"
                 onClick={() => setReportOpen(true)}
-                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:md:text-sm tw:bg-red-50 tw:px-4 tw:py-2 tw:rounded-full tw:text-[#F04438] hover:tw:bg-red-100"
+                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:md:text-sm tw:bg-red-50 tw:px-4 tw:py-2 tw:rounded-full tw:text-[#F04438] tw:hover:bg-red-100"
               >
                 <Flag className="tw:w-4 tw:h-4" />
                 <span>Report this event</span>
@@ -632,7 +632,7 @@ export default function ViewEvent() {
                       className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${
                         isFollowing
                           ? "tw:bg-white tw:border-primary/30 tw:text-primary"
-                          : "tw:bg-[#F3F4F6] tw:border-transparent tw:text-gray-800 hover:tw:bg-[#E5E7EB]"
+                          : "tw:bg-[#F3F4F6] tw:border-transparent tw:text-gray-800 tw:hover:bg-[#E5E7EB]"
                       } ${
                         followLoading
                           ? "tw:opacity-70 tw:cursor-not-allowed"
@@ -652,7 +652,7 @@ export default function ViewEvent() {
                           ? `/profile/${event.organiserId}`
                           : "/organizers"
                       }
-                      className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-primary text-white tw:rounded-[10px] hover:tw:bg-primarySecond"
+                      className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-primary text-white tw:rounded-[10px] tw:hover:bg-primarySecond"
                     >
                       View Profile
                     </Link>

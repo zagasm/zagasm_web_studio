@@ -27,6 +27,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
+    console.log("API response status:", status);
 
     if (status === 401) {
       // Clear *everything* in localStorage

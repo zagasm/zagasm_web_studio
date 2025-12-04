@@ -217,7 +217,7 @@ export default function SubscriptionsPage({}) {
                       fetchPlans(Math.max(1, plansMeta.currentPage - 1))
                     }
                     disabled={plansMeta.currentPage <= 1 || loadingPlans}
-                    className="tw:px-3 tw:py-1 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white disabled:tw:opacity-40 tw:text-slate-700 tw:shadow-sm"
+                    className="tw:px-3 tw:py-1 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:disabled:opacity-40 tw:text-slate-700 tw:shadow-sm"
                   >
                     <span>Prev</span>
                   </button>
@@ -232,7 +232,7 @@ export default function SubscriptionsPage({}) {
                       plansMeta.currentPage >= plansMeta.lastPage ||
                       loadingPlans
                     }
-                    className="tw:px-3 tw:py-1 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white disabled:tw:opacity-40 tw:text-slate-700 tw:shadow-sm"
+                    className="tw:px-3 tw:py-1 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:disabled:opacity-40 tw:text-slate-700 tw:shadow-sm"
                   >
                     <span>Next</span>
                   </button>

@@ -36,7 +36,7 @@ export default function StartStreamAppDownloadModal({ open, onClose }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="tw:absolute tw:right-4 tw:top-4 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 hover:tw:bg-gray-200 tw:text-gray-500"
+                  className="tw:absolute tw:right-4 tw:top-4 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-500"
                 >
                   <X className="tw:w-4 tw:h-4" />
                 </button>
@@ -60,7 +60,7 @@ export default function StartStreamAppDownloadModal({ open, onClose }) {
                       href="https://play.google.com/store/apps/details?id=dummy.zagasm"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="tw:flex-1 tw:inline-flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white hover:tw:bg-gray-900 tw:transition "
+                      className="tw:flex-1 tw:inline-flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-gray-900 tw:transition "
                     >
                       <span className="tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-70">
                         Download on
@@ -72,7 +72,7 @@ export default function StartStreamAppDownloadModal({ open, onClose }) {
                       href="https://apps.apple.com/app/id0000000000"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="tw:flex-1 tw:inline-flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white hover:tw:bg-black tw:transition "
+                      className="tw:flex-1 tw:inline-flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-black tw:transition "
                     >
                       <span className="tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-70">
                         Download on
@@ -84,7 +84,7 @@ export default function StartStreamAppDownloadModal({ open, onClose }) {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:mt-3 tw:text-xs tw:text-gray-500 hover:tw:text-gray-700"
+                    className="tw:mt-3 tw:text-xs tw:text-gray-500 tw:hover:text-gray-700"
                   >
                     I’ll do this later
                   </button>

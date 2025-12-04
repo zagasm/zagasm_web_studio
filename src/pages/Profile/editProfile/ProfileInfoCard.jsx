@@ -240,7 +240,7 @@ export default function ProfileInfoCard({
         <button
           type="button"
           onClick={() => setPasswordOpen(true)}
-          className="tw:flex tw:items-center tw:justify-between tw:w-full tw:rounded-2xl tw:border tw:border-gray-100 hover:tw:border-gray-200 tw:bg-gray-50 hover:tw:bg-gray-100 tw:px-4 tw:py-3 tw:transition"
+          className="tw:flex tw:items-center tw:justify-between tw:w-full tw:rounded-2xl tw:border tw:border-gray-100 tw:hover:border-gray-200 tw:bg-gray-50 tw:hover:bg-gray-100 tw:px-4 tw:py-3 tw:transition"
         >
           <span className="tw:flex tw:items-center tw:gap-2 tw:text-gray-800">
             <FiLock className="tw:text-gray-500" />

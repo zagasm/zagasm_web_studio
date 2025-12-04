@@ -4,7 +4,7 @@ import EventCard from "./EventCard";
 export default function EventsGrid({ events, loading, error }) {
   if (loading) {
     return (
-      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 xl:tw:grid-cols-3 tw:gap-5 tw:mt-4">
+      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-5 tw:mt-4">
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}

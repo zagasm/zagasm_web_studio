@@ -89,7 +89,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                     <button
                       type="button"
                       onClick={onClose}
-                      className="tw:h-8 tw:w-8 tw:flex tw:items-center tw:justify-center tw:rounded-full tw:bg-black/5 hover:tw:bg-black/10 tw:text-gray-700"
+                      className="tw:h-8 tw:w-8 tw:flex tw:items-center tw:justify-center tw:rounded-full tw:bg-black/5 tw:hover:bg-black/10 tw:text-gray-700"
                       aria-label="Close"
                     >
                       ✕
@@ -168,7 +168,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                     <button
                       type="button"
                       onClick={onClose}
-                      className="tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:rounded-full tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+                      className="tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:rounded-full tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
                     >
                       Done
                     </button>

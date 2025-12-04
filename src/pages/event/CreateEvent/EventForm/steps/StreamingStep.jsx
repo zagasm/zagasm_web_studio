@@ -42,9 +42,9 @@ export default function StreamingStep({ defaultValues = {}, onBack, onNext }) {
       onSubmit={handleSubmit(submit)}
       className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-[18px] tw:sm:text-lg tw:font-semibold tw:mb-5">
+      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
         How will you stream this event?
-      </h2>
+      </span>
 
       <div className="tw:space-y-5">
         <SelectField
@@ -83,7 +83,7 @@ export default function StreamingStep({ defaultValues = {}, onBack, onNext }) {
                   className={`tw:px-3 tw:py-2 tw:rounded-xl tw:text-[15px] ${
                     active
                       ? "tw:bg-primary tw:text-white"
-                      : "tw:border tw:border-gray-200 hover:tw:bg-gray-50"
+                      : "tw:border tw:border-gray-200 tw:hover:bg-gray-50"
                   }`}
                 >
                   {h} Hours
@@ -101,7 +101,7 @@ export default function StreamingStep({ defaultValues = {}, onBack, onNext }) {
           }}
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 hover:tw:bg-gray-50"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
         >
           Back
         </button>
@@ -110,7 +110,7 @@ export default function StreamingStep({ defaultValues = {}, onBack, onNext }) {
             borderRadius: 20,
           }}
           type="submit"
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
         >
           Next
         </button>

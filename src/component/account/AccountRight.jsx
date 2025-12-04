@@ -13,6 +13,7 @@ import {
   Trash,
   LogOut,
   User2,
+  UserPen,
 } from "lucide-react";
 import Switch from "@mui/material/Switch";
 import { api, authHeaders } from "../../lib/apiClient";
@@ -33,7 +34,7 @@ const ItemCard = ({ icon: Icon, label, to, onClick, isRed }) => {
     <Wrapper
       to={to}
       onClick={onClick}
-      className="tw:bg-white tw:w-full tw:rounded-3xl tw:py-3 tw:px-4 tw:flex tw:items-center tw:justify-between hover:tw:shadow-md tw:transition-all tw:cursor-pointer tw:group"
+      className="tw:bg-white tw:w-full tw:rounded-3xl tw:py-3 tw:px-4 tw:flex tw:items-center tw:justify-between tw:hover:shadow-md tw:transition-all tw:cursor-pointer tw:group"
     >
       <div className="tw:flex tw:items-center tw:gap-4">
         {Icon && (
@@ -53,7 +54,7 @@ const ItemCard = ({ icon: Icon, label, to, onClick, isRed }) => {
       </div>
       {!isRed && (
         <svg
-          className="tw:w-5 tw:h-5 tw:text-gray-300 group-hover:tw:text-gray-500 tw:transition-colors"
+          className="tw:w-5 tw:h-5 tw:text-gray-300 group-tw:hover:text-gray-500 tw:transition-colors"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -142,24 +143,26 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
     loadingSettings || updatingKey === "email" || !!notifError;
 
   const security = [
-    // {
-    //   icon: UserX,
-    //   label: "Blocked Organizers / Users",
-    //   to: "/account/blocked",
-    // },
+    {
+      icon: UserX,
+      label: "Blocked Organizers / Users",
+      to: "/account/blocked",
+    },
     // {
     //   icon: ShieldCheck,
     //   label: "Two-Factor Authentication",
     //   to: "/account/2fa",
     // },
   ];
-  const events = [
-    { icon: User2, label: "Mentions Tag", to: "/mentions" },
-    
-  ];
+  const events = [{ icon: User2, label: "Mentions Tag", to: "/mentions" }];
+  const profile = [{ icon: UserPen, label: "Edit profile", to: "/profile/edit-profile" }];
 
   const support = [
-    { icon: Headphones, label: "Community Guidelines", to: "/community-guidelines" },
+    {
+      icon: Headphones,
+      label: "Community Guidelines",
+      to: "/community-guidelines",
+    },
     { icon: FileText, label: "Terms of Service", to: "/terms-of-service" },
     { icon: FileText, label: "Privacy Policy", to: "/privacy-policy" },
     {
@@ -175,7 +178,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       {/* Preferences section with inline notification switches */}
       <MenuSection title="Preference">
         {/* Notifications card with Push / Email toggles */}
-        <div className="tw:bg-white tw:w-full tw:rounded-3xl tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all">
+        <div className="tw:bg-white tw:w-full tw:rounded-3xl tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3 tw:shadow-sm tw:hover:shadow-md tw:transition-all">
           <div className="tw:flex tw:items-center tw:justify-between">
             <div className="tw:flex tw:items-center tw:gap-3">
               <Bell className="tw:w-5 tw:h-5 tw:text-gray-700" />
@@ -216,12 +219,14 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
           </div>
 
           {loadingSettings && (
-            <p className="tw:mt-1 tw:text-xs tw:text-gray-400">
+            <span className="tw:mt-1 tw:text-xs tw:text-gray-400">
               Loading your preferences…
-            </p>
+            </span>
           )}
           {notifError && (
-            <p className="tw:mt-1 tw:text-xs tw:text-red-500">{notifError}</p>
+            <span className="tw:mt-1 tw:text-xs tw:text-red-500">
+              {notifError}
+            </span>
           )}
         </div>
 
@@ -230,16 +235,21 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       </MenuSection>
 
       {/* Security & Privacy */}
+      <MenuSection title="Profile">
+        {profile.map((item, index) => (
+          <ItemCard key={index} {...item} />
+        ))}
+      </MenuSection>
       <MenuSection title="Events">
         {events.map((item, index) => (
           <ItemCard key={index} {...item} />
         ))}
       </MenuSection>
-      {/* <MenuSection title="Security & Privacy">
+      <MenuSection title="Security & Privacy">
         {security.map((item, index) => (
           <ItemCard key={index} {...item} />
         ))}
-      </MenuSection> */}
+      </MenuSection>
 
       {/* Support */}
       <MenuSection title="Support">
@@ -253,7 +263,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
         <button
           style={{ borderRadius: 24 }}
           onClick={onLogout}
-          className="tw:flex tw:w-full tw:text-center tw:items-center tw:gap-2 tw:bg-white tw:px-8 tw:py-3 tw:rounded-full tw:shadow-sm hover:tw:shadow-md tw:transition-all"
+          className="tw:flex tw:w-full tw:text-center tw:items-center tw:gap-2 tw:bg-white tw:px-8 tw:py-3 tw:rounded-full tw:shadow-sm tw:hover:shadow-md tw:transition-all"
         >
           <LogOut className="tw:w-5 tw:h-5 tw:text-red-600" />
           <span className="tw:text-[15px] tw:font-bold tw:text-red-600">

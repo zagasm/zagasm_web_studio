@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
             Contact:{" "}
             <a
               href="mailto:support@zagasm.com"
-              className="tw:font-medium tw:text-primary tw:underline-offset-4 hover:tw:underline"
+              className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
             >
               support@zagasm.com
             </a>{" "}
@@ -90,7 +90,7 @@ export default function PrivacyPolicyPage() {
                   rights, you can contact our Data Protection Officer (DPO) at{" "}
                   <a
                     href="mailto:support@zagasm.com"
-                    className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
                     support@zagasm.com
                   </a>
@@ -690,7 +690,7 @@ export default function PrivacyPolicyPage() {
                   To exercise your rights, contact us at{" "}
                   <a
                     href="mailto:support@zagasm.com"
-                    className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
                     support@zagasm.com
                   </a>{" "}
@@ -900,7 +900,7 @@ export default function PrivacyPolicyPage() {
                     <strong>Email:</strong>{" "}
                     <a
                       href="mailto:support@zagasm.com"
-                      className="tw:text-primary tw:underline-offset-4 hover:tw:underline"
+                      className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
                       support@zagasm.com
                     </a>

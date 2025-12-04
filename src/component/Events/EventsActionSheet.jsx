@@ -398,7 +398,7 @@ export default function EventActionsSheet({
                           return (
                             <button
                               key={ch.key}
-                              className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:p-3 tw:bg-[#F9FAFB] tw:border tw:border-gray-100 tw:rounded-xl hover:tw:bg-gray-50"
+                              className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:p-3 tw:bg-[#F9FAFB] tw:border tw:border-gray-100 tw:rounded-xl tw:hover:bg-gray-50"
                               onClick={() => openShareLink(ch)}
                             >
                               {iconSrc ? (
@@ -460,7 +460,7 @@ export default function EventActionsSheet({
                       <button
                         disabled={busy}
                         onClick={onReport}
-                        className="tw:w-full tw:bg-primary tw:text-white tw:rounded-xl tw:py-3 tw:font-medium disabled:tw:opacity-60"
+                        className="tw:w-full tw:bg-primary tw:text-white tw:rounded-xl tw:py-3 tw:font-medium tw:disabled:opacity-60"
                       >
                         {busy ? "Submitting…" : "Submit Report"}
                       </button>

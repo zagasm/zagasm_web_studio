@@ -12,11 +12,13 @@ const AccountLeft = ({ user }) => {
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // const { refreshUser } = useAuth();
-
   useEffect(() => {
-    refreshUser();
-  }, [refreshUser]);
+    const onFocus = () => {
+      if (token) refreshUser();
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [token, refreshUser]);
 
   const Default_user_image = user?.profileUrl
     ? user.profileUrl
@@ -44,7 +46,7 @@ const AccountLeft = ({ user }) => {
         {/* 1. Profile Card */}
         <Link
           to={`/profile/${user.id}`}
-          className="tw:bg-white tw:rounded-3xl tw:px-3 tw:py-4 tw:flex tw:items-center tw:justify-between tw:shadow-sm hover:tw:shadow-md tw:transition-shadow tw:cursor-pointer"
+          className="tw:bg-white tw:rounded-3xl tw:px-3 tw:py-4 tw:flex tw:items-center tw:justify-between tw:shadow-sm tw:hover:shadow-md tw:transition-shadow tw:cursor-pointer"
         >
           <div className="tw:flex tw:items-center tw:gap-4">
             <div className="tw:h-12 tw:w-12 tw:rounded-full tw:overflow-hidden tw:bg-gray-200">
@@ -138,7 +140,7 @@ const AccountLeft = ({ user }) => {
             <button
               onClick={() => setIsVerifyModalOpen(true)}
               style={{ borderRadius: 8 }}
-              className="tw:md:w-auto tw:bg-orange-500 hover:tw:bg-orange-600 tw:text-white tw:text-[9px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
+              className="tw:md:w-auto tw:bg-orange-500 tw:hover:bg-orange-600 tw:text-white tw:text-[9px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
             >
               Verify Now
             </button>
@@ -147,7 +149,7 @@ const AccountLeft = ({ user }) => {
 
         {/* 2. Dashboard Banner */}
         {/* <Link className="tw:block">
-          <div className="tw:bg-[#F3E8FF] tw:rounded-3xl tw:p-5 tw:flex tw:items-center tw:justify-between tw:transition-opacity hover:tw:opacity-90">
+          <div className="tw:bg-[#F3E8FF] tw:rounded-3xl tw:p-5 tw:flex tw:items-center tw:justify-between tw:transition-opacity tw:hover:opacity-90">
             <div className="tw:flex tw:items-center tw:gap-4">
               <img className="tw:size-7" src="/images/dashIcon.svg" alt="" />
               <div className="tw:flex tw:flex-col">
@@ -168,7 +170,7 @@ const AccountLeft = ({ user }) => {
           <div className="col-6">
             <Link
               to="/my-events"
-              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all"
+              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm tw:hover:shadow-md tw:transition-all"
             >
               <img src="/images/camera.svg" alt="" />
               <span className="tw:text-[13px] tw:font-medium tw:text-gray-900 tw:leading-tight">
@@ -180,7 +182,7 @@ const AccountLeft = ({ user }) => {
           <div className="col-6">
             <Link
               to="/event/saved-events"
-              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all"
+              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm tw:hover:shadow-md tw:transition-all"
             >
               <img src="/images/saveIcon.svg" alt="" />
               <span className="tw:text-[13px] tw:font-medium tw:text-gray-900 tw:leading-tight">
@@ -192,7 +194,7 @@ const AccountLeft = ({ user }) => {
           <div className="col-6">
             <Link
               to="/me/organisers"
-              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all"
+              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm tw:hover:shadow-md tw:transition-all"
             >
               <img src="/images/following.svg" alt="" />
               <span className="tw:text-[13px] tw:font-medium tw:text-gray-900 tw:leading-tight">
@@ -204,7 +206,7 @@ const AccountLeft = ({ user }) => {
           <div className="col-6">
             <Link
               to="/me/organisers/followers"
-              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm hover:tw:shadow-md tw:transition-all"
+              className="tw:bg-white tw:rounded-3xl tw:p-4 tw:h-24 tw:flex tw:items-center tw:gap-3 tw:shadow-sm tw:hover:shadow-md tw:transition-all"
             >
               <img src="/images/followers.svg" alt="" />
               <span className="tw:text-[13px] tw:font-medium tw:text-gray-900 tw:leading-tight">

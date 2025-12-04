@@ -150,7 +150,7 @@ function OrganisersIFollow() {
                 borderRadius: "50%",
               }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:hover:tw:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
@@ -195,7 +195,7 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
   const followersLabel = formatFollowers(numberOfFollowers);
 
   return (
-    <div onClick={() => navigate(`/profile/${id}`)} className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
+    <div onClick={() => navigate(`/profile/${id}`)} className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
       {/* Image */}
       <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-gray-100">
         <img
@@ -231,7 +231,7 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
         type="button"
         disabled={isUnfollowing}
         onClick={onUnfollow}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:tw:bg-gray-50 tw:disabled:tw:opacity-60 tw:disabled:tw:cursor-not-allowed tw:transition"
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:tw:hover:bg-gray-50 tw:tw:disabled:opacity-60 tw:tw:disabled:cursor-not-allowed tw:transition"
       >
         <img src="/images/user-x.svg"/>
         <span>{isUnfollowing ? "Unfollowing…" : "Unfollow"}</span>

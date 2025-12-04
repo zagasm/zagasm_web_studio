@@ -332,10 +332,10 @@ const BecomeOrganiser = () => {
             setVerificationMethod("bank");
             setBankStep(0);
           }}
-          className={`tw:group tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm hover:tw:shadow-md ${
+          className={`tw:group tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm tw:hover:shadow-md ${
             verificationMethod === "bank"
               ? "tw:border-primary tw:bg-lightPurple/40 tw:ring-2 tw:ring-primary/20"
-              : "tw:border-gray-200 hover:tw:border-gray-300"
+              : "tw:border-gray-200 tw:hover:border-gray-300"
           }`}
         >
           <div className="tw:flex tw:items-start tw:gap-3">
@@ -352,7 +352,7 @@ const BecomeOrganiser = () => {
               </span>
             </div>
           </div>
-          <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[11px] tw:text-primary tw:font-medium tw:mt-3 tw:opacity-80 group-hover:tw:opacity-100">
+          <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[11px] tw:text-primary tw:font-medium tw:mt-3 tw:opacity-80 group-tw:hover:opacity-100">
             Recommended for organisers in Nigeria
           </span>
         </button>
@@ -366,10 +366,10 @@ const BecomeOrganiser = () => {
           onClick={() => {
             setVerificationMethod("crypto");
           }}
-          className={`tw:group tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm hover:tw:shadow-md ${
+          className={`tw:group tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm tw:hover:shadow-md ${
             verificationMethod === "crypto"
               ? "tw:border-primary tw:bg-lightPurple/40 tw:ring-2 tw:ring-primary/20"
-              : "tw:border-gray-200 hover:tw:border-gray-300"
+              : "tw:border-gray-200 tw:hover:border-gray-300"
           }`}
         >
           <div className="tw:flex tw:items-start tw:gap-3">
@@ -399,7 +399,7 @@ const BecomeOrganiser = () => {
           }}
           type="button"
           disabled={!verificationMethod}
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:text-xs tw:md:text-sm tw:font-semibold tw:bg-primary tw:text-white disabled:tw:opacity-50 disabled:tw:cursor-not-allowed tw:shadow-sm hover:tw:shadow-md tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:text-xs tw:md:text-sm tw:font-semibold tw:bg-primary tw:text-white tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:shadow-sm tw:hover:shadow-md tw:transition"
         >
           <span>
             {verificationMethod
@@ -503,7 +503,7 @@ const BecomeOrganiser = () => {
             borderRadius: 8,
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white hover:tw:bg-gray-50 tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
           onClick={() => {
             setVerificationMethod(null);
             setBankStep(0);
@@ -516,7 +516,7 @@ const BecomeOrganiser = () => {
             borderRadius: 8,
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm hover:tw:shadow-md disabled:tw:opacity-50 disabled:tw:cursor-not-allowed tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm tw:hover:shadow-md tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:transition"
           disabled={
             !selectedBank ||
             !accountNumber ||
@@ -573,14 +573,14 @@ const BecomeOrganiser = () => {
             borderRadius: 8,
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white hover:tw:bg-gray-50 tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
           onClick={() => setBankStep(0)}
         >
           <span>Back to bank details</span>
         </button>
         <button
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm hover:tw:shadow-md disabled:tw:opacity-50 disabled:tw:cursor-not-allowed tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm tw:hover:shadow-md tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:transition"
           disabled={!bvn || bvn.length < 11 || bvnLoading}
           onClick={handleSubmitBvn}
         >
@@ -646,7 +646,7 @@ const BecomeOrganiser = () => {
             borderRadius: 8,
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white hover:tw:bg-gray-50 tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
           onClick={() => {
             setVerificationMethod(null);
           }}
@@ -658,7 +658,7 @@ const BecomeOrganiser = () => {
             borderRadius: 8,
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm hover:tw:shadow-md disabled:tw:opacity-50 disabled:tw:cursor-not-allowed tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm tw:hover:shadow-md tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:transition"
           disabled={!cryptoAddress}
           onClick={handleCryptoSubmit}
         >

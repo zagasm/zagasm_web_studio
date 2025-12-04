@@ -36,9 +36,9 @@ export default function AccessStep({ defaultValues = {}, onBack, onNext }) {
       onSubmit={handleSubmit(submit)}
       className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
     >
-      <h2 className="tw:text-[18px] tw:sm:text-lg tw:font-semibold tw:mb-5">
+      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
         Access & Visibility
-      </h2>
+      </span>
 
       <div className="tw:space-y-5">
         <SelectField
@@ -68,7 +68,7 @@ export default function AccessStep({ defaultValues = {}, onBack, onNext }) {
           }}
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 hover:tw:bg-gray-50"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
         >
           Back
         </button>
@@ -77,7 +77,7 @@ export default function AccessStep({ defaultValues = {}, onBack, onNext }) {
             borderRadius: 20,
           }}
           type="submit"
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
         >
           Next
         </button>

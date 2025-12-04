@@ -29,7 +29,7 @@ export default function DataProtectionPage() {
 
         <Link
           to="/auth/signin"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:bg-primary tw:hover:bg-primary/80 text-white tw:px-5 tw:md:px-8 tw:py-3 tw:rounded-full tw:font-medium tw:shadow-sm hover:tw:shadow tw:transition-all tw:duration-300"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:bg-primary tw:hover:bg-primary/80 text-white tw:px-5 tw:md:px-8 tw:py-3 tw:rounded-full tw:font-medium tw:shadow-sm tw:hover:shadow tw:transition-all tw:duration-300"
         >
           Get Started
         </Link>

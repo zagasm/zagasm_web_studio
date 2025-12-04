@@ -4,7 +4,7 @@ export default function PlansSkeleton() {
   const placeholders = [1, 2, 3];
 
   return (
-    <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 xl:tw:grid-cols-3 tw:gap-5">
+    <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-5">
       {placeholders.map((id) => (
         <div
           key={id}

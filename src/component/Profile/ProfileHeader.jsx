@@ -57,7 +57,7 @@ export default function ProfileHeader({
             <button
               type="button"
               onClick={handleEditClick}
-              className="tw:absolute tw:-right-1 tw:-top-1 tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:shadow-md hover:tw:bg-gray-50"
+              className="tw:absolute tw:-right-1 tw:-top-1 tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:shadow-md tw:hover:bg-gray-50"
             >
               <Edit size={18} />
             </button>
@@ -66,8 +66,8 @@ export default function ProfileHeader({
 
         {/* name + meta */}
         <div className="tw:text-center tw:w-full">
-          <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900">
-            {displayName}{" "}
+          <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900 tw:flex tw:items-center tw:gap-0.5 tw:justify-center">
+            <span>{displayName}</span>
             {user.subscription?.isActive && (
               <img
                 className="tw:inline-block tw:ml-1 tw:size-5"
@@ -94,10 +94,13 @@ export default function ProfileHeader({
           {showFollowButton && (
             <div className="tw:mt-4 tw:flex tw:items-center tw:justify-center">
               <button
+                style={{
+                  borderRadius: 20,
+                }}
                 type="button"
                 disabled={followLoading}
                 onClick={onToggleFollow}
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-black tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-white hover:tw:bg-gray-900 tw:transition disabled:tw:opacity-60 disabled:tw:cursor-not-allowed"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-white tw:hover:bg-primary/80 tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
               >
                 {followLoading
                   ? "Please wait..."
@@ -126,7 +129,7 @@ export default function ProfileHeader({
         <div className="tw:mt-5 tw:grid tw:w-full tw:grid-cols-2 tw:gap-3">
           <button
             type="button"
-            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left hover:tw:bg-gray-100"
+            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100"
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
               <span className="tw:inline-flex tw:items-center tw:gap-1">
@@ -142,7 +145,7 @@ export default function ProfileHeader({
 
           <button
             type="button"
-            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left hover:tw:bg-gray-100"
+            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100"
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
               <span className="tw:inline-flex tw:items-center tw:gap-1">

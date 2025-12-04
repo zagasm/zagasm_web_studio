@@ -205,7 +205,7 @@ function EventType() {
                   borderRadius: 12,
                 }}
                 type="button"
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 hover:tw:bg-slate-50 tw:transition"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 tw:transition"
                 // onClick={() => navigate("/")} // if you have useNavigate
               >
                 Go to home
@@ -255,7 +255,7 @@ function EventType() {
                 key={event.id}
                 type="button"
                 onClick={() => navigate(`/event/create-event/${event.id}`)}
-                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] hover:tw:border-[#8F07E7] hover:tw:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3"
+                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-[#8F07E7] tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3"
               >
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:flex tw:items-center tw:gap-3">
@@ -273,7 +273,7 @@ function EventType() {
                     </div>
                   </div>
 
-                  <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F5F5F7] tw:text-xs tw:text-gray-500 group-hover:tw:bg-[#8F07E7] group-hover:tw:text-white tw:transition tw:duration-200">
+                  <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F5F5F7] tw:text-xs tw:text-gray-500 group-tw:hover:bg-[#8F07E7] group-tw:hover:text-white tw:transition tw:duration-200">
                     →
                   </span>
                 </div>
