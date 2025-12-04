@@ -220,7 +220,7 @@ export default function LivePipelineSection() {
                     </span>
                   </div>
 
-                  <span className="tw:inline-flex tw:items-center tw:rounded-full tw:bg-primary/15 tw:px-2.5 tw:py-1 tw:text-[10px] tw:font-medium tw:text-primary">
+                  <span className="tw:inline-flex tw:items-center tw:rounded-full tw:bg-white tw:px-2.5 tw:py-1 tw:text-[10px] tw:font-medium tw:text-primary">
                     {step.badge}
                   </span>
                 </div>

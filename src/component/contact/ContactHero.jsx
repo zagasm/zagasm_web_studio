@@ -54,7 +54,7 @@ export default function ContactHero() {
           </span>
 
           <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-600 tw:max-w-xl tw:mb-5">
-            Whether you’re planning a one-off live event, a recurring show, or
+            Whether you’re planning a one-off LIVE event, a recurring show, or
             full studio automation, we’ll help you design a pipeline that fits
             your reality, bandwidth, budget, and audience.
           </span>
@@ -69,7 +69,7 @@ export default function ContactHero() {
             >
               <Radio className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
               <span className="tw:block">
-                Live events • Streaming studios • Creators
+                LIVE events • Streaming studios • Creators
               </span>
             </motion.div>
             <motion.div
@@ -102,7 +102,7 @@ export default function ContactHero() {
                 Creator pipeline check
               </span>
               <span className="tw:block tw:text-sm tw:md:text-base tw:font-medium tw:mb-4 tw:text-white/95">
-                Tell us how you currently go live and we’ll help you design a
+                Tell us how you currently go LIVE and we’ll help you design a
                 cleaner, automated pipeline, from ingest to highlight clips.
               </span>
 
@@ -124,7 +124,7 @@ export default function ContactHero() {
                     Offices
                   </span>
                   <span className="tw:block tw:text-lg tw:font-semibold">
-                    Lagos-first
+                    Asaba-first
                   </span>
                   <span className="tw:block tw:text-[11px] tw:text-white/55">
                     Built around African creators.

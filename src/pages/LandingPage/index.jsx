@@ -44,8 +44,8 @@ export default function ZagasmLanding() {
         <LiveHighlightsSection />
 
         <AutomationSection
-          title="Turn live moments into momentum"
-          subtitle="Queue replays, publish highlight cards, syndicate everywhere, and track conversions—without leaving the player. Less busywork, more impact."
+          title="Turn LIVE moments into momentum"
+          subtitle="Queue replays, publish highlight cards, syndicate everywhere, and track conversions without leaving the player. Less busywork, more impact."
           ctaTo="/auth/signup"
           ctaLabel="Start automating free"
           mediaSrc="/images/z2.png"

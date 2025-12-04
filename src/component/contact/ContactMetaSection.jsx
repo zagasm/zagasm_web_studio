@@ -20,7 +20,7 @@ export default function ContactMetaSection() {
               A short call, a clear plan, and a realistic setup.
             </span>
             <span className="tw:block tw:mt-1.5 tw:text-[12px] tw:md:text-[13px] tw:text-slate-600">
-              We won’t drown you in decks. We’ll map out your live flow, show
+              We won’t drown you in decks. We’ll map out your LIVE flow, show
               what Zagasm can automate today, and give honest guidance on what
               you actually need to run reliably.
             </span>
@@ -30,7 +30,7 @@ export default function ContactMetaSection() {
             <MetaCard
               icon={Clock}
               title="Fast triage"
-              body="We respond to most serious inquiries in under 24 hours. If your event is sooner, mention the date."
+              body="We respond to all inquiries in under 24 hours. If your event is sooner, mention the date."
             />
             <MetaCard
               icon={LayoutTemplate}

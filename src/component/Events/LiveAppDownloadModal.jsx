@@ -47,11 +47,11 @@ export default function LiveAppDownloadModal({ open, onClose }) {
                   </div>
 
                   <span className="tw:text-lg tw:md:text-xl tw:lg:text-2xl tw:font-semibold tw:text-gray-900">
-                    Join this event live on mobile
+                    Join this event LIVE on mobile
                   </span>
 
                   <Dialog.Description className="tw:text-sm tw:text-gray-600 tw:max-w-sm">
-                    To join this event live right now, download the Zagasm
+                    To join this event LIVE right now, download the Zagasm
                     Studios app from your preferred app store.
                   </Dialog.Description>
 

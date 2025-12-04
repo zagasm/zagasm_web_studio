@@ -73,7 +73,7 @@ export default function PrivacyPolicyPage() {
                   interactions including user registration, content creation,
                   collaboration features, monetization tools, and support
                   services. Zagasm Inc., incorporated under the laws of the
-                  Federal Republic of Nigeria, operates from Lagos and adheres
+                  Federal Republic of Nigeria, operates from Asaba and adheres
                   to the Nigeria Data Protection Regulation (NDPR) 2019, as well
                   as international standards such as the General Data Protection
                   Regulation (GDPR) for users in the European Economic Area
@@ -986,7 +986,7 @@ export default function PrivacyPolicyPage() {
                   without regard to conflict of law principles.
                 </p>
                 <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
-                  Venue for disputes will be courts in Lagos State, Nigeria,
+                  Venue for disputes will be courts in Asaba State, Nigeria,
                   unless otherwise required by law. If any provision of this
                   Policy is found invalid, the remaining provisions remain in
                   full force.

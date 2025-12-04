@@ -45,7 +45,7 @@ export default function ContactFormSection() {
         >
           <div className="tw:mb-5">
             <span className="tw:block tw:text-lg tw:md:text-xl tw:font-semibold tw:text-slate-900">
-              Share a bit about your live setup
+              Share a bit about your LIVE setup
             </span>
             <span className="tw:block tw:mt-1 tw:text-xs tw:md:text-[13px] tw:text-slate-500">
               Give us context and we’ll respond with a tailored next step — not
@@ -102,7 +102,7 @@ export default function ContactFormSection() {
 
               <div>
                 <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-slate-500 tw:mb-1.5">
-                  Typical live frequency
+                  Typical LIVE frequency
                 </span>
                 <select
                   className="tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50/60 tw:px-3 tw:py-2.5 tw:text-sm tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
@@ -218,7 +218,7 @@ export default function ContactFormSection() {
                   <div>
                     <span className="tw:block tw:text-white/60">Base</span>
                     <span className="tw:block tw:text-white tw:font-medium">
-                      Lagos, Nigeria
+                      Asaba, Nigeria
                     </span>
                     <span className="tw:block tw:text-[11px] tw:text-white/55">
                       Available remotely for global productions.

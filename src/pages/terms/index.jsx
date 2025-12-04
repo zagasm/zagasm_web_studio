@@ -75,7 +75,7 @@ export default function TermsOfServicePage() {
                   Welcome to the Terms of Service <span>(“Terms”)</span> for
                   Zagasm Inc.’s Studio App <span>(“Service” or “App”)</span>.
                   Zagasm Inc., a technology company incorporated under the laws
-                  of the Federal Republic of Nigeria and headquartered in Lagos,
+                  of the Federal Republic of Nigeria and headquartered in Asaba,
                   provides this platform to help creators, filmmakers,
                   educators, and teams produce, edit, stream, and monetize
                   content. Whether you are hosting live interactive sessions,

@@ -18,7 +18,7 @@ export default function YouMayAlsoLike({ recs = [], posterFallback }) {
         {recs.slice(0, 2).map((event) => {
           const startDate = eventStartDate(event);
           const variant = "upcoming";
-          const isLive = variant === "live";
+          const isLIVE = variant === "live";
           const isUpcoming = variant === "upcoming";
 
           const ticketLabel = `Buy Ticket (${priceText(event)})`;

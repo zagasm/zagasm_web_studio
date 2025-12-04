@@ -28,13 +28,13 @@ export default function AboutHeroSection() {
         <span className="tw:font-dela tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-4">
           Turning{" "}
           <span className="tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:bg-clip-text tw:text-transparent">
-            live streams
+            LIVE streams
           </span>{" "}
           into a real business.
         </span>
 
         <span className="tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-xl">
-          Zagasm Studios is building the live infrastructure for creators,
+          Zagasm Studios is building the LIVE infrastructure for creators,
           events, and brands. From RTMP ingest to highlight automation, the
           studio helps you ship shows, not just posts.
         </span>
@@ -54,7 +54,7 @@ export default function AboutHeroSection() {
             Live-native
           </span>
           <span className="tw:mt-3 tw:block tw:text-[15px] tw:font-medium">
-            Built for teams that treat live content like a product, not a
+            Built for teams that treat LIVE content like a product, not a
             one-off broadcast.
           </span>
           <span className="tw:mt-4 tw:block tw:text-[11px] tw:text-white/70">

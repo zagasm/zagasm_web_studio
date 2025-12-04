@@ -26,11 +26,11 @@ export default function AboutEcosystemSection() {
         </span>
 
         <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-          A live studio built around real organisers, performers, and audiences.
+          A LIVE studio built around real organisers, performers, and audiences.
         </span>
 
         <span className="tw:mt-2 tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-2xl">
-          Zagasm Studios grew from running small shows in Lagos to powering
+          Zagasm Studios grew from running small shows in Asaba to powering
           recurring events, creator series, and community broadcasts. The stack
           is tuned for the realities of unstable networks, team workflows, and
           monetization in emerging markets.
@@ -62,7 +62,7 @@ export default function AboutEcosystemSection() {
           </span>
 
           <span className="tw:block">
-            The goal is simple. A creator in Lagos, London, or anywhere else
+            The goal is simple. A creator in Asaba, London, or anywhere else
             should be able to run a broadcast studio from a single browser tab
             and still feel in control of brand, community, and revenue.
           </span>
@@ -99,7 +99,7 @@ export default function AboutEcosystemSection() {
 
           <div className="tw:col-span-2 tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-white tw:p-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
             <span className="tw:block tw:text-[13px] tw:font-medium tw:max-w-xs">
-              Built from Lagos, tuned for global creators.
+              Built from Asaba, tuned for global creators.
             </span>
             <span className="tw:block tw:text-[11px] tw:text-white/80 tw:max-w-sm">
               From first house party streams to multi-city shows, Zagasm is
