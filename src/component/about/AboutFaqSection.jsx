@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: "Where is Zagasm based?",
-    a: "The team is built from Lagos with collaborators in other cities, but the platform is designed for live creators everywhere.",
+    a: "The team is built from Asaba with collaborators in other cities, but the platform is designed for LIVE creators everywhere.",
   },
 ];
 

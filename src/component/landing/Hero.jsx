@@ -173,7 +173,7 @@ const slides = [
   {
     id: 2,
     line1: ["Connect", "Beyond", "Borders"],
-    line2: ["From", "Lagos", "to", "London,", "Abuja", "to", "Abu", "Dhabi"],
+    line2: ["From", "Asaba", "to", "London,", "Abuja", "to", "Abu", "Dhabi"],
     highlightWord: "Borders",
     subText:
       "Bridge cities and continents in a single click. With Zagasm Studios, your creativity travels farther than your passport.",

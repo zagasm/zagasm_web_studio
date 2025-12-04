@@ -864,7 +864,7 @@ export default function CommunityGuidelinesPage() {
                   Federal Republic of Nigeria and apply alongside our Terms of
                   Service and Privacy Policy. Disputes arising from their
                   interpretation or enforcement may be handled through courts or
-                  arbitration in Lagos, depending on what applies.
+                  arbitration in Asaba, depending on what applies.
                 </span>
 
                 <span className="tw:block">
