@@ -7,12 +7,14 @@ import "./profile.css";
 
 export default function ProfileHeader({
   user,
+  organiser,
   isOwnProfile = true,
   isFollowing = false,
   followLoading = false,
   onToggleFollow,
 }) {
   console.log(user);
+  console.log(organiser);
   // organiser response vs normal user response
   const isOrganiserProfileData =
     !!user?.organiser || (!!user?.userId && !!user?.allEvents);
@@ -29,7 +31,7 @@ export default function ProfileHeader({
 
   const ticketsSold = user?.successfulPayments ?? user?.tickets_sold ?? 0;
 
-  const rankValue = user?.rank ?? user?.rank_global ?? null;
+  const rankValue = user?.rank ?? organiser?.rank ?? user?.rank_global ?? null;
 
   const rankingLabel = isOwnProfile ? "My Ranking" : "Organizer Ranking";
   const followersLabel = isOwnProfile ? "My Followers" : "Followers";
