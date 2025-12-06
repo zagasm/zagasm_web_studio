@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+// pages/event/create/EventForm.jsx
+import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api, authHeaders } from "../../../../lib/apiClient";
+import { useAuth } from "../../../auth/AuthContext";
 import {
-  ToastHost,
-  showError,
   showPromise,
+  showError,
   showSuccess,
 } from "../../../../component/ui/toast";
-import { api } from "../../../../lib/apiClient";
+
 import ProgressSteps from "./steps/ProgressSteps";
 import EventInformationStep from "./steps/EventInformationStep";
 import MediaUploadStep from "./steps/MediaUploadStep";
@@ -13,270 +16,396 @@ import TicketingStep from "./steps/TicketingStep";
 import StreamingStep from "./steps/StreamingStep";
 import AccessStep from "./steps/AccessStep";
 import ReviewStep from "./steps/ReviewStep";
-import StepLoader from "../../../../component/ui/StepLoader";
-import { useAuth } from "../../../auth/AuthContext";
-import { useNavigate } from "react-router-dom";
-import {
-  firstErrorStepNumber,
-  flattenLaravelErrors,
-} from "../../../../utils/helpers";
 
-export default function EventCreationWizard({ eventTypeId }) {
+/**
+ * Helper: map backend event -> defaultValues for each step
+ * Adjust field names to match your API exactly.
+ */
+function mapEventToDefaults(event) {
+  if (!event) {
+    return {
+      info: {},
+      ticketing: {},
+      streaming: {},
+      access: {},
+      media: {
+        posterImages: [],
+        posterVideos: [],
+        performers: [],
+      },
+    };
+  }
+
+  // These are guesses, tweak to your real response keys
+  const startDate =
+    event.currentEvent.start_date || event.currentEvent.eventDateISO || "";
+  const startTime = event.currentEvent.start_time || "";
+  const timezone =
+    event.currentEvent.timezone || event.currentEvent.timezone_id || "";
+
+  const maxTickets = event.currentEvent.max_tickets ? "limited" : "unlimited";
+
+  return {
+    info: {
+      title: event.currentEvent.title || "",
+      description: event.currentEvent.description || "",
+      location: event.currentEvent.location || event.currentEvent.country || "",
+      organizer:
+        event.currentEvent.organizer?.name ||
+        event.currentEvent.hostName ||
+        event.currentEvent.user?.name ||
+        "",
+      genre: event.currentEvent.genre || "",
+      date: startDate ? startDate.slice(0, 10) : "",
+      time: startTime,
+      timezone: String(timezone || ""),
+    },
+
+    ticketing: {
+      price: Number(event.currentEvent.price || 0),
+      maxTickets,
+      ticketLimit:
+        maxTickets === "limited"
+          ? Number(event.currentEvent.max_tickets || 0)
+          : undefined,
+      currency: String(event.currentEvent.currency.currencyId || ""),
+      hasBackstage: !!event.currentEvent.backstage_price,
+      backstagePrice: event.currentEvent.backstage_price
+        ? Number(event.currentEvent.backstage_price)
+        : undefined,
+    },
+
+    streaming: {
+      streamingOption: event.currentEvent.streaming_option || "in_app",
+      enableReplay:
+        typeof event.currentEvent.enable_replay === "boolean"
+          ? event.currentEvent.enable_replay
+          : true,
+      streamingDuration: String(event.currentEvent.streaming_duration || 24),
+    },
+
+    access: {
+      visibility: event.currentEvent.visibility || "public",
+      matureContent: !!event.currentEvent.mature_content,
+    },
+
+    // For edit you have existing poster items coming from backend.
+    // Wizard uses posterImages/posterVideos as File[], so we keep existing
+    // ones aside and only send new ones as Files.
+    media: {
+      posterImages: [],
+      posterVideos: [],
+      performers:
+        (event.currentEvent.performers || []).map((p) => ({
+          id: p.id,
+          name: p.name,
+          role: p.role || "speaker",
+          image: null, // they will only re-upload if they want to change
+          user_name: p.user_name || "",
+          userId: p.user_id || null,
+          avatar: p.avatar || p.image_url || null,
+        })) || [],
+      existingPoster: (event.currentEvent.poster || []).map((m, idx) => ({
+        id: m.id || idx,
+        type: m.type,
+        url: m.url,
+      })), // [{id,type,url,...}]
+    },
+  };
+}
+
+export default function EventCreationWizard({
+  eventTypeId, // used on create
+  mode = "create", // "create" | "edit"
+  eventId, // used on edit
+  initialEvent, // full event object from API
+}) {
+  const isEdit = mode === "edit" && !!eventId;
   const { token } = useAuth();
   const navigate = useNavigate();
 
+  const mapped = useMemo(
+    () => mapEventToDefaults(initialEvent),
+    [initialEvent]
+  );
+
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);
+  const [collected, setCollected] = useState({});
+  const [posterImages, setPosterImages] = useState(
+    mapped.media.posterImages || []
+  );
+  const [posterVideos, setPosterVideos] = useState(
+    mapped.media.posterVideos || []
+  );
+  const [performers, setPerformers] = useState(mapped.media.performers || []);
+  const [existingPoster, setExistingPoster] = useState(
+    mapped.media.existingPoster || []
+  );
 
-  const [posterImages, setPosterImages] = useState([]);
-  const [posterVideos, setPosterVideos] = useState([]);
-
-  const [performers, setPerformers] = useState([]);
-
-  const [formData, setFormData] = useState({
-    step1: {},
-    step2: {},
-    step3: {},
-    step4: {},
-    step5: {},
-  });
-  const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [timezoneLabel, setTimezoneLabel] = useState("");
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  const nextStep = (payload) => {
-    setFormData((prev) => ({ ...prev, [`step${currentStep}`]: payload }));
-    setCompletedSteps((prev) =>
-      prev.includes(currentStep) ? prev : [...prev, currentStep]
-    );
-
-    if (currentStep < 6) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setCurrentStep((s) => s + 1);
-        setIsLoading(false);
-      }, 220);
-    }
+  // Helpers
+  const markStepDone = (n) => {
+    setCompletedSteps((prev) => (prev.includes(n) ? prev : [...prev, n]));
   };
 
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setCurrentStep((s) => s - 1);
-        setIsLoading(false);
-      }, 180);
-    }
+  const mergeCollected = (stepKey, data) => {
+    setCollected((prev) => ({
+      ...prev,
+      [stepKey]: { ...(prev[stepKey] || {}), ...data },
+    }));
+  };
+
+  // Step handlers
+  const handleInfoNext = (values) => {
+    mergeCollected("step_1", values);
+    setTimezoneLabel(values.timezone_label || ""); // if you add this from EventInformationStep
+    markStepDone(1);
+    setCurrentStep(2);
+  };
+
+  const handleMediaNext = (values) => {
+    mergeCollected("step_2", {
+      ...values,
+      // we already track posterImages/posterVideos in top level state
+    });
+    markStepDone(2);
+    setCurrentStep(3);
+  };
+
+  const handleTicketingNext = (values) => {
+    mergeCollected("step_3", values);
+    markStepDone(3);
+    setCurrentStep(4);
+  };
+
+  const handleStreamingNext = (values) => {
+    mergeCollected("step_4", values);
+    markStepDone(4);
+    setCurrentStep(5);
+  };
+
+  const handleAccessNext = (values) => {
+    mergeCollected("step_5", values);
+    markStepDone(5);
+    setCurrentStep(6);
   };
 
   const goToStep = (n) => {
-    const s = Math.max(1, Math.min(6, Number(n) || 1));
-    setCurrentStep(s);
-    requestAnimationFrame(() =>
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    );
+    setCurrentStep(n);
   };
 
+  // Final submit (create or update)
   const handlePublish = async () => {
-    if (!eventTypeId) {
-      showError("Please select an event type.");
-      setCurrentStep(1);
-      return;
-    }
-    if ((posterImages?.length || 0) + (posterVideos?.length || 0) === 0) {
-      showError("Please add at least one poster (image or video).");
-      setCurrentStep(2);
-      return;
-    }
-
-    setIsSubmitting(true);
-    setFormErrors({});
     try {
-      const review = {
-        ...formData.step1,
-        ...formData.step2,
-        ...formData.step3,
-        ...formData.step4,
-        ...formData.step5,
-      };
+      setIsSubmitting(true);
+      setFormErrors({});
 
-      const fd = new FormData();
-      // REQUIRED
-      fd.append("event_type_id", eventTypeId);
-      fd.append("time_zone_id", String(review.timezone || ""));
-      fd.append("title", review.title || "");
-      fd.append("description", review.description || "");
-      fd.append("location", review.location || "");
-      fd.append("genre", review.genre || "");
-      fd.append("event_date", review.date || "");
-      fd.append("start_time", review.time || "");
+      // Build payload
+      const payload = new FormData();
 
-      // ticketing
-      fd.append("price", review.price ? String(review.price) : "0");
-      fd.append(
-        "ticket_limit",
-        review.maxTickets === "limited" ? "limited" : "unlimited"
-      );
-      if (review.maxTickets === "limited") {
-        fd.append(
-          "ticket_limit_number",
-          review.ticketLimit ? String(review.ticketLimit) : "0"
-        );
-      }
-      fd.append("currency_id", review.currency || "");
+      // Step 1
+      const s1 = collected.step_1 || mapped.info;
+      payload.append("title", s1.title || "");
+      payload.append("description", s1.description || "");
+      payload.append("location", s1.location || "");
+      payload.append("organizer", s1.organizer || "");
+      payload.append("genre", s1.genre || "");
+      payload.append("event_date", s1.date || "");
+      payload.append("start_time", s1.time || "");
+      payload.append("time_zone_id", s1.timezone || "");
 
-      // backstage
-      fd.append("has_backstage", review.hasBackstage ? "1" : "0");
-      if (review.hasBackstage && review.backstagePrice != null) {
-        fd.append("backstage_price", String(review.backstagePrice));
+      if (!isEdit && eventTypeId) {
+        payload.append("event_type_id", eventTypeId);
       }
 
-      // streaming
-      fd.append("streaming_option", review.streamingOption || "");
-      fd.append("enable_replay", review.enableReplay ? "1" : "0");
-      if (review.enableReplay)
-        fd.append("replay_time", review.streamingDuration || "24");
-
-      // access
-      fd.append("visibility", review.visibility || "public");
-      fd.append("post_mature_content", review.matureContent ? "1" : "0");
-
-      // media
-      performers.forEach((p, i) => {
-        fd.append(`performers[${i}][name]`, p.name || "");
-        if (p.user_name) {
-          fd.append(`performers[${i}][user_name]`, p.user_name);
-        }
-        if (p.image) fd.append(`performers[${i}][image]`, p.image);
-        if (p.role) fd.append(`performers[${i}][role]`, p.role);
-      });
+      // Step 2 – media
       posterImages.forEach((file, i) => {
-        fd.append(
+        payload.append(
           `poster_images[${i}]`,
           file,
           file.name || `poster_image_${i}`
         );
       });
       posterVideos.forEach((file, i) => {
-        fd.append(
+        payload.append(
           `poster_videos[${i}]`,
           file,
           file.name || `poster_video_${i}`
         );
       });
+      performers.forEach((p, i) => {
+        if (p.name) payload.append(`performers[${i}][name]`, p.name);
+        if (p.role) payload.append(`performers[${i}][role]`, p.role);
+        if (p.user_name)
+          payload.append(`performers[${i}][user_name]`, p.user_name);
+        if (p.image) {
+          payload.append(`performers[${i}][image]`, p.image);
+        }
+      });
 
-      const req = api.post("/api/v1/event/store", fd, {
+      // If edit: send IDs of existing posters you want to keep
+      if (isEdit && Array.isArray(existingPoster)) {
+        existingPoster.forEach((m, i) => {
+          payload.append(`keep_poster_ids[${i}]`, m.id);
+        });
+      }
+
+      // Step 3 – ticketing
+      const s3 = collected.step_3 || {};
+      payload.append("price", s3.price ?? 0);
+      payload.append("currency_id", s3.currency || "");
+      payload.append("ticket_limit", s3.maxTickets || "unlimited");
+      if (s3.maxTickets === "limited") {
+        payload.append("ticket_limit_number", s3.ticketLimit || 0);
+      }
+      payload.append("has_backstage", s3.hasBackstage ? "1" : "0");
+      if (s3.hasBackstage && s3.backstagePrice) {
+        payload.append("backstage_price", s3.backstagePrice);
+      }
+
+      // Step 4 – streaming
+      const s4 = collected.step_4 || {};
+      payload.append("streaming_option", s4.streamingOption || "in_app");
+      payload.append("enable_replay", s4.enableReplay ? "1" : "0");
+      if (s4.enableReplay) {
+        payload.append("replay_time", s4.streamingDuration || "24");
+      }
+
+      // Step 5 – access
+      const s5 = collected.step_5 || {};
+      payload.append("visibility", s5.visibility || "public");
+      payload.append("post_mature_content", s5.matureContent ? "1" : "0");
+
+      const url = isEdit
+        ? `/api/v1/event/${eventId}/edit`
+        : "/api/v1/event/store";
+      const method = isEdit ? "post" : "post";
+      // if your backend uses PUT/PATCH, change this to api.put/patch.
+
+      const req = api[method](url, payload, {
+        ...authHeaders(token),
         headers: {
-          //   "Content-Type": "multipart/form-data",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...authHeaders(token).headers,
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      await showPromise(req, {
-        loading: "Creating your event…",
-        success: "Event created successfully!",
-        error: "Failed to create event.",
+      console.log(payload);
+
+      const res = await showPromise(req, {
+        loading: isEdit ? "Updating event…" : "Creating event…",
+        success: isEdit ? "Event updated" : "Event created",
+        error: "Could not save event",
       });
 
-      navigate("/feed");
-      showSuccess("Your event has been created successfully.");
+      // const created = res?.data?.data || res?.data;
+      // const redirectId = created?.id || eventId;
+
+      // navigate(`/creator/channel/new?eventId=${redirectId}`);
     } catch (err) {
-      const status = err?.response?.status;
-      if (status === 422) {
-        const srv = err.response.data?.errors || {};
-        setFormErrors(srv);
-        const flat = flattenLaravelErrors(srv);
-        if (flat.length) showError(flat[0].messages[0]);
-        else showError(err.response.data?.message || "Validation failed.");
-        return;
-      } else {
-        showError(
-          err?.response?.data?.message ||
-            err?.message ||
-            "Something went wrong."
-        );
+      const data = err?.response?.data;
+      if (data?.errors) {
+        setFormErrors(data.errors);
       }
+      showError(data?.message || "Something went wrong");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="tw:mx-auto tw:max-w-5xl tw:pt-16 tw:md:pt-0 tw:pb-24 tw:px-3 tw:sm:px-6">
-      {/* <ToastHost /> */}
+  const mergedForReview = useMemo(() => {
+    return {
+      ...(collected.step_1 || mapped.info),
+      ...(collected.step_3 || mapped.ticketing),
+      ...(collected.step_4 || mapped.streaming),
+      ...(collected.step_5 || mapped.access),
+    };
+  }, [collected, mapped]);
 
+  if (isEdit && !initialEvent) {
+    // safety: you should normally not render wizard until event is loaded
+    return null;
+  }
+
+  return (
+    <div className="tw:max-w-5xl tw:mx-auto tw:px-4 tw:pb-16">
       <ProgressSteps
         currentStep={currentStep}
         completedSteps={completedSteps}
-        onBack={prevStep}
+        onBack={() => {
+          if (currentStep === 1) {
+            navigate(-1);
+          } else {
+            setCurrentStep((s) => Math.max(1, s - 1));
+          }
+        }}
       />
 
-      <div className="tw:relative">
-        {isLoading && <StepLoader />}
+      {currentStep === 1 && (
+        <EventInformationStep
+          defaultValues={mapped.info}
+          onNext={handleInfoNext}
+          eventTypeId={eventTypeId}
+        />
+      )}
 
-        {currentStep === 1 && (
-          <EventInformationStep
-            eventTypeId={eventTypeId}
-            defaultValues={formData.step1}
-            onNext={nextStep}
-          />
-        )}
-        {currentStep === 2 && (
-          <MediaUploadStep
-            posterImages={posterImages}
-            setPosterImages={setPosterImages}
-            posterVideos={posterVideos}
-            setPosterVideos={setPosterVideos}
-            performers={performers}
-            setPerformers={setPerformers}
-            onBack={prevStep}
-            onNext={nextStep}
-          />
-        )}
-        {currentStep === 3 && (
-          <TicketingStep
-            defaultValues={formData.step3}
-            onBack={prevStep}
-            onNext={nextStep}
-          />
-        )}
-        {currentStep === 4 && (
-          <StreamingStep
-            defaultValues={formData.step4}
-            onBack={prevStep}
-            onNext={nextStep}
-          />
-        )}
-        {currentStep === 5 && (
-          <AccessStep
-            defaultValues={formData.step5}
-            onBack={prevStep}
-            onNext={nextStep}
-          />
-        )}
-        {currentStep === 6 && (
-          <ReviewStep
-            isSubmitting={isSubmitting}
-            onBack={prevStep}
-            onPublish={handlePublish}
-            timezoneLabel={timezone}
-            posterImages={posterImages}
-            posterVideos={posterVideos}
-            performers={performers}
-            collected={{
-              ...formData.step1,
-              ...formData.step2,
-              ...formData.step3,
-              ...formData.step4,
-              ...formData.step5,
-            }}
-            formErrors={formErrors}
-            onGoToStep={goToStep}
-          />
-        )}
-      </div>
+      {currentStep === 2 && (
+        <MediaUploadStep
+          posterImages={posterImages}
+          setPosterImages={setPosterImages}
+          posterVideos={posterVideos}
+          setPosterVideos={setPosterVideos}
+          performers={performers}
+          setPerformers={setPerformers}
+          existingPoster={existingPoster}
+          setExistingPoster={setExistingPoster}
+          onBack={() => setCurrentStep(1)}
+          onNext={handleMediaNext}
+        />
+      )}
+
+      {currentStep === 3 && (
+        <TicketingStep
+          defaultValues={mapped.ticketing}
+          onBack={() => setCurrentStep(2)}
+          onNext={handleTicketingNext}
+        />
+      )}
+
+      {currentStep === 4 && (
+        <StreamingStep
+          defaultValues={mapped.streaming}
+          onBack={() => setCurrentStep(3)}
+          onNext={handleStreamingNext}
+        />
+      )}
+
+      {currentStep === 5 && (
+        <AccessStep
+          defaultValues={mapped.access}
+          onBack={() => setCurrentStep(4)}
+          onNext={handleAccessNext}
+        />
+      )}
+
+      {currentStep === 6 && (
+        <ReviewStep
+          collected={mergedForReview}
+          formErrors={formErrors}
+          isSubmitting={isSubmitting}
+          onBack={() => setCurrentStep(5)}
+          onPublish={handlePublish}
+          timezoneLabel={timezoneLabel}
+          performers={performers}
+          onGoToStep={goToStep}
+          posterImages={posterImages}
+          posterVideos={posterVideos}
+        />
+      )}
     </div>
   );
 }

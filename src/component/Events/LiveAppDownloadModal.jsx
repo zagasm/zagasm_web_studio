@@ -56,28 +56,48 @@ export default function LiveAppDownloadModal({ open, onClose }) {
                   </Dialog.Description>
 
                   <div className="tw:flex tw:flex-col tw:sm:flex-row tw:gap-3 tw:mt-3 tw:w-full">
+                    {/* Google Play button */}
                     <a
                       href="https://play.google.com/store/apps/details?id=dummy.zagasm"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="tw:flex-1 tw:inline-flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-gray-900 tw:transition "
+                      className="tw:flex-1 tw:inline-flex tw:flex-row tw:items-center tw:justify-center tw:gap-3 tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-gray-900 tw:transition"
                     >
-                      <span className="tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-70">
-                        Download on
+                      <img
+                        src="/images/icons/ps.png"
+                        alt="Google Play"
+                        className="tw:h-6 tw:w-6 tw:object-contain"
+                      />
+                      <span className="tw:flex tw:flex-col tw:items-start tw:text-left">
+                        <span className="tw:text-[10px] tw:uppercase tw:tracking-wide tw:opacity-70">
+                          Download on
+                        </span>
+                        <span className="tw:text-sm tw:leading-tight">
+                          Google Play
+                        </span>
                       </span>
-                      <span>Google Play</span>
                     </a>
 
+                    {/* App Store button */}
                     <a
-                      href="https://apps.apple.com/app/id0000000000"
+                      href="https://apps.apple.com/ng/app/zagasm-studios/id6755035145"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="tw:flex-1 tw:inline-flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-black tw:transition "
+                      className="tw:flex-1 tw:inline-flex tw:flex-row tw:items-center tw:justify-center tw:gap-3 tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-black tw:transition"
                     >
-                      <span className="tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-70">
-                        Download on
+                      <img
+                        src="/images/icons/as.png"
+                        alt="App Store"
+                        className="tw:h-6 tw:w-6 tw:object-contain"
+                      />
+                      <span className="tw:flex tw:flex-col tw:items-start tw:text-left">
+                        <span className="tw:text-[10px] tw:uppercase tw:tracking-wide tw:opacity-70">
+                          Download on
+                        </span>
+                        <span className="tw:text-sm tw:leading-tight">
+                          App Store
+                        </span>
                       </span>
-                      <span>App Store</span>
                     </a>
                   </div>
 

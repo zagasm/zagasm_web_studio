@@ -79,7 +79,7 @@ const AccountLeft = ({ user }) => {
           <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-400" />
         </Link>
 
-        <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-[11.5px] tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
+        <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
           <div className="tw:flex tw:items-center tw:gap-3">
             <div className="tw:shrink-0">
               {user.subscription?.isActive ? (
@@ -99,16 +99,16 @@ const AccountLeft = ({ user }) => {
             <div>
               {user.subscription?.isActive ? (
                 <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                  You are on the {user.subscription?.plan?.name} plan
+                  You are now Verified!
                 </span>
               ) : (
                 <div>
                   <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                    You are on a free plan
+                    Zagasm Studios Verification Badge
                   </span>
                   <br />
                   <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                    Upgrade plan to enjoy premium features
+                    Get the blue checkmark and unlock premium features
                   </span>
                 </div>
               )}
@@ -118,9 +118,9 @@ const AccountLeft = ({ user }) => {
             <Link
               to="/subscription"
               style={{ borderRadius: 8 }}
-              className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[14px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
+              className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[12px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
             >
-              Upgrade Now
+              Subscribe Now
             </Link>
           )}
         </div>

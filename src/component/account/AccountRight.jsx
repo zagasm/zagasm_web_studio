@@ -14,9 +14,12 @@ import {
   LogOut,
   User2,
   UserPen,
+  Coins,
+  CircleAlert,
 } from "lucide-react";
 import Switch from "@mui/material/Switch";
 import { api, authHeaders } from "../../lib/apiClient";
+import { useAuth } from "../../pages/auth/AuthContext";
 
 const MenuSection = ({ title, children }) => (
   <div className="tw:mb-8">
@@ -75,6 +78,10 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [updatingKey, setUpdatingKey] = useState(null);
   const [notifError, setNotifError] = useState("");
+  const { user } = useAuth();
+  // console.log(user);
+
+  const isOrganizer = user?.is_organiser_verified;
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -155,7 +162,12 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
     // },
   ];
   const events = [{ icon: User2, label: "Mentions Tag", to: "/mentions" }];
-  const profile = [{ icon: UserPen, label: "Edit profile", to: "/profile/edit-profile" }];
+  const profile = [
+    { icon: UserPen, label: "Edit profile", to: "/profile/edit-profile" },
+  ];
+  const wallet = [
+    { icon: Coins, label: "Crypto Wallet", to: "/account/crypto-wallet" },
+  ];
 
   const support = [
     {
@@ -166,8 +178,8 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
     { icon: FileText, label: "Terms of Service", to: "/terms-of-service" },
     { icon: FileText, label: "Privacy Policy", to: "/privacy-policy" },
     {
-      icon: Trash,
-      label: "Delete Account",
+      icon: CircleAlert,
+      label: "Deactivate Account",
       onClick: onDeactivate,
       isRed: false,
     },
@@ -240,6 +252,13 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
           <ItemCard key={index} {...item} />
         ))}
       </MenuSection>
+      {isOrganizer && (
+        <MenuSection title="Wallet">
+          {wallet.map((item, index) => (
+            <ItemCard key={index} {...item} />
+          ))}
+        </MenuSection>
+      )}
       <MenuSection title="Events">
         {events.map((item, index) => (
           <ItemCard key={index} {...item} />

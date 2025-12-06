@@ -37,14 +37,14 @@ export default function Navbar() {
               Also, cleaned up px class to ensure consistency. */}
       <div className="tw:flex tw:w-full tw:h-[85px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-8 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
         {/* LEFT SECTION */}
-        <div className="tw:flex tw:items-center tw:gap-6">
+        <Link to={'/feed'} className="tw:flex tw:items-center tw:gap-6">
           {/* Logo */}
           <img
             src={"/images/logo.png"}
             alt="Zagasm Logo"
             className="tw:w-24 tw:md:w-40 tw:-ml-5 tw:object-contain"
           />
-        </div>
+        </Link>
 
         {/* CENTER NAV LINKS */}
         <div className="tw:hidden tw:md:flex tw:gap-12 tw:mr-16">

@@ -13,22 +13,15 @@ const schema = z
   .object({
     posterImages: z.array(z.instanceof(File)).optional(),
     posterVideos: z.array(z.instanceof(File)).optional(),
-    performers: z
-      .array(
-        z.object({
-          name: z
-            .string()
-            .min(2, "Performer name must be at least 2 characters"),
-          image: z
-            .instanceof(File, { message: "Performer image is required" })
-            .refine((f) => f.size <= 5 * 1024 * 1024, {
-              message: "Image must be ≤ 5MB",
-            }),
-          role: z.string().optional(),
-          // extra fields (user_name, userId, avatar) are ignored by zod
-        })
-      )
-      .min(1, "At least one performer is required"),
+    performers: z.array(
+      z.object({
+        name: z.string().min(2, "Performer name must be at least 2 characters"),
+        image: z.any().optional(),
+        role: z.string().optional(),
+        // extra fields (user_name, userId, avatar) are ignored by zod
+      })
+    ),
+    // .min(1, "At least one performer is required"),
   })
   .refine(
     (v) => (v.posterImages?.length || 0) + (v.posterVideos?.length || 0) > 0,
@@ -45,6 +38,8 @@ export default function MediaUploadStep({
   setPosterVideos,
   performers,
   setPerformers,
+  existingPoster,
+  setExistingPoster,
   onBack,
   onNext,
 }) {
@@ -186,14 +181,75 @@ export default function MediaUploadStep({
     }, 400);
   };
 
-  const onSubmit = (vals) => onNext(vals);
+  const onSubmit = (vals) => {
+    const totalPosters =
+      (vals.posterImages?.length || 0) +
+      (vals.posterVideos?.length || 0) +
+      (existingPoster?.length || 0);
+
+    if (totalPosters === 0) {
+      showError("At least one poster (image or video) is required");
+      return;
+    }
+
+    onNext(vals);
+  };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="tw:bg-white tw:rounded-2xl tw:p-4 tw:sm:p-6 tw:border tw:border-gray-100"
     >
-      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-4">Event Media</span>
+      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-4">
+        Event Media
+      </span>
+
+      {existingPoster?.length > 0 && (
+        <div className="tw:mb-6">
+          <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
+            Existing media
+          </span>
+          <div className="tw:flex tw:flex-wrap tw:gap-3">
+            {existingPoster.map((m, idx) => (
+              <div
+                key={m.id || idx}
+                className="tw:relative tw:w-28 tw:h-28 tw:rounded-2xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-black/5"
+              >
+                {m.type === "image" ? (
+                  <img
+                    src={m.url}
+                    className="tw:w-full tw:h-full tw:object-cover"
+                  />
+                ) : (
+                  <video
+                    src={m.url}
+                    className="tw:w-full tw:h-full tw:object-cover"
+                    controls={false}
+                    muted
+                  />
+                )}
+
+                <span className="tw:absolute tw:left-2 tw:top-2 tw:text-[10px] tw:px-2 tw:py-0.5 tw:bg-black/60 tw:text-white tw:rounded-full tw-uppercase">
+                  {m.type}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExistingPoster((prev) =>
+                      prev.filter((_, i) => i !== idx)
+                    )
+                  }
+                  className="tw:absolute tw:top-1 tw:right-1 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
+                  aria-label="Remove media"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Poster IMAGES */}
       <div className="tw:mb-6">
@@ -448,6 +504,11 @@ export default function MediaUploadStep({
                   {p.image ? (
                     <img
                       src={URL.createObjectURL(p.image)}
+                      className="tw:h-full tw:w-full tw:object-cover"
+                    />
+                  ) : p.avatar ? (
+                    <img
+                      src={p.avatar}
                       className="tw:h-full tw:w-full tw:object-cover"
                     />
                   ) : (
