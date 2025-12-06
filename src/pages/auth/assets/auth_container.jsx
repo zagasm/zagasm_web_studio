@@ -44,10 +44,6 @@ function AuthContainer({
                   >
                     <Link to="/">
                       <img
-                        style={{
-                          width: 240,
-                          height: 240,
-                        }}
                         src={"/images/logo.png"}
                         className="zagasm_logo"
                         alt="Zagasm Logo"

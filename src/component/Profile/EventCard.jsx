@@ -1,11 +1,11 @@
+// component/Events/EventCard.jsx
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Eye, Heart, Users } from "lucide-react";
+import { Clock, Eye, Heart, Users, Pencil } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
 import MediaCarousel from "./MediaCarousel";
-import ObsInstructionsModal from "./ObsInstructionModal"; // ← spelling fixed
 import StartStreamAppDownloadModal from "../Events/StartStreamAppDownloadModal";
 
 function collectMedia(poster = []) {
@@ -17,8 +17,6 @@ function collectMedia(poster = []) {
 export default function EventCard({ event }) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
-  const [obsOpen, setObsOpen] = useState(false);
-  const [obsPayload, setObsPayload] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -28,32 +26,8 @@ export default function EventCard({ event }) {
   };
 
   const onCreateChannel = async () => {
-    // const run = api.post(
-    //   `/api/v1/event/${event.id}/scalstream/channel-create`,
-    //   {},
-    //   authHeaders(token)
-    // );
-    // const res = await showPromise(run, {
-    //   loading: "Creating channel…",
-    //   success: "Channel created!",
-    //   error: "Failed to create channel",
-    // });
-    // setObsPayload(res?.data?.data || res?.data);
-    // setObsOpen(true);
     setOpenModal(true);
     return;
-  };
-
-  const onProceed = () => {
-    setObsOpen(false);
-    navigate(`/creator/channel/new?eventId=${event.id}`, {
-      state: { channel: obsPayload },
-    });
-  };
-
-  const onCancelModal = () => {
-    setObsOpen(false);
-    navigate(-1);
   };
 
   const toggleSave = async () => {
@@ -71,7 +45,22 @@ export default function EventCard({ event }) {
   };
 
   return (
-    <article className="col-12 col-md-6 col-lg-6 col-xl-6 tw:overflow-hidden tw:rounded-3xl tw:bg-white ">
+    <article className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-white">
+      {/* Edit icon (only for owner) */}
+      {event.isOwner && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/event/edit/${event.id}`);
+          }}
+          className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-gray-500 tw:shadow-md hover:tw:bg-[#F4E6FD] hover:tw:text-primary tw:transition"
+          aria-label="Edit event"
+        >
+          <Pencil className="tw:w-4 tw:h-4" />
+        </button>
+      )}
+
       {/* Clickable media/title section navigates to streaming page */}
       <div className="tw:cursor-pointer" onClick={goToStreaming}>
         <MediaCarousel items={media} alt={event.title} />
@@ -86,7 +75,6 @@ export default function EventCard({ event }) {
             {event.title}
           </button>
 
-          {/* stop propagation so card doesn't navigate when pressing save */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -119,32 +107,29 @@ export default function EventCard({ event }) {
         <div className="tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-5 tw:text-gray-500">
           <div className="tw:space-x-5">
             <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm">
-              <Eye size={14} /> 0{" "}
+              <Eye size={14} /> 0
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm">
-              <Users size={14} /> 0{" "}
-            </span>{" "}
+              <Users size={14} /> 0
+            </span>
             <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm">
-              {" "}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 className="tw:size-3.5"
               >
-                {" "}
                 <path
                   fillRule="evenodd"
                   d="M15.75 4.5a3 3 0 1 1 .825 2.066l-8.421 4.679a3.002 3.002 0 0 1 0 1.51l8.421 4.679a3 3 0 1 1-.729 1.31l-8.421-4.678a3 3 0 1 1 0-4.132l8.421-4.679a3 3 0 0 1-.096-.755Z"
                   clipRule="evenodd"
-                />{" "}
-              </svg>{" "}
-              0{" "}
-            </span>{" "}
-          </div>{" "}
+                />
+              </svg>
+              0
+            </span>
+          </div>
         </div>
 
-        {/* Create Channel (only if not yet created) */}
         {!event.srt_ingest_url && (
           <button
             onClick={(e) => {
@@ -166,12 +151,6 @@ export default function EventCard({ event }) {
         )}
       </div>
 
-      {/* <ObsInstructionsModal
-        open={obsOpen}
-        payload={obsPayload}
-        onProceed={onProceed}
-        onClose={onCancelModal}
-      /> */}
       <StartStreamAppDownloadModal
         open={openModal}
         onClose={() => setOpenModal(false)}
