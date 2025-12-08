@@ -269,11 +269,9 @@ export default function ViewEvent() {
             ? event.description.slice(0, 155)
             : "Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!"
         }
-        keywords={`zagasm studios, ${event?.title || "event"}, ${
-          event?.eventType || "event"
-        }, event tickets, ${
-          event?.hostName || "event organizer"
-        }, live events, entertainment`}
+        keywords={`zagasm studios, ${event?.title || "event"}, ${event?.eventType || "event"
+          }, event tickets, ${event?.hostName || "event organizer"
+          }, live events, entertainment`}
         image={posterUrl}
         type="article"
       />
@@ -299,10 +297,10 @@ export default function ViewEvent() {
               event.eventType?.toLowerCase() === "virtual"
                 ? { "@type": "VirtualLocation", url: event.streamUrl || "" }
                 : {
-                    "@type": "Place",
-                    name: event.location || "Event Location",
-                    address: event.address || "",
-                  },
+                  "@type": "Place",
+                  name: event.location || "Event Location",
+                  address: event.address || "",
+                },
             offers: {
               "@type": "Offer",
               price: event.price || 0,
@@ -328,16 +326,18 @@ export default function ViewEvent() {
           {/* TOP BAR */}
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-5 tw:mt-10">
             <button
+              style={{
+                borderRadius: '50%'
+              }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-700 tw:shadow-sm tw:hover:bg-gray-50"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:text-xs tw:font-medium tw:text-gray-700 tw:shadow-sm tw:hover:bg-gray-50"
             >
               <ArrowLeft className="tw:w-4 tw:h-4" />
-              <span>Back</span>
             </button>
 
             <div className="tw:flex tw:flex-col tw:items-center tw:flex-1 tw:min-w-0">
-              <span className="tw:text-sm tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate">
+              <span className="tw:text-sm tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate tw:first-letter:uppercase">
                 {event.title}
               </span>
               <div className="tw:mt-1 tw:inline-flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
@@ -360,27 +360,7 @@ export default function ViewEvent() {
             </div>
 
             <div className="tw:flex tw:items-center tw:gap-2">
-              {/* <button
-                type="button"
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:p-2 tw:shadow-sm tw:hover:bg-gray-50"
-              >
-                <Share2 className="tw:w-4 tw:h-4 tw:text-gray-700" />
-              </button>
-              <button
-                type="button"
-                className={`tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:p-2 tw:shadow-sm ${
-                  isSaved
-                    ? "tw:bg-primary/10 tw:text-primary"
-                    : "tw:bg-white tw:text-gray-700 tw:hover:bg-gray-50"
-                }`}
-                // hook up to your "save event" endpoint later if needed
-              >
-                <Bookmark
-                  className={`tw:w-4 tw:h-4 ${
-                    isSaved ? "tw:fill-primary tw:text-primary" : ""
-                  }`}
-                />
-              </button> */}
+              
             </div>
           </div>
 
@@ -405,9 +385,8 @@ export default function ViewEvent() {
               <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
                 <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:bg-black/70 tw:text-white tw:text-[11px] tw:rounded-full tw:backdrop-blur-sm">
                   <span
-                    className={`tw:inline-block tw:size-2 tw:rounded-full ${
-                      isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
-                    } tw:animate-pulse`}
+                    className={`tw:inline-block tw:size-2 tw:rounded-full ${isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
+                      } tw:animate-pulse`}
                   />
                   <span>{isLiveNow ? "Live" : event.status || "Upcoming"}</span>
                 </div>
@@ -525,11 +504,10 @@ export default function ViewEvent() {
                         setAccessModalOpen(true);
                       }
                     }}
-                    className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${
-                      ctaDisabled
+                    className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${ctaDisabled
                         ? "tw:bg-gray-200 tw:text-gray-500 tw:cursor-not-allowed"
                         : "tw:bg-primary tw:tw:hover:bg-primarySecond tw:text-white"
-                    }`}
+                      }`}
                   >
                     {primaryCtaLabel}
                     {!ctaDisabled && !hasPaid && (
@@ -629,21 +607,19 @@ export default function ViewEvent() {
                       type="button"
                       onClick={handleToggleFollow}
                       disabled={followLoading || !event.hostId}
-                      className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${
-                        isFollowing
+                      className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${isFollowing
                           ? "tw:bg-white tw:border-primary/30 tw:text-primary"
                           : "tw:bg-[#F3F4F6] tw:border-transparent tw:text-gray-800 tw:hover:bg-[#E5E7EB]"
-                      } ${
-                        followLoading
+                        } ${followLoading
                           ? "tw:opacity-70 tw:cursor-not-allowed"
                           : ""
-                      }`}
+                        }`}
                     >
                       {followLoading
                         ? "Updating…"
                         : isFollowing
-                        ? "Following"
-                        : "Follow Organizer"}
+                          ? "Following"
+                          : "Follow Organizer"}
                     </button>
 
                     <Link

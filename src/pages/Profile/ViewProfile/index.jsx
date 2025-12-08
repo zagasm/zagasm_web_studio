@@ -350,7 +350,7 @@ export default function ViewProfile() {
           // (own profile with KYC verified OR viewing another organiser)
           <div className="tw:flex tw:flex-col tw:lg:flex-row tw:lg:gap-6 tw:lg:h-full">
             {/* LEFT: profile card + about */}
-            <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
+            <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:lg:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
               <div className="tw:space-y-4 tw:pb-6">
                 <ProfileHeader
                   user={profileUser}
