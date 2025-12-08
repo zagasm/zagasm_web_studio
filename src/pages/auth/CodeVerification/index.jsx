@@ -105,7 +105,7 @@ export function CodeVerification({ verificationData }) {
       return false;
     }
 
-    if (isEmail && !/^\w+@\w+\.\w{2,}$/.test(value)) {
+    if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test.test(value)) {
       setInputError('Please enter a valid email address');
       return false;
     }
