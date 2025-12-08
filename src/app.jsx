@@ -94,7 +94,7 @@ export function App() {
       <ToastHost />
       <ToastContainer />
       <NetworkStatus />
-      <DisableRightClick />
+      {/* <DisableRightClick /> */}
       <Routes>
         <Route element={<LandingLayout />}>
           <Route path="/" element={<ZagasmLanding />} />
