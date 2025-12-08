@@ -64,6 +64,7 @@ import ContactPage from "./pages/LandingPage/contact.jsx";
 import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import EventEditPage from "./pages/event/EventEditPage.jsx";
+import DisableRightClick from "./component/DisableRightClick.jsx";
 
 const MainLayout = () => (
   <>
@@ -93,6 +94,7 @@ export function App() {
       <ToastHost />
       <ToastContainer />
       <NetworkStatus />
+      <DisableRightClick />
       <Routes>
         <Route element={<LandingLayout />}>
           <Route path="/" element={<ZagasmLanding />} />

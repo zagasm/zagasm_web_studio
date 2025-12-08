@@ -85,7 +85,7 @@ export function SigninWithCode({ CodeType, CodeSource }) {
         return false;
       }
     } else {
-      if (!/^\w+@\w+\.\w{2,}$/.test(source)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(source)) {
         setSourceError('Please enter a valid email address');
         return false;
       }

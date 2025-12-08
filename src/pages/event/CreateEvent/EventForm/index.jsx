@@ -117,7 +117,7 @@ function mapEventToDefaults(event) {
 }
 
 export default function EventCreationWizard({
-  eventTypeId, // used on create
+  eventTypeId, // used on create and edit
   mode = "create", // "create" | "edit"
   eventId, // used on edit
   initialEvent, // full event object from API
@@ -223,6 +223,9 @@ export default function EventCreationWizard({
       if (!isEdit && eventTypeId) {
         payload.append("event_type_id", eventTypeId);
       }
+      if (isEdit && eventTypeId) {
+        payload.append("event_type_id", eventTypeId);
+      }
 
       // Step 2 – media
       posterImages.forEach((file, i) => {
@@ -296,13 +299,17 @@ export default function EventCreationWizard({
         },
       });
 
-      console.log(payload);
+      // console.log(payload);
 
       const res = await showPromise(req, {
         loading: isEdit ? "Updating event…" : "Creating event…",
         success: isEdit ? "Event updated" : "Event created",
         error: "Could not save event",
       });
+
+      if (isEdit) {
+        navigate(`/event/view/${eventId}`)
+      }
 
       // const created = res?.data?.data || res?.data;
       // const redirectId = created?.id || eventId;

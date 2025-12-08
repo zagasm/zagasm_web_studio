@@ -16,7 +16,7 @@ export default function ReviewStep({
   posterImages = [],
   posterVideos = [],
 }) {
-    const {
+  const {
     title,
     organizer,
     date,
@@ -90,15 +90,13 @@ export default function ReviewStep({
               <span className="tw:text-gray-500 tw:font-normal tw:ml-1">
                 (
                 {hasImages
-                  ? `${posterImages.length} image${
-                      posterImages.length > 1 ? "s" : ""
-                    }`
+                  ? `${posterImages.length} image${posterImages.length > 1 ? "s" : ""
+                  }`
                   : ""}
                 {hasImages && hasVideos ? ", " : ""}
                 {hasVideos
-                  ? `${posterVideos.length} video${
-                      posterVideos.length > 1 ? "s" : ""
-                    }`
+                  ? `${posterVideos.length} video${posterVideos.length > 1 ? "s" : ""
+                  }`
                   : ""}
                 )
               </span>
@@ -368,7 +366,7 @@ export default function ReviewStep({
           className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:hover:bg-primarySecond tw:disabled:opacity-70"
           style={{ borderRadius: 20 }}
         >
-          {isSubmitting ? "Creating…" : "Create Event"}
+          {isSubmitting ? "Submitting..." : "Submit Event"}
         </button>
       </div>
     </div>

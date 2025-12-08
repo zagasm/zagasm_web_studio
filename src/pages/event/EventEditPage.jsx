@@ -51,7 +51,9 @@ export default function EditEvent() {
       </div>
     );
   }
-  console.log(event)
+  const eventTypeId = event.currentEvent.eventTypeFullDetails.id
+  console.log(event, eventId, eventTypeId)
+
 
   return (
     <div className="">
@@ -59,6 +61,7 @@ export default function EditEvent() {
         <div className="row p-0 mt-5 ">
           <div className="col ">
             <EventCreationWizard
+              eventTypeId={eventTypeId}
               mode="edit"
               eventId={eventId}
               initialEvent={event}

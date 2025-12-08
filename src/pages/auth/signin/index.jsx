@@ -89,8 +89,8 @@ export function Signin() {
     } else {
       if (!formData.email.trim()) {
         newErrors.email = "Email is required";
-      } else if (!/^\w+@\w+\.\w{2,}$/.test(formData.email)) {
-        newErrors.email = "Please enter a valid email";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = "Please enter a valid emaill";
       }
     }
 
@@ -131,8 +131,8 @@ export function Signin() {
     } else {
       if (!formData.email.trim()) {
         newErrors.email = "Email address is required";
-      } else if (!/^\w+@\w+\.\w{2,}$/.test(formData.email)) {
-        newErrors.email = "Please enter a valid email address";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = "Please enter a valid email addresss";
       }
     }
 

@@ -59,7 +59,7 @@ export default function Navbar() {
                 className="tw:flex tw:flex-col tw:items-center tw:gap-1"
               >
                 <Icon
-                  className={`tw:w-6 tw:h-6 ${
+                  className={`tw:size-5 ${
                     active ? "tw:text-black" : "tw:text-gray-500"
                   }`}
                   fill={active ? "black" : "none"}
@@ -79,22 +79,22 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT ACTION ICONS */}
-        <div className="tw:flex tw:items-center tw:gap-8">
+        <div className="tw:flex tw:items-center tw:gap-4">
           {/* Search */}
           <Link to='/search'>
-            <Search className="tw:w-6 tw:h-6 tw:text-gray-700 tw:cursor-pointer" />
+            <Search className="tw:size-5 tw:text-gray-700 tw:cursor-pointer" />
           </Link>
 
           {/* Bell + dot */}
           <Link to={"/notifications"} className="tw:relative tw:cursor-pointer">
-            <Bell className="tw:w-6 tw:h-6 tw:text-gray-700" />
-            <span className="tw:absolute tw:-top-1 tw:-right-1 tw:w-3 tw:h-3 tw:bg-red-500 tw:rounded-full"></span>
+            <Bell className="tw:size-5 tw:text-gray-700" />
+            <span className="tw:absolute tw:-top-1 tw:right-0 tw:w-2 tw:h-2 tw:bg-red-500 tw:rounded-full"></span>
           </Link>
 
           {/* Profile */}
           <Link
             to="/account"
-            className="tw:size-[42px] tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
+            className="tw:size-7 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
           >
             <img
               src={profile}
