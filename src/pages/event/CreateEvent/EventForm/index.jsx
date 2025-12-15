@@ -45,6 +45,8 @@ function mapEventToDefaults(event) {
 
   const maxTickets = event.currentEvent.max_tickets ? "limited" : "unlimited";
 
+  const eventTypeId = event.currentEvent.eventType.id
+
   return {
     info: {
       title: event.currentEvent.title || "",

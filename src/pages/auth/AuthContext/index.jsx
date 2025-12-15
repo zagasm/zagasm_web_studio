@@ -6,6 +6,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [organiser, setOrganiser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -41,9 +42,12 @@ export const AuthProvider = ({ children }) => {
       // Adjust this depending on how your backend wraps it
       const payload = res?.data?.data || res?.data || {};
       const freshUser = payload.user || payload;
+      const freshOrganiser = payload.organiser || payload;
 
       setUser(freshUser);
+      setOrganiser(freshOrganiser);
       localStorage.setItem("userdata", JSON.stringify(freshUser));
+      localStorage.setItem("organiserdata", JSON.stringify(freshOrganiser));
     } catch (err) {
       console.error("Failed to refresh user", err);
     }

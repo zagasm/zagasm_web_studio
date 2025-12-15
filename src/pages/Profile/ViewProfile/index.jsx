@@ -16,7 +16,7 @@ export default function ViewProfile() {
   const { profileId: routeUserId } = useParams();
 
   // logged-in user (you)
-  const { user: me, token } = useAuth() || {};
+  const { user: me, token, organiser } = useAuth() || {};
 
   // existing hook for "my profile"
   const {
@@ -342,6 +342,7 @@ export default function ViewProfile() {
               <div className="tw:space-y-4 tw:pb-6">
                 <ProfileHeader
                   user={finalProfileUser}
+                  organiser={organiser}
                   isOwnProfile={isOwnProfile}
                   isFollowing={isFollowing}
                   followLoading={followLoading}
