@@ -14,7 +14,7 @@ function collectMedia(poster = []) {
   return [...imgs, ...vids];
 }
 
-export default function EventCard({ event }) {
+export default function EventCard({ event, isOrganiserProfile }) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [openModal, setOpenModal] = useState(false);
@@ -49,6 +49,10 @@ export default function EventCard({ event }) {
       {/* Edit icon (only for owner) */}
       {event.isOwner && (
         <button
+          style={{
+            borderRadius: 16,
+            fontSize: 12,
+          }}
           type="button"
           onClick={(e) => {
             e.stopPropagation();
@@ -75,21 +79,23 @@ export default function EventCard({ event }) {
             {event.title}
           </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleSave();
-            }}
-            className={`tw:rounded-xl tw:p-2 tw:transition ${
-              isSaved ? "tw:text-primary" : "tw:text-gray-600 "
-            }`}
-            aria-label="Save"
-            title={isSaved ? "Unsave" : "Save"}
-          >
-            <Heart
-              className={`tw:size-5 ${isSaved ? "tw:fill-current" : ""}`}
-            />
-          </button>
+          {isOrganiserProfile && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSave();
+              }}
+              className={`tw:rounded-xl tw:p-2 tw:transition ${
+                isSaved ? "tw:text-primary" : "tw:text-gray-600 "
+              }`}
+              aria-label="Save"
+              title={isSaved ? "Unsave" : "Save"}
+            >
+              <Heart
+                className={`tw:size-5 ${isSaved ? "tw:fill-current" : ""}`}
+              />
+            </button>
+          )}
         </div>
 
         <span className="tw:text-gray-400">{event.hostName}</span>
@@ -130,24 +136,46 @@ export default function EventCard({ event }) {
           </div>
         </div>
 
-        {!event.srt_ingest_url && (
+        {/* CTA */}
+        {isOrganiserProfile ? (
           <button
+            style={{
+              borderRadius: 16,
+              fontSize: 12,
+            }}
             onClick={(e) => {
               e.stopPropagation();
-              onCreateChannel();
+              onCreateChannel(); // opens download modal
             }}
             className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="tw:size-6"
-            >
-              <path d="M4.5 4.5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h8.25a3 3 0 0 0 3-3v-9a3 3 0 0 0-3-3H4.5ZM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06Z" />
-            </svg>
-            <span className="tw:mr-2">Create Channel</span>
+            <span className="tw:mr-2">Join event</span>
           </button>
+        ) : (
+          !event.srt_ingest_url && (
+            <button
+              style={{
+                borderRadius: 16,
+                fontSize: 12,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCreateChannel();
+              }}
+              className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
+            >
+              {/* keep your icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="tw:size-4"
+              >
+                <path d="M4.5 4.5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h8.25a3 3 0 0 0 3-3v-9a3 3 0 0 0-3-3H4.5ZM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06Z" />
+              </svg>
+              <span className="tw:mr-2">Create Channel</span>
+            </button>
+          )
         )}
       </div>
 

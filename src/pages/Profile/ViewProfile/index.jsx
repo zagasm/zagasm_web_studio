@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useProfile from "../../../hooks/useProfile";
 import ProfileHeader from "../../../component/Profile/ProfileHeader";
@@ -21,13 +21,14 @@ export default function ViewProfile() {
   // existing hook for "my profile"
   const {
     user: myProfile,
+    organiser: myOrganiser,
     loading: myProfileLoading,
     error: myProfileError,
   } = useProfile();
 
   // generic "profile being viewed" state (could be you or another organiser)
   const [profileUser, setProfileUser] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState(null);
 
   // follow state (only meaningful when viewing another organiser)
@@ -38,26 +39,25 @@ export default function ViewProfile() {
   const isOwnProfile =
     !routeUserId || (me?.id && routeUserId && routeUserId === me.id);
 
+  const mergedOwnProfile = useMemo(() => {
+    if (!isOwnProfile) return null;
+    if (!myProfile && !myOrganiser) return null;
+
+    return {
+      ...(myProfile || {}),
+      organiser: myOrganiser || myProfile?.organiser || null,
+    };
+  }, [isOwnProfile, myProfile, myOrganiser]);
+
   /* ------------------ load profile data ------------------ */
   useEffect(() => {
-    // if it's your own profile, reuse the existing hook result
-    if (isOwnProfile) {
-      setProfileUser(myProfile || null);
-      // setProfileLoading(myProfileLoading);
-      setProfileError(myProfileError || null);
+    if (isOwnProfile) return; // <-- IMPORTANT
 
-      if (myProfile?.is_following !== undefined) {
-        setIsFollowing(!!myProfile.is_following);
-      }
-      return;
-    }
-
-    // viewing another organiser profile
     if (!routeUserId) return;
 
     let cancelled = false;
 
-    async function fetchProfile() {
+    (async () => {
       try {
         setProfileLoading(true);
         setProfileError(null);
@@ -66,57 +66,49 @@ export default function ViewProfile() {
           `/api/v1/organiser/${routeUserId}`,
           authHeaders(token)
         );
-
         const data = res?.data?.data || res?.data?.user || res?.data || null;
 
         if (cancelled) return;
-
         setProfileUser(data);
-        if (data?.is_following !== undefined) {
+        if (data?.is_following !== undefined)
           setIsFollowing(!!data.is_following);
-        }
       } catch (e) {
-        console.error(e);
-        if (!cancelled) {
-          setProfileError("Unable to load profile.");
-        }
+        if (!cancelled) setProfileError("Unable to load profile.");
       } finally {
-        if (!cancelled) {
-          setProfileLoading(false);
-        }
+        if (!cancelled) setProfileLoading(false);
       }
-    }
-
-    fetchProfile();
+    })();
 
     return () => {
       cancelled = true;
     };
-  }, [
-    isOwnProfile,
-    routeUserId,
-    myProfile,
-    myProfileLoading,
-    myProfileError,
-    token,
-  ]);
+  }, [isOwnProfile, routeUserId, token]);
+
+  const finalProfileUser = isOwnProfile ? mergedOwnProfile : profileUser;
+
+  const isLoading = isOwnProfile
+    ? myProfileLoading && !mergedOwnProfile && !myProfileError
+    : profileLoading;
 
   /* ------------------ organiser / KYC logic (only for own profile) ------------------ */
   const isOrganiser =
     isOwnProfile &&
-    (profileUser?.is_organiser_verified ||
-      profileUser?.roles?.includes("organiser") ||
-      profileUser?.roles?.includes("organizer"));
+    (finalProfileUser?.is_organiser_verified ||
+      finalProfileUser?.roles?.includes("organiser") ||
+      finalProfileUser?.roles?.includes("organizer") ||
+      finalProfileUser?.organiser?.is_organiser_verified || // optional
+      finalProfileUser?.organiser?.roles?.includes?.("organiser")); // optional
 
-  const kycStatus = isOwnProfile ? profileUser?.kyc?.status || null : null;
+  const kycStatus = isOwnProfile ? finalProfileUser?.kyc?.status || null : null;
   const isKycVerified = kycStatus === "verified";
+
   const shouldShowBecomeOrganiser =
     isOwnProfile && !isOrganiser && !isKycVerified;
 
   /* ------------------ follow / unfollow organiser ------------------ */
   const handleToggleFollow = async () => {
-    if (isOwnProfile) return; // no follow button for your own profile
-    if (!profileUser?.id) return;
+    if (isOwnProfile) return;
+    if (!finalProfileUser?.id) return;
 
     if (!token) {
       showError("Please log in to follow organizers.");
@@ -129,7 +121,7 @@ export default function ViewProfile() {
 
       // endpoint: /api/v1/follow/{organizerId}
       const res = await api.post(
-        `/api/v1/follow/${profileUser.id}`,
+        `/api/v1/follow/${finalProfileUser.id}`,
         null,
         authHeaders(token)
       );
@@ -153,10 +145,6 @@ export default function ViewProfile() {
       setFollowLoading(false);
     }
   };
-
-  const isLoading = isOwnProfile
-    ? !profileUser && !profileError 
-    : profileLoading;
 
   return (
     <div className="tw:bg-[#f5f5f7] tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
@@ -207,7 +195,7 @@ export default function ViewProfile() {
           <p className="tw-text-red-600 tw:mt-10">
             Failed to load profile: {profileError}
           </p>
-        ) : !profileUser ? (
+        ) : !finalProfileUser ? (
           <p className="tw-text-gray-600 tw-mt-10">No profile data found.</p>
         ) : isOwnProfile && shouldShowBecomeOrganiser ? (
           // 1) Your own profile + NOT organiser + KYC not verified → "Become an Organiser"
@@ -216,24 +204,24 @@ export default function ViewProfile() {
               <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
                 <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
                   <img
-                    src={profileUser?.profileUrl || "/images/avater_pix.avif"}
+                    src={finalProfileUser?.profileUrl || "/images/avater_pix.avif"}
                     alt=""
                     className="tw:w-full tw:h-full tw:object-cover"
                   />
                 </div>
                 <div className="tw:mt-1 tw:text-center">
                   <span className="tw:block tw:font-semibold tw:text-[16px]">
-                    {profileUser?.name}
+                    {finalProfileUser?.name}
                   </span>
                   <span className="tw:block tw:text-xs">
-                    {profileUser?.email}
+                    {finalProfileUser?.email}
                   </span>
                 </div>
                 <div className="tw:bg-[#f5f5f5] tw:relative tw:px-4 tw:py-3 tw:rounded-2xl tw:mt-6 tw:w-full">
                   <div>
                     <span className="tw:block tw:text-xs">Following</span>
                     <span className="tw:block tw:font-semibold tw:text-[20px]">
-                      {profileUser?.followings_count ?? 0}
+                      {finalProfileUser?.followings_count ?? 0}
                     </span>
                   </div>
                   <img
@@ -247,7 +235,7 @@ export default function ViewProfile() {
 
             <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-2 tw:rounded-2xl tw:px-4 tw:py-3">
               <span className="tw:block tw:font-semibold">About Me</span>
-              <span className="tw:block tw:text-xs">{profileUser?.about}</span>
+              <span className="tw:block tw:text-xs">{finalProfileUser?.about}</span>
             </div>
 
             <div className="tw:bg-linear-to-r tw:from-[#8F07E7] tw:via-[#9105B4] tw:to-[#500481] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
@@ -353,20 +341,23 @@ export default function ViewProfile() {
             <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:lg:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
               <div className="tw:space-y-4 tw:pb-6">
                 <ProfileHeader
-                  user={profileUser}
+                  user={finalProfileUser}
                   organiser={organiser}
                   isOwnProfile={isOwnProfile}
                   isFollowing={isFollowing}
                   followLoading={followLoading}
                   onToggleFollow={handleToggleFollow}
                 />
-                <AboutPanel user={profileUser} />
+                <AboutPanel user={finalProfileUser} />
               </div>
             </div>
 
             {/* RIGHT: events */}
             <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:pb-20 tw:pr-1 tw:lg:overflow-y-auto">
-              <ProfileTabs user={profileUser} isOwnProfile={isOwnProfile} />
+              <ProfileTabs
+                user={finalProfileUser}
+                isOwnProfile={isOwnProfile}
+              />
             </div>
           </div>
         )}
