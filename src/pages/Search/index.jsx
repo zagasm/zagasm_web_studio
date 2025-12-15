@@ -10,7 +10,6 @@ import { showError } from "../../component/ui/toast";
 // Re-use your existing card + shimmer
 import { EventCard, EventShimmer } from "../../component/Events/SingleEvent";
 
-const PLACEHOLDER_AVATAR = "/images/avater_pix.avif";
 const RECENTS_KEY = "zagasm_search_recent_people";
 
 function normalizeSearchResponse(raw) {
@@ -33,16 +32,75 @@ function normalizeSearchResponse(raw) {
   return { people, events };
 }
 
+function initialsFromName(name = "") {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] || "";
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+  return (first + last).toUpperCase() || "?";
+}
+
+function getDisplayName(item) {
+  const data = item?.data || {};
+
+  // Organiser search result
+  if (item?.type === "organiser") {
+    // if organiser is a string, use it
+    if (typeof data.organiser === "string") return data.organiser;
+
+    // if organiser is an object, pick a good label
+    if (data.organiser && typeof data.organiser === "object") {
+      return (
+        data.organiser.organiser ||
+        data.organiser.name ||
+        data.organiser.userName ||
+        data.organiser.email ||
+        "Organizer"
+      );
+    }
+
+    // some APIs might return name directly
+    return data.name || data.userName || data.email || "Organizer";
+  }
+
+  // Normal user search result
+  return data.name || data.firstName || data.userName || data.email || "User";
+}
+
+function getPersonId(item) {
+  const data = item?.data || {};
+
+  // organiser result
+  if (item?.type === "organiser") {
+    if (typeof data.organiser === "object" && data.organiser?.id)
+      return data.organiser.id;
+    return data.id || data.userId || null;
+  }
+
+  // user result
+  return data.id || data.userId || null;
+}
+
+function getAvatarUrl(item) {
+  const data = item?.data || {};
+
+  if (item?.type === "organiser") {
+    // organiser might be object or string
+    if (typeof data.organiser === "object") {
+      return data.organiser.profileImage || data.organiser.profileUrl || null;
+    }
+    return data.profileImage || null;
+  }
+
+  return data.profileUrl || data.profileImage || null;
+}
+
 function PersonRow({ item, onClick }) {
   const isOrganiser = item.type === "organiser";
-  const data = item.data;
 
-  const name = isOrganiser ? data.organiser : data.name || data.firstName;
+  const name = getDisplayName(item);
   const subtitle = isOrganiser ? "Event organiser" : "User";
-
-  const avatar = isOrganiser
-    ? data.profileImage
-    : data.profileUrl || PLACEHOLDER_AVATAR;
+  const avatarUrl = getAvatarUrl(item);
+  const initials = initialsFromName(name);
 
   return (
     <button
@@ -50,12 +108,16 @@ function PersonRow({ item, onClick }) {
       onClick={onClick}
       className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:hover:bg-zinc-50 tw:transition-colors"
     >
-      <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-zinc-200">
-        <img
-          src={avatar || PLACEHOLDER_AVATAR}
-          alt={name}
-          className="tw:w-full tw:h-full tw:object-cover"
-        />
+      <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold">
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={name}
+            className="tw:w-full tw:h-full tw:object-cover"
+          />
+        ) : (
+          <span className="tw:text-primary">{initials}</span>
+        )}
       </div>
 
       <div className="tw:flex tw:flex-col tw:text-left tw:overflow-hidden">
@@ -80,6 +142,30 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+  const [trendingEvents, setTrendingEvents] = useState([]);
+  const [loadingTrending, setLoadingTrending] = useState(false);
+
+  const fetchTrending = async () => {
+    try {
+      setLoadingTrending(true);
+      const res = await api.get("/api/v1/recommendations/trending/search", {
+        ...authHeaders(token),
+      });
+
+      setTrendingEvents(res?.data?.data ?? []);
+    } catch (err) {
+      console.error(err);
+      // don't toast here - trending is "nice to have"
+    } finally {
+      setLoadingTrending(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrending();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
   // persistent recent people
   const [recentPeople, setRecentPeople] = useState([]);
 
@@ -101,9 +187,17 @@ export default function SearchPage() {
   const [pendingQuery, setPendingQuery] = useState("");
   useEffect(() => {
     const id = setTimeout(() => {
-      if (pendingQuery.trim().length > 0) {
-        doSearch(pendingQuery.trim());
+      const t = pendingQuery.trim();
+
+      if (!t) {
+        // reset search results view when input is empty
+        setPeople([]);
+        setEvents([]);
+        setHasSearched(false);
+        return;
       }
+
+      doSearch(t);
     }, 400);
 
     return () => clearTimeout(id);
@@ -194,7 +288,7 @@ export default function SearchPage() {
 
   return (
     <div className="tw:min-h-screen tw:bg-white tw:flex tw:justify-center tw:py-16 tw:md:py-20 tw:px-3 tw:sm:px-4">
-      <div className="tw:w-full tw:max-w-6xl tw:pt-4 tw:pb-10">
+      <div className="tw:w-full tw:max-w-6xl tw:pb-10 tw:pt-8">
         {/* Top search bar */}
         <div className="tw:flex tw:items-center tw:gap-3 tw:mb-6 tw:sm:mb-8">
           <button
@@ -209,7 +303,7 @@ export default function SearchPage() {
             onSubmit={handleSubmit}
             className="tw:flex-1 tw:relative tw:flex tw:items-center"
           >
-            <div className="tw:flex tw:items-center tw:bg-[#F4E6FD]/60 tw:border tw:border-[#F4E6FD] tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-2 tw:w-full">
+            <div className="tw:flex tw:items-center tw:bg-white tw:border tw:border-[#F5F5F5] tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-4 tw:w-full">
               <Search className="tw:w-5 tw:h-5 tw:text-zinc-500 tw:mr-2" />
               <input
                 type="text"
@@ -239,9 +333,9 @@ export default function SearchPage() {
         {/* People / recent searches */}
         {showPeopleSection && (
           <section className="tw:mb-8">
-            <h2 className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
+            <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
               Recent Searches
-            </h2>
+            </span>
 
             <div className="tw:flex tw:flex-col tw:gap-1">
               {peopleToShow.map((item) => (
@@ -249,7 +343,9 @@ export default function SearchPage() {
                   key={`${item.type}-${item.data.id}`}
                   item={item}
                   onClick={() => {
-                    // later: navigate to organiser/user profile
+                    const id = getPersonId(item);
+                    if (!id) return;
+                    navigate(`/profile/${id}`);
                   }}
                 />
               ))}
@@ -257,14 +353,43 @@ export default function SearchPage() {
           </section>
         )}
 
+        {/* Trending events (initial load / when not searching) */}
+        {!hasSearched && trendingEvents.length > 0 && (
+          <section className="tw:mb-6">
+            <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-6">
+              Trending Searches
+            </span>
+
+            <div className="row tw:mx-0 tw:mt-3">
+              {trendingEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  variant="all"
+                  onMore={() => {}}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Trending shimmer */}
+        {!hasSearched && loadingTrending && trendingEvents.length === 0 && (
+          <div className="row tw:mx-0 tw:mt-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <EventShimmer key={i} />
+            ))}
+          </div>
+        )}
+
         {/* Events */}
         {events.length > 0 && (
           <section className="tw:mb-6">
-            <h2 className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
+            <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
               Events
-            </h2>
+            </span>
 
-            <div className="row tw:mx-0">
+            <div className="row tw:mx-0 tw:mt-3">
               {events.map((event) => (
                 <EventCard
                   key={event.id}

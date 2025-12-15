@@ -19,9 +19,19 @@ export default function ProfileHeader({
 
   const navigate = useNavigate();
 
-  const img = user?.profileImage || user?.profileUrl || defaultProfile;
+  const img = user?.profileImage || user?.profileUrl || null;
+
   const displayName =
     user?.name || user?.organiser || user?.userName || "Your Name";
+
+  function initialsFromName(name = "") {
+    const parts = String(name).trim().split(/\s+/).filter(Boolean);
+    const first = parts[0]?.[0] || "";
+    const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+    return (first + last).toUpperCase() || "?";
+  }
+
+  const initials = initialsFromName(displayName);
 
   const followersCount = user?.numberOfFollowers ?? user?.followers_count ?? 0;
 
@@ -29,7 +39,12 @@ export default function ProfileHeader({
 
   const ticketsSold = user?.successfulPayments ?? user?.tickets_sold ?? 0;
 
-  const rankValue = user?.rank ?? user?.rank_global ?? null;
+  const rankValue =
+    user?.organiser?.rank ??
+    user?.organiser?.rank_global ??
+    user?.rank ??
+    user?.rank_global ??
+    null;
 
   const rankingLabel = isOwnProfile ? "My Ranking" : "Organizer Ranking";
   const followersLabel = isOwnProfile ? "My Followers" : "Followers";
@@ -45,12 +60,20 @@ export default function ProfileHeader({
       <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
         {/* avatar + edit / follow */}
         <div className="tw:relative">
-          <img
-            src={img}
-            alt={displayName}
-            className="tw:h-24 tw:w-24 tw:rounded-full tw:border tw:border-gray-200 tw:object-cover"
-            loading="lazy"
-          />
+          <div className="tw:h-24 tw:w-24 tw:rounded-full tw:border tw:border-gray-200 tw:bg-lightPurple tw:overflow-hidden tw:flex tw:items-center tw:justify-center">
+            {img ? (
+              <img
+                src={img}
+                alt={displayName}
+                className="tw:h-full tw:w-full tw:object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <span className="tw:text-2xl tw:font-semibold tw:text-primary">
+                {initials}
+              </span>
+            )}
+          </div>
 
           {isOwnProfile ? (
             // edit button for your own profile

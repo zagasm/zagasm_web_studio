@@ -16,8 +16,7 @@ export default function ProfileTabs({ user, isOwnProfile }) {
     error: myEventsError,
   } = useMyEvents(apiFilter, user?.id);
 
-  const isOrganiserProfileData =
-    !isOwnProfile && !!user?.allEvents; // organiser API response
+  const isOrganiserProfileData = !isOwnProfile && !!user?.allEvents; // organiser API response
 
   let events = myEvents;
   let loading = myEventsLoading;
@@ -54,7 +53,13 @@ export default function ProfileTabs({ user, isOwnProfile }) {
       </div>
 
       <div className="tw:flex-1 tw:mt-3 tw:pb-20">
-        <EventsGrid events={events} loading={loading} error={error} />
+        <EventsGrid
+          events={events}
+          loading={loading}
+          error={error}
+          isOwnProfile={isOwnProfile}
+          isOrganiserProfile={isOrganiserProfileData}
+        />
       </div>
     </div>
   );

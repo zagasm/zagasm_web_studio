@@ -1,15 +1,19 @@
 import React from "react";
 import EventCard from "./EventCard";
+import EventCardShimmer from "../Events/EventCardShimmer";
 
-export default function EventsGrid({ events, loading, error }) {
+export default function EventsGrid({
+  events,
+  loading,
+  error,
+  isOwnProfile,
+  isOrganiserProfile,
+}) {
   if (loading) {
     return (
-      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-5 tw:mt-4">
+      <div className="row tw:mt-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="tw:h-64 tw:rounded-2xl tw:bg-gray-100 tw:animate-pulse"
-          />
+          <EventCardShimmer key={i} />
         ))}
       </div>
     );
@@ -34,7 +38,12 @@ export default function EventsGrid({ events, loading, error }) {
   return (
     <div className="tw:mt-4 tw:md:mt-6 row tw:mb-20 tw:md:mb-0">
       {events.map((e) => (
-        <EventCard key={e.id} event={e} />
+        <EventCard
+          key={e.id}
+          event={e}
+          isOwnProfile={isOwnProfile}
+          isOrganiserProfile={isOrganiserProfile}
+        />
       ))}
     </div>
   );

@@ -6,13 +6,20 @@ import camera_icon from "../../../assets/navbar_icons/camera_icon.png";
 import live_indicator from "../../../assets/navbar_icons/live_indicator.png";
 import { Link } from "react-router-dom";
 import usePaginatedEvents from "../../../hooks/usePaginatedEvents";
-import { Ellipsis, Clock, MapPin, CalendarDays, Frown } from "lucide-react";
+import {
+  Ellipsis,
+  Clock,
+  MapPin,
+  CalendarDays,
+  Frown,
+  Pause,
+} from "lucide-react";
 import Countdown from "react-countdown";
 import EventActionsSheet from "../EventsActionSheet";
 
 /* ---- Shimmer ---- */
 export const EventShimmer = () => (
-  <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+  <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
     <div className="shadow-s rounded h-100 blog-card border-0 position-relative">
       <div className="shimmer-container">
         <div className="shimmer-image"></div>
@@ -207,6 +214,8 @@ export function EventCard({ event, variant = "default", onMore }) {
 
   const isLive =
     isDedicatedLiveTab || (variant === "all" && event.status === "live");
+  const isPaused =
+    isDedicatedLiveTab || (variant === "all" && event.status === "paused");
 
   const isUpcoming =
     isDedicatedUpcomingTab ||
@@ -218,6 +227,18 @@ export function EventCard({ event, variant = "default", onMore }) {
 
   const ticketLabel = `Buy Ticket (${priceText(event)})`;
 
+  function initialsFromName(name = "") {
+    const parts = String(name).trim().split(/\s+/).filter(Boolean);
+    const first = parts[0]?.[0] || "";
+    const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+    return (first + last).toUpperCase();
+  }
+
+  function hostAvatarFallback(event) {
+    const name = hostName(event);
+    return initialsFromName(name) || "?";
+  }
+
   // FLEXIBLE FLAG FOR "MY" EVENTS (back-end should set one of these)
   const isMyEvent =
     event?.is_owner ||
@@ -226,7 +247,7 @@ export function EventCard({ event, variant = "default", onMore }) {
     event?.is_current_user_event;
 
   return (
-    <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+    <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
       <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full blog-card border-0 tw:relative">
         {/* three dots */}
         <button
@@ -262,9 +283,17 @@ export function EventCard({ event, variant = "default", onMore }) {
                 </div>
 
                 {/* viewers pill */}
-                <div className="tw:absolute tw:right-4 tw:bottom-4 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:rounded-full tw:bg-lightPurple tw:text-xs tw:font-medium tw:text-black tw:shadow-sm">
+                {/* <div className="tw:absolute tw:right-4 tw:bottom-4 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:rounded-full tw:bg-lightPurple tw:text-xs tw:font-medium tw:text-black tw:shadow-sm">
                   <span className="tw:inline-block tw:w-2 tw:h-2 tw:rounded-full tw:bg-[#22C55E]" />
                   <span>{event?.live_viewers_label || "38M viewers"}</span>
+                </div> */}
+              </>
+            )}
+            {isPaused && (
+              <>
+                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-neutral-800 tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
+                  <span>Paused</span>
+                  <Pause className="tw:size-4" />
                 </div>
               </>
             )}
@@ -303,13 +332,17 @@ export function EventCard({ event, variant = "default", onMore }) {
 
           {/* Host row */}
           <div className="tw:flex tw:items-center tw:gap-3 tw:-mt-3">
-            <div className="tw:px-3 tw:py-1.5 tw:bg-lightPurple tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2">
-              <span className="tw:inline-block tw:w-8 tw:h-8 tw:rounded-full tw:bg-zinc-300 tw:overflow-hidden tw:-ml-1">
-                <img
-                  src={event.hostImage ?? "/images/avater_pix.avif"}
-                  alt={hostName(event)}
-                  className="tw:w-full tw:h-full tw:object-cover"
-                />
+            <div className="tw:px-3 tw:py-1.5 tw:bg-[#f5f5f5] tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2">
+              <span className="tw:w-8 tw:h-8 tw:rounded-full tw:bg-lightPurple tw:overflow-hidden tw:-ml-1 tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-semibold tw:text-zinc-800">
+                {event?.hostImage ? (
+                  <img
+                    src={event.hostImage}
+                    alt={hostName(event)}
+                    className="tw:w-full tw:h-full tw:object-cover"
+                  />
+                ) : (
+                  hostAvatarFallback(event)
+                )}
               </span>
               <span>{hostName(event)}</span>
             </div>
@@ -353,7 +386,6 @@ export function EventCard({ event, variant = "default", onMore }) {
 
           {/* CTA */}
           {isMyEvent ? (
-            // For events created by me
             <Link
               to={`/event/view/${event.id}`}
               className="tw:mt-2 tw:w-full tw:inline-block"
@@ -361,11 +393,20 @@ export function EventCard({ event, variant = "default", onMore }) {
               <button
                 type="button"
                 style={{ borderRadius: 8 }}
-                className="tw:w-full tw:rounded-2xl tw:bg-black tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
+                className="tw:w-full tw:rounded-2xl tw:bg-black tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md"
               >
                 View event
               </button>
             </Link>
+          ) : event?.hasPaid ? (
+            <button
+              type="button"
+              style={{ borderRadius: 8 }}
+              disabled
+              className="tw:w-full tw:mt-2 tw:rounded-2xl tw:bg-primary/30 tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:cursor-not-allowed"
+            >
+              Paid for event
+            </button>
           ) : isEnded ? (
             <button
               type="button"
@@ -376,7 +417,6 @@ export function EventCard({ event, variant = "default", onMore }) {
               Event ended
             </button>
           ) : isLive ? (
-            // LIVE: show "Join event now" button instead of Buy
             <Link
               to={`/event/view/${event.id}`}
               className="tw:mt-2 tw:w-full tw:inline-block"
@@ -384,23 +424,12 @@ export function EventCard({ event, variant = "default", onMore }) {
               <button
                 type="button"
                 style={{ borderRadius: 8 }}
-                className="tw:w-full tw:rounded-2xl tw:bg-red-500 tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
+                className="tw:w-full tw:rounded-2xl tw:bg-red-500 tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md"
               >
                 Join event now
               </button>
             </Link>
-          ) : isUpcoming && event.hasPaid ? (
-            // UPCOMING + already paid
-            <button
-              type="button"
-              style={{ borderRadius: 8 }}
-              disabled={event.hasPaid}
-              className="tw:w-full tw:rounded-2xl tw:disabled:bg-primary/30 tw:disabled:cursor-not-allowed tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
-            >
-              Paid for this event
-            </button>
           ) : (
-            // Default: show Buy Ticket
             <Link
               to={`/event/view/${event.id}`}
               className="tw:mt-2 tw:w-full tw:inline-block"
@@ -408,7 +437,7 @@ export function EventCard({ event, variant = "default", onMore }) {
               <button
                 type="button"
                 style={{ borderRadius: 8 }}
-                className="tw:w-full tw:rounded-2xl tw:bg-primary tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:hover:bg-primarySecond tw:transition-colors tw:duration-150"
+                className="tw:w-full tw:rounded-2xl tw:bg-primary tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:hover:bg-primarySecond"
               >
                 {ticketLabel}
               </button>

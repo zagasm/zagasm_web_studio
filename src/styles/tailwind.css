@@ -59,3 +59,9 @@ html{
 [data-tw-reset] svg {
   display: block;
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
