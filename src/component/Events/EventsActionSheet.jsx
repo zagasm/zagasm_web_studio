@@ -135,15 +135,21 @@ export default function EventActionsSheet({
 
   async function onShare() {
     if (!event?.id) return;
+
     setShareState({ loading: true, channels: null, error: null });
+
     try {
-      const { data } = await api.get(
+      const res = await api.get(
         `/api/v1/event/share/${event.id}`,
         authHeaders(token)
       );
+
+      // NEW SHAPE: channels is top-level
+      const channels = res?.data?.channels || [];
+
       setShareState({
         loading: false,
-        channels: data?.channels || [],
+        channels,
         error: null,
       });
     } catch (e) {
@@ -159,17 +165,20 @@ export default function EventActionsSheet({
 
   function openShareLink(ch) {
     try {
-      const fullLink =
-        ch?.type === "internal"
-          ? `https://studios.zagasm.com/event/share`
-          : ch?.link;
+      const fullLink = ch?.link; // already correct from backend
+
+      if (!fullLink) {
+        showError("Share link not available.");
+        return;
+      }
 
       if (ch?.key === "copy_link") {
         navigator.clipboard.writeText(fullLink);
         showSuccess("Link copied!");
-      } else {
-        window.open(fullLink, "_blank", "noopener,noreferrer");
+        return;
       }
+
+      window.open(fullLink, "_blank", "noopener,noreferrer");
     } catch (e) {
       console.error(e);
       showError("Could not open share link.");
@@ -244,6 +253,13 @@ export default function EventActionsSheet({
 
   const isMainView = !shareState.channels && !reporting;
 
+  const goToHostProfile = (e) => {
+    e?.stopPropagation?.();
+    if (!hostId) return;
+    navigate(`/profile/${event.organiserId}`);
+    onClose?.();
+  };
+
   return (
     <Transition show={open} as={Fragment} appear>
       <Dialog
@@ -265,7 +281,7 @@ export default function EventActionsSheet({
         </Transition.Child>
 
         {/* Panel */}
-        <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
+        <div className="tw:fixed tw:inset-0 tw:overflow-y-auto tw:font-sans">
           <div className="tw:flex tw:min-h-full tw:items-end tw:md:items-center tw:justify-center tw:p-0 tw:pb-16 tw:md:pb-0 tw:md:p-4">
             <Transition.Child
               as={Fragment}
@@ -300,11 +316,15 @@ export default function EventActionsSheet({
                     </div>
 
                     <div className="tw:flex tw:flex-col tw:gap-1 tw:min-w-0">
-                      <span className="tw:text-sm tw:sm:text-lg tw:font-semibold tw:text-black tw:truncate">
+                      <span className="tw:text-sm tw:sm:text-lg tw:font-semibold tw:text-black tw:truncate tw:uppercase">
                         {event?.title || "Event"}
                       </span>
 
-                      <div className="tw:flex tw:items-center tw:gap-1 tw:min-w-0">
+                      <button
+                        type="button"
+                        onClick={goToHostProfile}
+                        className="tw:flex tw:items-center tw:gap-1 tw:min-w-0 tw:text-left"
+                      >
                         {hostImage ? (
                           <img
                             src={hostImage}
@@ -316,10 +336,11 @@ export default function EventActionsSheet({
                             {hostName?.[0]?.toUpperCase() || "O"}
                           </div>
                         )}
+
                         <span className="tw:text-xs tw:text-black tw:truncate">
                           {hostName}
                         </span>
-                      </div>
+                      </button>
                     </div>
                   </div>
                 </div>

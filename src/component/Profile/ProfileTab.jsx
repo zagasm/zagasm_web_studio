@@ -1,47 +1,63 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import EventsFilterTabs from "./EventsFilterTab";
 import EventsGrid from "./EventsGrid";
 import useMyEvents from "../../hooks/useMyEvents";
 
 export default function ProfileTabs({ user, isOwnProfile }) {
-  const [statusTab, setStatusTab] = useState("upcoming");
+  const [statusTab, setStatusTab] = useState("all");
 
-  // map to your API filter for "my events"
-  const apiFilter = statusTab === "upcoming" ? "soon" : statusTab;
+  // ---------- MY PROFILE ----------
+  const apiFilter = useMemo(() => {
+    if (statusTab === "upcoming") return "soon";
+    if (statusTab === "all") return "all";
+    return statusTab; // live, ended
+  }, [statusTab]);
 
-  // still call the hook at the top level (React rules)
   const {
     events: myEvents,
     loading: myEventsLoading,
     error: myEventsError,
   } = useMyEvents(apiFilter, user?.id);
 
-  const isOrganiserProfileData = !isOwnProfile && !!user?.allEvents; // organiser API response
+  // ---------- ORGANISER PROFILE ----------
+  const isOrganiserProfileData =
+    !isOwnProfile && (!!user?.events || !!user?.allEvents);
 
-  let events = myEvents;
-  let loading = myEventsLoading;
-  let error = myEventsError;
+  const organiserEventsByTab = useMemo(() => {
+    const buckets = user?.events || null;
 
-  // If this is an organiser profile fetched from organiser endpoint,
-  // use the events that came from that response instead of myEvents.
-  if (isOrganiserProfileData) {
-    loading = false;
-    error = null;
+    const all =
+      buckets?.all ?? (Array.isArray(user?.allEvents) ? user.allEvents : []);
 
-    if (statusTab === "upcoming") {
-      events = user?.upcomingEvents || [];
-    } else {
-      // For now, treat other tabs as "all events".
-      // You can later filter user.allEvents by status (live, past, etc.).
-      events = user?.allEvents || [];
-    }
-  }
+    const upcoming =
+      buckets?.upcoming ??
+      (Array.isArray(user?.upcomingEvents) ? user.upcomingEvents : []);
+
+    const live = buckets?.live ?? [];
+
+    // IMPORTANT: many systems treat paused as "not live" / past-ish.
+    // If you want "Ended" to include paused too:
+    const endedStrict = buckets?.ended ?? [];
+    const paused = buckets?.paused ?? [];
+    const ended = [...endedStrict, ...paused];
+
+    if (statusTab === "all") return all;
+    if (statusTab === "upcoming") return upcoming;
+    if (statusTab === "live") return live;
+    if (statusTab === "ended") return ended;
+
+    return all;
+  }, [user, statusTab]);
+
+  // ---------- choose source ----------
+  const events = isOrganiserProfileData ? organiserEventsByTab : myEvents;
+  const loading = isOrganiserProfileData ? false : myEventsLoading;
+  const error = isOrganiserProfileData ? null : myEventsError;
 
   const heading = isOwnProfile ? "My Events" : "Events";
 
   return (
     <div className="tw:h-full tw:flex tw:flex-col">
-      {/* sticky only on lg+; on mobile/md it scrolls normally */}
       <div className="tw:lg:sticky tw:lg:top-0 tw:z-20 tw:bg-[#f5f5f7] tw:pb-3">
         <div className="tw:flex tw:items-center tw:justify-between tw:pt-3 tw:pb-2">
           <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">

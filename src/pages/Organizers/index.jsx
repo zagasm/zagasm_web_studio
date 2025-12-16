@@ -157,7 +157,7 @@ export default function AllOrganizers() {
         keywords="zagasm studios, organizers, ranking"
       />
 
-      <div className="tw:bg-white tw:min-h-screen tw:pt-20 tw:md:pt-28 tw:px-4 tw:md:px-6">
+      <div className="tw:font-sans tw:bg-white tw:min-h-screen tw:pt-20 tw:md:pt-28 tw:px-2 tw:md:px-6">
         <div className="tw:max-w-3xl tw:mx-auto">
           {/* header (spans only) */}
           <div className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:mt-5 tw:md:mt-0">

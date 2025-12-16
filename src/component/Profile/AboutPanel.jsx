@@ -29,12 +29,11 @@ export default function AboutPanel({ user }) {
     ? [
         ["Organizer Name", organiserName],
         ["Email", truncate(user?.email, 10)],
-        ["Phone", user?.phoneNumber],
         ["KYC Status", user?.kyc_status ?? user?.kyc?.status],
-        ["Total Events", user?.organiser?.totalEventsCreated],
-        ["Followers", user?.organiser?.numberOfFollowers],
-        ["Total Views", user?.organiser?.total_views],
-        ["Successful Payments", user?.organiser?.successfulPayments],
+        ["Total Events", user?.totalEventsCreated],
+        ["Followers", user?.numberOfFollowers],
+        ["Total Views", user?.total_views],
+        ["Successful Payments", user?.successfulPayments],
       ]
     : [
         ["Username", user?.userName],
@@ -47,7 +46,7 @@ export default function AboutPanel({ user }) {
       ];
 
   return (
-    <div className="tw:mt-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:mb-16 tw:md:mb-0">
+    <div className="tw:hidden tw:lg:block tw:mt-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:mb-16 tw:md:mb-0">
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-x-8 tw:gap-y-4">
         {rows.map(([label, value]) => (
           <div key={label} className="tw:flex tw:flex-col">

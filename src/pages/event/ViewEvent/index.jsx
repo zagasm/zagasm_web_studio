@@ -34,15 +34,22 @@ import {
   MapPin,
   Bookmark,
 } from "lucide-react";
-
+import EventShareModal from "../../../component/Events/EvenetShareModal";
+function isUuid(value = "") {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(value)
+  );
+}
 /* ---------- Page ---------- */
 export default function ViewEvent() {
   const { eventId } = useParams();
+
   const [event, setEvent] = useState(null);
   const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
 
@@ -60,6 +67,17 @@ export default function ViewEvent() {
   // access-type modal
   const [accessModalOpen, setAccessModalOpen] = useState(false);
 
+  function initialsFromName(name = "") {
+    const parts = String(name).trim().split(/\s+/).filter(Boolean);
+    const first = parts[0]?.[0] || "";
+    const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+    return (first + last).toUpperCase() || "?";
+  }
+
+  const hostName = event?.hostName || "Organizer";
+  const hostInitials = initialsFromName(hostName);
+  const hostHasImage = !!event?.hostImage;
+
   useEffect(() => {
     if (!eventId) return;
 
@@ -68,18 +86,42 @@ export default function ViewEvent() {
     (async () => {
       try {
         setLoading(true);
-        const res = await api.get(
-          `/api/v1/events/${eventId}/view`,
-          authHeaders(token)
-        );
-        const payload = res?.data?.data || {};
+        setError(null);
+
+        const isId = isUuid(eventId);
+
+        const res = isId
+          ? await api.get(`/api/v1/events/${eventId}/view`, authHeaders(token))
+          : await api.get(
+              `/api/v1/event/recommended/${eventId}`,
+              authHeaders(token)
+            );
+
         if (!mounted) return;
 
-        const ev = payload.currentEvent || null;
+        // Handle BOTH response shapes safely
+        const data = res?.data?.data || res?.data || {};
+
+        // ID endpoint shape (what you already use):
+        // data.currentEvent, data.recommendations
+        const ev =
+          data?.currentEvent ||
+          data?.event || // slug endpoint likely
+          data?.data?.event || // extra fallback
+          null;
+
+        const recommendations =
+          data?.recommendations ||
+          data?.recommended.data ||
+          data?.recs ||
+          data?.data?.recommendations ||
+          [];
+
         setEvent(ev);
-        setRecs(payload.recommendations || []);
+        setRecs(recommendations);
+
         setIsSaved(!!ev?.is_saved);
-        setIsFollowing(!!ev?.is_following_organizer);
+        setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
       } catch (e) {
         setError(
           e?.response?.data?.message || e?.message || "Failed to fetch event"
@@ -190,13 +232,13 @@ export default function ViewEvent() {
   // Else fall back to normal states
   let primaryCtaLabel;
   if (hasPaid && isLiveNow) {
-    primaryCtaLabel = "Enter Live Room";
+    primaryCtaLabel = "Join Live Event";
   } else if (hasPaid && !isLiveNow) {
     primaryCtaLabel = "Ticket Purchased";
   } else if (isSoldOut) {
     primaryCtaLabel = "Sold Out";
   } else if (isLiveNow) {
-    primaryCtaLabel = "Join Live";
+    primaryCtaLabel = "Buy Ticket";
   } else {
     primaryCtaLabel = "Buy Ticket";
   }
@@ -269,9 +311,11 @@ export default function ViewEvent() {
             ? event.description.slice(0, 155)
             : "Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!"
         }
-        keywords={`zagasm studios, ${event?.title || "event"}, ${event?.eventType || "event"
-          }, event tickets, ${event?.hostName || "event organizer"
-          }, live events, entertainment`}
+        keywords={`zagasm studios, ${event?.title || "event"}, ${
+          event?.eventType || "event"
+        }, event tickets, ${
+          event?.hostName || "event organizer"
+        }, live events, entertainment`}
         image={posterUrl}
         type="article"
       />
@@ -297,10 +341,10 @@ export default function ViewEvent() {
               event.eventType?.toLowerCase() === "virtual"
                 ? { "@type": "VirtualLocation", url: event.streamUrl || "" }
                 : {
-                  "@type": "Place",
-                  name: event.location || "Event Location",
-                  address: event.address || "",
-                },
+                    "@type": "Place",
+                    name: event.location || "Event Location",
+                    address: event.address || "",
+                  },
             offers: {
               "@type": "Offer",
               price: event.price || 0,
@@ -321,23 +365,23 @@ export default function ViewEvent() {
       </Helmet>
 
       {/* PAGE BG */}
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:pb-10 tw:text-black">
-        <div className="tw:max-w-6xl tw:mx-auto tw:px-4 tw:md:px-6 tw:lg:px-8">
+      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:pb-10 tw:text-black">
+        <div className="tw:max-w-6xl tw:mx-auto tw:px-2 tw:md:px-6 tw:lg:px-8">
           {/* TOP BAR */}
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-5 tw:mt-10">
             <button
               style={{
-                borderRadius: '50%'
+                borderRadius: "50%",
               }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:text-xs tw:font-medium tw:text-gray-700 tw:shadow-sm tw:hover:bg-gray-50"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50"
             >
               <ArrowLeft className="tw:w-4 tw:h-4" />
             </button>
 
             <div className="tw:flex tw:flex-col tw:items-center tw:flex-1 tw:min-w-0">
-              <span className="tw:text-sm tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate tw:first-letter:uppercase">
+              <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate tw:uppercase">
                 {event.title}
               </span>
               <div className="tw:mt-1 tw:inline-flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
@@ -360,7 +404,17 @@ export default function ViewEvent() {
             </div>
 
             <div className="tw:flex tw:items-center tw:gap-2">
-              
+              <button
+              style={{
+                borderRadius: "50%"
+              }}
+                type="button"
+                onClick={() => setShareOpen(true)}
+                className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50"
+                aria-label="Share event"
+              >
+                <Share2 className="tw:size-5 tw:text-gray-800" />
+              </button>
             </div>
           </div>
 
@@ -385,8 +439,9 @@ export default function ViewEvent() {
               <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
                 <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:bg-black/70 tw:text-white tw:text-[11px] tw:rounded-full tw:backdrop-blur-sm">
                   <span
-                    className={`tw:inline-block tw:size-2 tw:rounded-full ${isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
-                      } tw:animate-pulse`}
+                    className={`tw:inline-block tw:size-2 tw:rounded-full ${
+                      isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
+                    } tw:animate-pulse`}
                   />
                   <span>{isLiveNow ? "Live" : event.status || "Upcoming"}</span>
                 </div>
@@ -412,15 +467,6 @@ export default function ViewEvent() {
                       </span>
                     </div>
                   </div>
-
-                  <div className="tw:flex tw:items-center tw:gap-2">
-                    <span className="tw:text-[11px] tw:text-gray-300">
-                      From
-                    </span>
-                    <span className="tw:text-base tw:font-semibold">
-                      {priceDisplay}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -431,19 +477,33 @@ export default function ViewEvent() {
                 {/* Left: Organizer + countdown */}
                 <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-3">
                   <div className="tw:flex tw:items-center tw:gap-3">
-                    <div className="tw:h-12 tw:w-12 tw:rounded-full tw:bg-gray-200 tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
-                      <img
-                        src={event.hostImage || "/images/avater_pix.avif"}
-                        alt={event.hostName || "Organizer"}
-                        className="tw:w-full tw:h-full tw:object-cover"
-                      />
+                    <div className="tw:h-12 tw:w-12 tw:rounded-full tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
+                      {hostHasImage ? (
+                        <img
+                          src={event.hostImage}
+                          alt={hostName}
+                          className="tw:w-full tw:h-full tw:object-cover"
+                        />
+                      ) : (
+                        <span className="tw:text-[13px] tw:font-semibold tw:text-primary">
+                          {hostInitials}
+                        </span>
+                      )}
                     </div>
+
                     <div>
                       <div className="tw:text-[11px] tw:text-gray-500">
                         Hosted by
                       </div>
-                      <div className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
-                        {event.hostName || "Event Organizer"}
+                      <div className="tw:flex tw:items-center tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
+                        <span>{event.hostName || "Event Organizer"}</span>
+                        {event.hostHasActiveSubscription && (
+                          <img
+                            className="tw:inline-block tw:size-4"
+                            src="/images/verifiedIcon.svg"
+                            alt="Verified"
+                          />
+                        )}
                       </div>
                       <div className="tw:text-[11px] tw:text-gray-400 tw:mt-0.5">
                         {event.organizer_since
@@ -504,10 +564,11 @@ export default function ViewEvent() {
                         setAccessModalOpen(true);
                       }
                     }}
-                    className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${ctaDisabled
+                    className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${
+                      ctaDisabled
                         ? "tw:bg-gray-200 tw:text-gray-500 tw:cursor-not-allowed"
                         : "tw:bg-primary tw:tw:hover:bg-primarySecond tw:text-white"
-                      }`}
+                    }`}
                   >
                     {primaryCtaLabel}
                     {!ctaDisabled && !hasPaid && (
@@ -548,32 +609,22 @@ export default function ViewEvent() {
                   <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-center tw:md:items-start tw:gap-4">
                     {/* avatar + meta */}
                     <div className="tw:flex-1 tw:flex tw:flex-col tw:items-center tw:md:items-start tw:gap-2">
-                      <div className="tw:h-14 tw:w-14 tw:rounded-full tw:bg-[#E5E7EB] tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
-                        <img
-                          className="tw:w-full tw:h-full tw:object-cover"
-                          src={event.hostImage || "/images/avater_pix.avif"}
-                          alt={event.hostName || "Organizer"}
-                        />
+                      <div className="tw:h-14 tw:w-14 tw:rounded-full tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
+                        {hostHasImage ? (
+                          <img
+                            className="tw:w-full tw:h-full tw:object-cover"
+                            src={event.hostImage}
+                            alt={hostName}
+                          />
+                        ) : (
+                          <span className="tw:text-[16px] tw:font-semibold tw:text-primary">
+                            {hostInitials}
+                          </span>
+                        )}
                       </div>
 
                       <div className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900 tw:text-center tw:md:text-left">
                         {event.hostName || "Organizer"}
-                      </div>
-
-                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-1 tw:bg-[#EEF2FF] tw:rounded-full">
-                        <div className="tw:flex tw:-space-x-2">
-                          {[0, 1, 2].map((i) => (
-                            <img
-                              key={i}
-                              src={randomAvatar((event.id || "host") + ":" + i)}
-                              alt=""
-                              className="tw:h-5 tw:w-5 tw:rounded-full tw:ring-2 tw:ring-white tw:object-cover"
-                            />
-                          ))}
-                        </div>
-                        <span className="tw:text-[11px] tw:text-[#4B5563] tw:whitespace-nowrap">
-                          {event.organizer_followers_label || "+200k followers"}
-                        </span>
                       </div>
 
                       <div className="tw:text-[11px] tw:text-gray-400 tw:mt-1">
@@ -607,19 +658,21 @@ export default function ViewEvent() {
                       type="button"
                       onClick={handleToggleFollow}
                       disabled={followLoading || !event.hostId}
-                      className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${isFollowing
+                      className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${
+                        isFollowing
                           ? "tw:bg-white tw:border-primary/30 tw:text-primary"
                           : "tw:bg-[#F3F4F6] tw:border-transparent tw:text-gray-800 tw:hover:bg-[#E5E7EB]"
-                        } ${followLoading
+                      } ${
+                        followLoading
                           ? "tw:opacity-70 tw:cursor-not-allowed"
                           : ""
-                        }`}
+                      }`}
                     >
                       {followLoading
                         ? "Updating…"
                         : isFollowing
-                          ? "Following"
-                          : "Follow Organizer"}
+                        ? "Following"
+                        : "Follow Organizer"}
                     </button>
 
                     <Link
@@ -784,26 +837,6 @@ export default function ViewEvent() {
           <div className="tw:mt-6 tw:px-1">
             <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
           </div>
-
-          {/* Mobile sticky bar (bottom) */}
-          <MobileStickyBar
-            priceDisplay={priceDisplay}
-            dateTime={formattedDateTime}
-            onGetTickets={() => {
-              if (ctaDisabled) return;
-
-              if (hasPaid && isLiveNow) {
-                handleEnterLive();
-                return;
-              }
-
-              if (isLiveNow && !event.hasBackstage && !event.combined_price) {
-                handleGetTicket("main");
-              } else {
-                setAccessModalOpen(true);
-              }
-            }}
-          />
         </div>
       </div>
 
@@ -819,6 +852,13 @@ export default function ViewEvent() {
           navigate("/feed");
           showSuccess("Report submitted. Thank you.");
         }}
+      />
+      <EventShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        eventId={event?.id} // IMPORTANT: use actual id even when page was opened via slug
+        token={token}
+        title="Share this event"
       />
 
       <AccessTypeModal

@@ -72,12 +72,12 @@ export default function EventCard({ event, isOrganiserProfile }) {
 
       <div className="tw:p-5 tw:space-y-2">
         <div className="tw:flex tw:items-start tw:gap-2">
-          <button
+          <div
             onClick={goToStreaming}
-            className="tw:text-left tw:block tw:text-lg tw:text-black tw:font-semibold tw:flex-1"
+            className="tw:uppercase tw:text-left tw:block tw:text-lg tw:text-black tw:font-semibold tw:flex-1"
           >
             {event.title}
-          </button>
+          </div>
 
           {isOrganiserProfile && (
             <button

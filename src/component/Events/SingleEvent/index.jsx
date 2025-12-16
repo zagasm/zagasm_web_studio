@@ -4,7 +4,7 @@ import { useInView } from "react-intersection-observer";
 import "./eventSTyling.css";
 import camera_icon from "../../../assets/navbar_icons/camera_icon.png";
 import live_indicator from "../../../assets/navbar_icons/live_indicator.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import usePaginatedEvents from "../../../hooks/usePaginatedEvents";
 import {
   Ellipsis,
@@ -208,6 +208,7 @@ export function CountdownPill({ target }) {
 /* ---- Single Card (shared for all variants) ---- */
 export function EventCard({ event, variant = "default", onMore }) {
   const startDate = eventStartDate(event);
+  const navigate = useNavigate();
 
   const isDedicatedLiveTab = variant === "live";
   const isDedicatedUpcomingTab = variant === "upcoming";
@@ -234,10 +235,7 @@ export function EventCard({ event, variant = "default", onMore }) {
     return (first + last).toUpperCase();
   }
 
-  function hostAvatarFallback(event) {
-    const name = hostName(event);
-    return initialsFromName(name) || "?";
-  }
+  const hostInitials = initialsFromName(hostName(event) || "");
 
   // FLEXIBLE FLAG FOR "MY" EVENTS (back-end should set one of these)
   const isMyEvent =
@@ -245,6 +243,14 @@ export function EventCard({ event, variant = "default", onMore }) {
     event?.is_my_event ||
     event?.isMine ||
     event?.is_current_user_event;
+
+  const goToHostProfile = (e) => {
+    e.preventDefault(); // stops the <Link to="/event/view/..."> navigation
+    e.stopPropagation(); // stops any parent click handlers
+    const hostId = event?.organiserId || event?.host?.id || event?.host?.userId;
+    if (!hostId) return;
+    navigate(`/profile/${hostId}`);
+  };
 
   return (
     <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
@@ -332,8 +338,12 @@ export function EventCard({ event, variant = "default", onMore }) {
 
           {/* Host row */}
           <div className="tw:flex tw:items-center tw:gap-3 tw:-mt-3">
-            <div className="tw:px-3 tw:py-1.5 tw:bg-[#f5f5f5] tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2">
-              <span className="tw:w-8 tw:h-8 tw:rounded-full tw:bg-lightPurple tw:overflow-hidden tw:-ml-1 tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-semibold tw:text-zinc-800">
+            <button
+              type="button"
+              onClick={goToHostProfile}
+              className="tw:px-3 tw:py-1.5 tw:bg-[#f5f5f5] tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2 tw:text-left"
+            >
+              <span className="tw:w-8 tw:h-8 tw:rounded-full tw:bg-lightPurple tw:overflow-hidden tw:-ml-1 tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-semibold tw:text-primary">
                 {event?.hostImage ? (
                   <img
                     src={event.hostImage}
@@ -341,11 +351,21 @@ export function EventCard({ event, variant = "default", onMore }) {
                     className="tw:w-full tw:h-full tw:object-cover"
                   />
                 ) : (
-                  hostAvatarFallback(event)
+                  hostInitials || "?"
                 )}
               </span>
-              <span>{hostName(event)}</span>
-            </div>
+
+              <div className="tw:flex tw:items-center">
+                <span className="tw:truncate">{hostName(event)}</span>
+                {event.hostHasActiveSubscription && (
+                  <img
+                    className="tw:inline-block tw:size-4"
+                    src="/images/verifiedIcon.svg"
+                    alt="Verified"
+                  />
+                )}
+              </div>
+            </button>
           </div>
 
           {/* META BLOCK (ALWAYS RENDERED TO KEEP CTA ALIGNED) */}

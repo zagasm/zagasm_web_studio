@@ -1,6 +1,7 @@
 import React from "react";
 
 const FILTERS = [
+  { key: "all", label: "All" },
   { key: "upcoming", label: "Upcoming" },
   { key: "live", label: "Live" },
   { key: "ended", label: "Ended" },
@@ -8,13 +9,11 @@ const FILTERS = [
 
 export default function EventsFilterTabs({ value, onChange }) {
   return (
-    <div className="tw:flex tw:rounded-2xl tw:bg-white tw:p-1 tw:ring-1 tw:ring-gray-200">
+    <div className="tw:flex tw:rounded-3xl tw:bg-white tw:p-1 tw:ring-1 tw:ring-gray-200">
       {FILTERS.map((f) => (
         <button
           key={f.key}
-          style={{
-            borderRadius: 20,
-          }}
+          style={{ borderRadius: 24 }}
           type="button"
           onClick={() => onChange(f.key)}
           className={`tw:flex-1 tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:md:text-base tw:font-medium tw:transition

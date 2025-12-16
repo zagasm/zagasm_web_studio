@@ -116,7 +116,7 @@ function TicketsPage() {
   }, [ticketsWithPhase, activeTab]);
 
   return (
-    <div className="">
+    <div className="tw:font-sans">
       <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-20 tw:md:pt-24 tw:lg:px-4">
         <div className="account_section" style={{ padding: 0 }}>
           <div className="tw:px-4 tw:py-4 tw:md:px-8 tw:md:py-8">

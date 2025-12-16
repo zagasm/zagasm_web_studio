@@ -2,7 +2,7 @@ import React from "react";
 import defaultProfile from "../../assets/avater_pix.avif";
 import { Users, UserPlus, ArrowUpRight, Ticket } from "lucide-react";
 import { Edit } from "react-feather";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./profile.css";
 
 export default function ProfileHeader({
@@ -24,7 +24,8 @@ export default function ProfileHeader({
       : !!user?.following;
   // organiser response vs normal user response
   const isOrganiserProfileData =
-    !!user?.organiser || (!!user?.userId && !!user?.allEvents);
+    !!user?.organiser ||
+    (!!user?.userId && (!!user?.events || !!user?.allEvents));
 
   const navigate = useNavigate();
 
@@ -56,7 +57,7 @@ export default function ProfileHeader({
     null;
 
   const rankingLabel = isOwnProfile ? "My Ranking" : "Organizer Ranking";
-  const followersLabel = isOwnProfile ? "My Followers" : "Followers";
+  const followersLabel = isOwnProfile ? "Followers" : "Followers";
 
   const handleEditClick = () => {
     navigate("/profile/edit-profile");
@@ -65,7 +66,7 @@ export default function ProfileHeader({
   const showFollowButton = !isOwnProfile && isOrganiserProfileData;
 
   return (
-    <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-6 tw:shadow-sm">
+    <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:py-6 tw:px-3 tw:shadow-sm">
       <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
         {/* avatar + edit / follow */}
         <div className="tw:relative">
@@ -105,13 +106,6 @@ export default function ProfileHeader({
                 className="tw:inline-block tw:size-5"
                 src="/images/verifiedIcon.svg"
                 alt="Verified"
-              />
-            )}
-            {user.plan && (
-              <img
-                className="tw:size-5"
-                src="/images/verifiedIcon.svg"
-                alt=""
               />
             )}
           </span>
@@ -172,7 +166,6 @@ export default function ProfileHeader({
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
               <span className="tw:inline-flex tw:items-center tw:gap-1">
-                <Users size={14} />
                 {followersLabel}
               </span>
               <ArrowUpRight size={14} />
@@ -188,7 +181,6 @@ export default function ProfileHeader({
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
               <span className="tw:inline-flex tw:items-center tw:gap-1">
-                <UserPlus size={14} />
                 Following
               </span>
               <ArrowUpRight size={14} />
@@ -215,6 +207,9 @@ export default function ProfileHeader({
               </span>
             </span>
           </div>
+          <Link className="text-dark tw:bg-white tw:py-2 tw:w-full tw:rounded-xl text-center tw:mt-3 tw:font-semibold" to={'/organizers'}>
+              View Top Organisers
+          </Link>
         </div>
       </div>
     </div>
