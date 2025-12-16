@@ -65,6 +65,8 @@ import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import EventEditPage from "./pages/event/EventEditPage.jsx";
 import DisableRightClick from "./component/DisableRightClick.jsx";
+import ScrollToTop from "./component/ScrollToTop.jsx";
+import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 
 const MainLayout = () => (
   <>
@@ -94,6 +96,7 @@ export function App() {
       <ToastHost />
       <ToastContainer />
       <NetworkStatus />
+      <ScrollToTop />
       {/* <DisableRightClick /> */}
       <Routes>
         <Route element={<LandingLayout />}>
@@ -142,6 +145,7 @@ export function App() {
             <Route path="/mentions" element={<TaggedMentionsPage />} />
 
             <Route path="/event" element={<Event />}>
+              <Route path="view/share/:slug" element={<EventShareRedirect />} />
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
               <Route path="select-event-type" element={<EventType />} />

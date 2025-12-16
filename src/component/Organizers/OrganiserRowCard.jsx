@@ -44,10 +44,10 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
       {/* meta */}
       <div className="tw:flex-1 tw:min-w-0">
         <div className="tw:flex tw:items-center">
-          <span className="tw:block tw:text-sm tw:sm:text-lg tw:font-semibold tw:text-gray-900 tw:truncate">
+          <span className="tw:block tw:text-xs tw:sm:text-lg tw:font-semibold tw:text-gray-900 tw:truncate">
             {name}
           </span>
-          {org.plan && (
+          {org.has_active_subscription && (
             <img className="tw:size-4" src="/images/verifiedIcon.svg" alt="" />
           )}
         </div>
@@ -79,7 +79,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
       </div>
 
       {/* follow */}
-      <div className="tw:shrink-0 tw:w-24 tw:sm:w-[120px]">
+      {/* <div className="tw:shrink-0 tw:w-24 tw:sm:w-[120px]">
         <button
           style={{
             borderRadius: 16,
@@ -101,7 +101,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
         >
           {loading ? "Wait..." : isFollowing ? "Unfollow" : "Follow"}
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -59,7 +59,7 @@ export default function PodiumCard({ org, position }) {
       <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-1">
         <div className="tw:flex tw:items-center">
           <span className="tw:text-[10px] tw:sm:text-base tw:font-semibold tw:text-gray-900">
-            {truncate(name, 18)}
+            {truncate(name, 12)}
           </span>
           {org.plan && <img className="tw:size-4" src="/images/verifiedIcon.svg" alt="" />}
         </div>

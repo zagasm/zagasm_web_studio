@@ -136,7 +136,7 @@ export default function MobileSingleOrganizers() {
   );
 
   return (
-    <div className="tw:mb-3">
+    <div className="tw:mb-3 tw:font-sans">
       {loadingList ? (
         <div className="tw:flex tw:items-center tw:justify-center tw:py-10">
           <svg

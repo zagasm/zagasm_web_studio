@@ -40,7 +40,7 @@ function Account() {
   return (
     <Fragment>
       {/* Main Container with Light Grey Background */}
-      <div className="account-page-wrapper tw:w-full tw:bg-[#F9FAFB] tw:pt-20">
+      <div className="tw:font-sans account-page-wrapper tw:w-full tw:bg-[#F9FAFB] tw:pt-20">
         <div className="container-fluid">
           <div className="row">
             {/* LEFT COLUMN */}

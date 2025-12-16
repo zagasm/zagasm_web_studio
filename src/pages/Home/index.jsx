@@ -38,7 +38,7 @@ export default function Home() {
     <>
       <SEO title="Discover Events - Zagasm Studios" />
 
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-24 tw:md:pt-24 tw:lg:px-4">
+      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-24 tw:md:pt-24 tw:lg:px-4 tw:font-sans">
         {/* TABS */}
         <div className="tw:flex tw:gap-3 tw:mb-6 tw:ml-2">
           <button

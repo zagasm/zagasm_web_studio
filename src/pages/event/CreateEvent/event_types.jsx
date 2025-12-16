@@ -219,7 +219,7 @@ function EventType() {
 
   // 3) Organiser + KYC verified → modern card grid for event types
   return (
-    <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
+    <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
       <div className="tw:max-w-7xl tw:mx-auto">
         <div className="tw:flex tw:flex-col tw:gap-2 tw:mb-6">
           <span className="tw:block tw:text-2xl tw:md:text-3xl tw:font-semibold">

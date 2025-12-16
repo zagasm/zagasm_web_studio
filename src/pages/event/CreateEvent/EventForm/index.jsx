@@ -341,7 +341,7 @@ export default function EventCreationWizard({
   }
 
   return (
-    <div className="tw:max-w-5xl tw:mx-auto tw:px-4 tw:pb-16">
+    <div className="tw:max-w-5xl tw:mx-auto tw:px-1 tw:pt-10 tw:md:pt-0 tw:pb-20">
       <ProgressSteps
         currentStep={currentStep}
         completedSteps={completedSteps}

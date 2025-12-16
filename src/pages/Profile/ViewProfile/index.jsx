@@ -51,8 +51,7 @@ export default function ViewProfile() {
 
   /* ------------------ load profile data ------------------ */
   useEffect(() => {
-    if (isOwnProfile) return; // <-- IMPORTANT
-
+    if (isOwnProfile) return;
     if (!routeUserId) return;
 
     let cancelled = false;
@@ -66,18 +65,59 @@ export default function ViewProfile() {
           `/api/v1/organiser/${routeUserId}`,
           authHeaders(token)
         );
-        const data = res?.data?.data || res?.data?.user || res?.data || null;
+
+        // NEW SHAPE:
+        // res.data.data = { organiser: {...}, events: {...buckets} }
+        const payload = res?.data?.data ?? null;
+
+        // fallback for older shapes
+        const organiserData =
+          payload?.organiser ??
+          res?.data?.data ??
+          res?.data?.user ??
+          res?.data ??
+          null;
+
+        const eventsBuckets = payload?.events ?? null;
 
         if (cancelled) return;
-        setProfileUser(data);
+
+        // attach buckets in a predictable way for tabs/components
+        const normalised = organiserData
+          ? {
+              ...organiserData,
+
+              // ✅ new format
+              events: eventsBuckets || organiserData?.events || null,
+
+              // ✅ backward-compat for older code paths (optional but helps)
+              allEvents:
+                eventsBuckets?.all ??
+                organiserData?.allEvents ??
+                organiserData?.events?.all ??
+                [],
+              upcomingEvents:
+                eventsBuckets?.upcoming ??
+                organiserData?.upcomingEvents ??
+                organiserData?.events?.upcoming ??
+                [],
+            }
+          : null;
+
+        setProfileUser(normalised);
+
+        // fix following flag picking (your backend uses isFollowing)
         const pickIsFollowing = (d) => {
-          if (typeof d?.isFollowing === "boolean") return d.isFollowing; // organiser payload
-          if (typeof d?.is_following === "boolean") return d.is_following; // fallback
-          if (typeof d?.following === "boolean") return d.following; // fallback
+          if (!d) return false;
+          if (typeof d.isFollowing === "boolean") return d.isFollowing;
+          if (typeof d.is_following === "boolean") return d.is_following;
+          if (typeof d.following === "boolean") return d.following;
+          if (typeof d.is_following_organizer === "boolean")
+            return d.is_following_organizer;
           return false;
         };
 
-        setIsFollowing(pickIsFollowing(data));
+        setIsFollowing(pickIsFollowing(normalised));
       } catch (e) {
         if (!cancelled) setProfileError("Unable to load profile.");
       } finally {
@@ -168,7 +208,7 @@ export default function ViewProfile() {
   };
 
   return (
-    <div className="tw:bg-[#f5f5f7] tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
+    <div className="tw:font-sans tw:bg-[#f5f5f7] tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
       {/* top bar */}
       <div className="tw:bg-white tw:w-full tw:pt-20 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
         <div className="tw:max-w-2xl tw:mx-auto tw:flex tw:items-center tw:justify-between tw:px-4">
@@ -364,7 +404,7 @@ export default function ViewProfile() {
           <div className="tw:flex tw:flex-col tw:lg:flex-row tw:lg:gap-6 tw:lg:h-full">
             {/* LEFT: profile card + about */}
             <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:lg:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
-              <div className="tw:space-y-4 tw:pb-6">
+              <div className="tw:space-y-4 tw:lg:pb-6">
                 <ProfileHeader
                   user={finalProfileUser}
                   organiser={organiser}
