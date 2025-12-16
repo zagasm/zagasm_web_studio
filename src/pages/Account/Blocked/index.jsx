@@ -83,10 +83,10 @@ function BlockedUsersPage() {
 
       // toggle block state via backend
       const res = await api.post(
-        "/api/v1/blockUserOrEvent",
+        "/api/v1/unblockUserOrEvent",
         {
-          user_id: user.id,
-          type: "user", // adjust if your backend expects a different key
+          blockable_id: user.id,
+          blockable_type: "user", // adjust if your backend expects a different key
         },
         authHeaders(token)
       );

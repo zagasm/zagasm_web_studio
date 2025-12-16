@@ -13,7 +13,6 @@ export default function ProfileHeader({
   followLoading = false,
   onToggleFollow,
 }) {
-
   // console.log(user);
   const computedIsFollowing =
     typeof isFollowing === "boolean"
@@ -55,7 +54,6 @@ export default function ProfileHeader({
     user?.rank ??
     user?.rank_global ??
     null;
-
 
   const rankingLabel = isOwnProfile ? "My Ranking" : "Organizer Ranking";
   const followersLabel = isOwnProfile ? "My Followers" : "Followers";
@@ -104,9 +102,16 @@ export default function ProfileHeader({
             <span>{displayName}</span>
             {user.subscription?.isActive && (
               <img
-                className="tw:inline-block tw:ml-1 tw:size-5"
+                className="tw:inline-block tw:size-5"
                 src="/images/verifiedIcon.svg"
                 alt="Verified"
+              />
+            )}
+            {user.plan && (
+              <img
+                className="tw:size-5"
+                src="/images/verifiedIcon.svg"
+                alt=""
               />
             )}
           </span>

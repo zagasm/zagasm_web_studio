@@ -217,9 +217,19 @@ export default function MobileSingleOrganizers() {
                     </div>
 
                     <div className="tw:min-w-0 tw:flex-1">
-                      <span className="tw:block tw:text-xs tw:font-medium tw:truncate">
-                        {truncate(name, 14)}
-                      </span>
+                      <div className="tw:flex tw:items-center">
+                        <span className="tw:block tw:text-xs tw:font-medium tw:truncate">
+                          {truncate(name, 14)}
+                        </span>
+                        {organizer.plan && (
+                          <img
+                            className="tw:size-4"
+                            src="/images/verifiedIcon.svg"
+                            alt=""
+                          />
+                        )}
+                      </div>
+
                       <span className="tw:block tw:text-[8px] tw:text-gray-500 tw:truncate">
                         {organizer.totalEventsCreated || "No"} Events created
                       </span>

@@ -10,7 +10,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
   const showImage = hasProfileImage(org?.profileImage);
   const followersCount = org?.numberOfFollowers ?? 0;
   const isFollowing =
-  typeof org?.isFollowing === "boolean" ? org.isFollowing : !!org?.following;
+    typeof org?.isFollowing === "boolean" ? org.isFollowing : !!org?.following;
 
   return (
     <div
@@ -43,9 +43,14 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
 
       {/* meta */}
       <div className="tw:flex-1 tw:min-w-0">
-        <span className="tw:block tw:text-sm tw:sm:text-lg tw:font-semibold tw:text-gray-900 tw:truncate">
-          {name}
-        </span>
+        <div className="tw:flex tw:items-center">
+          <span className="tw:block tw:text-sm tw:sm:text-lg tw:font-semibold tw:text-gray-900 tw:truncate">
+            {name}
+          </span>
+          {org.plan && (
+            <img className="tw:size-4" src="/images/verifiedIcon.svg" alt="" />
+          )}
+        </div>
 
         <span className="tw:block tw:text-[10px] tw:sm:text-xs tw:text-gray-500 tw:truncate">
           @{(org?.username || org?.email || org?.slug || "").replace("@", "")}

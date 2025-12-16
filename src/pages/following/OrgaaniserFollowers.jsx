@@ -97,7 +97,7 @@ function OrganiserFollowers() {
   };
 
   return (
-    <div className="tw:bg-[#F5F5F7] tw:min-h-screen tw:pb-12">
+    <div className="tw:bg-[#F5F5F7] tw:min-h-screen tw:pb-20">
       <div className="tw:pt-20">
         {/* Header */}
         <div className="tw:bg-white tw:py-4 tw:px-4 tw:md:px-0 tw:text-center tw:mb-6">
@@ -110,7 +110,7 @@ function OrganiserFollowers() {
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
-            <span className="tw:text-[22px] tw:text-center tw:md:text-xl tw:font-semibold tw:text-gray-900">
+            <span className="tw:text-lg tw:text-center tw:md:text-xl tw:font-semibold tw:text-gray-900">
               Organizers Following Me
             </span>
             <div className="tw:lg:w-20" />
@@ -139,22 +139,46 @@ function OrganiserFollowers() {
   );
 }
 
+function hasValidProfileImage(url) {
+  if (!url) return false;
+  if (url === "null") return false;
+  if (url === "undefined") return false;
+  return true;
+}
+
+function getInitials(name) {
+  if (!name || typeof name !== "string") return "Z";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const a = parts[0]?.[0] ?? "";
+  const b = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+  return (a + b).toUpperCase() || "Z";
+}
+
 /* ---------- Card Components ---------- */
 
 function OrganiserCard({ organiser }) {
-  const { organiser: name, profileImage, numberOfFollowers, rank, subscription } = organiser;
+  const { organiser: name, profileImage, numberOfFollowers, rank } = organiser;
 
   const followersLabel = formatFollowers(numberOfFollowers);
+  const showImage = hasValidProfileImage(profileImage);
+  const initials = getInitials(name);
 
   return (
-    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
-      {/* Image */}
-      <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-gray-100">
-        <img
-          src={profileImage || "/images/organiser.png"}
-          alt={name}
-          className="tw:w-full tw:h-full tw:object-cover"
-        />
+    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:tw:-translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
+      {/* Image / initials */}
+      <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-[#F4E6FD] tw:flex tw:items-center tw:justify-center">
+        {showImage ? (
+          <img
+            src={profileImage}
+            alt={name}
+            className="tw:w-full tw:h-full tw:object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <span className="tw:text-[#500481] tw:text-2xl tw:font-semibold">
+            {initials}
+          </span>
+        )}
       </div>
 
       {/* Name + rank */}
@@ -162,9 +186,7 @@ function OrganiserCard({ organiser }) {
         <span className="tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
           {name}
         </span>
-        {/* {subscription.isActive && (
-          <img className="tw:size-5" src="/images/verifiedIcon.svg" alt="" />
-        )} */}
+
         <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-1 tw:rounded-lg tw:bg-black tw:text-[10px] tw:text-white tw:shrink-0">
           <img width={21} height={21} src="/images/globe.svg" alt="" />
           <span className="tw:font-semibold tw:text-[10px]">
@@ -180,10 +202,9 @@ function OrganiserCard({ organiser }) {
         </span>
       </div>
 
-      {/* Optional: a subtle CTA, no API attached for now */}
       <Link
         to={`/profile/${organiser.id}`}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-[11px] tw:font-medium tw:tw:hover:bg-gray-50 tw:transition text-dark"
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-[11px] tw:font-medium tw:hover:tw:bg-gray-50 tw:transition text-dark"
       >
         View organizer
       </Link>
