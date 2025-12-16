@@ -2,32 +2,34 @@ import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
+import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../../pages/auth/AuthContext";
 import { truncate } from "../../../utils/helpers";
 import { showError, showSuccess } from "../../ui/toast";
 import { api, authHeaders } from "../../../lib/apiClient";
 
 export default function MobileSingleOrganizers() {
+  const navigate = useNavigate();
+
   const [organizers, setOrganizers] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
   const [followLoading, setFollowLoading] = useState({});
   const { token } = useAuth();
 
-  // ---- helpers: stable id + image pickers
-  const getId = (org) => org?.userId ?? org?.id; // support either shape
+  // stable ids (your payload has BOTH id and userId)
+  const getProfileId = (org) => org?.id; // for /profile/:id
+  const getFollowId = (org) => org?.userId; // for /follow/:userId
 
   const getInitials = (organizer) => {
     const name =
       organizer.organiser ||
       [organizer.firstName, organizer.lastName].filter(Boolean).join(" ") ||
       "";
-
     if (!name) return "Z";
-
     const parts = name.trim().split(/\s+/);
     const first = parts[0]?.[0] ?? "";
     const second = parts.length > 1 ? parts[1][0] : "";
-
     return (first + second).toUpperCase();
   };
 
@@ -38,6 +40,9 @@ export default function MobileSingleOrganizers() {
     return true;
   };
 
+  const deriveIsFollowing = (org) =>
+    typeof org?.isFollowing === "boolean" ? org.isFollowing : !!org?.following;
+
   useEffect(() => {
     fetchOrganizers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,60 +51,65 @@ export default function MobileSingleOrganizers() {
   const fetchOrganizers = async () => {
     try {
       setLoadingList(true);
+
       const res = await api.get(
         "/api/v1/organiser/for-you/get",
         authHeaders(token)
       );
-      const data = res?.data;
-      if (data && Array.isArray(data.data)) {
-        // Normalize: ensure boolean "following"
-        const list = data.data.map((o) => ({
-          ...o,
-          following: !!o.following,
-        }));
-        setOrganizers(list);
-      } else {
-        setOrganizers([]);
-        console.warn("No organisers data received");
-      }
+
+      const list = Array.isArray(res?.data?.data) ? res.data.data : [];
+
+      // normalize follow state (keep both fields in sync)
+      const normalized = list.map((o) => {
+        const isFollowing = deriveIsFollowing(o);
+        return { ...o, isFollowing, following: isFollowing };
+      });
+
+      setOrganizers(normalized);
     } catch (e) {
       console.error("Error fetching organizers:", e);
       showError("Unable to load organizers right now.");
+      setOrganizers([]);
     } finally {
       setLoadingList(false);
     }
   };
 
-  const toggleFollow = async (targetId) => {
-    if (!targetId) return;
-    setFollowLoading((prev) => ({ ...prev, [targetId]: true }));
+  const toggleFollow = async (followUserId) => {
+    if (!followUserId) return;
+
+    setFollowLoading((prev) => ({ ...prev, [followUserId]: true }));
+
     try {
       const res = await api.post(
-        `/api/v1/follow/${targetId}`,
+        `/api/v1/follow/${followUserId}`,
         {},
         authHeaders(token)
       );
 
-      // Accept either { following, message } or { data: { following }, message }
       const body = res?.data || {};
       const newFollowing =
         typeof body.following === "boolean"
           ? body.following
-          : !!body?.data?.following;
+          : typeof body?.data?.following === "boolean"
+          ? body.data.following
+          : // fallback: some APIs return is_following / isFollowing
+            !!(body?.data?.is_following ?? body?.data?.isFollowing);
 
       showSuccess(body?.message || "Updated");
 
-      // Update the exact organizer using our stable id getter
       setOrganizers((prev) =>
         prev.map((org) =>
-          getId(org) === targetId ? { ...org, following: newFollowing } : org
+          org?.userId === followUserId
+            ? { ...org, isFollowing: newFollowing, following: newFollowing }
+            : org
         )
       );
     } catch (e) {
       console.error("Error toggling follow:", e);
       showError("Something went wrong. Please try again.");
     } finally {
-      setFollowLoading((prev) => ({ ...prev, [targetId]: false }));
+      setFollowLoading((prev) => ({ ...prev, [followUserId]: false }));
     }
   };
 
@@ -119,7 +129,9 @@ export default function MobileSingleOrganizers() {
           <circle cx="12" cy="7" r="4" strokeWidth="1.5" />
         </svg>
       </div>
-      <p className="tw:text-sm tw:text-gray-600">No organizers to show yet.</p>
+      <span className="tw:text-sm tw:text-gray-600">
+        No organizers to show yet.
+      </span>
     </div>
   );
 
@@ -153,7 +165,6 @@ export default function MobileSingleOrganizers() {
         <Swiper
           modules={[Pagination]}
           spaceBetween={12}
-          // pagination={{ clickable: true }}
           breakpoints={{
             0: { slidesPerView: 3.2 },
             480: { slidesPerView: 4 },
@@ -162,23 +173,37 @@ export default function MobileSingleOrganizers() {
           className="tw:pb-8"
         >
           {organizers.map((organizer) => {
-            const id = getId(organizer);
+            const profileId = getProfileId(organizer);
+            const followUserId = getFollowId(organizer);
+
             const name =
               organizer.organiser ||
               [organizer.firstName, organizer.lastName]
                 .filter(Boolean)
                 .join(" ") ||
               "Organizer";
-            const isFollowing = !!organizer.following;
-            const isBusy = !!followLoading[id];
+
+            const isFollowing = deriveIsFollowing(organizer);
+            const isBusy = !!followLoading[followUserId];
             const showImage = hasValidProfileImage(organizer.profileImage);
             const initials = getInitials(organizer);
 
             return (
-              <SwiperSlide key={id}>
-                <div className="tw:h-full tw:bg-white tw:border tw:border-gray-100 tw:rounded-2xl tw:p-3 tw:flex tw:flex-col tw:items-stretch tw:gap-2">
+              <SwiperSlide key={profileId || followUserId}>
+                {/* CARD: click navigates */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => profileId && navigate(`/profile/${profileId}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && profileId) {
+                      navigate(`/profile/${profileId}`);
+                    }
+                  }}
+                  className="tw:h-full tw:bg-white tw:border tw:border-gray-100 tw:rounded-2xl tw:p-3 tw:flex tw:flex-col tw:items-stretch tw:gap-2 tw:cursor-pointer"
+                >
                   <div className="tw:flex tw:flex-col tw:items-center tw:text-center tw:gap-3">
-                    <div className="tw:w-14 tw:h-14 tw:rounded-full tw:ring-2 tw:ring-white tw:shadow-sm tw:flex tw:items-center tw:justify-center tw:bg-[#F4E6FD] tw:text-xs tw:font-semibold tw:text-[#500481] tw:overflow-hidden">
+                    <div className="tw:w-14 tw:h-14 tw:rounded-full tw:ring-2 tw:ring-white tw:shadow-sm tw:flex tw:items-center tw:justify-center tw:bg-[#F4E6FD] tw:font-semibold tw:text-[#500481] tw:overflow-hidden">
                       {showImage ? (
                         <img
                           src={organizer.profileImage}
@@ -192,26 +217,30 @@ export default function MobileSingleOrganizers() {
                     </div>
 
                     <div className="tw:min-w-0 tw:flex-1">
-                      <div className="tw:text-xs tw:font-medium tw:truncate">
+                      <span className="tw:block tw:text-xs tw:font-medium tw:truncate">
                         {truncate(name, 14)}
-                      </div>
-                      <div className="tw:text-[8px] tw:text-gray-500 tw:truncate">
+                      </span>
+                      <span className="tw:block tw:text-[8px] tw:text-gray-500 tw:truncate">
                         {organizer.totalEventsCreated || "No"} Events created
-                      </div>
+                      </span>
                     </div>
                   </div>
 
+                  {/* FOLLOW BUTTON: stopPropagation so it doesn't open profile */}
                   <button
                     style={{ borderRadius: 6 }}
                     type="button"
-                    onClick={() => toggleFollow(id)}
-                    disabled={isBusy}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFollow(followUserId);
+                    }}
+                    disabled={isBusy || !followUserId}
                     className={`tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-xl tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:ring-1 tw:transition
                       ${
                         isFollowing
                           ? "tw:bg-primary tw:text-white tw:ring-primary"
                           : "tw:bg-[#F4E6FD] tw:text-black tw:ring-transparent tw:hover:bg-primary/10"
-                      }`}
+                      } ${isBusy ? "tw:opacity-70 tw:cursor-not-allowed" : ""}`}
                   >
                     {isBusy ? (
                       <svg
@@ -235,7 +264,6 @@ export default function MobileSingleOrganizers() {
                       </svg>
                     ) : (
                       <>
-                        {/* TRUE/FALSE decides label here */}
                         <span className="tw:text-[10px]">
                           {isFollowing ? "Unfollow" : "Follow"}
                         </span>

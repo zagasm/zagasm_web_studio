@@ -317,7 +317,7 @@ export function EventCard({ event, variant = "default", onMore }) {
           {/* Title + price */}
           <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
             <div className="tw:flex-1">
-              <span className="tw:text-[16px] tw:font-semibold tw:text-black tw:leading-snug">
+              <span className="tw:text-[16px] tw:font-semibold tw:text-black tw:leading-snug tw:uppercase">
                 {event?.title?.length > 40
                   ? event.title.slice(0, 40) + "…"
                   : event?.title}

@@ -42,7 +42,7 @@ export default function Navbar() {
           <img
             src={"/images/logo.png"}
             alt="Zagasm Logo"
-            className="tw:w-24 tw:md:w-40 tw:-ml-5 tw:object-contain"
+            className="tw:w-24 tw:lg:w-40 tw:-ml-5 tw:object-contain"
           />
         </Link>
 
@@ -65,7 +65,7 @@ export default function Navbar() {
                   fill={active ? "black" : "none"}
                 />
                 <span
-                  className={`tw:text-[13px] ${
+                  className={`tw:text-[11px] ${
                     active
                       ? "tw:text-black tw:font-semibold"
                       : "tw:text-gray-500"

@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Just+Another+Hand&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss" prefix(tw);
 
 @layer theme, base, components, utilities;
@@ -12,7 +12,7 @@
   --color-primary: #8f07e7;
   --color-lightPurple: #f4e6fd;
   --color-primarySecond: #c115b5;
-  --font-sans: "Poppins", sans-serif;
+  --font-sans: "Montserrat", sans-serif;
   --font-dela: "Dela Gothic One", sans-serif;
   --font-cursive: "Just Another Hand", cursive;
 }
@@ -21,7 +21,7 @@
 }
 
 html{
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-sans);
 }
 
 .tw-no-scrollbar::-webkit-scrollbar {

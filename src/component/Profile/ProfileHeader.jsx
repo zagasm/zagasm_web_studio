@@ -13,8 +13,16 @@ export default function ProfileHeader({
   followLoading = false,
   onToggleFollow,
 }) {
-  console.log(user);
-  console.log(organiser);
+
+  // console.log(user);
+  const computedIsFollowing =
+    typeof isFollowing === "boolean"
+      ? isFollowing
+      : typeof user?.isFollowing === "boolean"
+      ? user.isFollowing
+      : typeof user?.is_following === "boolean"
+      ? user.is_following
+      : !!user?.following;
   // organiser response vs normal user response
   const isOrganiserProfileData =
     !!user?.organiser || (!!user?.userId && !!user?.allEvents);
@@ -130,8 +138,8 @@ export default function ProfileHeader({
               >
                 {followLoading
                   ? "Please wait..."
-                  : isFollowing
-                  ? "Following"
+                  : computedIsFollowing
+                  ? "Unfollow"
                   : "Follow Organizer"}
               </button>
             </div>
