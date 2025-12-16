@@ -1,5 +1,6 @@
 // lib/apiClient.js
 import axios from "axios";
+import { showError } from "../component/ui/toast"; // <-- adjust path if different
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
@@ -19,12 +20,22 @@ export function authHeaders(token) {
     : {};
 }
 
-/**
- * Global response interceptor:
- * - In dev: don't auto-redirect on 401, just let the request fail
- * - In prod: on 401, clear auth + redirect to /auth/signin (like before)
- * - Never treat network/5xx errors as auth issues
- */
+// prevent repeated spam toasts for the same situation
+let lastDeactivatedToastAt = 0;
+const DEACTIVATED_TOAST_COOLDOWN_MS = 8000;
+
+function maybeToastDeactivated(payload) {
+  if (!payload || payload.reactivate !== true) return;
+
+  const now = Date.now();
+  if (now - lastDeactivatedToastAt < DEACTIVATED_TOAST_COOLDOWN_MS) return;
+  lastDeactivatedToastAt = now;
+
+  const when = payload.deactivation_requested_at || "recently";
+  // keep it short and clear
+  showError(`Account deactivated (${when}). Please reactivate to continue.`);
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -39,8 +50,16 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    const payload = error?.response?.data;
+
     if (!import.meta.env.PROD) {
       console.log("[api] response status:", status, "url:", url);
+    }
+
+    // ---- 403 handling (deactivated account) ----
+    if (status === 403) {
+      maybeToastDeactivated(payload);
+      return Promise.reject(error);
     }
 
     // For non-401, just bubble up
@@ -49,21 +68,12 @@ api.interceptors.response.use(
     }
 
     // ---- 401 handling ----
-
-    // In development: do NOT auto-logout / redirect.
-    // This is what was kicking you out while coding / server restarting.
     if (!import.meta.env.PROD) {
       console.warn("[api] 401 in dev – NOT redirecting, just rejecting.");
-      // Optionally clear only the token if you want:
-      // localStorage.removeItem("token");
       return Promise.reject(error);
     }
 
-    // In production: behave like before (hard logout + redirect),
-    // but avoid looping on the signin page.
-    if (window.location.pathname !== "/auth/signin") {
-      // Clear auth-related storage. You were doing localStorage.clear(),
-      // keeping same behaviour to avoid surprises.
+    if (window.location.pathname !== "/auth/signin") { 
       localStorage.clear();
       window.location.replace("/auth/signin");
     }

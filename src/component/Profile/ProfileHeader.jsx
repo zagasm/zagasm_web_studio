@@ -13,8 +13,15 @@ export default function ProfileHeader({
   followLoading = false,
   onToggleFollow,
 }) {
-  console.log(user);
-  console.log(organiser);
+  // console.log(user);
+  const computedIsFollowing =
+    typeof isFollowing === "boolean"
+      ? isFollowing
+      : typeof user?.isFollowing === "boolean"
+      ? user.isFollowing
+      : typeof user?.is_following === "boolean"
+      ? user.is_following
+      : !!user?.following;
   // organiser response vs normal user response
   const isOrganiserProfileData =
     !!user?.organiser || (!!user?.userId && !!user?.allEvents);
@@ -47,7 +54,6 @@ export default function ProfileHeader({
     user?.rank ??
     user?.rank_global ??
     null;
-
 
   const rankingLabel = isOwnProfile ? "My Ranking" : "Organizer Ranking";
   const followersLabel = isOwnProfile ? "My Followers" : "Followers";
@@ -96,9 +102,16 @@ export default function ProfileHeader({
             <span>{displayName}</span>
             {user.subscription?.isActive && (
               <img
-                className="tw:inline-block tw:ml-1 tw:size-5"
+                className="tw:inline-block tw:size-5"
                 src="/images/verifiedIcon.svg"
                 alt="Verified"
+              />
+            )}
+            {user.plan && (
+              <img
+                className="tw:size-5"
+                src="/images/verifiedIcon.svg"
+                alt=""
               />
             )}
           </span>
@@ -130,8 +143,8 @@ export default function ProfileHeader({
               >
                 {followLoading
                   ? "Please wait..."
-                  : isFollowing
-                  ? "Following"
+                  : computedIsFollowing
+                  ? "Unfollow"
                   : "Follow Organizer"}
               </button>
             </div>

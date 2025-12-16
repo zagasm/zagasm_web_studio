@@ -92,7 +92,7 @@ function OrganisersIFollow() {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-6 tw:gap-3 tw:md:gap-4">
+        <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-2 tw:lg:grid-cols-3 tw:xl:grid-cols-4 tw:gap-3 tw:md:gap-4">
           {Array.from({ length: 8 }).map((_, idx) => (
             <div key={idx} className="tw:flex tw:pb-1">
               <SkeletonCard />
@@ -116,7 +116,7 @@ function OrganisersIFollow() {
     }
 
     return (
-      <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-5 tw:xl:grid-cols-6 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
+      <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-2 tw:lg:grid-cols-3 tw:xl:grid-cols-4 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
         {organisers.map((org) => (
           <div key={org.id} className="tw:flex tw:pb-1">
             <OrganiserCard
@@ -131,7 +131,7 @@ function OrganisersIFollow() {
   };
 
   return (
-    <div className="tw:bg-[#F5F5F7] tw:min-h-screen tw:pb-12">
+    <div className="tw:bg-[#F5F5F7] tw:min-h-screen tw:pb-20">
       <div className="tw:pt-20">
         {/* Top bar */}
         {/* <div className="tw:flex tw:items-center tw:justify-between tw:mb-4">
@@ -150,11 +150,11 @@ function OrganisersIFollow() {
                 borderRadius: "50%",
               }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-8 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
-            <span className="tw:text-[22px] text-center tw:md:text-xl tw:font-semibold tw:text-gray-900">
+            <span className="tw:text-lg text-center tw:md:text-xl tw:font-semibold tw:text-gray-900">
               Organizers I Follow
             </span>
             <div className="tw:lg:w-20" />
@@ -181,7 +181,13 @@ function OrganisersIFollow() {
 
 function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
   const navigate = useNavigate();
-  const { organiser: name, profileImage, numberOfFollowers, rank, id } = organiser;
+  const {
+    organiser: name,
+    profileImage,
+    numberOfFollowers,
+    rank,
+    id,
+  } = organiser;
 
   const initials = name
     ? name
@@ -192,17 +198,34 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
         .toUpperCase()
     : "?";
 
+  function hasValidProfileImage(url) {
+    if (!url) return false;
+    if (url === "null") return false;
+    if (url === "undefined") return false;
+    return true;
+  }
+
   const followersLabel = formatFollowers(numberOfFollowers);
 
   return (
-    <div onClick={() => navigate(`/profile/${id}`)} className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
+    <div
+      onClick={() => navigate(`/profile/${id}`)}
+      className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)]"
+    >
       {/* Image */}
-      <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-gray-100">
-        <img
-          src={profileImage || "/images/organiser.png"}
-          alt={name}
-          className="tw:w-full tw:object-cover"
-        />
+      <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-[#F4E6FD] tw:flex tw:items-center tw:justify-center">
+        {hasValidProfileImage(profileImage) ? (
+          <img
+            src={profileImage}
+            alt={name}
+            className="tw:w-full tw:h-full tw:object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <span className="tw:text-[#500481] tw:text-2xl tw:font-semibold">
+            {initials}
+          </span>
+        )}
       </div>
 
       {/* Name + rank */}
@@ -227,13 +250,13 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
 
       {/* Unfollow button */}
       <button
-        style={{ borderRadius: 8 }}
+        style={{ borderRadius: 8, fontSize: 12 }}
         type="button"
         disabled={isUnfollowing}
         onClick={onUnfollow}
         className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:tw:hover:bg-gray-50 tw:tw:disabled:opacity-60 tw:tw:disabled:cursor-not-allowed tw:transition"
       >
-        <img src="/images/user-x.svg"/>
+        <img src="/images/user-x.svg" />
         <span>{isUnfollowing ? "Unfollowing…" : "Unfollow"}</span>
       </button>
     </div>

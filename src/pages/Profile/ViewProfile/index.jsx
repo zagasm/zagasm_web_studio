@@ -70,8 +70,14 @@ export default function ViewProfile() {
 
         if (cancelled) return;
         setProfileUser(data);
-        if (data?.is_following !== undefined)
-          setIsFollowing(!!data.is_following);
+        const pickIsFollowing = (d) => {
+          if (typeof d?.isFollowing === "boolean") return d.isFollowing; // organiser payload
+          if (typeof d?.is_following === "boolean") return d.is_following; // fallback
+          if (typeof d?.following === "boolean") return d.following; // fallback
+          return false;
+        };
+
+        setIsFollowing(pickIsFollowing(data));
       } catch (e) {
         if (!cancelled) setProfileError("Unable to load profile.");
       } finally {
@@ -121,17 +127,32 @@ export default function ViewProfile() {
 
       // endpoint: /api/v1/follow/{organizerId}
       const res = await api.post(
-        `/api/v1/follow/${finalProfileUser.id}`,
+        `/api/v1/follow/${finalProfileUser.userId}`,
         null,
         authHeaders(token)
       );
 
-      const isNowFollowing =
-        res?.data?.data?.is_following ??
-        res?.data?.is_following ??
-        !isFollowing;
+      const pickFollowFromToggle = (r) => {
+        if (typeof r?.data?.following === "boolean") return r.data.following;
+        if (typeof r?.following === "boolean") return r.following;
+        if (typeof r?.data?.is_following === "boolean")
+          return r.data.is_following;
+        if (typeof r?.is_following === "boolean") return r.is_following;
+        if (typeof r?.data?.isFollowing === "boolean")
+          return r.data.isFollowing;
+        if (typeof r?.isFollowing === "boolean") return r.isFollowing;
+        return null;
+      };
+
+      const next = pickFollowFromToggle(res?.data);
+      const isNowFollowing = typeof next === "boolean" ? next : !isFollowing;
 
       setIsFollowing(isNowFollowing);
+
+      // also keep local profileUser in sync so ProfileHeader sees it too
+      setProfileUser((p) =>
+        p ? { ...p, isFollowing: isNowFollowing, following: isNowFollowing } : p
+      );
 
       if (isNowFollowing) {
         showSuccess("You’re now following this organizer.");
@@ -204,7 +225,9 @@ export default function ViewProfile() {
               <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
                 <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
                   <img
-                    src={finalProfileUser?.profileUrl || "/images/avater_pix.avif"}
+                    src={
+                      finalProfileUser?.profileUrl || "/images/avater_pix.avif"
+                    }
                     alt=""
                     className="tw:w-full tw:h-full tw:object-cover"
                   />
@@ -235,7 +258,9 @@ export default function ViewProfile() {
 
             <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-2 tw:rounded-2xl tw:px-4 tw:py-3">
               <span className="tw:block tw:font-semibold">About Me</span>
-              <span className="tw:block tw:text-xs">{finalProfileUser?.about}</span>
+              <span className="tw:block tw:text-xs">
+                {finalProfileUser?.about}
+              </span>
             </div>
 
             <div className="tw:bg-linear-to-r tw:from-[#8F07E7] tw:via-[#9105B4] tw:to-[#500481] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">

@@ -57,9 +57,12 @@ export default function PodiumCard({ org, position }) {
       </div>
 
       <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-1">
-        <span className="tw:text-[10px] tw:sm:text-base tw:font-semibold tw:text-gray-900">
-          {truncate(name, 18)}
-        </span>
+        <div className="tw:flex tw:items-center">
+          <span className="tw:text-[10px] tw:sm:text-base tw:font-semibold tw:text-gray-900">
+            {truncate(name, 18)}
+          </span>
+          {org.plan && <img className="tw:size-4" src="/images/verifiedIcon.svg" alt="" />}
+        </div>
 
         {/* <span className="tw:text-[11px] tw:sm:text-xs tw:text-gray-500">
           @{(org?.username || org?.email || org?.slug || "").replace("@", "")}
