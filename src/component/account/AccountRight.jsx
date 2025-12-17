@@ -16,6 +16,7 @@ import {
   UserPen,
   Coins,
   CircleAlert,
+  PlusCircle,
 } from "lucide-react";
 import Switch from "@mui/material/Switch";
 import { api, authHeaders } from "../../lib/apiClient";
@@ -167,6 +168,11 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
   ];
   const wallet = [
     { icon: Coins, label: "Crypto Wallet", to: "/account/crypto-wallet" },
+    {
+      icon: PlusCircle,
+      label: "Fund Wallet",
+      to: "/account/fund-wallet",
+    },
   ];
 
   const support = [

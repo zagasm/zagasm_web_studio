@@ -27,18 +27,58 @@ const GENRES = [
   "Cultural & Social",
 ];
 
-const schema = z.object({
-  title: z.string().min(10, "Event title must be at least 10 characters"),
-  description: z.string().min(20, "Description must be at least 20 characters"),
-  location: z.string().min(1, "Please select a location"),
-  organizer: z.string().min(3, "Organizer name must be at least 3 characters"),
-  genre: z.string().min(1, "Please select a genre"),
-  date: z.string().refine((v) => new Date(v) > new Date(), {
-    message: "Event date must be in the future",
-  }),
-  time: z.string().min(1, "Please select a time"),
-  timezone: z.string().min(1, "Please select a timezone"),
-});
+const schema = z
+  .object({
+    title: z.string().min(10, "Event title must be at least 10 characters"),
+    description: z
+      .string()
+      .min(20, "Description must be at least 20 characters"),
+    location: z.string().min(1, "Please select a location"),
+    organizer: z
+      .string()
+      .min(3, "Organizer name must be at least 3 characters"),
+    genre: z.string().min(1, "Please select a genre"),
+    date: z.string().refine(
+      (v) => {
+        if (!v) return false;
+        const now = new Date();
+        const todayStart = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        );
+        const selected = new Date(v);
+        return selected.getTime() >= todayStart.getTime();
+      },
+      {
+        message: "Event date cannot be in the past",
+      }
+    ),
+    time: z.string().min(1, "Please select a time"),
+    timezone: z.string().min(1, "Please select a timezone"),
+  })
+  .superRefine((values, ctx) => {
+    const { date, time } = values;
+    if (!date || !time) return;
+
+    const selected = new Date(`${date}T${time}`);
+    if (!Number.isFinite(selected.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["time"],
+        message: "Invalid date or time",
+      });
+      return;
+    }
+
+    if (selected.getTime() <= Date.now()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["time"],
+        message: "Event time must be in the future",
+      });
+    }
+  });
 
 export default function EventInformationStep({
   defaultValues = {},
@@ -108,6 +148,14 @@ export default function EventInformationStep({
       })),
     [timeZones]
   );
+
+  useEffect(() => {
+    if (!tzOptions.length || watchVals.timezone) return;
+    const first = tzOptions[0]?.value;
+    if (first) {
+      setValue("timezone", first, { shouldValidate: true });
+    }
+  }, [tzOptions, setValue, watchVals.timezone]);
 
   const typeOptions = useMemo(
     () => eventTypes.map((t) => ({ value: t.id, label: t.name })),
@@ -282,17 +330,22 @@ export default function EventInformationStep({
                 shouldValidate: true,
               });
             }}
-            disabled={loadingTZ}
+            disabled
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder={loadingTZ ? "Loading…" : "Select Timezone"}
+                placeholder={loadingTZ ? "Loading…" : "Timezone locked"}
                 size="small"
                 error={!!errors.timezone}
                 helperText={errors.timezone?.message}
               />
             )}
           />
+          {tzOptions[0] && (
+            <p className="tw:mt-2 tw:text-[11px] tw:text-gray-500">
+              Your Timezone is fixed to {tzOptions[0].label}.
+            </p>
+          )}
         </div>
       </div>
 

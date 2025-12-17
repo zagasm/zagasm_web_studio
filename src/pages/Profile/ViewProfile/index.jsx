@@ -11,6 +11,66 @@ import { useAuth } from "../../auth/AuthContext";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
+const ProfileSkeleton = () => (
+  <div className="tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full tw:animate-pulse">
+    <div className="tw:w-full tw:lg:w-[35%] tw:space-y-4 tw:lg:pb-8">
+      <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-6 tw:space-y-4">
+        <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
+          <div className="tw:h-24 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:h-6 tw:w-1/2 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:h-4 tw:w-1/3 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <span className="tw:h-5 tw:w-20 tw:rounded-full tw:bg-gray-200" />
+            <span className="tw:h-5 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+          </div>
+        </div>
+
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3">
+          {Array.from({ length: 2 }).map((_, idx) => (
+            <div key={idx} className="tw:h-20 tw:rounded-2xl tw:bg-gray-100" />
+          ))}
+        </div>
+
+        <div className="tw:h-28 tw:rounded-2xl tw:bg-gray-100" />
+      </div>
+
+      <div className="tw:hidden tw:lg:block tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:space-y-4">
+        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="tw:space-y-2">
+              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+              <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div className="tw:flex-1 tw:space-y-4">
+      <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:space-y-4">
+        <div className="tw:h-6 tw:w-40 tw:rounded-full tw:bg-gray-200" />
+        <div className="tw:flex tw:gap-3">
+          {["1", "2", "3", "4"].map((tab) => (
+            <span
+              key={tab}
+              className="tw:h-9 tw:w-20 tw:rounded-full tw:bg-gray-100"
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-4">
+        {Array.from({ length: 6 }).map((_, idx) => (
+          <div
+            key={idx}
+            className="tw:h-56 tw:rounded-2xl tw:bg-gray-100 tw:border tw:border-gray-100"
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 export default function ViewProfile() {
   const navigate = useNavigate();
   const { profileId: routeUserId } = useParams();
@@ -230,28 +290,7 @@ export default function ViewProfile() {
       {/* content */}
       <div className="tw:mt-4 tw:px-2 tw:md:px-6 tw:h-auto tw:lg:h-[calc(100vh-140px)]">
         {isLoading ? (
-          // SKELETON
-          <div className="tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
-            {/* LEFT skeleton */}
-            <div className="tw:w-full tw:lg:w-[35%] tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto">
-              <div className="tw:mt-6 tw:lg:mt-10 tw:h-72 tw:rounded-3xl tw:bg-gray-100 tw:animate-pulse" />
-              <div className="tw:mt-4 tw:h-56 tw:rounded-3xl tw:bg-gray-100 tw:animate-pulse" />
-            </div>
-
-            {/* RIGHT skeleton */}
-            <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:lg:overflow-y-auto">
-              <div className="tw:h-10 tw:w-40 tw:mt-6 tw:rounded-full tw:bg-gray-100 tw:animate-pulse" />
-              <div className="tw:mt-4 tw:h-11 tw:rounded-2xl tw:bg-gray-100 tw:animate-pulse" />
-              <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-5">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="tw:h-64 tw:rounded-2xl tw:bg-gray-100 tw:animate-pulse"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+          <ProfileSkeleton />
         ) : profileError ? (
           <p className="tw-text-red-600 tw:mt-10">
             Failed to load profile: {profileError}

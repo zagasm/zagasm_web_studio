@@ -213,7 +213,7 @@ export default function ContactFormSection() {
                     </span>
                   </div>
                 </div>
-                <div className="tw:flex tw:items-start tw:gap-2.5">
+                {/* <div className="tw:flex tw:items-start tw:gap-2.5">
                   <MapPin className="tw:w-4 tw:h-4 tw:mt-0.5 tw:text-primarySecond" />
                   <div>
                     <span className="tw:block tw:text-white/60">Base</span>
@@ -224,7 +224,7 @@ export default function ContactFormSection() {
                       Available remotely for global productions.
                     </span>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

@@ -1,16 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./SavedeventSTyling.css";
 import { useAuth } from "../../../pages/auth/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../../lib/apiClient";
-import {
-  showError,
-  showPromise,
-  showSuccess,
-} from "../../../component/ui/toast";
-import SavedEventCard from "./SaveEventCard";
-
-const FALLBACK_IMG = "/images/event-dummy.jpg";
+import { EventCard, EventShimmer } from "../SingleEvent";
+import EventActionsSheet from "../EventsActionSheet";
 
 const TABS = [
   { key: "all", label: "All" },
@@ -19,65 +12,14 @@ const TABS = [
   { key: "ended", label: "Ended" },
 ];
 
-/* ---------- Shimmer ---------- */
-const ShimmerCard = () => (
-  <div className="col-12 col-md-4 col-lg-3 mb-4">
-    <div className="tw:bg-white tw:rounded-3xl tw:p-3 tw:h-full tw:shadow-[0_12px_30px_rgba(15,23,42,0.10)] shimmer-container">
-      <div className="tw:rounded-[20px] tw:mb-3 shimmer-image shimmer-placeholder" />
-      <div className="shimmer-line shimmer-title shimmer-placeholder" />
-      <div className="shimmer-line shimmer-author shimmer-placeholder tw:mt-3" />
-      <div className="shimmer-line shimmer-date shimmer-placeholder tw:mt-3" />
-      <div className="shimmer-line shimmer-cta shimmer-placeholder tw:mt-4" />
-    </div>
-  </div>
-);
-
-/* ---------- Helpers ---------- */
-function resolveCurrencySymbol(ev) {
-  if (Array.isArray(ev.suggested_currencies)) {
-    const ngn = ev.suggested_currencies.find((c) => c.code === "NGN");
-    if (ngn?.symbol) return ngn.symbol;
-    const first = ev.suggested_currencies[0];
-    if (first?.symbol) return first.symbol;
-  }
-  // fallback
-  return "₦";
-}
-
-function buildEventModel(ev) {
-  const symbol = resolveCurrencySymbol(ev);
-  const rawPrice = ev.price || "";
-  // keep formatting from backend, just strip .00
-  const cleanedPrice = rawPrice.endsWith(".00")
-    ? rawPrice.slice(0, -3)
-    : rawPrice;
-
-  return {
-    id: ev.id,
-    title: ev.title || "Untitled Event",
-    description: ev.description || "",
-    status: ev.status || "upcoming",
-    image: ev?.poster?.[0]?.url || FALLBACK_IMG,
-    hostImage: ev.hostImage,
-    hostName: ev.hostName || "Unknown Host",
-    hasPaid: !!ev.hasPaid,
-    isSaved: !!ev.is_saved,
-    liveViewers: ev.live_sessions_count ?? null,
-    eventDate: ev.eventDate || "",
-    startTime: ev.startTime || "",
-    priceLabel: `${symbol}${cleanedPrice || "0"}`,
-    streamUrl: ev.streamUrl || null,
-  };
-}
-
 export default function SaveEventTemplate() {
   const { token } = useAuth();
-  const navigate = useNavigate();
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchSavedEvents = useCallback(async () => {
     if (!token) {
@@ -95,7 +37,7 @@ export default function SaveEventTemplate() {
       );
 
       const list = Array.isArray(data?.data) ? data.data : [];
-      const mapped = list.map(buildEventModel);
+      const mapped = list.map((ev) => ({ ...ev, is_saved: true }));
       setEvents(mapped);
 
       if (!mapped.length) {
@@ -150,43 +92,6 @@ export default function SaveEventTemplate() {
     return events;
   }, [events, activeTab]);
 
-  function handleOpenDetails(id) {
-    navigate(`/event/view/${id}`);
-  }
-
-  async function handleToggleSave(eventId) {
-    const previous = events;
-    setEvents((list) => list.filter((ev) => ev.id !== eventId));
-
-    try {
-      await showPromise(
-        api.post(`/api/v1/events/${eventId}/toggle`, {}, authHeaders(token)),
-        {
-          loading: "Updating…",
-          success: "Event removed from saved",
-          error: "Failed to update saved event",
-        }
-      );
-    } catch (e) {
-      console.error(e);
-      setEvents(previous); // rollback
-      showError("Failed to unsave event. Please try again.");
-    }
-  }
-
-  function handlePrimaryAction(ev) {
-    const status = (ev.status || "").toLowerCase();
-
-    if (status === "live" && ev.streamUrl) {
-      // TODO: adjust this route to your live player route
-      window.open(ev.streamUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    // For upcoming / ended / fallback, go to event details.
-    navigate(`/event/view/${ev.id}`);
-  }
-
   if (!loading && error && !events.length) {
     return (
       <div className="tw:py-24 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4 tw:text-center">
@@ -240,8 +145,13 @@ export default function SaveEventTemplate() {
                     : "tw:text-gray-500 tw:hover:text-gray-900",
                 ].join(" ")}
               >
-                {tab.label}
-                
+                <span className="tw:flex tw:items-center tw:gap-1">
+                  <span>{tab.label}</span>
+                  <span className="tw:text-xs tw:font-normal tw:text-gray-500">
+                    ({count})
+                  </span>
+                </span>
+              
               </button>
             );
           })}
@@ -252,20 +162,25 @@ export default function SaveEventTemplate() {
       {loading ? (
         <div className="row">
           {Array.from({ length: 12 }).map((_, i) => (
-            <ShimmerCard key={i} />
+            <EventShimmer key={i} />
           ))}
         </div>
       ) : filteredEvents.length ? (
         <div className="row">
           {filteredEvents.map((ev) => (
-            <div key={ev.id} className="col-12 col-md-4 col-lg-3 mb-4">
-              <SavedEventCard
-                event={ev}
-                onToggleSave={handleToggleSave}
-                onPrimaryAction={handlePrimaryAction}
-                onOpenDetails={handleOpenDetails}
-              />
-            </div>
+            <EventCard
+              key={ev.id}
+              event={ev}
+              variant={
+                activeTab === "live"
+                  ? "live"
+                  : activeTab === "upcoming"
+                  ? "upcoming"
+                  : "all"
+              }
+              onMore={() => setSelectedEvent(ev)}
+              hidePrice
+            />
           ))}
         </div>
       ) : (
@@ -273,6 +188,18 @@ export default function SaveEventTemplate() {
           No {activeTab === "all" ? "" : activeTab} saved events yet.
         </div>
       )}
+
+      <EventActionsSheet
+        open={!!selectedEvent}
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        onSaveChange={(eventId, isSaved) => {
+          if (!isSaved) {
+            setEvents((prev) => prev.filter((ev) => ev.id !== eventId));
+            setSelectedEvent(null);
+          }
+        }}
+      />
     </>
   );
 }

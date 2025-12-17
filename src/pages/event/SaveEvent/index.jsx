@@ -13,7 +13,7 @@ export default function SaveEvents() {
         description="View and manage your saved events at Zagasm Studios. Keep track of concerts, festivals, parties and events you're interested in attending."
         keywords="zagasm studios, saved events, favorite events, bookmarked events, upcoming events"
       />
-      <div className="">
+      <div className="tw:font-sans">
         <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
           <div className="">
             <div className="col pb-5 mb-5 mt-4">

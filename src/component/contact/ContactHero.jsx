@@ -121,13 +121,13 @@ export default function ContactHero() {
                 </div>
                 <div className="tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:px-3 tw:py-3">
                   <span className="tw:block tw:text-xs tw:text-white/60 tw:mb-1">
-                    Offices
+                    Support
                   </span>
                   <span className="tw:block tw:text-lg tw:font-semibold">
-                    Asaba-first
+                    7 days
                   </span>
                   <span className="tw:block tw:text-[11px] tw:text-white/55">
-                    Built around African creators.
+                    We’re around when you need us.
                   </span>
                 </div>
               </div>

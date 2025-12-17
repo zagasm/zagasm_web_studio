@@ -5,7 +5,6 @@ const STEPS = [
   "Event Information",
   "Media Upload",
   "Ticketing & Pricing",
-  "Streaming Setup",
   "Access & Visibility",
   "Review & Publish",
 ];
@@ -33,7 +32,7 @@ export default function ProgressSteps({ currentStep, completedSteps, onBack }) {
           {STEPS[currentStep - 1]}
         </div>
         <div className="tw:text-sm tw:md:text-lg tw:text-gray-500">
-          Step {currentStep} of 6
+          Step {currentStep} of {STEPS.length}
         </div>
       </div>
 

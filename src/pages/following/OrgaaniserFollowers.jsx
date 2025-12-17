@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../lib/apiClient";
-import { showError } from "../../component/ui/toast";
+import { showError, showSuccess } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
+import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
 
 const CACHE_KEY = "zagasm_followers_organisers";
 
@@ -14,6 +15,7 @@ function OrganiserFollowers() {
   const [organisers, setOrganisers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [networkBusy, setNetworkBusy] = useState(false);
+  const [togglingId, setTogglingId] = useState(null);
 
   const loadOrganisers = useCallback(async () => {
     try {
@@ -37,6 +39,45 @@ function OrganiserFollowers() {
       setNetworkBusy(false);
     }
   }, [token, organisers.length]);
+
+  const handleToggleFollow = useCallback(
+    async (org) => {
+      if (!org?.userId) return;
+      setTogglingId(org.userId);
+      try {
+        const res = await api.post(
+          `/api/v1/follow/${org.userId}`,
+          {},
+          authHeaders(token)
+        );
+
+        const following =
+          typeof res?.data?.following === "boolean"
+            ? res.data.following
+            : typeof res?.data?.data?.following === "boolean"
+            ? res.data.data.following
+            : !org.isFollowing;
+
+        setOrganisers((prev) => {
+          const updated = prev.map((item) =>
+            item.userId === org.userId ? { ...item, isFollowing: following } : item
+          );
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+          return updated;
+        });
+
+        showSuccess(
+          following ? "Organizer followed" : "Organizer unfollowed"
+        );
+      } catch (error) {
+        console.error(error);
+        showError("Could not update follow state. Please try again.");
+      } finally {
+        setTogglingId(null);
+      }
+    },
+    [token]
+  );
 
   useEffect(() => {
     // 1. use cache for instant paint
@@ -89,7 +130,12 @@ function OrganiserFollowers() {
       <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:lg:grid-cols-5 tw:xl:grid-cols-6 tw:gap-3 tw:px-0 tw:md:px-4 tw:md:gap-4">
         {organisers.map((org) => (
           <div key={org.id} className="tw:flex tw:pb-1">
-            <OrganiserCard organiser={org} />
+            <OrganiserCard
+              organiser={org}
+              onToggleFollow={handleToggleFollow}
+              isToggling={togglingId === org.userId}
+              onCardClick={() => navigate(`/profile/${org.id}`)}
+            />
           </div>
         ))}
       </div>
@@ -139,32 +185,36 @@ function OrganiserFollowers() {
   );
 }
 
-function hasValidProfileImage(url) {
-  if (!url) return false;
-  if (url === "null") return false;
-  if (url === "undefined") return false;
-  return true;
-}
-
-function getInitials(name) {
-  if (!name || typeof name !== "string") return "Z";
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const a = parts[0]?.[0] ?? "";
-  const b = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
-  return (a + b).toUpperCase() || "Z";
-}
-
 /* ---------- Card Components ---------- */
 
-function OrganiserCard({ organiser }) {
-  const { organiser: name, profileImage, numberOfFollowers, rank } = organiser;
+function OrganiserCard({
+  organiser,
+  onToggleFollow,
+  isToggling = false,
+  onCardClick = () => {},
+}) {
+  const {
+    organiser: name,
+    profileImage,
+    numberOfFollowers,
+    rank,
+    has_active_subscription,
+  } = organiser;
 
-  const followersLabel = formatFollowers(numberOfFollowers);
-  const showImage = hasValidProfileImage(profileImage);
   const initials = getInitials(name);
+  const showImage = hasProfileImage(profileImage);
+  const followersLabel = formatFollowers(numberOfFollowers);
+  const showVerified = !!has_active_subscription;
+  const isFollowing = !!organiser.isFollowing;
+  const buttonLabel = isFollowing ? "Unfollow" : "Follow";
 
   return (
-    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:tw:-translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onCardClick}
+      className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)] tw:cursor-pointer"
+    >
       {/* Image / initials */}
       <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-[#F4E6FD] tw:flex tw:items-center tw:justify-center">
         {showImage ? (
@@ -183,8 +233,16 @@ function OrganiserCard({ organiser }) {
 
       {/* Name + rank */}
       <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-        <span className="tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
+        <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
           {name}
+          {showVerified && (
+            <img
+              width={12}
+              height={12}
+              src="/images/verifiedIcon.svg"
+              alt="Verified organizer"
+            />
+          )}
         </span>
 
         <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-1 tw:rounded-lg tw:bg-black tw:text-[10px] tw:text-white tw:shrink-0">
@@ -202,12 +260,25 @@ function OrganiserCard({ organiser }) {
         </span>
       </div>
 
-      <Link
-        to={`/profile/${organiser.id}`}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-[11px] tw:font-medium tw:hover:tw:bg-gray-50 tw:transition text-dark"
+      <button
+        type="button"
+        disabled={isToggling}
+        onClick={(event) => {
+          event.stopPropagation();
+          onToggleFollow?.(organiser);
+        }}
+        className={[
+          "tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:text-[11px] tw:font-semibold tw:transition",
+          isFollowing
+            ? "tw:bg-white tw:border tw:border-gray-200 tw:text-gray-800"
+            : "tw:bg-primary tw:text-white tw:border tw:border-primary",
+          isToggling ? "tw:opacity-60 tw:cursor-not-allowed" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
-        View organizer
-      </Link>
+        {isToggling ? "Processing…" : buttonLabel}
+      </button>
     </div>
   );
 }

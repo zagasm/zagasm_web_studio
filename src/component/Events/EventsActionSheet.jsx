@@ -79,6 +79,7 @@ export default function EventActionsSheet({
   onClose,
   event = {},
   onEventReported,
+  onSaveChange,
 }) {
   const { token: ctxToken } = useAuth();
   const token =
@@ -118,16 +119,20 @@ export default function EventActionsSheet({
   async function onToggleSave() {
     if (!event?.id) return;
     setBusy(true);
+    const nextSaved = !saved;
     try {
       await showPromise(
         api.post(`/api/v1/events/${event.id}/toggle`, {}, authHeaders(token)),
         {
-          loading: saved ? "Unsaving…" : "Saving…",
-          success: saved ? "Event removed from saved" : "Event saved",
+          loading: nextSaved ? "Saving…" : "Unsaving…",
+          success: nextSaved ? "Event saved" : "Event removed from saved",
           error: "Could not toggle save",
         }
       );
-      setSaved((s) => !s);
+      setSaved(nextSaved);
+      if (onSaveChange) {
+        onSaveChange(event.id, nextSaved);
+      }
     } finally {
       setBusy(false);
     }

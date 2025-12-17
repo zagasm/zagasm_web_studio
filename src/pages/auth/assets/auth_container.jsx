@@ -76,7 +76,7 @@ function AuthContainer({
                   )}
                 </div>
                 {children}
-                {footer && (
+                {/* {footer && (
                   <>
                     {" "}
                     <div
@@ -123,7 +123,7 @@ function AuthContainer({
                       </div>
                     </div>
                   </>
-                )}
+                )} */}
                 {haveAccount ? (
                   <div className="text-center footer_text mt-4 ">
                     Don't have an account?{" "}
@@ -142,16 +142,16 @@ function AuthContainer({
                 {privacy && (
                   <div className="text-center mt-3 footer_text">
                     By continuing, you agree to our{" "}
-                    <a
-                      href="https://api.studios.zagasm.com/legal/terms-of-service"
+                    <Link
+                      to="/terms-of-service"
                       className=""
                     >
                       Terms
-                    </a>
+                    </Link>
                     <span> and </span>
-                    <a href="https://api.studios.zagasm.com/legal/privacy-policy">
+                    <Link to="/privacy-policy">
                       Privacy Policy
-                    </a>
+                    </Link>
                   </div>
                 )}
               </div>
