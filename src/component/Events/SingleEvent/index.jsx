@@ -432,7 +432,7 @@ export function EventCard({
               disabled
               className="tw:w-full tw:mt-2 tw:rounded-2xl tw:bg-primary/30 tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:cursor-not-allowed"
             >
-              Paid for event
+              You have paid for this event.
             </button>
           ) : isEnded ? (
             <button

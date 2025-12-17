@@ -102,6 +102,8 @@ function PersonRow({ item, onClick }) {
   const avatarUrl = getAvatarUrl(item);
   const initials = initialsFromName(name);
 
+  console.log(item)
+
   return (
     <button
       type="button"
@@ -121,9 +123,14 @@ function PersonRow({ item, onClick }) {
       </div>
 
       <div className="tw:flex tw:flex-col tw:text-left tw:overflow-hidden">
-        <span className="tw:text-base tw:font-semibold tw:text-black tw:truncate">
-          {name}
-        </span>
+        <div className="tw:flex tw:items-center">
+          <span className="tw:text-base tw:font-semibold tw:text-black tw:truncate">
+            {name}
+          </span>
+          {item.data.has_active_subscription && (
+            <img width={15} src="/images/verifiedIcon.svg" alt="" />
+          )}
+        </div>
         <span className="tw:text-sm tw:text-zinc-500 tw:truncate">
           {subtitle}
         </span>
