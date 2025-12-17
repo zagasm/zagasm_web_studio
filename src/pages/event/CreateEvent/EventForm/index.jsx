@@ -13,9 +13,9 @@ import ProgressSteps from "./steps/ProgressSteps";
 import EventInformationStep from "./steps/EventInformationStep";
 import MediaUploadStep from "./steps/MediaUploadStep";
 import TicketingStep from "./steps/TicketingStep";
-import StreamingStep from "./steps/StreamingStep";
 import AccessStep from "./steps/AccessStep";
 import ReviewStep from "./steps/ReviewStep";
+import EventCreationSuccessModal from "../../../../component/Events/EventCreationSuccessModal";
 
 /**
  * Helper: map backend event -> defaultValues for each step
@@ -148,6 +148,11 @@ export default function EventCreationWizard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [timezoneLabel, setTimezoneLabel] = useState("");
+  const [successModal, setSuccessModal] = useState({
+    open: false,
+    eventId: null,
+    variant: "created",
+  });
 
   // Helpers
   const markStepDone = (n) => {
@@ -184,20 +189,19 @@ export default function EventCreationWizard({
     setCurrentStep(4);
   };
 
-  const handleStreamingNext = (values) => {
-    mergeCollected("step_4", values);
+  const handleAccessNext = (values) => {
+    mergeCollected("step_5", values);
     markStepDone(4);
     setCurrentStep(5);
   };
 
-  const handleAccessNext = (values) => {
-    mergeCollected("step_5", values);
-    markStepDone(5);
-    setCurrentStep(6);
-  };
-
   const goToStep = (n) => {
     setCurrentStep(n);
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModal((prev) => ({ ...prev, open: false }));
+    navigate(`/event/view/${successModal.eventId}`)
   };
 
   // Final submit (create or update)
@@ -273,7 +277,7 @@ export default function EventCreationWizard({
       }
 
       // Step 4 – streaming
-      const s4 = collected.step_4 || {};
+      const s4 = collected.step_4 || mapped.streaming || {};
       payload.append("streaming_option", s4.streamingOption || "in_app");
       payload.append("enable_replay", s4.enableReplay ? "1" : "0");
       if (s4.enableReplay) {
@@ -307,9 +311,13 @@ export default function EventCreationWizard({
         error: "Could not save event",
       });
 
-      if (isEdit) {
-        navigate(`/event/view/${eventId}`)
-      }
+      const created = res?.data?.data || res?.data || {};
+      const createdId = created?.id || eventId;
+      setSuccessModal({
+        open: true,
+        eventId: createdId,
+        variant: isEdit ? "updated" : "created",
+      });
 
       // const created = res?.data?.data || res?.data;
       // const redirectId = created?.id || eventId;
@@ -385,6 +393,7 @@ export default function EventCreationWizard({
         />
       )}
 
+      {/* 
       {currentStep === 4 && (
         <StreamingStep
           defaultValues={mapped.streaming}
@@ -392,21 +401,22 @@ export default function EventCreationWizard({
           onNext={handleStreamingNext}
         />
       )}
+      */}
 
-      {currentStep === 5 && (
+      {currentStep === 4 && (
         <AccessStep
           defaultValues={mapped.access}
-          onBack={() => setCurrentStep(4)}
+          onBack={() => setCurrentStep(3)}
           onNext={handleAccessNext}
         />
       )}
 
-      {currentStep === 6 && (
+      {currentStep === 5 && (
         <ReviewStep
           collected={mergedForReview}
           formErrors={formErrors}
           isSubmitting={isSubmitting}
-          onBack={() => setCurrentStep(5)}
+          onBack={() => setCurrentStep(4)}
           onPublish={handlePublish}
           timezoneLabel={timezoneLabel}
           performers={performers}
@@ -415,6 +425,13 @@ export default function EventCreationWizard({
           posterVideos={posterVideos}
         />
       )}
+
+      <EventCreationSuccessModal
+        open={successModal.open}
+        onClose={closeSuccessModal}
+        eventId={successModal.eventId}
+        variant={successModal.variant}
+      />
     </div>
   );
 }

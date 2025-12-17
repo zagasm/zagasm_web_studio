@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { showError, showSuccess } from "../ui/toast";
-import default_profilePicture from "../../assets/avater_pix.avif"; // Adjust path
+import { getInitials, hasProfileImage } from "../Organizers/organiser.utils";
 import VerificationModal from "./VerificationModal";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
@@ -20,10 +20,12 @@ const AccountLeft = ({ user }) => {
     return () => window.removeEventListener("focus", onFocus);
   }, [token, refreshUser]);
 
-  const Default_user_image = user?.profileUrl
-    ? user.profileUrl
-    : default_profilePicture;
-
+  const profileImage = user?.profileUrl;
+  const showProfileImage = hasProfileImage(profileImage);
+  const fullName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ""}`.trim()
+    : user?.username || user?.email || "User";
+  const initials = getInitials(fullName);
   const isVerified = user?.email_verified || user?.phone_verified;
 
   const handleVerificationSuccess = async () => {
@@ -49,12 +51,22 @@ const AccountLeft = ({ user }) => {
           className="tw:bg-white tw:rounded-3xl tw:px-3 tw:py-4 tw:flex tw:items-center tw:justify-between tw:shadow-sm tw:hover:shadow-md tw:transition-shadow tw:cursor-pointer"
         >
           <div className="tw:flex tw:items-center tw:gap-4">
-            <div className="tw:h-12 tw:w-12 tw:rounded-full tw:overflow-hidden tw:bg-gray-200">
-              <img
-                src={Default_user_image}
-                alt="Profile"
-                className="tw:w-full tw:h-full tw:object-cover"
-              />
+            <div
+              className={`tw:h-12 tw:w-12 tw:rounded-full tw:overflow-hidden tw:flex tw:items-center tw:justify-center ${
+                showProfileImage ? "" : "tw:bg-lightPurple"
+              }`}
+            >
+              {showProfileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="tw:w-full tw:h-full tw:object-cover"
+                />
+              ) : (
+                <span className="tw:text-primary tw:text-sm tw:font-semibold">
+                  {initials}
+                </span>
+              )}
             </div>
             <div className="tw:flex tw:flex-col">
               <div className="tw:flex tw:items-center tw:gap-0.5">
@@ -78,59 +90,64 @@ const AccountLeft = ({ user }) => {
           </div>
           <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-400" />
         </Link>
-
-        <div className="tw:bg-[#000000] tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4">
-          <div className="tw:flex tw:items-center tw:gap-3">
-            <div className="tw:shrink-0">
-              {user.subscription?.isActive ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="tw:size-8 tw:text-white"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                    clipRule="evenodd"
+        {!user.subscription?.isActive && (
+          <div
+            className={`${
+              user.subscription?.isActive ? "tw:bg-blue-600" : "tw:bg-black"
+            } tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4`}
+          >
+            <div className="tw:flex tw:items-center tw:gap-3">
+              <div className="tw:shrink-0">
+                {user.subscription?.isActive ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="tw:size-8 tw:text-white"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  <img
+                    className="tw:size-6"
+                    src="/images/upgrade.png"
+                    alt="Upgrade"
                   />
-                </svg>
-              ) : (
-                <img
-                  className="tw:size-6"
-                  src="/images/upgrade.png"
-                  alt="Upgrade"
-                />
-              )}
-            </div>
-            <div>
-              {user.subscription?.isActive ? (
-                <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                  You are now Verified!
-                </span>
-              ) : (
-                <div>
+                )}
+              </div>
+              <div>
+                {user.subscription?.isActive ? (
                   <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                    Zagasm Studios Verification Badge
+                    You are now Verified!
                   </span>
-                  <br />
-                  <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                    Get the blue checkmark and unlock premium features
-                  </span>
-                </div>
-              )}
+                ) : (
+                  <div>
+                    <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
+                      Zagasm Studios Verification Badge
+                    </span>
+                    <br />
+                    <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
+                      Get the blue checkmark and unlock premium features
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
+            {user.subscription?.isActive ? null : (
+              <Link
+                to="/subscription"
+                style={{ borderRadius: 8 }}
+                className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[12px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
+              >
+                Subscribe Now
+              </Link>
+            )}
           </div>
-          {user.subscription?.isActive ? null : (
-            <Link
-              to="/subscription"
-              style={{ borderRadius: 8 }}
-              className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[12px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
-            >
-              Subscribe Now
-            </Link>
-          )}
-        </div>
+        )}
 
         {/* 3. Verification Warning (Shows ONLY if NOT verified) */}
         {!isVerified && (

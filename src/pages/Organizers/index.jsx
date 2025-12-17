@@ -33,7 +33,7 @@ export default function AllOrganizers() {
         isMore ? setLoadingMore(true) : setLoadingList(true);
 
         const endpoint =
-          url || `${import.meta.env.VITE_API_URL}/api/v1/organisers`;
+          url || `${import.meta.env.VITE_API_URL}/api/v1/top-organisers`;
 
         const res = await fetch(endpoint, {
           method: "GET",
@@ -197,7 +197,11 @@ export default function AllOrganizers() {
               </div>
             ) : (
               <>
-                <PodiumSection top3={top3} />
+                <PodiumSection
+                  top3={top3}
+                  onToggleFollow={toggleFollow}
+                  followLoading={followLoading}
+                />
 
                 <div className="tw:mt-6 tw:space-y-3">
                   {rest.map((org) => (

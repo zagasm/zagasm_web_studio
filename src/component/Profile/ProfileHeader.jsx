@@ -151,7 +151,7 @@ export default function ProfileHeader({
               <span className="tw:font-semibold">{ticketsSold}</span>
               <span className="tw:text-gray-500">
                 {isOrganiserProfileData
-                  ? "Successful Payments"
+                  ? "Tickets Sold"
                   : "Tickets Sold"}
               </span>
             </span>

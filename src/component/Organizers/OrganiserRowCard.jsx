@@ -1,8 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getInitials, hasProfileImage } from "./organiser.utils";
+import { Camera, CameraIcon, Ticket } from "lucide-react";
+import { FaCamera, FaCameraRetro } from "react-icons/fa";
+import { useAuth } from "../../pages/auth/AuthContext";
 
 export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const name = org?.organiser || "Organizer";
@@ -48,12 +52,16 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
             {name}
           </span>
           {org.has_active_subscription && (
-            <img className="tw:size-4" src="/images/verifiedIcon.svg" alt="" />
+            <img
+              className="tw:size-3 tw:md:size-4"
+              src="/images/verifiedIcon.svg"
+              alt=""
+            />
           )}
         </div>
 
         <span className="tw:block tw:text-[10px] tw:sm:text-xs tw:text-gray-500 tw:truncate">
-          @{(org?.username || org?.email || org?.slug || "").replace("@", "")}
+          {org?.userName || org?.email || org?.slug || ""}
         </span>
 
         <span className="tw:block tw:mt-1.5 tw:text-[11px] tw:sm:text-xs tw:text-gray-600">
@@ -61,47 +69,64 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
         </span>
 
         {/* optional stats (keep small on mobile) */}
-        {/* <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-[11px] tw:sm:text-xs">
-          <span className="tw:text-red-500 tw:inline-flex tw:items-center tw:gap-2">
-            <span className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-lg tw:border tw:border-red-200 tw:px-2 tw:py-1">
-              🎟️
+        <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-1 tw:md:gap-2 ">
+          <span className=" tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="tw:size-4 tw:text-red-500"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+              />
+            </svg>
+            <span className="tw:text-red-500">
+              {org?.events_live_count ?? 0}
             </span>
-            {org?.totalEventsCreated ?? 0} {org?.totalEventsCreated > 1 ? "events" : "event"}  created
+            active {org?.totalEventsCreated > 1 ? "events" : "event"}
           </span>
 
-          <span className="tw:text-emerald-600 tw:inline-flex tw:items-center tw:gap-2">
-            <span className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-lg tw:border tw:border-emerald-200 tw:px-2 tw:py-1">
-              ✅
+          <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
+            <Ticket className="tw:text-emerald-600 tw:size-4" />
+            <span className="tw:text-emerald-600">
+              {org?.tickets_total ?? 0}
             </span>
-            {org?.tickets_total ?? 0} Tickets Sold
+            Tickets Sold
           </span>
-        </div> */}
+        </div>
       </div>
 
       {/* follow */}
-      {/* <div className="tw:shrink-0 tw:w-24 tw:sm:w-[120px]">
-        <button
-          style={{
-            borderRadius: 16,
-            fontSize: 12,
-          }}
-          type="button"
-          disabled={loading}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFollow(org.userId);
-          }}
-          className={`tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 tw:text-[12px] tw:sm:text-sm tw:font-medium tw:ring-1 tw:transition
+      {user.id !== org?.userId && (
+        <div className="tw:shrink-0 tw:w-24 tw:sm:w-[120px]">
+          <button
+            style={{
+              borderRadius: 16,
+              fontSize: 12,
+            }}
+            type="button"
+            disabled={loading}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFollow(org.userId);
+            }}
+            className={`tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 tw:text-[12px] tw:sm:text-sm tw:font-medium tw:ring-1 tw:transition
             ${
               isFollowing
                 ? "tw:bg-white tw:text-gray-900 tw:ring-gray-200"
                 : "tw:bg-primary tw:text-white tw:ring-primary"
             }
             ${loading ? "tw:opacity-70 tw:cursor-not-allowed" : ""}`}
-        >
-          {loading ? "Wait..." : isFollowing ? "Unfollow" : "Follow"}
-        </button>
-      </div> */}
+          >
+            {loading ? "Wait..." : isFollowing ? "Unfollow" : "Follow"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   PlusSquare,
   Ticket,
   User,
+  Star,
 } from "lucide-react";
 
 export default function MobileNav() {
@@ -27,10 +28,10 @@ export default function MobileNav() {
       ),
     },
     {
-      name: "Saved",
-      to: "/event/saved-events",
+      name: "Tickets",
+      to: "/tickets",
       icon: (active) => (
-        <Heart
+        <Ticket
           className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
@@ -51,10 +52,10 @@ export default function MobileNav() {
       ),
     },
     {
-      name: "Tickets",
-      to: "/tickets",
+      name: "Organizers",
+      to: "/organizers",
       icon: (active) => (
-        <Ticket
+        <Star
           className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
@@ -77,7 +78,7 @@ export default function MobileNav() {
   ];
 
   return (
-    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-5 tw:z-999 tw:block tw:md:hidden">
+    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-5 tw:z-999 tw:block">
       <div className="tw:flex tw:items-center tw:justify-between tw:px-6">
         {navItems.map((item) => {
           const active = location.pathname === item.to;
@@ -91,7 +92,9 @@ export default function MobileNav() {
               {item.icon(active)}
               <span
                 className={`tw:text-[10px] ${
-                  active ? "tw:text-black tw:font-semibold" : "tw:text-[#4A4A4A]"
+                  active
+                    ? "tw:text-black tw:font-semibold"
+                    : "tw:text-[#4A4A4A]"
                 }`}
               >
                 {item.name}

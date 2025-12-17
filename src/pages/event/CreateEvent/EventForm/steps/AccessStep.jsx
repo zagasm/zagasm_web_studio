@@ -12,7 +12,7 @@ const schema = z.object({
 const VIS = [
   { value: "public", label: "Public" },
   { value: "private", label: "Private" },
-  { value: "unlisted", label: "Unlisted" },
+  // { value: "unlisted", label: "Unlisted" },
 ];
 
 export default function AccessStep({ defaultValues = {}, onBack, onNext }) {

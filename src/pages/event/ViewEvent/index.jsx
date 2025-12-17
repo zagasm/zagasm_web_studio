@@ -35,6 +35,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import EventShareModal from "../../../component/Events/EvenetShareModal";
+import TicketPromptModal from "../../../component/Events/TicketPromptModal";
 function isUuid(value = "") {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     String(value)
@@ -52,6 +53,9 @@ export default function ViewEvent() {
   const [shareOpen, setShareOpen] = useState(false);
 
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [purchaseModalOpen, setPurchaseModalOpen] = useState(false);
+  const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
+  const [initiatingPayment, setInitiatingPayment] = useState(false);
 
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -87,6 +91,8 @@ export default function ViewEvent() {
       try {
         setLoading(true);
         setError(null);
+        setModalAutoTrigger(true);
+        setPurchaseModalOpen(false);
 
         const isId = isUuid(eventId);
 
@@ -137,6 +143,22 @@ export default function ViewEvent() {
     };
   }, [eventId, token]);
 
+  useEffect(() => {
+    if (!event || !modalAutoTrigger) return;
+
+    const priceValue = Number(event?.price ?? 0);
+    const hasPrice = priceValue > 0 || Boolean(event?.price_display);
+
+    if (!event?.hasPaid && hasPrice) {
+      setPurchaseModalOpen(true);
+    }
+  }, [event, modalAutoTrigger]);
+
+  const closePurchaseModal = () => {
+    setPurchaseModalOpen(false);
+    setModalAutoTrigger(false);
+  };
+
   const priceDisplay =
     event?.price_display ||
     `${event?.currency?.symbol || "₦"}${event?.price || "0"}`;
@@ -153,6 +175,7 @@ export default function ViewEvent() {
     }
 
     try {
+      setInitiatingPayment(true);
       const res = await api.post(
         `/api/v1/payments/${event.id}/initiate`,
         { access_type: accessType },
@@ -180,6 +203,8 @@ export default function ViewEvent() {
         "Failed to initiate payment.";
       showError(errorMessage);
       console.error("Payment initiation error:", error);
+    } finally {
+      setInitiatingPayment(false);
     }
   };
 
@@ -742,14 +767,6 @@ export default function ViewEvent() {
                 </div>
               </div>
 
-              {/* AGE RESTRICTION */}
-              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
-                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                  <div className="tw:w-full tw:bg-[#FEF3C7] tw:text-[#92400E] tw:text-center tw:text-xs tw:md:text-sm tw:py-3 tw:rounded-[14px] tw:font-medium">
-                    {event.ageRestrictionText || "+18 (not for children)"}
-                  </div>
-                </div>
-              </div>
 
               {/* EVENT STATS */}
               <div className="tw:px-4 tw:md:px-6 tw:pb-6">
@@ -869,6 +886,14 @@ export default function ViewEvent() {
           await handleGetTicket(accessType);
           setAccessModalOpen(false);
         }}
+      />
+
+      <TicketPromptModal
+        open={purchaseModalOpen}
+        onClose={closePurchaseModal}
+        event={event}
+        onBuy={() => handleGetTicket("main")}
+        buying={initiatingPayment}
       />
 
       <LiveAppDownloadModal

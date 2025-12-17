@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError, showSuccess } from "../../component/ui/toast";
+import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
 
 import { useAuth } from "../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
@@ -187,25 +188,13 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
     numberOfFollowers,
     rank,
     id,
+    has_active_subscription,
   } = organiser;
 
-  const initials = name
-    ? name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "?";
-
-  function hasValidProfileImage(url) {
-    if (!url) return false;
-    if (url === "null") return false;
-    if (url === "undefined") return false;
-    return true;
-  }
-
+  const initials = getInitials(name);
+  const showImage = hasProfileImage(profileImage);
   const followersLabel = formatFollowers(numberOfFollowers);
+  const showVerified = !!has_active_subscription;
 
   return (
     <div
@@ -214,7 +203,7 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
     >
       {/* Image */}
       <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-[#F4E6FD] tw:flex tw:items-center tw:justify-center">
-        {hasValidProfileImage(profileImage) ? (
+        {showImage ? (
           <img
             src={profileImage}
             alt={name}
@@ -230,8 +219,16 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
 
       {/* Name + rank */}
       <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-        <span className="tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
+        <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
           {name}
+          {showVerified && (
+            <img
+              width={12}
+              height={12}
+              src="/images/verifiedIcon.svg"
+              alt="Verified organizer"
+            />
+          )}
         </span>
         <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-1 tw:rounded-lg tw:bg-black tw:text-[10px] tw:text-white tw:shrink-0">
           <img width={21} height={21} src="/images/globe.svg" alt="" />
@@ -253,7 +250,10 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
         style={{ borderRadius: 8, fontSize: 12 }}
         type="button"
         disabled={isUnfollowing}
-        onClick={onUnfollow}
+        onClick={(event) => {
+          event.stopPropagation();
+          onUnfollow?.();
+        }}
         className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:tw:hover:bg-gray-50 tw:tw:disabled:opacity-60 tw:tw:disabled:cursor-not-allowed tw:transition"
       >
         <img src="/images/user-x.svg" />

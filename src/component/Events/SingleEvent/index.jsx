@@ -206,7 +206,12 @@ export function CountdownPill({ target }) {
 }
 
 /* ---- Single Card (shared for all variants) ---- */
-export function EventCard({ event, variant = "default", onMore }) {
+export function EventCard({
+  event,
+  variant = "default",
+  onMore,
+  hidePrice = false,
+}) {
   const startDate = eventStartDate(event);
   const navigate = useNavigate();
 
@@ -226,7 +231,7 @@ export function EventCard({ event, variant = "default", onMore }) {
     event?.status === "ended" ||
     (startDate && startDate.getTime() < Date.now() && event?.status !== "live");
 
-  const ticketLabel = `Buy Ticket (${priceText(event)})`;
+  const ticketLabel = `Buy Ticket ${!hidePrice ? `(${priceText(event)})` : ''} `;
 
   function initialsFromName(name = "") {
     const parts = String(name).trim().split(/\s+/).filter(Boolean);
@@ -329,11 +334,13 @@ export function EventCard({ event, variant = "default", onMore }) {
                   : event?.title}
               </span>
             </div>
-            <div className="tw:text-right tw:ml-2">
-              <span className="tw:text-xl tw:font-bold tw:text-black">
-                {priceText(event)}
-              </span>
-            </div>
+            {!hidePrice && (
+              <div className="tw:text-right tw:ml-2">
+                <span className="tw:text-xl tw:font-bold tw:text-black">
+                  {priceText(event)}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Host row */}

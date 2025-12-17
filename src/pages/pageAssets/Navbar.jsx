@@ -8,25 +8,33 @@ import {
   Search,
   Bell,
   Ticket,
+  Star,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import MobileNav from "./MobileNav";
 import logo from "../../assets/zagasm_studio_logo.png";
-import default_profilePicture from "../../assets/avater_pix.avif";
+import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
 
 // src/component/Events/SingleEvent.jsx (Updated Navbar function)
 export default function Navbar() {
   const location = useLocation();
   const { user } = useAuth();
 
-  const profile = user?.profileUrl || default_profilePicture;
-  const firstName = user?.firstName || "User";
+  const profileImage = user?.profileUrl;
+  const hasImage = hasProfileImage(profileImage);
+  const nameForInitials =
+    user?.firstName || user?.username || user?.organiser || user?.email || "User";
+  const initials = getInitials(
+    user?.firstName
+      ? `${user.firstName} ${user.lastName || ""}`.trim()
+      : nameForInitials
+  );
 
   const nav = [
     { name: "Home", to: "/feed", icon: HomeIcon },
-    { name: "Saved", to: "/event/saved-events", icon: Heart },
-    { name: "Create Event", to: "/event/select-event-type", icon: PlusSquare },
     { name: "Tickets", to: "/tickets", icon: Ticket },
+    { name: "Create Event", to: "/event/select-event-type", icon: PlusSquare },
+    { name: "Organizers", to: "/organizers", icon: Star },
     { name: "Account", to: "/account", icon: User },
   ];
 
@@ -47,7 +55,7 @@ export default function Navbar() {
         </Link>
 
         {/* CENTER NAV LINKS */}
-        <div className="tw:hidden tw:md:flex tw:gap-12 tw:mr-16">
+        <div className="tw:hidden tw:md:flex tw:md:justify-center tw:gap-12 tw:mr-16">
           {nav.map((item) => {
             const active = location.pathname === item.to;
             const Icon = item.icon;
@@ -96,11 +104,17 @@ export default function Navbar() {
             to="/account"
             className="tw:size-7 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
           >
-            <img
-              src={profile}
-              className="tw:w-full tw:h-full tw:object-cover"
-              alt="Profile"
-            />
+            {hasImage ? (
+              <img
+                src={profileImage}
+                className="tw:w-full tw:h-full tw:object-cover"
+                alt="Profile"
+              />
+            ) : (
+              <span className="tw:flex tw:items-center tw:justify-center tw:h-full tw:w-full tw:bg-lightPurple tw:text-primary tw:text-sm tw:font-semibold">
+                {initials}
+              </span>
+            )}
           </Link>
         </div>
       </div>

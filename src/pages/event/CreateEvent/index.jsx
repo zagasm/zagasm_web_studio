@@ -14,7 +14,7 @@ function CreateEvent() {
                 keywords="zagasm studios, create event, host event, event management, sell tickets, event hosting, organize concert, plan party, festival management, event ticketing platform"
             />
             <div className="">
-                <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:md:pt-0 tw:lg:px-4">
+                <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:md:pt-28 tw:lg:px-4">
                     <div className="">
                         <div className="col ">
                              <EventCreationWizard eventTypeId={eventTypeId} />

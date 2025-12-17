@@ -300,32 +300,6 @@ export default function ReviewStep({
         </div>
       </section>
 
-      {/* Streaming */}
-      <section className="tw:mb-6">
-        <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Streaming</span>
-          <button
-            type="button"
-            className="tw:text-primary"
-            onClick={() => onGoToStep?.(4)}
-          >
-            Edit
-          </button>
-        </div>
-        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Option</div>
-            <div>{streamingOption || "—"}</div>
-          </div>
-          {enableReplay && (
-            <div>
-              <div className="tw:text-xs tw:text-gray-500">Replay</div>
-              <div>{streamingDuration || "24"} Hours</div>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* Access */}
       <section className="tw:mb-2">
         <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
@@ -333,7 +307,7 @@ export default function ReviewStep({
           <button
             type="button"
             className="tw:text-primary"
-            onClick={() => onGoToStep?.(5)}
+            onClick={() => onGoToStep?.(4)}
           >
             Edit
           </button>
