@@ -59,7 +59,7 @@ export default function Home() {
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
             }`}
           >
-            Upcoming
+            Trending
           </button>
           <button
             onClick={() => handleTabChange("live")}

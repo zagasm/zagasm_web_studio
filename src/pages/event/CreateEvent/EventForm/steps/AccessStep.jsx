@@ -24,7 +24,11 @@ export default function AccessStep({ defaultValues = {}, onBack, onNext }) {
     watch,
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { matureContent: false, ...defaultValues },
+    defaultValues: {
+      matureContent: false,
+      visibility: defaultValues.visibility || "public",
+      ...defaultValues,
+    },
   });
 
   const visibility = watch("visibility");

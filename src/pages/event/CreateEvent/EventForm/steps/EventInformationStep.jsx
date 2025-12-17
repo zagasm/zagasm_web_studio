@@ -88,6 +88,7 @@ export default function EventInformationStep({
   const { user, token } = useAuth();
   const [timeZones, setTimeZones] = useState([]);
   const [loadingTZ, setLoadingTZ] = useState(true);
+  const locationDefault = defaultValues.location || "Online";
 
   const [eventTypes, setEventTypes] = useState([]);
   const [loadingET, setLoadingET] = useState(true);
@@ -103,7 +104,7 @@ export default function EventInformationStep({
     defaultValues: {
       title: "",
       description: "",
-      location: "",
+      location: locationDefault,
       organizer: user?.name || user?.lastName || "",
       genre: "",
       date: "",
@@ -116,6 +117,10 @@ export default function EventInformationStep({
   });
 
   const watchVals = watch();
+
+  useEffect(() => {
+    setValue("location", locationDefault, { shouldValidate: true });
+  }, [locationDefault, setValue]);
 
   // Time zones
   useEffect(() => {
@@ -215,32 +220,12 @@ export default function EventInformationStep({
           )}
         </div>
 
-        {/* Location as Autocomplete */}
-        <div>
-          <span className="tw:block tw:text-[15px] tw:mb-1">Location*</span>
-          <Autocomplete
-            options={countryOptions}
-            getOptionLabel={(option) => option.label || ""}
-            value={
-              countryOptions.find((opt) => opt.value === watchVals.location) ||
-              null
-            }
-            onChange={(event, newValue) => {
-              setValue("location", newValue ? newValue.value : "", {
-                shouldValidate: true,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Select Country"
-                size="small"
-                error={!!errors.location}
-                helperText={errors.location?.message}
-              />
-            )}
-          />
-        </div>
+        {/* Location field intentionally hidden—set to Online by default */}
+        <input
+          type="hidden"
+          value={locationDefault}
+          {...register("location")}
+        />
 
         {/* Organizer */}
         <div>

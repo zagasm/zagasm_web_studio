@@ -97,6 +97,11 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     [currencies]
   );
 
+  useEffect(() => {
+    if (!currencyOptions.length || currencyVal) return;
+    setValue("currency", currencyOptions[0].value, { shouldValidate: true });
+  }, [currencyOptions, currencyVal, setValue]);
+
   // FX rate preview: price → USD using backend endpoint
   useEffect(() => {
     const numericPrice =
@@ -238,11 +243,11 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
                 shouldValidate: true,
               });
             }}
-            disabled={loadingCurrencies}
+            disabled
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder={loadingCurrencies ? "Loading…" : "Select Currency"}
+                placeholder={loadingCurrencies ? "Loading…" : "Currency locked"}
                 size="small"
                 error={!!errors.currency}
                 helperText={errors.currency?.message}

@@ -201,7 +201,6 @@ export default function EventCreationWizard({
 
   const closeSuccessModal = () => {
     setSuccessModal((prev) => ({ ...prev, open: false }));
-    navigate(`/event/view/${successModal.eventId}`)
   };
 
   // Final submit (create or update)

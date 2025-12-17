@@ -12,33 +12,35 @@ import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
 const ProfileSkeleton = () => (
-  <div className="tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full tw:animate-pulse">
-    <div className="tw:w-full tw:lg:w-[35%] tw:space-y-4 tw:lg:pb-8">
-      <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-6 tw:space-y-4">
+  <div className="tw:animate-pulse tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
+    <div className="tw:w-full tw:lg:w-[35%] tw:space-y-4">
+      <div className="tw:bg-white tw:rounded-3xl tw:p-6 tw:border tw:border-gray-100 tw:space-y-4 tw:shadow-sm">
         <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
           <div className="tw:h-24 tw:w-24 tw:rounded-full tw:bg-gray-200" />
           <div className="tw:h-6 tw:w-1/2 tw:rounded-full tw:bg-gray-200" />
           <div className="tw:h-4 tw:w-1/3 tw:rounded-full tw:bg-gray-200" />
-          <div className="tw:flex tw:items-center tw:gap-2">
-            <span className="tw:h-5 tw:w-20 tw:rounded-full tw:bg-gray-200" />
-            <span className="tw:h-5 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2">
+            <span className="tw:h-4 tw:w-20 tw:rounded-full tw:bg-gray-100" />
+            <span className="tw:h-4 tw:w-24 tw:rounded-full tw:bg-gray-100" />
           </div>
         </div>
 
         <div className="tw:grid tw:grid-cols-2 tw:gap-3">
-          {Array.from({ length: 2 }).map((_, idx) => (
-            <div key={idx} className="tw:h-20 tw:rounded-2xl tw:bg-gray-100" />
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="tw:space-y-2">
+              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-100" />
+              <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
+            </div>
           ))}
         </div>
-
-        <div className="tw:h-28 tw:rounded-2xl tw:bg-gray-100" />
       </div>
 
-      <div className="tw:hidden tw:lg:block tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:space-y-4">
-        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
+      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm">
+        <div className="tw:h-5 tw:w-40 tw:rounded-full tw:bg-gray-100" />
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:mt-4">
           {Array.from({ length: 6 }).map((_, idx) => (
             <div key={idx} className="tw:space-y-2">
-              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-100" />
               <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
             </div>
           ))}
@@ -47,25 +49,23 @@ const ProfileSkeleton = () => (
     </div>
 
     <div className="tw:flex-1 tw:space-y-4">
-      <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:space-y-4">
-        <div className="tw:h-6 tw:w-40 tw:rounded-full tw:bg-gray-200" />
+      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm tw:space-y-4">
         <div className="tw:flex tw:gap-3">
-          {["1", "2", "3", "4"].map((tab) => (
+          {["tab-1", "tab-2", "tab-3"].map((tab) => (
             <span
               key={tab}
-              className="tw:h-9 tw:w-20 tw:rounded-full tw:bg-gray-100"
+              className="tw:h-10 tw:w-24 tw:rounded-full tw:bg-gray-100"
             />
           ))}
         </div>
+        <div className="tw:h-52 tw:rounded-2xl tw:bg-gray-100" />
       </div>
-
-      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:xl:grid-cols-3 tw:gap-4">
-        {Array.from({ length: 6 }).map((_, idx) => (
-          <div
-            key={idx}
-            className="tw:h-56 tw:rounded-2xl tw:bg-gray-100 tw:border tw:border-gray-100"
-          />
-        ))}
+      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm">
+        <div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:md:grid-cols-3">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="tw:h-52 tw:rounded-2xl tw:bg-gray-100" />
+          ))}
+        </div>
       </div>
     </div>
   </div>

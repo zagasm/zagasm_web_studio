@@ -7,6 +7,8 @@ import TextField from "@mui/material/TextField";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { showError } from "../../../../../component/ui/toast";
+import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 // ✅ Zod: at least one poster (image or video)
 const schema = z
@@ -31,6 +33,14 @@ const schema = z
     }
   );
 
+function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
+  return centerCrop(
+    makeAspectCrop({ unit: "%", width: 90 }, aspect, mediaWidth, mediaHeight),
+    mediaWidth,
+    mediaHeight
+  );
+}
+
 export default function MediaUploadStep({
   posterImages,
   setPosterImages,
@@ -54,6 +64,19 @@ export default function MediaUploadStep({
   const [mentionOptions, setMentionOptions] = useState([]);
   const [mentionLoading, setMentionLoading] = useState(false);
   const mentionDebounceRef = useRef(null);
+  const [cropDialog, setCropDialog] = useState({
+    open: false,
+    file: null,
+    url: "",
+    index: null,
+  });
+  const ASPECT = 3 / 1;
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState(null);
+
+  const cropImageRef = useRef(null);
+  const previewCanvasRef = useRef(null);
+  const previewCacheRef = useRef(new Map());
 
   const {
     handleSubmit,
@@ -79,13 +102,161 @@ export default function MediaUploadStep({
     []
   );
 
-  // ---- Poster helpers
-  const addPosterImages = (files) => {
-    const valid = [...files].filter(
-      (f) => /^image\//.test(f.type) && f.size <= 10 * 1024 * 1024
+  useEffect(() => {
+    if (
+      !completedCrop ||
+      !previewCanvasRef.current ||
+      !cropImageRef.current ||
+      !cropDialog.open
+    )
+      return;
+
+    const image = cropImageRef.current;
+    const canvas = previewCanvasRef.current;
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = completedCrop.width * scaleX;
+    canvas.height = completedCrop.height * scaleY;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(
+      image,
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY,
+      0,
+      0,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY
     );
-    if (!valid.length) return;
-    setPosterImages((prev) => [...prev, ...valid]);
+  }, [completedCrop, cropDialog.open]);
+
+  useEffect(() => {
+    return () => {
+      previewCacheRef.current.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+      previewCacheRef.current.clear();
+    };
+  }, []);
+
+  // ---- Poster helpers
+  const getCroppedBlob = (image, pixelCrop) =>
+    new Promise((resolve, reject) => {
+      if (!image || !pixelCrop?.width || !pixelCrop?.height) {
+        reject(new Error("No crop data"));
+        return;
+      }
+
+      const canvas = document.createElement("canvas");
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
+
+      canvas.width = Math.round(pixelCrop.width * scaleX);
+      canvas.height = Math.round(pixelCrop.height * scaleY);
+
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingQuality = "high";
+
+      ctx.drawImage(
+        image,
+        pixelCrop.x * scaleX,
+        pixelCrop.y * scaleY,
+        pixelCrop.width * scaleX,
+        pixelCrop.height * scaleY,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      canvas.toBlob(
+        (blob) =>
+          blob ? resolve(blob) : reject(new Error("Failed to crop image")),
+        "image/jpeg",
+        0.92
+      );
+    });
+
+  const closeCropDialog = () => {
+    if (cropDialog.url) {
+      URL.revokeObjectURL(cropDialog.url);
+    }
+    setCropDialog({ open: false, file: null, url: "", index: null });
+    setCompletedCrop(null);
+  };
+
+  const getPosterPreviewUrl = (file) => {
+    if (!file) return "";
+    const cache = previewCacheRef.current;
+    if (cache.has(file)) {
+      return cache.get(file);
+    }
+    const url = URL.createObjectURL(file);
+    cache.set(file, url);
+    return url;
+  };
+
+  const revokePosterPreview = (file) => {
+    if (!file) return;
+    const cache = previewCacheRef.current;
+    const url = cache.get(file);
+    if (url) {
+      URL.revokeObjectURL(url);
+      cache.delete(file);
+    }
+  };
+
+  const commitCrop = async () => {
+    if (!cropDialog.file || !completedCrop) return;
+    try {
+      const blob = await getCroppedBlob(cropImageRef.current, completedCrop);
+      const fileName = cropDialog.file.name || `poster-${Date.now()}.jpg`;
+      const cropped = new File([blob], fileName, {
+        type: cropDialog.file.type || "image/jpeg",
+      });
+      if (cropDialog.index !== null) {
+        setPosterImages((prev) =>
+          prev.map((item, idx) => {
+            if (idx === cropDialog.index) {
+              revokePosterPreview(item);
+              return cropped;
+            }
+            return item;
+          })
+        );
+      } else {
+        setPosterImages((prev) => [...prev, cropped]);
+      }
+    } catch (err) {
+      console.error(err);
+      showError("Failed to crop the image, try again.");
+    } finally {
+      closeCropDialog();
+    }
+  };
+
+  const startCropSession = (file, index = null) => {
+    if (!file) return;
+    if (!/^image\//.test(file.type) || file.size > 10 * 1024 * 1024) {
+      showError("Only images under 10MB are supported.");
+      return;
+    }
+    if (cropDialog.url) URL.revokeObjectURL(cropDialog.url);
+    setCropDialog({
+      open: true,
+      file,
+      url: URL.createObjectURL(file),
+      index,
+    });
+    setCrop({ unit: "%", width: 90 });
+    setCompletedCrop(null);
+  };
+
+  const handlePosterImageFiles = (files) => {
+    const first = [...files].find((f) => /^image\//.test(f.type));
+    if (!first) return;
+    startCropSession(first);
   };
 
   const addPosterVideos = (files) => {
@@ -97,7 +268,11 @@ export default function MediaUploadStep({
   };
 
   const removePosterImageAt = (i) =>
-    setPosterImages((prev) => prev.filter((_, idx) => idx !== i));
+    setPosterImages((prev) => {
+      const target = prev[i];
+      revokePosterPreview(target);
+      return prev.filter((_, idx) => idx !== i);
+    });
   const removePosterVideoAt = (i) =>
     setPosterVideos((prev) => prev.filter((_, idx) => idx !== i));
 
@@ -196,379 +371,483 @@ export default function MediaUploadStep({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="tw:bg-white tw:rounded-2xl tw:p-4 tw:sm:p-6 tw:border tw:border-gray-100"
-    >
-      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-4">
-        Event Media
-      </span>
+    <>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="tw:bg-white tw:rounded-2xl tw:p-4 tw:sm:p-6 tw:border tw:border-gray-100"
+      >
+        <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-4">
+          Event Media
+        </span>
 
-      {existingPoster?.length > 0 && (
+        {existingPoster?.length > 0 && (
+          <div className="tw:mb-6">
+            <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
+              Existing media
+            </span>
+            <div className="tw:flex tw:flex-wrap tw:gap-3">
+              {existingPoster.map((m, idx) => (
+                <div
+                  key={m.id || idx}
+                  className="tw:relative tw:w-28 tw:h-28 tw:rounded-2xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-black/5"
+                >
+                  {m.type === "image" ? (
+                    <img
+                      src={m.url}
+                      className="tw:w-full tw:h-full tw:object-cover"
+                    />
+                  ) : (
+                    <video
+                      src={m.url}
+                      className="tw:w-full tw:h-full tw:object-cover"
+                      controls={false}
+                      muted
+                    />
+                  )}
+
+                  <span className="tw:absolute tw:left-2 tw:top-2 tw:text-[10px] tw:px-2 tw:py-0.5 tw:bg-black/60 tw:text-white tw:rounded-full tw:uppercase">
+                    {m.type}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExistingPoster((prev) =>
+                        prev.filter((_, i) => i !== idx)
+                      )
+                    }
+                    className="tw:absolute tw:top-1 tw:right-1 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
+                    aria-label="Remove media"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Poster IMAGES */}
         <div className="tw:mb-6">
           <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
-            Existing media
+            Poster images (JPG/PNG/WEBP)
           </span>
-          <div className="tw:flex tw:flex-wrap tw:gap-3">
-            {existingPoster.map((m, idx) => (
-              <div
-                key={m.id || idx}
-                className="tw:relative tw:w-28 tw:h-28 tw:rounded-2xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-black/5"
-              >
-                {m.type === "image" ? (
-                  <img
-                    src={m.url}
-                    className="tw:w-full tw:h-full tw:object-cover"
-                  />
-                ) : (
-                  <video
-                    src={m.url}
-                    className="tw:w-full tw:h-full tw:object-cover"
-                    controls={false}
-                    muted
-                  />
-                )}
-
-                <span className="tw:absolute tw:left-2 tw:top-2 tw:text-[10px] tw:px-2 tw:py-0.5 tw:bg-black/60 tw:text-white tw:rounded-full tw-uppercase">
-                  {m.type}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExistingPoster((prev) =>
-                      prev.filter((_, i) => i !== idx)
-                    )
-                  }
-                  className="tw:absolute tw:top-1 tw:right-1 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
-                  aria-label="Remove media"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Poster IMAGES */}
-      <div className="tw:mb-6">
-        <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
-          Poster images (JPG/PNG/WEBP)
-        </span>
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDraggingImg(true);
-          }}
-          onDragLeave={() => setIsDraggingImg(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDraggingImg(false);
-            addPosterImages(e.dataTransfer.files);
-          }}
-          onClick={() => imgInputRef.current?.click()}
-          className={`tw:border tw:border-dashed tw:rounded-2xl tw:p-5 tw:text-center tw:cursor-pointer tw:transition
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDraggingImg(true);
+            }}
+            onDragLeave={() => setIsDraggingImg(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDraggingImg(false);
+              handlePosterImageFiles(e.dataTransfer.files);
+            }}
+            onClick={() => imgInputRef.current?.click()}
+            className={`tw:border tw:border-dashed tw:rounded-2xl tw:p-5 tw:text-center tw:cursor-pointer tw:transition
             ${
               isDraggingImg
                 ? "tw:border-primary tw:bg-lightPurple"
                 : "tw:border-gray-300 tw:hover:border-primary"
             }`}
-        >
-          <div className="tw:text-primary tw:font-medium">
-            Drag & drop image(s) or click to choose
+          >
+            <div className="tw:text-primary tw:font-medium">
+              Drag & drop image(s) or click to choose
+            </div>
+            <input
+              ref={imgInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="tw:hidden"
+              onChange={(e) => {
+                handlePosterImageFiles(e.target.files);
+                e.target.value = null;
+              }}
+            />
           </div>
-          <input
-            ref={imgInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="tw:hidden"
-            onChange={(e) => addPosterImages(e.target.files)}
-          />
-        </div>
-        {/* Thumbs */}
-        {posterImages?.length > 0 && (
-          <div className="tw:flex tw:flex-wrap tw:gap-3 tw:mt-3">
-            {posterImages.map((f, i) => (
-              <div
-                key={`${f.name}-${i}`}
-                className="tw:relative tw:w-24 tw:h-24 tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-200"
-              >
-                <img
-                  src={URL.createObjectURL(f)}
-                  className="tw:w-full tw:h-full tw:object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => removePosterImageAt(i)}
-                  className="tw:absolute tw:top-1 tw:right-1 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
-                  aria-label="Remove"
+          {/* Thumbs */}
+          {posterImages?.length > 0 && (
+            <div className="tw:flex tw:flex-wrap tw:gap-3 tw:mt-3">
+              {posterImages.map((f, i) => (
+                <div
+                  key={`${f.name}-${i}`}
+                  className="tw:relative tw:w-24 tw:h-24 tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-white tw:shadow-sm"
                 >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                  <button
+                    type="button"
+                    onClick={() => startCropSession(f, i)}
+                    className="tw:absolute tw:inset-0 tw:z-0 tw:p-0 tw:border-0 tw:bg-transparent tw:flex tw:flex-col tw:items-stretch tw:justify-between"
+                  >
+                    <img
+                      src={getPosterPreviewUrl(f)}
+                      className="tw:w-full tw:h-full tw:object-cover tw:pointer-events-none"
+                      alt={f.name || `poster-${i}`}
+                    />
+                    <span className="tw:text-[10px] tw:font-semibold tw:tracking-wide tw:text-white tw:bg-black/40 tw:px-2 tw:py-1 tw:text-center">
+                      Recrop &amp; preview
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removePosterImageAt(i)}
+                    className="tw:absolute tw:top-1 tw:right-1 tw:z-10 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
+                    aria-label="Remove"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-      {/* Poster VIDEOS */}
-      <div className="tw:mb-6">
-        <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
-          Poster videos (MP4/MOV)
-        </span>
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDraggingVid(true);
-          }}
-          onDragLeave={() => setIsDraggingVid(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDraggingVid(false);
-            addPosterVideos(e.dataTransfer.files);
-          }}
-          onClick={() => vidInputRef.current?.click()}
-          className={`tw:border tw:border-dashed tw:rounded-2xl tw:p-5 tw:text-center tw:cursor-pointer tw:transition
+        {/* Poster VIDEOS */}
+        <div className="tw:mb-6">
+          <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
+            Poster videos (MP4/MOV)
+          </span>
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDraggingVid(true);
+            }}
+            onDragLeave={() => setIsDraggingVid(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDraggingVid(false);
+              addPosterVideos(e.dataTransfer.files);
+            }}
+            onClick={() => vidInputRef.current?.click()}
+            className={`tw:border tw:border-dashed tw:rounded-2xl tw:p-5 tw:text-center tw:cursor-pointer tw:transition
             ${
               isDraggingVid
                 ? "tw:border-primary tw:bg-lightPurple"
                 : "tw:border-gray-300 tw:hover:border-primary"
             }`}
-        >
-          <div className="tw:text-primary tw:font-medium">
-            Drag & drop video(s) or click to choose
-          </div>
-          <input
-            ref={vidInputRef}
-            type="file"
-            accept="video/*"
-            multiple
-            className="tw:hidden"
-            onChange={(e) => addPosterVideos(e.target.files)}
-          />
-        </div>
-        {/* File list */}
-        {posterVideos?.length > 0 && (
-          <ul className="tw:mt-3 tw:space-y-2">
-            {posterVideos.map((f, i) => (
-              <li
-                key={`${f.name}-${i}`}
-                className="tw:flex tw:items-center tw:justify-between tw:text-sm tw:bg-gray-50 tw:px-3 tw:py-2 tw:rounded-xl"
-              >
-                <span className="tw:truncate tw:max-w-[70%]">{f.name}</span>
-                <button
-                  type="button"
-                  onClick={() => removePosterVideoAt(i)}
-                  className="tw:text-red-500"
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Poster overall validation (from schema refine) */}
-      {errors.poster && (
-        <p className="tw:text-red-500 tw:text-xs tw:mt-1">
-          {errors.poster.message}
-        </p>
-      )}
-
-      {/* Performers */}
-      <div className="tw:mb-4">
-        <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
-          Performer(s) / Speaker(s)*
-        </span>
-
-        {performers.length === 0 && (
-          <div className="tw:py-8 tw:text-center tw:border tw:border-dashed tw:rounded-2xl tw:text-gray-500">
-            No performers added yet
-          </div>
-        )}
-
-        <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:md:grid-cols-3 tw:gap-4 tw:mt-4">
-          {performers.map((p) => (
-            <div
-              key={p.id}
-              className="tw:border tw:border-gray-200 tw:rounded-2xl tw:p-3"
-            >
-              {/* Tag by username */}
-              <div className="tw:mb-2">
-                <Autocomplete
-                  options={mentionOptions}
-                  loading={mentionLoading}
-                  getOptionLabel={(option) =>
-                    option.user_name || option.name || ""
-                  }
-                  value={
-                    p.user_name
-                      ? {
-                          user_name: p.user_name,
-                          name: p.name,
-                          avatar: p.avatar,
-                        }
-                      : null
-                  }
-                  isOptionEqualToValue={(option, value) =>
-                    option.user_name === value.user_name
-                  }
-                  onChange={(event, newValue) => {
-                    if (newValue) {
-                      updatePerformerTag(p.id, {
-                        user_name: newValue.user_name,
-                        userId: newValue.id,
-                        avatar: newValue.avatar,
-                        // auto-fill name if empty
-                        name: p.name || newValue.name || newValue.user_name,
-                      });
-                    } else {
-                      updatePerformerTag(p.id, {
-                        user_name: "",
-                        userId: null,
-                        avatar: null,
-                      });
-                    }
-                  }}
-                  onInputChange={(event, newInput) => {
-                    searchTaggedUsers(newInput);
-                  }}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      <div className="tw:flex tw:items-center tw:gap-2">
-                        <img
-                          src={option.avatar}
-                          alt={option.user_name}
-                          className="tw:h-7 tw:w-7 tw:rounded-full tw:object-cover"
-                        />
-                        <div>
-                          <div className="tw:text-sm">
-                            {option.user_name || ""}
-                          </div>
-                          <div className="tw:text-[11px] tw:text-gray-500">
-                            {option.name || ""}
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Tag by @username"
-                      placeholder="@username"
-                      size="small"
-                    />
-                  )}
-                />
-              </div>
-
-              {/* Display name */}
-              <input
-                defaultValue={p.name}
-                onBlur={(e) => updatePerformerName(p.id, e.target.value)}
-                placeholder="Performer name"
-                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:mb-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-              />
-
-              {/* Role */}
-              <input
-                defaultValue={p.role || "speaker"}
-                onBlur={(e) => updatePerformerRole(p.id, e.target.value)}
-                placeholder="Role (e.g. speaker, artist)"
-                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:mb-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-              />
-
-              {p.user_name && (
-                <p className="tw:text-[11px] tw:text-gray-500 tw:mb-2 tw:truncate">
-                  Tagged: {p.user_name}
-                </p>
-              )}
-
-              <div className="tw:flex tw:items-end tw:justify-between tw:gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const input = document.createElement("input");
-                    input.type = "file";
-                    input.accept = "image/*";
-                    input.onchange = (e) =>
-                      setPerformerImage(p.id, e.target.files?.[0]);
-                    input.click();
-                  }}
-                  className="tw:h-[74px] tw:w-[74px] tw:rounded-full tw:bg-lightPurple tw:border-2 tw:border-dashed tw:flex tw:items-center tw:justify-center tw:overflow-hidden"
-                >
-                  {p.image ? (
-                    <img
-                      src={URL.createObjectURL(p.image)}
-                      className="tw:h-full tw:w-full tw:object-cover"
-                    />
-                  ) : p.avatar ? (
-                    <img
-                      src={p.avatar}
-                      className="tw:h-full tw:w-full tw:object-cover"
-                    />
-                  ) : (
-                    <span className="tw:text-primary tw:text-xl">+</span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => removePerformer(p.id)}
-                  className="tw:text-red-500 tw:text-sm"
-                >
-                  Remove
-                </button>
-              </div>
-
-              {p.image && (
-                <p className="tw:text-xs tw:text-gray-500 tw:mt-2 tw:truncate">
-                  {p.image.name}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="tw:flex tw:justify-end tw:mt-4">
-          <button
-            type="button"
-            onClick={addPerformer}
-            className="tw:px-3 tw:py-2 tw:rounded-xl tw:border tw:border-primary tw:text-primary tw:hover:bg-lightPurple"
           >
-            Add Guest Artiste +
-          </button>
+            <div className="tw:text-primary tw:font-medium">
+              Drag & drop video(s) or click to choose
+            </div>
+            <input
+              ref={vidInputRef}
+              type="file"
+              accept="video/*"
+              multiple
+              className="tw:hidden"
+              onChange={(e) => addPosterVideos(e.target.files)}
+            />
+          </div>
+          {/* File list */}
+          {posterVideos?.length > 0 && (
+            <ul className="tw:mt-3 tw:space-y-2">
+              {posterVideos.map((f, i) => (
+                <li
+                  key={`${f.name}-${i}`}
+                  className="tw:flex tw:items-center tw:justify-between tw:text-sm tw:bg-gray-50 tw:px-3 tw:py-2 tw:rounded-xl"
+                >
+                  <span className="tw:truncate tw:max-w-[70%]">{f.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removePosterVideoAt(i)}
+                    className="tw:text-red-500"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        {errors.performers && (
-          <p className="tw:text-red-500 tw:text-xs tw:mt-2">
-            {errors.performers.message}
+        {/* Poster overall validation (from schema refine) */}
+        {errors.poster && (
+          <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+            {errors.poster.message}
           </p>
         )}
-      </div>
 
-      {/* Nav */}
-      <div className="tw:flex tw:justify-between tw:mt-6">
-        <button
-          type="button"
-          onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
-          style={{ borderRadius: 20 }}
-        >
-          Back
-        </button>
-        <button
-          type="submit"
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
-          style={{ borderRadius: 20 }}
-        >
-          Next
-        </button>
-      </div>
-    </form>
+        {/* Performers */}
+        <div className="tw:mb-4">
+          <span className="tw:text-sm tw:font-medium tw:block tw:mb-2">
+            Performer(s) / Speaker(s)*
+          </span>
+
+          {performers.length === 0 && (
+            <div className="tw:py-8 tw:text-center tw:border tw:border-dashed tw:rounded-2xl tw:text-gray-500">
+              No performers added yet
+            </div>
+          )}
+
+          <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:md:grid-cols-3 tw:gap-4 tw:mt-4">
+            {performers.map((p) => (
+              <div
+                key={p.id}
+                className="tw:border tw:border-gray-200 tw:rounded-2xl tw:p-3"
+              >
+                {/* Tag by username */}
+                <div className="tw:mb-2">
+                  <Autocomplete
+                    options={mentionOptions}
+                    loading={mentionLoading}
+                    getOptionLabel={(option) =>
+                      option.user_name || option.name || ""
+                    }
+                    value={
+                      p.user_name
+                        ? {
+                            user_name: p.user_name,
+                            name: p.name,
+                            avatar: p.avatar,
+                          }
+                        : null
+                    }
+                    isOptionEqualToValue={(option, value) =>
+                      option.user_name === value.user_name
+                    }
+                    onChange={(event, newValue) => {
+                      if (newValue) {
+                        updatePerformerTag(p.id, {
+                          user_name: newValue.user_name,
+                          userId: newValue.id,
+                          avatar: newValue.avatar,
+                          // auto-fill name if empty
+                          name: p.name || newValue.name || newValue.user_name,
+                        });
+                      } else {
+                        updatePerformerTag(p.id, {
+                          user_name: "",
+                          userId: null,
+                          avatar: null,
+                        });
+                      }
+                    }}
+                    onInputChange={(event, newInput) => {
+                      searchTaggedUsers(newInput);
+                    }}
+                    renderOption={(props, option) => (
+                      <li {...props}>
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <img
+                            src={option.avatar}
+                            alt={option.user_name}
+                            className="tw:h-7 tw:w-7 tw:rounded-full tw:object-cover"
+                          />
+                          <div>
+                            <div className="tw:text-sm">
+                              {option.user_name || ""}
+                            </div>
+                            <div className="tw:text-[11px] tw:text-gray-500">
+                              {option.name || ""}
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Tag by @username"
+                        placeholder="@username"
+                        size="small"
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Display name */}
+                <input
+                  defaultValue={p.name}
+                  onBlur={(e) => updatePerformerName(p.id, e.target.value)}
+                  placeholder="Performer name"
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:mb-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                />
+
+                {/* Role */}
+                <input
+                  defaultValue={p.role || "speaker"}
+                  onBlur={(e) => updatePerformerRole(p.id, e.target.value)}
+                  placeholder="Role (e.g. speaker, artist)"
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:mb-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                />
+
+                {p.user_name && (
+                  <p className="tw:text-[11px] tw:text-gray-500 tw:mb-2 tw:truncate">
+                    Tagged: {p.user_name}
+                  </p>
+                )}
+
+                <div className="tw:flex tw:items-end tw:justify-between tw:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = "image/*";
+                      input.onchange = (e) =>
+                        setPerformerImage(p.id, e.target.files?.[0]);
+                      input.click();
+                    }}
+                    className="tw:h-[74px] tw:w-[74px] tw:rounded-full tw:bg-lightPurple tw:border-2 tw:border-dashed tw:flex tw:items-center tw:justify-center tw:overflow-hidden"
+                  >
+                    {p.image ? (
+                      <img
+                        src={URL.createObjectURL(p.image)}
+                        className="tw:h-full tw:w-full tw:object-cover"
+                      />
+                    ) : p.avatar ? (
+                      <img
+                        src={p.avatar}
+                        className="tw:h-full tw:w-full tw:object-cover"
+                      />
+                    ) : (
+                      <span className="tw:text-primary tw:text-xl">+</span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => removePerformer(p.id)}
+                    className="tw:text-red-500 tw:text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                {p.image && (
+                  <p className="tw:text-xs tw:text-gray-500 tw:mt-2 tw:truncate">
+                    {p.image.name}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="tw:flex tw:justify-end tw:mt-4">
+            <button
+              type="button"
+              onClick={addPerformer}
+              className="tw:px-3 tw:py-2 tw:rounded-xl tw:border tw:border-primary tw:text-primary tw:hover:bg-lightPurple"
+            >
+              Add Guest Artiste +
+            </button>
+          </div>
+
+          {errors.performers && (
+            <p className="tw:text-red-500 tw:text-xs tw:mt-2">
+              {errors.performers.message}
+            </p>
+          )}
+        </div>
+
+        {/* Nav */}
+        <div className="tw:flex tw:justify-between tw:mt-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
+            style={{ borderRadius: 20 }}
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
+            style={{ borderRadius: 20 }}
+          >
+            Next
+          </button>
+        </div>
+      </form>
+      {cropDialog.open && (
+        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:bg-black/60 tw:p-4 tw:backdrop-blur-sm">
+          <div className="tw:w-full tw:max-w-3xl tw:rounded-[34px] tw:bg-white tw:p-6 tw:shadow-2xl tw:border tw:border-gray-100 tw:flex tw:flex-col tw:gap-4 tw:max-h-[80vh] tw:overflow-hidden">
+            <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+              <div>
+                <span className="tw:block tw:text-xl tw:font-bold tw:text-gray-900">
+                  Crop poster
+                </span>
+                <span className="tw:text-sm tw:text-gray-500">
+                  Adjust the frame and preview how the poster will appear.
+                </span>
+              </div>
+              <button
+                type="button"
+                className="tw:text-gray-400 tw:hover:text-gray-600"
+                onClick={closeCropDialog}
+              >
+                Cancel
+              </button>
+            </div>
+
+            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-[1.2fr_0.8fr] tw:overflow-y-auto tw:pr-1">
+              <div className="tw:bg-gray-50 tw:rounded-3xl tw:p-3 tw:border tw:border-dashed tw:border-gray-200">
+                <ReactCrop
+                  crop={crop}
+                  onChange={(_, percentCrop) => setCrop(percentCrop)} // keep crop as % for UI
+                  onComplete={(pixelCrop) => setCompletedCrop(pixelCrop)} // store PixelCrop for canvas/blob
+                  aspect={ASPECT}
+                  ruleOfThirds
+                  keepSelection
+                  className="tw:w-full tw:max-h-[420px]"
+                >
+                  <img
+                    ref={cropImageRef}
+                    alt="Crop poster"
+                    src={cropDialog.url}
+                    className="tw:w-full tw:block tw:max-h-[260px] tw:sm:max-h-[360px] tw:lg:max-h-[520px] tw:object-contain"
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      // initialize crop once the image has real dimensions
+                      setCrop(centerAspectCrop(img.width, img.height, ASPECT));
+                    }}
+                  />
+                </ReactCrop>
+              </div>
+              <div className="tw:hidden tw:lg:flex tw:flex-col tw:gap-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:p-4">
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <div className="tw:h-2 tw:w-8 tw:rounded-full tw:bg-linear-to-r tw:from-primary tw:to-primarySecond" />
+                  <span className="tw:text-sm tw:text-gray-500">Preview</span>
+                </div>
+                <div className="tw:flex-1 tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-100 tw:p-4 tw:flex tw:items-center tw:justify-center">
+                  <canvas
+                    ref={previewCanvasRef}
+                    className="tw:w-full tw:max-h-[260px]"
+                  />
+                </div>
+                <span className="tw:block tw:text-xs tw:text-gray-500">
+                  Once you tap “Save”, the cropped poster will replace the
+                  current selection. You can always recrop later.
+                </span>
+              </div>
+            </div>
+            {/* Footer actions (always visible) */}
+            <div
+              className="tw:flex tw:items-center tw:justify-end tw:gap-3 tw:pt-3 tw:border-t tw:border-gray-100
+                tw:bg-white tw:sticky tw:bottom-0"
+            >
+              <button
+                type="button"
+                onClick={closeCropDialog}
+                className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
+                style={{ borderRadius: 16, fontSize: 12 }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={commitCrop}
+                disabled={!completedCrop?.width || !completedCrop?.height}
+                className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold tw:hover:bg-primarySecond disabled:tw:opacity-50 disabled:tw:cursor-not-allowed"
+                style={{ borderRadius: 16, fontSize: 12 }}
+              >
+                Save poster
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
