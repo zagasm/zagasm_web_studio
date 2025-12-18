@@ -29,17 +29,16 @@ export default function AboutPipelineSection() {
         variants={item}
       >
         <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.2em] tw:text-primarySecond">
-          Pipeline
+          How it works
         </span>
 
         <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-          From first frame to final highlight, on autopilot.
+          From setup to showtime, all in one flow.
         </span>
 
         <span className="tw:mt-2 tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-2xl">
-          Zagasm plugs into your existing cameras and encoders, then pushes each
-          session into a workflow that handles streaming, clipping, and
-          follow-up without extra tabs.
+          Create an event, go live, and keep the whole production organized in
+          one place. Your show stays smooth and your audience stays locked in.
         </span>
       </motion.div>
 
@@ -57,10 +56,10 @@ export default function AboutPipelineSection() {
         >
           <span className="tw:absolute tw:-left-10 tw:-top-10 tw:h-24 tw:w-24 tw:rounded-full tw:bg-primary/40 tw:blur-2xl" />
           <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.16em] tw:text-white/60">
-            01 · Ingest
+            01 · Setup
           </span>
           <span className="tw:mt-3 tw:block tw:text-[15px] tw:font-medium">
-            Low-latency RTMP entry point.
+            Connect and go LIVE.
           </span>
           <span className="tw:mt-2 tw:block tw:text-[12px] tw:text-white/70">
             Connect OBS, Ecamm, or hardware encoders. Route to YouTube, Twitch,
@@ -74,14 +73,14 @@ export default function AboutPipelineSection() {
           className="tw:relative tw:rounded-2xl tw:bg-linear-to-b tw:from-primary/10 tw:to-primarySecond/10 tw:border tw:border-primary/20 tw:p-5 tw:min-h-[170px]"
         >
           <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.16em] tw:text-primary">
-            02 · Automation
+            02 · Control Room
           </span>
           <span className="tw:mt-3 tw:block tw:text-[15px] tw:font-medium tw:text-slate-900">
-            Clips, segments, and highlights.
+            Run your show cleanly.
           </span>
           <span className="tw:mt-2 tw:block tw:text-[12px] tw:text-slate-700">
-            Segment long shows into moments, generate vertical cuts, and push
-            highlight cards straight into your content calendar.
+            Manage guests, keep the stream steady, and stay focused while the
+            show is live.
           </span>
         </motion.div>
 
@@ -91,14 +90,13 @@ export default function AboutPipelineSection() {
           className="tw:relative tw:rounded-2xl tw:bg-white tw:border tw:border-slate-200/80 tw:p-5 tw:min-h-[170px] tw:shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
         >
           <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.16em] tw:text-slate-500">
-            03 · After-live
+            03 · Tickets
           </span>
           <span className="tw:mt-3 tw:block tw:text-[15px] tw:font-medium tw:text-slate-900">
-            CRM and monetization in the loop.
+            Sell tickets and keep earning.
           </span>
           <span className="tw:mt-2 tw:block tw:text-[12px] tw:text-slate-700">
-            Tag attendees, sync to your CRM, and spin up replays, offers, and
-            paid follow-up sessions from the same studio.
+            Create ticketed events, sell access, and keep your content working.
           </span>
         </motion.div>
       </motion.div>

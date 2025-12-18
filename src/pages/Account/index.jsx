@@ -42,16 +42,16 @@ function Account() {
       {/* Main Container with Light Grey Background */}
       <div className="tw:font-sans account-page-wrapper tw:w-full tw:bg-[#F9FAFB] tw:pt-20">
         <div className="container-fluid">
-          <div className="row">
+          <div className="tw:grid tw:grid-cols-2 tw:gap-4">
             {/* LEFT COLUMN */}
-            <div className="col-12 col-lg-6 col-xl-6 account-scroll-area hide-scrollbar tw:bg-[#F9FAFB]">
+            <div className="tw:col-span-2 tw:lg:col-span-1 account-scroll-area hide-scrollbar tw:bg-[#F9FAFB]">
               <div className="tw:lg:mr-0">
                 <AccountLeft user={user} />
               </div>
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="col-12 col-lg-6 col-xl-6 account-scroll-area hide-scrollbar tw:bg-[#F9FAFB]">
+            <div className="tw:col-span-2 tw:lg:col-span-1 account-scroll-area hide-scrollbar tw:bg-[#F9FAFB]">
               <div className="tw:max-w-2xl">
                 <AccountRight
                   onLogout={handleForceLogout}

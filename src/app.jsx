@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -69,6 +69,8 @@ import DisableRightClick from "./component/DisableRightClick.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 
+import SEO from "./component/SEO/index.jsx";
+
 const MainLayout = () => (
   <>
     <PostSignupForm />
@@ -90,6 +92,92 @@ export function App() {
     return () => clearTimeout(timer);
   }, [location.pathname]); // Runs on every route change
   const background = location.state?.background;
+  const canonicalUrl = `${window?.location?.origin || ""}${location.pathname}`;
+
+  const pageMetadata = useMemo(() => {
+    const routes = [
+      {
+        matcher: /^\/(feed)?$/,
+        meta: {
+          title: "Discover Live Events & Tickets",
+          description:
+            "Browse trending concerts, workshops, and immersive experiences on Zagasm Studios. Reserve tickets, follow organizers, and share moments.",
+          keywords:
+            "events, live performances, concerts, festivals, workshops, tickets, organizers, Zagasm Studios",
+          image: "/images/hero-event.jpg",
+        },
+      },
+      {
+        matcher: /^\/event\/view\/.+$/,
+        meta: {
+          title: "Event Details & Tickets",
+          description:
+            "See the latest event information, host profile, and secure your spot with fast checkout on Zagasm Studios.",
+          keywords:
+            "event details, buy tickets, event host, live stream, Zagasm Studios",
+          image: "/images/event-tile.jpg",
+          type: "article",
+        },
+      },
+      {
+        matcher: /^\/event\/create-event\/.+$/,
+        meta: {
+          title: "Create an Event on Zagasm Studios",
+          description:
+            "Launch your own concert, workshop, or meetup with Zagasm Studios' intuitive event builder and ticketing tools.",
+          keywords:
+            "create event, ticketing, event hosting, Zagasm Studios, organizer tools",
+        },
+      },
+      {
+        matcher: /^\/organizers/,
+        meta: {
+          title: "Meet Top Organizers",
+          description:
+            "Discover verified organizers, follow their upcoming experiences, and collaborate with the Zagasm community.",
+          keywords: "organizers, follow, streaming, community, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/account/,
+        meta: {
+          title: "Your Profile & Wallet",
+          description:
+            "Manage your profile, wallets, subscriptions, and saved events securely from your Zagasm account panel.",
+          keywords: "profile, account, wallet, settings, subscriptions, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/tickets/,
+        meta: {
+          title: "Tickets & Passes",
+          description: "Access all your purchased tickets and upcoming experiences at a glance.",
+          keywords: "tickets, passes, QR code, events, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/support/,
+        meta: {
+          title: "Zagasm Support Center",
+          description:
+            "Get help with tickets, organizers, and account questions from the Zagasm support team.",
+          keywords: "support, help, ticket assistance, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/landing/,
+        meta: {
+          title: "Zagasm Studios",
+          description:
+            "Plan, promote, and experience unforgettable events with Zagasm Studios's all-in-one platform.",
+          keywords: "landing, Zagasm Studios, events platform, social tickets",
+        },
+      },
+    ];
+
+    const match = routes.find((route) => route.matcher.test(location.pathname));
+    return match?.meta || {};
+  }, [location.pathname]);
   return (
     <Fragment>
       {loading && <FullpagePreloader loading={loading} />}
@@ -98,6 +186,7 @@ export function App() {
       <ToastContainer />
       <NetworkStatus />
       <ScrollToTop />
+      <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
       <Routes>
         <Route element={<LandingLayout />}>

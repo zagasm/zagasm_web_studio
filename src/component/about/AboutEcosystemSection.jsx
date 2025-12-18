@@ -22,18 +22,17 @@ export default function AboutEcosystemSection() {
         variants={fadeUp}
       >
         <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-          Ecosystem
+          Made for real events
         </span>
 
         <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-          A LIVE studio built around real organisers, performers, and audiences.
+          Built for organisers, performers, and fans.
         </span>
 
         <span className="tw:mt-2 tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-2xl">
-          Zagasm Studios grew from running small shows in Asaba to powering
-          recurring events, creator series, and community broadcasts. The stack
-          is tuned for the realities of unstable networks, team workflows, and
-          monetization in emerging markets.
+          Zagasm Studios is a platform for recurring
+          events and serious creators. We built it for the way live shows
+          actually run, with real audiences and real revenue.
         </span>
       </motion.div>
 
@@ -49,22 +48,18 @@ export default function AboutEcosystemSection() {
           custom={0.1}
         >
           <span className="tw:block">
-            Zagasm treats every organiser like a studio, not a single page. That
-            means multi-show calendars, performer tagging, ticketing, and payout
-            flows that respect both sides of the relationship.
+            Zagasm Studios is built for organisers who run shows regularly. Plan your
+            calendar, manage performers, sell tickets, and pay out smoothly.
           </span>
 
           <span className="tw:block">
-            Under the hood, each event generates a trail of data: who watched,
-            when they dropped, what segments landed, and which offers converted.
-            The platform turns those signals into simple decisions organisers
-            can act on before the next show.
+            After each event, you can see what worked. Who showed up, where
+            people stayed engaged, and what to improve for the next show.
           </span>
 
           <span className="tw:block">
-            The goal is simple. A creator in Asaba, London, or anywhere else
-            should be able to run a broadcast studio from a single browser tab
-            and still feel in control of brand, community, and revenue.
+            The goal is simple. Run a professional live show from one place and
+            stay in control of your brand, your audience, and your money.
           </span>
         </motion.div>
 
@@ -81,29 +76,28 @@ export default function AboutEcosystemSection() {
               24 / 7
             </span>
             <span className="tw:mt-1 tw:block tw:text-[11px] tw:text-white/70">
-              Streams monitored with alerting, not guesswork.
+              Your events stay stable and supported.
             </span>
           </div>
 
           <div className="tw:rounded-2xl tw:bg-white tw:border tw:border-slate-200/80 tw:p-4 tw:min-h-[130px] tw:shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
             <span className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-              Workflow-first
+              Team-ready
             </span>
             <span className="tw:mt-3 tw:block tw:text-[14px] tw:font-medium tw:text-slate-900">
-              Roles for producers, talent, and partners.
+              Roles for your team and collaborators.
             </span>
             <span className="tw:mt-1 tw:block tw:text-[11px] tw:text-slate-700">
-              Access control that matches how real teams work.
+              Invite people in without losing control.
             </span>
           </div>
 
           <div className="tw:col-span-2 tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-white tw:p-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
             <span className="tw:block tw:text-[13px] tw:font-medium tw:max-w-xs">
-              Built from Asaba, tuned for global creators.
+              Built for creators everywhere.
             </span>
             <span className="tw:block tw:text-[11px] tw:text-white/80 tw:max-w-sm">
-              From first house party streams to multi-city shows, Zagasm is
-              designed to scale with the ambition of the organisers using it.
+              From small rooms to big stages, Zagasm Studios grows with your audience.
             </span>
           </div>
         </motion.div>

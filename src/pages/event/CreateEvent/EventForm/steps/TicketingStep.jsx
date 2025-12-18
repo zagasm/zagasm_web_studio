@@ -37,6 +37,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const { token } = useAuth();
   const [currencies, setCurrencies] = useState([]);
   const [loadingCurrencies, setLoadingCurrencies] = useState(true);
+  const [suggestedCurrency, setSuggestedCurrency] = useState(null);
 
   // FX preview state
   const [fxPreview, setFxPreview] = useState(null); // holds API payload
@@ -88,6 +89,33 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     };
   }, [token]);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await api.get("/api/v1/currency/suggest", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const suggestion =
+          res?.data?.suggestions?.[0] ||
+          res?.data?.data?.suggestions?.[0] ||
+          null;
+        if (mounted && suggestion) {
+          setSuggestedCurrency({
+            value: String(suggestion.id),
+            label: `${suggestion.symbol} - ${suggestion.name} (${suggestion.code})`,
+            raw: suggestion,
+          });
+        }
+      } catch (err) {
+        console.error("Currency suggestion failed", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [token]);
+
   const currencyOptions = useMemo(
     () =>
       currencies.map((c) => ({
@@ -98,9 +126,18 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   );
 
   useEffect(() => {
-    if (!currencyOptions.length || currencyVal) return;
-    setValue("currency", currencyOptions[0].value, { shouldValidate: true });
-  }, [currencyOptions, currencyVal, setValue]);
+    if (currencyVal) return;
+    if (suggestedCurrency) {
+      setValue("currency", suggestedCurrency.value, { shouldValidate: true });
+      return;
+    }
+
+    if (currencyOptions.length) {
+      setValue("currency", currencyOptions[0].value, {
+        shouldValidate: true,
+      });
+    }
+  }, [currencyOptions, currencyVal, setValue, suggestedCurrency]);
 
   // FX rate preview: price → USD using backend endpoint
   useEffect(() => {
@@ -243,17 +280,21 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
                 shouldValidate: true,
               });
             }}
-            disabled
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder={loadingCurrencies ? "Loading…" : "Currency locked"}
+                placeholder={loadingCurrencies ? "Loading…" : "Select currency"}
                 size="small"
                 error={!!errors.currency}
                 helperText={errors.currency?.message}
               />
             )}
           />
+          {suggestedCurrency && (
+            <p className="tw:text-[11px] tw:text-gray-500 tw:mt-1">
+              Suggested for you: {suggestedCurrency.label}.
+            </p>
+          )}
         </div>
 
         {/* Ticket availability */}

@@ -28,15 +28,14 @@ export default function AboutHeroSection() {
         <span className="tw:font-dela tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-4">
           Turning{" "}
           <span className="tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:bg-clip-text tw:text-transparent">
-            LIVE streams
+            LIVE shows <br />
           </span>{" "}
           into a real business.
         </span>
 
         <span className="tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-xl">
-          Zagasm Studios is building the LIVE infrastructure for creators,
-          events, and brands. From RTMP ingest to highlight automation, the
-          studio helps you ship shows, not just posts.
+          Zagasm Studios is a home for live events that feel premium. Host
+          shows, sell tickets, and build a real audience that keeps coming back.
         </span>
       </motion.div>
 
@@ -51,15 +50,15 @@ export default function AboutHeroSection() {
         <div className="tw:relative tw:rounded-3xl tw:bg-slate-900 tw:text-white tw:p-5 tw:overflow-hidden tw:shadow-[0_18px_60px_rgba(15,23,42,0.45)]">
           <span className="tw:absolute tw:-right-10 tw:-top-10 tw:h-32 tw:w-32 tw:rounded-full tw:bg-primary/40 tw:blur-2xl" />
           <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-white/60">
-            Live-native
+            Built for live shows
           </span>
           <span className="tw:mt-3 tw:block tw:text-[15px] tw:font-medium">
-            Built for teams that treat LIVE content like a product, not a
-            one-off broadcast.
+            Built for creators and teams who want consistent shows, not random
+            lives.
           </span>
           <span className="tw:mt-4 tw:block tw:text-[11px] tw:text-white/70">
-            Programmable pipelines, reusable assets, and automation across
-            platforms. One control room, all your shows.
+            Plan events, manage your show, and keep everything in one place from
+            setup to payout.
           </span>
         </div>
       </motion.div>

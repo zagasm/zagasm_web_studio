@@ -1,3 +1,4 @@
+// src/pages/contact/ContactMetaSection.jsx
 import React from "react";
 import { Clock, LayoutTemplate, Users } from "lucide-react";
 import { motion } from "framer-motion";
@@ -17,30 +18,30 @@ export default function ContactMetaSection() {
               What happens after you reach out
             </span>
             <span className="tw:font-dela tw:block tw:mt-2 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
-              A short call, a clear plan, and a realistic setup.
+              A short call, a clear plan, and a smooth launch.
             </span>
             <span className="tw:block tw:mt-1.5 tw:text-[12px] tw:md:text-[13px] tw:text-slate-600">
-              We won’t drown you in decks. We’ll map out your LIVE flow, show
-              what Zagasm can automate today, and give honest guidance on what
-              you actually need to run reliably.
+              We keep it simple. We will understand your event, suggest the
+              right setup, and help you decide how to run it on Zagasm, free or
+              ticketed.
             </span>
           </div>
 
           <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-3 tw:gap-3 tw:w-full tw:max-w-xl">
             <MetaCard
               icon={Clock}
-              title="Fast triage"
-              body="We respond to all inquiries in under 24 hours. If your event is sooner, mention the date."
+              title="Fast response"
+              body="We reply within 24 hours. If your event is close, include the date."
             />
             <MetaCard
               icon={LayoutTemplate}
-              title="Pipeline first"
-              body="We start by mapping your ingest → stream → clips → analytics flow before talking tools."
+              title="Clear plan"
+              body="We outline the steps from setup to going live, based on your exact needs."
             />
             <MetaCard
               icon={Users}
-              title="Creator-friendly"
-              body="We design around real people on camera, not just ideal studio diagrams."
+              title="Made for real teams"
+              body="Solo host or full crew, we help you run the show without confusion."
             />
           </div>
         </div>

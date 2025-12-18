@@ -143,10 +143,10 @@ const slides = [
   {
     id: 0,
     line1: ["Welcome", "to", "Zagasm", "Studios"],
-    line2: ["Where", "your", "moments", "become", "global", "experiences"],
-    highlightWord: "moments",
+    line2: ["Go", "live.", "Look", "premium.", "Reach", "everywhere."],
+    highlightWord: "live.",
     subText:
-      "Turn every moment into a global experience with reliable, high-quality live streaming built for concerts, shows, and creative events.",
+      "High-quality live streaming for concerts, shows, and creators. Simple setup. Solid delivery.",
     ctaLabel: "Get Started",
     ctaTo: "/auth/signin",
     icons: [
@@ -155,13 +155,14 @@ const slides = [
       { Icon: Music, delay: 0.6, yOffset: 0, curve: 40 },
     ],
   },
+
   {
     id: 1,
-    line1: ["The", "World", "is", "Your", "Stage"],
-    line2: ["Concerts,", "shows,", "hangouts,", "talk", "shows,", "seminars"],
-    highlightWord: "Stage",
+    line1: ["Your", "Show.", "Your", "Stage."],
+    line2: ["Concerts,", "talks,", "hangouts,", "seminars."],
+    highlightWord: "Stage.",
     subText:
-      "If it's happening, it can be live. Run concerts, hangouts, talk shows, and seminars from one stage and stream them everywhere.",
+      "Host any kind of event and stream it cleanly to your audience, anywhere.",
     ctaLabel: "Go Live",
     ctaTo: "/auth/signin",
     icons: [
@@ -170,13 +171,14 @@ const slides = [
       { Icon: Users, delay: 0.6, yOffset: 20, curve: -30 },
     ],
   },
+
   {
     id: 2,
-    line1: ["Connect", "Beyond", "Borders"],
-    line2: ["From", "Asaba", "to", "London,", "Abuja", "to", "Abu", "Dhabi"],
+    line1: ["Stream", "Beyond", "Borders"],
+    line2: ["From", "anywhere", "to", "everywhere."],
     highlightWord: "Borders",
     subText:
-      "Bridge cities and continents in a single click. With Zagasm Studios, your creativity travels farther than your passport.",
+      "Go live from your city and reach fans across countries in seconds.",
     ctaLabel: "Stream Worldwide",
     ctaTo: "/auth/signin",
     icons: [
@@ -185,23 +187,15 @@ const slides = [
       { Icon: Zap, delay: 0.6, yOffset: -5, curve: 30 },
     ],
   },
+
   {
     id: 3,
-    line1: [
-      "Whether",
-      "you're",
-      "a",
-      "pro",
-      "or",
-      "a",
-      "first-time",
-      "streamer",
-    ],
-    line2: ["Unleash", "the", "blockbuster", "trapped", "in", "your", "head"],
-    highlightWord: "blockbuster",
+    line1: ["First", "stream", "or", "pro", "level"],
+    line2: ["Create", "something", "worth", "replaying."],
+    highlightWord: "replaying.",
     subText:
-      "No complex setup, no panic. Just a clean studio flow that lets you ship the blockbuster idea you've been sitting on.",
-    ctaLabel: "Start Your First Stream",
+      "No stress setup. Just a smooth flow that helps you deliver a great show.",
+    ctaLabel: "Start Streaming",
     ctaTo: "/auth/signin",
     icons: [
       { Icon: Film, delay: 0.2, yOffset: 15, curve: -20 },
@@ -209,21 +203,14 @@ const slides = [
       { Icon: Video, delay: 0.6, yOffset: 35, curve: -25 },
     ],
   },
+
   {
     id: 4,
-    line1: ["Make", "Moments", "Magical"],
-    line2: [
-      "Smooth",
-      "streaming,",
-      "clean",
-      "visuals.",
-      "No",
-      "technical",
-      "glitch",
-    ],
-    highlightWord: "Magical",
+    line1: ["Smooth", "Streams.", "Sharp", "Visuals."],
+    line2: ["No", "glitches.", "No", "drama."],
+    highlightWord: "Smooth",
     subText:
-      "Enjoy smooth streaming, sharp visuals, and rock-solid stability so your audience remembers the magic, not the glitches.",
+      "Stable streaming that keeps your audience locked in from start to finish.",
     ctaLabel: "See How It Works",
     ctaTo: "/auth/signin",
     icons: [
@@ -232,24 +219,14 @@ const slides = [
       { Icon: Sparkles, delay: 0.6, yOffset: -35, curve: 25 },
     ],
   },
+
   {
     id: 5,
-    line1: ["Bring", "the", "energy", "to", "Zagasm", "Studios"],
-    line2: [
-      "Your",
-      "creativity",
-      "deserves",
-      "4K,",
-      "Dolby",
-      "Atmos,",
-      "and",
-      "a",
-      "standing",
-      "ovation",
-    ],
-    highlightWord: "energy",
+    line1: ["Bring", "the", "Energy"],
+    line2: ["Premium", "video.", "Clean", "sound.", "Big", "feel."],
+    highlightWord: "Energy",
     subText:
-      "Push out 4K streams, cinematic audio, and studio-grade production that makes every session feel like a premiere night.",
+      "Make every stream feel like a real production, not a random live video.",
     ctaLabel: "Upgrade Your Streams",
     ctaTo: "/auth/signin",
     icons: [
