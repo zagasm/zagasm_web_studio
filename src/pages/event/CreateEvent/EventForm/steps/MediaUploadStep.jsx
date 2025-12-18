@@ -536,7 +536,7 @@ export default function MediaUploadStep({
             <div className="tw:mt-4 tw:space-y-3">
               {/* Big thumbnail */}
               {posterImages[thumbnailIndex] && (
-                <div className="tw:w-[60%] tw:rounded-2xl tw:border tw:border-primary tw:ring-2 tw:ring-primary/15 tw:bg-white tw:shadow-sm tw:overflow-hidden">
+                <div className="tw:w-full tw:lg:w-[60%] tw:rounded-2xl tw:border tw:border-primary tw:ring-2 tw:ring-primary/15 tw:bg-white tw:shadow-sm tw:overflow-hidden">
                   <div className=" tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-2 tw:border-b tw:border-gray-100">
                     <div className="tw:flex tw:items-center tw:gap-2">
                       <span className="tw:text-[11px] tw:px-2 tw:py-1 tw:bg-primary tw:text-white tw:rounded-full">
