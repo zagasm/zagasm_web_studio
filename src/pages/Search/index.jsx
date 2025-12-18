@@ -102,7 +102,7 @@ function PersonRow({ item, onClick }) {
   const avatarUrl = getAvatarUrl(item);
   const initials = initialsFromName(name);
 
-  console.log(item)
+  // console.log(item)
 
   return (
     <button
