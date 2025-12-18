@@ -5,34 +5,34 @@ const steps = [
   {
     id: 1,
     label: "Creator",
-    title: "Capture the show",
+    title: "Start your event",
     description:
-      "Creators go live from studio setups, phones, or RTMP sources with smart presets tuned for African networks.",
-    badge: "Source",
+      "Go live from your phone or studio setup in minutes. No confusing setup.",
+    badge: "Start",
   },
   {
     id: 2,
-    label: "Zagasm Studio",
-    title: "Process & enhance",
+    label: "Zagasm Studios",
+    title: "We keep it smooth",
     description:
-      "Our pipeline stabilizes video, optimizes bitrates, syncs audio, and adds overlays in real time.",
-    badge: "Intelligence",
+      "Your stream stays clear and stable so your audience enjoys the show, not the struggle.",
+    badge: "Quality",
   },
   {
     id: 3,
-    label: "Distribution",
-    title: "Everywhere at once",
+    label: "Ticketing",
+    title: "Sell tickets. Get paid",
     description:
-      "Restream to social, embed players on your site, and reach audiences on web and mobile simultaneously.",
-    badge: "Reach",
+      "Set a price, sell tickets to your audience, and earn directly from your event.",
+    badge: "Revenue",
   },
   {
     id: 4,
     label: "Audience",
-    title: "Real-time reactions",
+    title: "Fans join and engage",
     description:
-      "Fans react, chat, send gifts and clips while watching the stream – all with near-zero friction.",
-    badge: "Impact",
+      "Viewers watch, chat, and react in real time, making the moment feel alive.",
+    badge: "Engagement",
   },
 ];
 
@@ -233,7 +233,6 @@ export default function LivePipelineSection() {
                     {step.description}
                   </p>
                 </div>
-                
               </motion.div>
             </motion.div>
           ))}

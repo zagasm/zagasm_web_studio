@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   FaCalendarAlt,
   FaChevronDown,
@@ -11,47 +11,42 @@ import PostSignupFormModal from "./ModalContainer";
 import SignUpCodecomponent from "./SignUpCodecomponent";
 import "./postSignupStyle.css";
 import { useAuth } from "../../../../pages/auth/AuthContext";
-import axios from "axios";
-import qs from "qs";
 import { showToast } from "../../../ToastAlert";
 import { showError, showSuccess } from "../../../ui/toast";
 import { api } from "../../../../lib/apiClient";
 import { useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
   const navigate = useNavigate();
-  // Conditionally render the page only if required
-  // Only hide form if BOTH gender AND dob are already set
-  if (user.gender != null && user.dob != null) return null;
 
-  if (!user) {
-    return null;
-  }
-  const [dob, setDob] = useState("");
+  // ✅ hooks must always run, every render
+  const [dob, setDob] = useState(null);
   const [gender, setGender] = useState("");
-  const [tosendUserdata, settosendUserdata] = useState();
+  const [tosendUserdata, settosendUserdata] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const dateInputRef = useRef(null);
+  const fifteenYearsAgo = useMemo(() => {
+    const boundary = new Date();
+    boundary.setFullYear(boundary.getFullYear() - 15);
+    boundary.setHours(0, 0, 0, 0);
+    return boundary;
+  }, []);
 
-  const handleWrapperClick = () => {
-    dateInputRef.current?.showPicker?.() || dateInputRef.current?.focus();
-  };
+  const fiveYearsBefore = useMemo(() => {
+    const earliest = new Date(fifteenYearsAgo);
+    earliest.setFullYear(earliest.getFullYear() - 80);
+    return earliest;
+  }, [fifteenYearsAgo]);
+
   const isFormValid = dob && gender;
-  const isAtLeast15 = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age >= 15;
+
+  const isAtLeast15 = (date) => {
+    if (!date) return false;
+    return date.getTime() <= fifteenYearsAgo.getTime();
   };
 
   const handleSubmit = async (e) => {
@@ -71,27 +66,25 @@ const PostSignupForm = () => {
     setIsLoading(true);
     try {
       const endpoint = `/api/v1/gender/dob`;
-      console.log("Attempting to reach:", endpoint);
 
-      // Use FormData like the editProfile component does
       const formData = new FormData();
       formData.append("gender", gender);
-      formData.append("dob", dob);
+      const formattedDob = dob ? dob.toISOString().split("T")[0] : "";
+      formData.append("dob", formattedDob);
 
       const response = await api.post(endpoint, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
-        validateStatus: (status) => status < 500, // Accept 4xx as responses
+        validateStatus: (status) => status < 500,
       });
-      console.log("update data:", response);
+
       if (response.status === 401) {
         localStorage.clear();
         navigate("/auth/signin");
+        return;
       }
-      console.log("Response status:", response.status);
-      console.log("Response data:", response.data);
 
       if (response.status === 200 || response.status === 201) {
         showSuccess(
@@ -100,33 +93,34 @@ const PostSignupForm = () => {
         );
         settosendUserdata(response.data.user);
         setFormSubmitted(true);
-      } else if (response.status === 422) {
-        // Log the 422 error details
-        console.error("422 Error details:", response.data);
+        return;
+      }
 
+      if (response.status === 422) {
         const message = response.data?.message || "";
 
-        // Check if user already has gender/dob set
         if (message.toLowerCase().includes("already")) {
-          // Data already set, just continue - don't show this form anymore
           showToast.info(message);
-          // Update user object to reflect that gender/dob are set
-          const updatedUser = { ...user, gender: gender, dob: dob };
+
+          // ✅ don’t reload the page; just update auth state
+          const updatedUser = {
+            ...user,
+            gender: user?.gender ?? gender,
+            dob: user?.dob ?? dob,
+          };
           login({ token, user: updatedUser });
-          // This will trigger the form to hide on next render
-          window.location.reload();
-        } else {
-          // Show specific validation error from API
-          const errorMsg =
-            message || response.data?.error || "Validation failed";
-          setError(errorMsg);
-          showError(errorMsg);
+
+          return;
         }
-      } else {
-        throw new Error(response.data?.message || "Update failed");
+
+        const errorMsg = message || response.data?.error || "Validation failed";
+        setError(errorMsg);
+        showError(errorMsg);
+        return;
       }
+
+      throw new Error(response.data?.message || "Update failed");
     } catch (err) {
-      console.error("API Error:", err);
       setError(
         err.response?.data?.message ||
           err.message ||
@@ -136,6 +130,12 @@ const PostSignupForm = () => {
       setIsLoading(false);
     }
   };
+
+  // ✅ now it’s safe to return early, after hooks
+  if (!user) return null;
+
+  const profileComplete = user.gender != null && user.dob != null;
+  if (profileComplete) return null;
 
   if (formSubmitted) {
     return (
@@ -163,35 +163,38 @@ const PostSignupForm = () => {
         >
           Complete your Profile
         </motion.span>
+
         <p>Just a few more details to complete your profile</p>
 
         {error && <div className="alert alert-danger mb-3">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          {/* Date of Birth Field */}
+        <form onSubmit={handleSubmit} className="tw:space-y-5">
           <div className="form-group">
             <label>Date of Birth</label>
             <motion.div
               className="dob-wrapper"
-              onClick={handleWrapperClick}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <FaCalendarAlt className="left-icon" />
-              <input
-                type="date"
-                ref={dateInputRef}
-                value={dob}
-                max={new Date().toISOString().split("T")[0]}
-                onChange={(e) => setDob(e.target.value)}
+              <DatePicker
+                selected={dob}
+                onChange={(date) => setDob(date)}
+                maxDate={fifteenYearsAgo}
+                minDate={fiveYearsBefore}
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                placeholderText="Select your date of birth"
                 className="dob-input border-0"
-                required
+                wrapperClassName="tw:w-full"
+                autoComplete="off"
+                dateFormat="yyyy-MM-dd"
               />
               <FaChevronDown className="right-icon" />
             </motion.div>
           </div>
 
-          {/* Gender Selection */}
           <div className="form-group">
             <label>Gender</label>
             <div className="gender-buttons">

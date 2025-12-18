@@ -3,30 +3,30 @@ import { motion } from "framer-motion";
 
 const pills = [
   "Low-latency streaming",
+  "Ticketed events",
+  "Live chat & reactions",
   "Multi-host sessions",
-  "Reactions & live chat",
-  "Clips & highlights",
   "Mobile-friendly",
 ];
 
 const features = [
   {
     title: "Ultra-smooth streams",
-    badge: "Latency < 2s",
+    badge: "Low delay",
     description:
-      "Deliver high-quality video to your audience with minimal delay, perfect for concerts, podcasts, and live shows.",
+      "Deliver clean video with minimal delay, perfect for concerts, podcasts, and live shows.",
+  },
+  {
+    title: "Sell tickets, get paid",
+    badge: "Built-in ticketing",
+    description:
+      "Create paid events, set your price, and earn from your audience directly on Zagasm.",
   },
   {
     title: "Interactive by design",
     badge: "Real-time engagement",
     description:
-      "Live chat, reactions, and polls keep your community glued to the screen and part of the experience.",
-  },
-  {
-    title: "Creator-first tools",
-    badge: "Built for studios",
-    description:
-      "Schedule shows, manage guests, pin comments, and capture clips – all from a clean, focused interface.",
+      "Live chat and reactions keep your community locked in and part of the moment.",
   },
 ];
 
@@ -105,7 +105,7 @@ export default function LiveHighlightsSection() {
               <div className="tw:absolute tw:-right-10 tw:-top-10 tw:h-24 tw:w-24 tw:bg-primary/30 tw:blur-3xl tw:opacity-70" />
 
               <div className="tw:relative tw:z-10 tw:flex tw:flex-col tw:gap-3">
-                <span className="tw:inline-flex tw:self-start tw:rounded-full tw:bg-primary/15 tw:text-primary tw:text-[11px] tw:font-medium tw:px-2.5 tw:py-1">
+                <span className="tw:inline-flex tw:self-start tw:rounded-full tw:bg-white/80 tw:text-primary tw:text-[11px] tw:font-medium tw:px-2.5 tw:py-1">
                   {feature.badge}
                 </span>
                 <h3 className="tw:text-base tw:md:text-lg tw:font-semibold text-white">

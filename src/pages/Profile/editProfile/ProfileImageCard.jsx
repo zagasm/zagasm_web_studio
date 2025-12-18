@@ -244,7 +244,7 @@ export default function ProfileImageCard({
                   )}
                 </div>
 
-                <div className="tw-w-full tw-flex tw:flex-col tw:gap-2">
+                <div className="tw:w-full tw:flex tw:flex-col tw:gap-2">
                   <button
                     style={{
                       borderRadius: 16,
@@ -270,7 +270,7 @@ export default function ProfileImageCard({
                   </button>
                 </div>
 
-                <div className="tw-text-[11px] tw:text-gray-500 tw-text-center">
+                <div className="tw:text-[11px] tw:text-gray-500 tw:text-center">
                   You can crop the new photo before uploading.
                 </div>
               </div>
@@ -333,7 +333,7 @@ export default function ProfileImageCard({
                 </ReactCrop>
               </div>
 
-              <div className="tw-mt-2 tw-text-[11px] tw-text-gray-500">
+              <div className="tw:mt-2 tw:text-[11px] tw:text-gray-500">
                 Default crop is a square, but you can resize it freely.
               </div>
             </div>

@@ -1,3 +1,4 @@
+// src/pages/about/AboutFaqSection.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import Accordion from "@mui/material/Accordion";
@@ -17,19 +18,19 @@ const fadeUp = {
 const faqs = [
   {
     q: "Who is Zagasm Studios for?",
-    a: "For organisers, studios, and creators who run recurring shows, not one-off lives. If you care about consistency, workflows, and monetization, the platform is built for you.",
+    a: "For organisers, studios, and creators who want to run proper live events. If you care about quality, consistency, and selling tickets, you will feel at home here.",
   },
   {
-    q: "Do I need new hardware to use Zagasm?",
-    a: "No. You can start with your existing cameras and encoders. As long as you can send RTMP, you can plug into the studio.",
+    q: "Can I start without fancy equipment?",
+    a: "Yes. You can start with your phone and upgrade later. If you already have a studio setup, that works too.",
   },
   {
-    q: "Can Zagasm coexist with my current tools?",
-    a: "Yes. Zagasm is designed as a control layer on top of YouTube, Twitch, ticketing, and CRMs you already use.",
+    q: "Can I sell tickets for my events?",
+    a: "Yes. You can create ticketed events, set your price, and earn directly from your audience.",
   },
   {
-    q: "Where is Zagasm based?",
-    a: "The team is built from Asaba with collaborators in other cities, but the platform is designed for LIVE creators everywhere.",
+    q: "Where is Zagasm Studios based?",
+    a: "16192 Coastal Highway Lewes, Delaware 19958 Sussex County United States",
   },
 ];
 
@@ -47,11 +48,10 @@ export default function AboutFaqSection() {
           FAQ
         </span>
         <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-          A few quick answers before you go live.
+          Quick answers before you start.
         </span>
         <span className="tw:mt-1 tw:block tw:text-sm tw:text-slate-600 tw:max-w-xl">
-          Still deciding if Zagasm fits your stack? These are the questions most
-          teams ask first.
+          These are the questions people ask before their first event.
         </span>
       </motion.div>
 
@@ -86,6 +86,7 @@ export default function AboutFaqSection() {
                 {item.q}
               </span>
             </AccordionSummary>
+
             <AccordionDetails sx={{ paddingTop: 0, paddingBottom: 1.5 }}>
               <span className="tw:block tw:text-[12px] tw:md:text-[13px] tw:text-slate-700">
                 {item.a}

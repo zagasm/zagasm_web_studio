@@ -33,24 +33,24 @@ export default function ZagasmLanding() {
         <Hero />
 
         <AutomationSection
-          title="Stream once. Zagasm does the rest"
-          subtitle="Hit Go Live—Zagasm auto-clips verticals, adds captions & chapters, multistreams via RTMP to every platform, and logs your best moments to the CRM in real time."
+          title="Sell tickets. Stream. Get paid"
+          subtitle="Create ticketed events, schedule replays, post highlights, share everywhere, and track results in one place. Less work. More revenue."
           ctaTo="/auth/signup"
-          ctaLabel="Start automating free"
-          mediaSrc="/images/z1.png"
-          mediaAlt="Auto-clip, multistream, and CRM logging powered by Zagasm"
+          ctaLabel="Start free"
+          mediaSrc="/images/z2.png"
+          mediaAlt="Ticketing, replays, highlights, and cross-posting automation"
+          right
         />
 
         <LiveHighlightsSection />
 
         <AutomationSection
-          title="Turn LIVE moments into momentum"
-          subtitle="Queue replays, publish highlight cards, syndicate everywhere, and track conversions without leaving the player. Less busywork, more impact."
+          title="Go live once. We handle the setup"
+          subtitle="Start your event and we generate your stream details, keep everything organized, and help you go live without the usual confusion."
           ctaTo="/auth/signup"
-          ctaLabel="Start automating free"
-          mediaSrc="/images/z2.png"
-          mediaAlt="Highlight cards, replays, and cross-posting automation"
-          right
+          ctaLabel="Start free"
+          mediaSrc="/images/z1.png"
+          mediaAlt="Stream setup made simple on Zagasm"
         />
 
         <LivePipelineSection />

@@ -53,14 +53,14 @@ export default function AutomationSection({
             whileInView="show"
             viewport={{ once: true, amount: 0.3 }}
           >
-            <motion.div
+            {/* <motion.div
               className="tw:mb-4 tw:inline-flex tw:items-center tw:gap-2 tw:text-[#8F07E7] tw:text-[12px] tw:tracking-widest tw:uppercase"
               variants={textVariants}
               custom={0}
             >
               <Workflow size={16} />
               <span>Automate Workflows</span>
-            </motion.div>
+            </motion.div> */}
 
             <motion.span
               className="tw:font-dela tw:block tw:mb-4 tw:text-3xl tw:md:text-[40px] tw:lg:text-5xl tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"

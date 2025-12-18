@@ -41,6 +41,27 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   );
 }
 
+function percentToPixelCrop(percentCrop, width, height) {
+  if (!percentCrop) return null;
+  return {
+    unit: "px",
+    x: Math.round((percentCrop.x / 100) * width),
+    y: Math.round((percentCrop.y / 100) * height),
+    width: Math.round((percentCrop.width / 100) * width),
+    height: Math.round((percentCrop.height / 100) * height),
+  };
+}
+
+// default crop is 3:1 but user can resize freely after
+function centerDefaultBannerCrop(mediaWidth, mediaHeight) {
+  const c = centerCrop(
+    makeAspectCrop({ unit: "%", width: 90 }, 3 / 1, mediaWidth, mediaHeight),
+    mediaWidth,
+    mediaHeight
+  );
+  return c;
+}
+
 export default function MediaUploadStep({
   posterImages,
   setPosterImages,
@@ -57,6 +78,9 @@ export default function MediaUploadStep({
   const vidInputRef = useRef(null);
   const [isDraggingImg, setIsDraggingImg] = useState(false);
   const [isDraggingVid, setIsDraggingVid] = useState(false);
+
+  const [thumbnailIndex, setThumbnailIndex] = useState(0);
+  const pendingCropQueueRef = useRef([]); // for multi-image crop queue
 
   const { token } = useAuth();
 
@@ -140,6 +164,14 @@ export default function MediaUploadStep({
     };
   }, []);
 
+  useEffect(() => {
+    if (!posterImages?.length) {
+      setThumbnailIndex(0);
+      return;
+    }
+    if (thumbnailIndex >= posterImages.length) setThumbnailIndex(0);
+  }, [posterImages, thumbnailIndex]);
+
   // ---- Poster helpers
   const getCroppedBlob = (image, pixelCrop) =>
     new Promise((resolve, reject) => {
@@ -208,13 +240,16 @@ export default function MediaUploadStep({
   };
 
   const commitCrop = async () => {
-    if (!cropDialog.file || !completedCrop) return;
+    if (!cropDialog.file || !completedCrop?.width || !completedCrop?.height)
+      return;
+
     try {
       const blob = await getCroppedBlob(cropImageRef.current, completedCrop);
       const fileName = cropDialog.file.name || `poster-${Date.now()}.jpg`;
       const cropped = new File([blob], fileName, {
         type: cropDialog.file.type || "image/jpeg",
       });
+
       if (cropDialog.index !== null) {
         setPosterImages((prev) =>
           prev.map((item, idx) => {
@@ -226,13 +261,24 @@ export default function MediaUploadStep({
           })
         );
       } else {
-        setPosterImages((prev) => [...prev, cropped]);
+        setPosterImages((prev) => {
+          const next = [...prev, cropped];
+
+          // default thumbnail = first image uploaded (only set once)
+          if (next.length === 1) setThumbnailIndex(0);
+
+          return next;
+        });
       }
     } catch (err) {
       console.error(err);
       showError("Failed to crop the image, try again.");
     } finally {
       closeCropDialog();
+
+      // open next queued image automatically
+      const nextFile = pendingCropQueueRef.current.shift();
+      if (nextFile) startCropSession(nextFile);
     }
   };
 
@@ -242,21 +288,29 @@ export default function MediaUploadStep({
       showError("Only images under 10MB are supported.");
       return;
     }
+
     if (cropDialog.url) URL.revokeObjectURL(cropDialog.url);
+
     setCropDialog({
       open: true,
       file,
       url: URL.createObjectURL(file),
       index,
     });
-    setCrop({ unit: "%", width: 90 });
+
+    setCrop(undefined);
     setCompletedCrop(null);
   };
 
   const handlePosterImageFiles = (files) => {
-    const first = [...files].find((f) => /^image\//.test(f.type));
-    if (!first) return;
-    startCropSession(first);
+    const images = [...files].filter(
+      (f) => /^image\//.test(f.type) && f.size <= 10 * 1024 * 1024
+    );
+    if (!images.length) return;
+
+    // queue the rest, crop first immediately
+    pendingCropQueueRef.current = images.slice(1);
+    startCropSession(images[0]);
   };
 
   const addPosterVideos = (files) => {
@@ -271,8 +325,19 @@ export default function MediaUploadStep({
     setPosterImages((prev) => {
       const target = prev[i];
       revokePosterPreview(target);
-      return prev.filter((_, idx) => idx !== i);
+
+      const next = prev.filter((_, idx) => idx !== i);
+
+      setThumbnailIndex((cur) => {
+        if (!next.length) return 0;
+        if (cur === i) return 0; // removed the thumbnail -> fallback
+        if (i < cur) return cur - 1; // shift left
+        return cur;
+      });
+
+      return next;
     });
+
   const removePosterVideoAt = (i) =>
     setPosterVideos((prev) => prev.filter((_, idx) => idx !== i));
 
@@ -367,7 +432,7 @@ export default function MediaUploadStep({
       return;
     }
 
-    onNext(vals);
+    onNext({ ...vals, thumbnailIndex });
   };
 
   return (
@@ -468,36 +533,141 @@ export default function MediaUploadStep({
           </div>
           {/* Thumbs */}
           {posterImages?.length > 0 && (
-            <div className="tw:flex tw:flex-wrap tw:gap-3 tw:mt-3">
-              {posterImages.map((f, i) => (
-                <div
-                  key={`${f.name}-${i}`}
-                  className="tw:relative tw:w-24 tw:h-24 tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-white tw:shadow-sm"
-                >
+            <div className="tw:mt-4 tw:space-y-3">
+              {/* Big thumbnail */}
+              {posterImages[thumbnailIndex] && (
+                <div className="tw:w-[60%] tw:rounded-2xl tw:border tw:border-primary tw:ring-2 tw:ring-primary/15 tw:bg-white tw:shadow-sm tw:overflow-hidden">
+                  <div className=" tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-2 tw:border-b tw:border-gray-100">
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <span className="tw:text-[11px] tw:px-2 tw:py-1 tw:bg-primary tw:text-white tw:rounded-full">
+                        Thumbnail
+                      </span>
+                      <span className="tw:text-xs tw:text-gray-600 tw:hidden tw:sm:block">
+                        This is the main poster people will see first
+                      </span>
+                    </div>
+
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <button
+                        style={{
+                          borderRadius: 16,
+                          fontSize: 12,
+                        }}
+                        type="button"
+                        onClick={() =>
+                          startCropSession(
+                            posterImages[thumbnailIndex],
+                            thumbnailIndex
+                          )
+                        }
+                        className="tw:text-xs tw:px-3 tw:py-1.5 tw:rounded-full tw:border tw:border-gray-200 tw:hover:bg-gray-50"
+                      >
+                        Recrop
+                      </button>
+
+                      <button
+                        style={{
+                          borderRadius: 16,
+                          fontSize: 12,
+                        }}
+                        type="button"
+                        onClick={() => removePosterImageAt(thumbnailIndex)}
+                        className="tw:text-xs tw:px-3 tw:py-1.5 tw:rounded-full tw:border tw:border-red-200 tw:text-red-600 tw:hover:bg-red-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* big preview */}
                   <button
                     type="button"
-                    onClick={() => startCropSession(f, i)}
-                    className="tw:absolute tw:inset-0 tw:z-0 tw:p-0 tw:border-0 tw:bg-transparent tw:flex tw:flex-col tw:items-stretch tw:justify-between"
+                    onClick={() =>
+                      startCropSession(
+                        posterImages[thumbnailIndex],
+                        thumbnailIndex
+                      )
+                    }
+                    className="tw:block tw:w-full tw:bg-black/5"
+                    style={{ fontSize: 12 }}
                   >
                     <img
-                      src={getPosterPreviewUrl(f)}
-                      className="tw:w-full tw:h-full tw:object-cover tw:pointer-events-none"
-                      alt={f.name || `poster-${i}`}
+                      src={getPosterPreviewUrl(posterImages[thumbnailIndex])}
+                      alt="Thumbnail poster"
+                      className="tw:w-full tw:h-40 tw:sm:h-[220px] tw:md:h-[260px] tw:object-cover"
                     />
-                    <span className="tw:text-[10px] tw:font-semibold tw:tracking-wide tw:text-white tw:bg-black/40 tw:px-2 tw:py-1 tw:text-center">
-                      Recrop &amp; preview
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removePosterImageAt(i)}
-                    className="tw:absolute tw:top-1 tw:right-1 tw:z-10 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
-                    aria-label="Remove"
-                  >
-                    ✕
                   </button>
                 </div>
-              ))}
+              )}
+
+              {/* Other posters row (responsive wrap) */}
+              {posterImages.length > 1 && (
+                <div>
+                  <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
+                    <span className="tw:text-xs tw:text-gray-600">
+                      Other poster images
+                    </span>
+                  </div>
+
+                  <div className="tw:flex tw:flex-wrap tw:gap-3">
+                    {posterImages.map((f, i) => {
+                      if (i === thumbnailIndex) return null;
+
+                      return (
+                        <div
+                          key={`${f.name}-${i}`}
+                          className="tw:relative tw:overflow-hidden tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:shadow-sm
+                           tw:w-[90px] tw:h-[90px] tw:sm:w-[100px] tw:sm:h-[100px]"
+                        >
+                          {/* tap to recrop */}
+                          <button
+                            type="button"
+                            onClick={() => startCropSession(f, i)}
+                            className="tw:absolute tw:inset-0 tw:bg-transparent tw:p-0 tw:border-0"
+                            style={{ fontSize: 12 }}
+                          >
+                            <img
+                              src={getPosterPreviewUrl(f)}
+                              alt={f.name || `poster-${i}`}
+                              className="tw:w-full tw:h-full tw:object-cover"
+                            />
+                          </button>
+
+                          {/* set as thumbnail */}
+                          <button
+                          
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setThumbnailIndex(i);
+                            }}
+                            className="tw:absolute tw:left-2 tw:bottom-2 tw:z-10 tw:text-[10px] tw:px-2 tw:py-1 tw:bg-black/60 tw:text-white tw:rounded-full"
+                            style={{ borderRadius: 9999, fontSize: 8 }}
+                          >
+                            Set thumbnail
+                          </button>
+
+                          {/* remove */}
+                          <button
+                            type="button"
+                            onClick={() => removePosterImageAt(i)}
+                            className="tw:absolute tw:top-1 tw:right-1 tw:z-10 tw:h-7 tw:w-7 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:border"
+                            aria-label="Remove"
+                            style={{ fontSize: 10 }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <span className="tw:block tw:text-xs tw:text-gray-500">
+                Tip: Upload multiple images. The first becomes the thumbnail by
+                default, but you can change it.
+              </span>
             </div>
           )}
         </div>
@@ -784,9 +954,16 @@ export default function MediaUploadStep({
               <div className="tw:bg-gray-50 tw:rounded-3xl tw:p-3 tw:border tw:border-dashed tw:border-gray-200">
                 <ReactCrop
                   crop={crop}
-                  onChange={(_, percentCrop) => setCrop(percentCrop)} // keep crop as % for UI
-                  onComplete={(pixelCrop) => setCompletedCrop(pixelCrop)} // store PixelCrop for canvas/blob
-                  aspect={ASPECT}
+                  onChange={(_, percentCrop) => {
+                    setCrop(percentCrop);
+
+                    const img = cropImageRef.current;
+                    if (img)
+                      setCompletedCrop(
+                        percentToPixelCrop(percentCrop, img.width, img.height)
+                      );
+                  }}
+                  onComplete={(pixelCrop) => setCompletedCrop(pixelCrop)}
                   ruleOfThirds
                   keepSelection
                   className="tw:w-full tw:max-h-[420px]"
@@ -798,8 +975,19 @@ export default function MediaUploadStep({
                     className="tw:w-full tw:block tw:max-h-[260px] tw:sm:max-h-[360px] tw:lg:max-h-[520px] tw:object-contain"
                     onLoad={(e) => {
                       const img = e.currentTarget;
-                      // initialize crop once the image has real dimensions
-                      setCrop(centerAspectCrop(img.width, img.height, ASPECT));
+
+                      const defaultCrop = centerDefaultBannerCrop(
+                        img.width,
+                        img.height
+                      );
+                      setCrop(defaultCrop);
+
+                      const pixel = percentToPixelCrop(
+                        defaultCrop,
+                        img.width,
+                        img.height
+                      );
+                      setCompletedCrop(pixel);
                     }}
                   />
                 </ReactCrop>

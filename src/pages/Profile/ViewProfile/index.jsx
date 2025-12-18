@@ -292,11 +292,11 @@ export default function ViewProfile() {
         {isLoading ? (
           <ProfileSkeleton />
         ) : profileError ? (
-          <p className="tw-text-red-600 tw:mt-10">
+          <p className="tw:text-red-600 tw:mt-10">
             Failed to load profile: {profileError}
           </p>
         ) : !finalProfileUser ? (
-          <p className="tw-text-gray-600 tw-mt-10">No profile data found.</p>
+          <p className="tw:text-gray-600 tw:mt-10">No profile data found.</p>
         ) : isOwnProfile && shouldShowBecomeOrganiser ? (
           // 1) Your own profile + NOT organiser + KYC not verified → "Become an Organiser"
           <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:px-4 tw:lg:px-4">

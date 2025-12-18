@@ -1,5 +1,6 @@
+// src/pages/contact/ContactFormSection.jsx
 import React, { useState } from "react";
-import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Mail, Phone, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { showSuccess } from "../ui/toast";
 
@@ -23,7 +24,7 @@ export default function ContactFormSection() {
 
     setTimeout(() => {
       setSubmitting(false);
-      showSuccess("Message sent. We’ll get back to you soon.");
+      showSuccess("Message sent. We will get back to you soon.");
     }, 900);
   };
 
@@ -45,11 +46,11 @@ export default function ContactFormSection() {
         >
           <div className="tw:mb-5">
             <span className="tw:block tw:text-lg tw:md:text-xl tw:font-semibold tw:text-slate-900">
-              Share a bit about your LIVE setup
+              Tell us about your event
             </span>
             <span className="tw:block tw:mt-1 tw:text-xs tw:md:text-[13px] tw:text-slate-500">
-              Give us context and we’ll respond with a tailored next step — not
-              a generic pitch.
+              A few details help us respond with something useful, not a generic
+              reply.
             </span>
           </div>
 
@@ -62,13 +63,13 @@ export default function ContactFormSection() {
                 <input
                   type="text"
                   required
-                  placeholder="What should we call you?"
+                  placeholder="Your name"
                   className="tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50/60 tw:px-3 tw:py-2.5 tw:text-sm tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
                 />
               </div>
               <div>
                 <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-slate-500 tw:mb-1.5">
-                  Work email
+                  Email
                 </span>
                 <input
                   type="email"
@@ -82,7 +83,7 @@ export default function ContactFormSection() {
             <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-3">
               <div>
                 <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-slate-500 tw:mb-1.5">
-                  What are you?
+                  You are
                 </span>
                 <select
                   className="tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50/60 tw:px-3 tw:py-2.5 tw:text-sm tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
@@ -93,7 +94,7 @@ export default function ContactFormSection() {
                     Choose one
                   </option>
                   <option value="creator">Creator / Host</option>
-                  <option value="agency">Agency / Studio</option>
+                  <option value="agency">Studio / Agency</option>
                   <option value="brand">Brand / Organisation</option>
                   <option value="event">Event organiser</option>
                   <option value="other">Other</option>
@@ -102,7 +103,7 @@ export default function ContactFormSection() {
 
               <div>
                 <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-slate-500 tw:mb-1.5">
-                  Typical LIVE frequency
+                  How often do you host?
                 </span>
                 <select
                   className="tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50/60 tw:px-3 tw:py-2.5 tw:text-sm tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
@@ -113,7 +114,7 @@ export default function ContactFormSection() {
                     Select one
                   </option>
                   <option value="once">One-off / occasional</option>
-                  <option value="monthly">1–3 times per month</option>
+                  <option value="monthly">1 to 3 times per month</option>
                   <option value="weekly">Weekly</option>
                   <option value="often">Multiple times per week</option>
                 </select>
@@ -122,32 +123,30 @@ export default function ContactFormSection() {
 
             <div>
               <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-slate-500 tw:mb-1.5">
-                How are you currently going live?
+                What do you want to host?
               </span>
               <textarea
                 rows={4}
                 required
-                placeholder="E.g. We use OBS into YouTube + Instagram Live on a phone, then manually cut clips for TikTok over the weekend…"
+                placeholder="Concert, talk show, church service, comedy night, community hangout, training, panel, and so on"
                 className="tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50/60 tw:px-3 tw:py-2.5 tw:text-sm tw:resize-none tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
               />
             </div>
 
             <div>
               <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-slate-500 tw:mb-1.5">
-                Anything else we should know?
+                When is your next event?
               </span>
               <textarea
                 rows={3}
-                placeholder="Timeline, budget range, upcoming event dates, tools you already use…"
+                placeholder="Date, time, and any deadlines you are working with"
                 className="tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50/60 tw:px-3 tw:py-2.5 tw:text-sm tw:resize-none tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
               />
             </div>
 
             <div className="tw:flex tw:flex-col tw:items-start tw:gap-2 tw:pt-2 tw:border-t tw:border-slate-100">
               <motion.button
-                style={{
-                  borderRadius: 16,
-                }}
+                style={{ borderRadius: 16 }}
                 type="submit"
                 disabled={submitting}
                 className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white tw:shadow-[0_16px_50px_rgba(143,7,231,0.45)] tw:hover:opacity-95 tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
@@ -158,19 +157,19 @@ export default function ContactFormSection() {
                 whileTap={{ scale: submitting ? 1 : 0.98 }}
               >
                 <span className="tw:block">
-                  {submitting ? "Sending…" : "Send message"}
+                  {submitting ? "Sending..." : "Send message"}
                 </span>
                 <ArrowRight className="tw:ml-1.5 tw:w-4 tw:h-4" />
               </motion.button>
+
               <span className="tw:block tw:text-[11px] tw:text-slate-500">
-                We’ll never share your details. No newsletter spam — just a
-                reply to this message.
+                We only use your details to reply to this message.
               </span>
             </div>
           </form>
         </motion.div>
 
-        {/* Info / locations card */}
+        {/* Info card */}
         <motion.div
           className="tw:space-y-4"
           initial={{ opacity: 0, y: 18 }}
@@ -185,8 +184,8 @@ export default function ContactFormSection() {
                 Studio contact
               </span>
               <span className="tw:block tw:mt-2 tw:text-sm tw:md:text-base tw:font-medium tw:text-white/95">
-                If your show date is already fixed, mention it in the message.
-                We prioritise conversations with clear timelines.
+                If you already have a fixed date, include it. We prioritize
+                messages with clear timelines.
               </span>
 
               <div className="tw:mt-4 tw:space-y-2.5 tw:text-[13px]">
@@ -199,6 +198,7 @@ export default function ContactFormSection() {
                     </span>
                   </div>
                 </div>
+
                 <div className="tw:flex tw:items-start tw:gap-2.5">
                   <Phone className="tw:w-4 tw:h-4 tw:mt-0.5 tw:text-primarySecond" />
                   <div>
@@ -209,22 +209,10 @@ export default function ContactFormSection() {
                       +234 (0) 802 379 7265
                     </span>
                     <span className="tw:block tw:text-[11px] tw:text-white/55">
-                      Mon–Sat, 10:00 – 17:00 WAT
+                      Mon to Sat, 10:00 to 17:00 WAT
                     </span>
                   </div>
                 </div>
-                {/* <div className="tw:flex tw:items-start tw:gap-2.5">
-                  <MapPin className="tw:w-4 tw:h-4 tw:mt-0.5 tw:text-primarySecond" />
-                  <div>
-                    <span className="tw:block tw:text-white/60">Base</span>
-                    <span className="tw:block tw:text-white tw:font-medium">
-                      Asaba, Nigeria
-                    </span>
-                    <span className="tw:block tw:text-[11px] tw:text-white/55">
-                      Available remotely for global productions.
-                    </span>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -235,9 +223,8 @@ export default function ContactFormSection() {
               Already using Zagasm Studios?
             </span>
             <span className="tw:block">
-              For billing, support, or urgent show-day issues, use the in-app
-              help section or your account manager channel. This form is best
-              for new projects and collaborations.
+              For billing or show-day issues, use the in-app help section. This
+              form is best for new projects and collaborations.
             </span>
           </div>
         </motion.div>

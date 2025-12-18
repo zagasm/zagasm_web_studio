@@ -1,3 +1,4 @@
+// src/pages/contact/ContactHero.jsx
 import React from "react";
 import { Sparkles, Radio, Waves } from "lucide-react";
 import { motion } from "framer-motion";
@@ -47,16 +48,17 @@ export default function ContactHero() {
           </motion.div>
 
           <span className="tw:font-dela tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-3">
-            Talk to the team{" "}
+            Let’s plan your next{" "}
             <span className="tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:bg-clip-text tw:text-transparent">
-              behind the streams.
+              live event
             </span>
+            .
           </span>
 
           <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-600 tw:max-w-xl tw:mb-5">
-            Whether you’re planning a one-off LIVE event, a recurring show, or
-            full studio automation, we’ll help you design a pipeline that fits
-            your reality, bandwidth, budget, and audience.
+            Tell us what you want to host and how soon it is. We will suggest a
+            simple setup, help you run a clean show, and if you want to charge
+            for access, we will guide you on ticketing too.
           </span>
 
           <motion.div
@@ -69,22 +71,23 @@ export default function ContactHero() {
             >
               <Radio className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
               <span className="tw:block">
-                LIVE events • Streaming studios • Creators
+                Concerts • Shows • Talk sessions • Communities
               </span>
             </motion.div>
+
             <motion.div
               className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-900 tw:px-3 tw:py-1 tw:text-white tw:text-[11px]"
               whileHover={{ y: -2, scale: 1.02 }}
             >
               <Waves className="tw:w-3.5 tw:h-3.5 tw:text-primarySecond" />
               <span className="tw:block">
-                RTMP • Multistream • Highlight automation
+                Ticketing • Live chat • Replays
               </span>
             </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Right: stat / highlight card */}
+        {/* Right: highlight card */}
         <motion.div
           className="tw:flex-1 tw:max-w-md tw:mx-auto tw:w-full"
           variants={itemVariants}
@@ -99,26 +102,27 @@ export default function ContactHero() {
 
             <div className="tw:relative">
               <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.22em] tw:text-white/60 tw:mb-2">
-                Creator pipeline check
+                Quick check-in
               </span>
+
               <span className="tw:block tw:text-sm tw:md:text-base tw:font-medium tw:mb-4 tw:text-white/95">
-                Tell us how you currently go LIVE and we’ll help you design a
-                cleaner, automated pipeline, from ingest to highlight clips.
+                Share your event date and what you want to host. We will reply
+                with next steps and the best way to set it up on Zagasm.
               </span>
 
               <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:mb-4">
                 <div className="tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:px-3 tw:py-3">
                   <span className="tw:block tw:text-xs tw:text-white/60 tw:mb-1">
-                    First response
+                    Reply time
                   </span>
                   <span className="tw:block tw:text-lg tw:font-semibold">
-                    {" "}
                     &lt; 24 hrs
                   </span>
                   <span className="tw:block tw:text-[11px] tw:text-white/55">
-                    For most live inquiries.
+                    Most messages get a same-day response.
                   </span>
                 </div>
+
                 <div className="tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:px-3 tw:py-3">
                   <span className="tw:block tw:text-xs tw:text-white/60 tw:mb-1">
                     Support
@@ -127,7 +131,7 @@ export default function ContactHero() {
                     7 days
                   </span>
                   <span className="tw:block tw:text-[11px] tw:text-white/55">
-                    We’re around when you need us.
+                    We are available when it matters.
                   </span>
                 </div>
               </div>
@@ -140,7 +144,7 @@ export default function ContactHero() {
                   </span>
                 </span>
                 <span className="tw:block">
-                  We’ll reply with next steps and a simple intake form.
+                  We will send a short intake form after your message.
                 </span>
               </div>
             </div>
