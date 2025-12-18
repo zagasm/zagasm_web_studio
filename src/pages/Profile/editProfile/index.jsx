@@ -13,6 +13,8 @@ import { api, authHeaders } from "../../../lib/apiClient"; // ✅ use axios inst
 function EditProfile() {
   const { user, login, token } = useAuth();
 
+  console.log(user);
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [recoveryPhoneNumber, setRecoveryPhoneNumber] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
@@ -108,15 +110,20 @@ function EditProfile() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ use api + authHeaders and guard token to avoid 401 from missing/expired token
-  const handlePictureChange = async (e) => {
-    const file = e.target.files?.[0];
+  const handlePictureChange = async (payload) => {
+    const file =
+      payload instanceof File ? payload : payload?.target?.files?.[0];
+
     if (!file) return;
 
     if (!token) {
       showError("Your session has expired. Please sign in again.");
       return;
     }
+
+    // optional: instant UI update (optimistic preview)
+    const localPreviewUrl = URL.createObjectURL(file);
+    setProfileImage(localPreviewUrl);
 
     const form = new FormData();
     form.append("profile_url", file);
@@ -135,7 +142,17 @@ function EditProfile() {
       if (res.status === 200) {
         showSuccess(res.data?.message || "Profile image updated!");
         login({ user: res.data.user, token });
-        setProfileImage(res.data.user.profileUrl);
+
+        const urlFromServer = res.data?.user?.profileUrl || "";
+
+        // ✅ cache-bust to force refresh even if server returns same URL
+        const busted = urlFromServer
+          ? `${urlFromServer}${
+              urlFromServer.includes("?") ? "&" : "?"
+            }t=${Date.now()}`
+          : localPreviewUrl;
+
+        setProfileImage(busted);
       }
     } catch (err) {
       console.error("Failed to upload profile picture:", err);
@@ -144,8 +161,12 @@ function EditProfile() {
         err?.response?.data?.error ||
         "Failed to upload profile image.";
       showError(msg);
+
+      // revert optimistic preview if you want:
+      setProfileImage(user?.profileUrl || Default_user_image);
     } finally {
       setUploading(false);
+      URL.revokeObjectURL(localPreviewUrl);
     }
   };
 
@@ -217,6 +238,9 @@ function EditProfile() {
     }
   };
 
+  const primaryPhoneLocked = !!user?.phoneNumber; // lock only if it exists
+  const recoveryPhoneLocked = !!user?.phoneNumber2; // lock only if it exists
+
   return (
     <div className="tw:min-h-screen tw:bg-[#F5F5F7] tw:flex tw:flex-col tw:items-center tw:pb-24">
       {/* Top header (back + title) */}
@@ -243,6 +267,10 @@ function EditProfile() {
           profileImage={profileImage}
           uploading={uploading}
           onPictureChange={handlePictureChange}
+          displayName={
+            `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
+            user?.email
+          }
         />
 
         <ProfileInfoCard
@@ -261,6 +289,8 @@ function EditProfile() {
           updating={updating}
           setPasswordOpen={setPasswordOpen}
           setVerifyOpen={setVerifyOpen}
+          primaryPhoneLocked={primaryPhoneLocked}
+          recoveryPhoneLocked={recoveryPhoneLocked}
         />
       </div>
 
@@ -273,7 +303,7 @@ function EditProfile() {
           type="button"
           onClick={handleUpdateProfile}
           disabled={updating}
-          className="tw:w-full tw:rounded-full tw:h-11 tw:text-sm tw:font-medium tw:text-white tw:bg-primary tw:hover:bg-[var(--color-primarySecond)] tw:transition tw:disabled:opacity-60"
+          className="tw:w-full tw:rounded-full tw:h-11 tw:text-sm tw:font-medium tw:text-white tw:bg-primary tw:hover:bg-primarySecond tw:transition tw:disabled:opacity-60"
         >
           {updating ? "Updating..." : "Update Information"}
         </button>

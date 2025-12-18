@@ -25,6 +25,8 @@ export default function ProfileInfoCard({
   updating,
   setPasswordOpen,
   setVerifyOpen,
+  primaryPhoneLocked,
+  recoveryPhoneLocked,
 }) {
   return (
     <div className="tw:bg-white tw:rounded-3xl tw:px-2 tw:md:px-6 tw:py-7 tw:border tw:border-gray-100 tw:shadow-sm tw:space-y-6">
@@ -123,19 +125,30 @@ export default function ProfileInfoCard({
           <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
             Phone Number
           </label>
-          <div className="tw:w-full tw:rounded-2xl tw:bg-[#f3f4f6] tw:px-3 tw:py-2 tw:opacity-80">
+          <div
+            className={`tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 ${
+              primaryPhoneLocked
+                ? "tw:bg-[#f3f4f6] tw:opacity-80"
+                : "tw:bg-white tw:border tw:border-gray-200"
+            }`}
+          >
             <PhoneInput
               value={phoneNumber}
               onChange={setPhoneNumber}
               country={"ng"}
-              disabled
+              disabled={primaryPhoneLocked}
               inputStyle={{
                 width: "100%",
                 border: "none",
                 background: "transparent",
-                paddingLeft: 120
+                paddingLeft: 75, // ✅ fix overlap
               }}
-              buttonStyle={{ background: "transparent", border: "none" }}
+              buttonStyle={{
+                background: "transparent",
+                border: "none",
+                width: 44, // ✅ smaller button
+              }}
+              containerStyle={{ width: "100%" }}
             />
           </div>
           {/* <div className="tw:mt-1">
@@ -156,17 +169,30 @@ export default function ProfileInfoCard({
           <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
             Recovery Phone
           </label>
-          <div className="tw:w-full tw:rounded-2xl tw:bg-[#f3f4f6] tw:px-3 tw:py-2">
+          <div
+            className={`tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 ${
+              recoveryPhoneLocked
+                ? "tw:bg-[#f3f4f6] tw:opacity-80"
+                : "tw:bg-white tw:border tw:border-gray-200"
+            }`}
+          >
             <PhoneInput
               value={recoveryPhoneNumber}
               onChange={setRecoveryPhoneNumber}
               country={"ng"}
+              disabled={recoveryPhoneLocked}
               inputStyle={{
                 width: "100%",
                 border: "none",
                 background: "transparent",
+                paddingLeft: 75, // ✅ fix overlap
               }}
-              buttonStyle={{ background: "transparent", border: "none" }}
+              buttonStyle={{
+                background: "transparent",
+                border: "none",
+                width: 44,
+              }}
+              containerStyle={{ width: "100%" }}
             />
           </div>
         </div>
