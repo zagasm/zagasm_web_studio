@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import EventShareModal from "../../../component/Events/EvenetShareModal";
 import TicketPromptModal from "../../../component/Events/TicketPromptModal";
+import HlsVideoPlayer from "../../../component/HlsVideoPlayer";
 function isUuid(value = "") {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     String(value)
@@ -766,7 +767,6 @@ export default function ViewEvent() {
                   </div>
                 </div>
               </div>
-
 
               {/* EVENT STATS */}
               <div className="tw:px-4 tw:md:px-6 tw:pb-6">

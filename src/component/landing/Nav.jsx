@@ -32,6 +32,7 @@ export default function Nav() {
   const navLinks = [
     { to: "/", label: "Home" },
     { to: "/about", label: "About" },
+    // { to: "/ads", label: "Run Ads" },
     { to: "/contact", label: "Contact" },
   ];
 
