@@ -65,12 +65,12 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
         </span>
 
         <span className="tw:block tw:mt-1.5 tw:text-[11px] tw:sm:text-xs tw:text-gray-600">
-          +{followersCount} <span className="tw:text-gray-500">followers</span>
+          {followersCount} <span className="tw:text-gray-500">followers</span>
         </span>
 
         {/* optional stats (keep small on mobile) */}
         <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-1 tw:md:gap-2 ">
-          <span className=" tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
+          {/* <span className=" tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -89,7 +89,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
               {org?.events_live_count ?? 0}
             </span>
             active {org?.totalEventsCreated > 1 ? "events" : "event"}
-          </span>
+          </span> */}
 
           <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
             <Ticket className="tw:text-emerald-600 tw:size-4" />
