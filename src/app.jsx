@@ -71,6 +71,7 @@ import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 
 import SEO from "./component/SEO/index.jsx";
+import DownloadAppModal from "./component/DownloadAppModal.jsx";
 
 const MainLayout = () => (
   <>
@@ -79,6 +80,18 @@ const MainLayout = () => (
     <Outlet />
   </>
 );
+
+function normalizeApkUrl(url) {
+  if (!url) return "";
+  const driveMatch = url.match(
+    /https:\/\/drive\.google\.com\/file\/d\/([^/]+)/
+  );
+  if (!driveMatch) return url;
+
+  const id = driveMatch[1];
+  // This avoids the Drive UI and goes straight to download
+  return `https://drive.google.com/uc?export=download&id=${id}`;
+}
 export function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation(); // Detects route changes
@@ -145,14 +158,16 @@ export function App() {
           title: "Your Profile & Wallet",
           description:
             "Manage your profile, wallets, subscriptions, and saved events securely from your Zagasm account panel.",
-          keywords: "profile, account, wallet, settings, subscriptions, Zagasm Studios",
+          keywords:
+            "profile, account, wallet, settings, subscriptions, Zagasm Studios",
         },
       },
       {
         matcher: /^\/tickets/,
         meta: {
           title: "Tickets & Passes",
-          description: "Access all your purchased tickets and upcoming experiences at a glance.",
+          description:
+            "Access all your purchased tickets and upcoming experiences at a glance.",
           keywords: "tickets, passes, QR code, events, Zagasm Studios",
         },
       },
@@ -179,6 +194,52 @@ export function App() {
     const match = routes.find((route) => route.matcher.test(location.pathname));
     return match?.meta || {};
   }, [location.pathname]);
+
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+  const APP_STORE_URL =
+    "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
+
+  const APK_DOWNLOAD_URL =
+    "https://drive.google.com/uc?export=download&id=1oRUyH4NyT13pdTB3yCoT9sxh3AW1B5Ly";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Show on every fresh page load (initial and full reload)
+    setShowDownloadModal(true);
+  }, []);
+
+  const closeDownloadModal = () => {
+    setShowDownloadModal(false);
+  };
+
+  const handleAppStoreDownload = () => {
+    if (APP_STORE_URL) {
+      window.open(APP_STORE_URL, "_blank", "noopener,noreferrer");
+    }
+    closeDownloadModal();
+  };
+
+  const handleApkDownload = () => {
+    const url = normalizeApkUrl(APK_DOWNLOAD_URL);
+    if (!url) return;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.rel = "noopener noreferrer";
+    link.setAttribute("download", "Zagasm.apk");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    closeDownloadModal();
+  };
+
+  const handleSkip = () => {
+    closeDownloadModal();
+  };
+
   return (
     <Fragment>
       {loading && <FullpagePreloader loading={loading} />}
@@ -283,6 +344,14 @@ export function App() {
           />
         </Routes>
       )}
+
+      <DownloadAppModal
+        open={showDownloadModal}
+        onClose={closeDownloadModal}
+        onSkip={handleSkip}
+        onAppStoreDownload={handleAppStoreDownload}
+        onApkDownload={handleApkDownload}
+      />
     </Fragment>
   );
 }
