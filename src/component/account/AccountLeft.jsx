@@ -93,8 +93,8 @@ const AccountLeft = ({ user }) => {
         {!user.subscription?.isActive && (
           <div
             className={`${
-              user.subscription?.isActive ? "tw:bg-blue-600" : "tw:bg-black"
-            } tw:border tw:border-orange-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4`}
+              user.subscription?.isActive ? "tw:bg-blue-600" : "tw:bg-blue-700"
+            } tw:border tw:border-blue-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4`}
           >
             <div className="tw:flex tw:items-center tw:gap-3">
               <div className="tw:shrink-0">
@@ -141,7 +141,7 @@ const AccountLeft = ({ user }) => {
               <Link
                 to="/subscription"
                 style={{ borderRadius: 8 }}
-                className="tw:md:w-auto tw:bg-[#FFCC00] tw:hover:bg-[#FFCC00]/80 text-dark tw:text-[12px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
+                className="tw:md:w-auto tw:bg-[#FFFFFF] tw:hover:bg-[#FFFFFF]/80 text-dark tw:text-[12px] tw:font-semibold tw:px-4 tw:py-2.5 tw:transition-colors"
               >
                 Subscribe Now
               </Link>

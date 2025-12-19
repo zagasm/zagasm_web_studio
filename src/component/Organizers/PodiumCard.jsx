@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getInitials, hasProfileImage, truncate } from "./organiser.utils";
+import { Ticket } from "lucide-react";
 
 export default function PodiumCard({ org, position, onToggleFollow, loading }) {
   const navigate = useNavigate();
@@ -85,7 +86,12 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
         </span>
 
         <span className="tw:text-[11px] tw:sm:text-xs tw:text-gray-600">
-          +{followersCount} <span className="tw:text-gray-500">followers</span>
+          {followersCount} <span className="tw:text-gray-500">followers</span>
+        </span>
+        <span className="tw:my-1 tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
+          <Ticket className="tw:text-emerald-600 tw:size-4" />
+          <span className="tw:text-emerald-600">{org?.tickets_total ?? 0}</span>
+          Tickets Sold
         </span>
 
         {onToggleFollow && (
