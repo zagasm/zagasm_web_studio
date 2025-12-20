@@ -4,8 +4,7 @@ import React from "react";
 const STEPS = [
   "Event Information",
   "Media Upload",
-  "Ticketing & Pricing",
-  "Access & Visibility",
+  "Ticketing & Access",
   "Review & Publish",
 ];
 

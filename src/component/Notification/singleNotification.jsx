@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import './singleNotification.css';
+import React, { useEffect, useState } from "react";
 
 /**
  * Props:
@@ -13,82 +12,90 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Prefer actionable text from data.action; else stringify message
-  const fullText = notification?.data?.action
-    || (notification?.message ? JSON.stringify(notification.message) : 'Notification');
-
-  const previewText = fullText.length > 100 ? (fullText.substring(0, 100) + '…') : fullText;
+  const title =
+    notification?.data?.action ||
+    notification?.data?.message ||
+    notification?.message ||
+    "Notification";
+  const messageBody =
+    notification?.data?.message ||
+    notification?.message ||
+    `${notification?.data?.actor?.name || "Someone"} updated your feed`;
+  const previewText =
+    messageBody.length > 120 ? `${messageBody.slice(0, 120)}…` : messageBody;
 
   useEffect(() => {
     const checkIfMobile = () => setIsMobile(window.innerWidth <= 768);
     checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
-    return () => window.removeEventListener('resize', checkIfMobile);
+    window.addEventListener("resize", checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   const toggleExpand = (e) => {
     e.stopPropagation();
-    setIsExpanded(!isExpanded);
+    setIsExpanded((prev) => !prev);
   };
 
   const isUnread = !notification?.read_at;
+  const timeLabel = notification?.time_ago || notification?.created_at || "Just now";
 
   return (
-    <div
-      className="noty_container shadow-sm p-2 mb-3"
+    <article
+      className={`tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-sm tw:transition tw:duration-200 tw:cursor-pointer tw:border ${
+        isUnread
+          ? "tw:border-l-4 tw:border-purple-600 tw:shadow-[0_12px_30px_rgba(15,23,42,0.15)]"
+          : "tw:border-transparent hover:tw:shadow-md"
+      }`}
       onClick={onClick}
       role="button"
-      style={{
-        cursor: 'pointer',
-        // small visual hint for unread without tailwind restyle:
-        borderLeft: isUnread ? '3px solid #8F07E7' : '3px solid transparent'
-      }}
     >
-      <div className="d-flex align-items-center osahan-post-header noty_info">
-        {/* Removed random user image as requested */}
-        <div className="font-weight-bold w-100">
-          {/* Top line: a simple title from message.reference if present */}
-          {notification?.message?.reference && (
-            <div className="mb-1">
-              <b>{notification.message.reference}</b>
-            </div>
-          )}
+      <div className="tw:flex tw:gap-4 tw:items-start">
+        <span
+          className={`tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-full ${
+            isUnread ? "tw:bg-purple-600" : "tw:bg-slate-300"
+          }`}
+        />
+        <div className="tw:flex-1 tw:space-y-3">
+          <div className="tw:flex tw:justify-between tw:gap-3">
+            <strong className="tw:text-base tw:font-semibold tw:text-slate-900 tw:first-letter:uppercase ">
+              {title}
+            </strong>
+            {isUnread && (
+              <span className="tw:rounded-full tw:bg-purple-100 tw:px-3 tw:py-0.5 tw:text-xs tw:font-semibold tw:text-purple-700">
+                New
+              </span>
+            )}
+          </div>
 
-          <p className="mb-1">
-            <small>
-              {isMobile && !isExpanded ? previewText : fullText}
-              {isMobile && fullText.length > 100 && (
-                <button
-                  onClick={toggleExpand}
-                  className="read-more-btn"
-                  style={{ border: 'none', background: 'transparent', color: '#8F07E7' }}
-                >
-                  {isExpanded ? ' Read Less' : ' Read More'}
-                </button>
-              )}
-            </small>
-          </p>
-
-          {/* Meta row: time + unread dot + delete icon */}
-          <ul className="right_interval_indicator pb-1 d-flex align-items-center">
-            <li><span>{notification?.time_ago || notification?.created_at}</span></li>
-            <li className='indicator' />
-            {/* delete button */}
-            <li className="ms-auto">
+          <p className="tw:text-sm tw:text-slate-600">
+            {isMobile && !isExpanded ? previewText : messageBody}
+            {isMobile && messageBody.length > 120 && (
               <button
                 type="button"
-                aria-label="Delete notification"
-                onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
-                className="btn btn-sm btn-link text-danger p-0"
-                title="Delete"
+                onClick={toggleExpand}
+                className="tw:ml-2 tw:text-xs tw:font-semibold tw:text-purple-600 tw:underline-offset-4 hover:tw:underline"
               >
-                &#10005;
+                {isExpanded ? "Read less" : "Read more"}
               </button>
-            </li>
-          </ul>
+            )}
+          </p>
+
+          <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-slate-500">
+            <span>{timeLabel}</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
+              className="tw:text-red-500 hover:tw:text-red-600"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 

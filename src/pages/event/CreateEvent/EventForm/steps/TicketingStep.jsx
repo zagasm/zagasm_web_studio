@@ -9,6 +9,11 @@ import SelectField from "../../../../../component/form/SelectField";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 
+const VISIBILITY_OPTIONS = [
+  { value: "public", label: "Public" },
+  { value: "private", label: "Private" },
+];
+
 const schema = z
   .object({
     price: z.number().min(0, "Ticket price must be at least 0"),
@@ -23,6 +28,8 @@ const schema = z
       .number()
       .min(1, "Backstage price must be at least 1")
       .optional(),
+    visibility: z.enum(["public", "private"]),
+    matureContent: z.boolean(),
   })
   .refine((d) => d.maxTickets !== "limited" || d.ticketLimit, {
     message: "Ticket limit is required when tickets are limited",
@@ -58,6 +65,8 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       currency: "",
       hasBackstage: false,
       backstagePrice: undefined,
+      visibility: "public",
+      matureContent: false,
       ...defaultValues,
     },
   });
@@ -66,6 +75,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const currencyVal = watch("currency");
   const hasBackstage = watch("hasBackstage");
   const priceVal = watch("price");
+  const visibilityVal = watch("visibility");
 
   // Fetch currencies
   useEffect(() => {
@@ -362,6 +372,27 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
             )}
           </div>
         )}
+
+        <SelectField
+          label="Event Visibility*"
+          value={visibilityVal}
+          onChange={(v) =>
+            setValue("visibility", v, { shouldValidate: true })
+          }
+          options={VISIBILITY_OPTIONS}
+          error={errors?.visibility?.message}
+        />
+
+        <div className="tw:flex tw:items-center tw:justify-between">
+          <label className="tw:text-[15px]">
+            This event contains mature content
+          </label>
+          <input
+            type="checkbox"
+            {...register("matureContent")}
+            className="tw:accent-primary"
+          />
+        </div>
       </div>
 
       <div className="tw:flex tw:justify-between tw:mt-6">
