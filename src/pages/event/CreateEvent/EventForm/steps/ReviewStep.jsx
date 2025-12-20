@@ -63,7 +63,10 @@ export default function ReviewStep({
                   className="tw:underline tw:underline-offset-2 tw:text-red-700 tw:hover:text-red-800"
                   onClick={() => {
                     const match = path.match(/^step_(\d+)/);
-                    if (match && onGoToStep) onGoToStep(Number(match[1]));
+                    if (!match || !onGoToStep) return;
+                    const rawStep = Number(match[1]);
+                    const resolvedStep = rawStep >= 3 ? 3 : rawStep;
+                    onGoToStep(resolvedStep);
                   }}
                 >
                   {prettifyPath(path)}:

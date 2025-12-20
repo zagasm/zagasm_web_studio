@@ -13,7 +13,6 @@ import ProgressSteps from "./steps/ProgressSteps";
 import EventInformationStep from "./steps/EventInformationStep";
 import MediaUploadStep from "./steps/MediaUploadStep";
 import TicketingStep from "./steps/TicketingStep";
-import AccessStep from "./steps/AccessStep";
 import ReviewStep from "./steps/ReviewStep";
 import EventCreationSuccessModal from "../../../../component/Events/EventCreationSuccessModal";
 
@@ -189,12 +188,6 @@ export default function EventCreationWizard({
     setCurrentStep(4);
   };
 
-  const handleAccessNext = (values) => {
-    mergeCollected("step_5", values);
-    markStepDone(4);
-    setCurrentStep(5);
-  };
-
   const goToStep = (n) => {
     setCurrentStep(n);
   };
@@ -264,7 +257,10 @@ export default function EventCreationWizard({
       }
 
       // Step 3 – ticketing
-      const s3 = collected.step_3 || {};
+      const s3 = collected.step_3 || {
+        ...mapped.ticketing,
+        ...mapped.access,
+      };
       payload.append("price", s3.price ?? 0);
       payload.append("currency_id", s3.currency || "");
       payload.append("ticket_limit", s3.maxTickets || "unlimited");
@@ -285,9 +281,9 @@ export default function EventCreationWizard({
       }
 
       // Step 5 – access
-      const s5 = collected.step_5 || {};
-      payload.append("visibility", s5.visibility || "public");
-      payload.append("post_mature_content", s5.matureContent ? "1" : "0");
+      const access = collected.step_3 || mapped.access || {};
+      payload.append("visibility", access.visibility || "public");
+      payload.append("post_mature_content", access.matureContent ? "1" : "0");
 
       const url = isEdit
         ? `/api/v1/event/${eventId}/edit`
@@ -337,11 +333,20 @@ export default function EventCreationWizard({
   const mergedForReview = useMemo(() => {
     return {
       ...(collected.step_1 || mapped.info),
-      ...(collected.step_3 || mapped.ticketing),
+      ...(collected.step_3 || {
+        ...mapped.ticketing,
+        ...mapped.access,
+      }),
       ...(collected.step_4 || mapped.streaming),
-      ...(collected.step_5 || mapped.access),
     };
   }, [collected, mapped]);
+
+  const infoStepDefaults = collected.step_1 || mapped.info;
+  const ticketStepDefaults =
+    collected.step_3 || {
+      ...mapped.ticketing,
+      ...mapped.access,
+    };
 
   if (isEdit && !initialEvent) {
     // safety: you should normally not render wizard until event is loaded
@@ -364,7 +369,7 @@ export default function EventCreationWizard({
 
       {currentStep === 1 && (
         <EventInformationStep
-          defaultValues={mapped.info}
+          defaultValues={infoStepDefaults}
           onNext={handleInfoNext}
           eventTypeId={eventTypeId}
         />
@@ -387,36 +392,18 @@ export default function EventCreationWizard({
 
       {currentStep === 3 && (
         <TicketingStep
-          defaultValues={mapped.ticketing}
+          defaultValues={ticketStepDefaults}
           onBack={() => setCurrentStep(2)}
           onNext={handleTicketingNext}
         />
       )}
 
-      {/* 
       {currentStep === 4 && (
-        <StreamingStep
-          defaultValues={mapped.streaming}
-          onBack={() => setCurrentStep(3)}
-          onNext={handleStreamingNext}
-        />
-      )}
-      */}
-
-      {currentStep === 4 && (
-        <AccessStep
-          defaultValues={mapped.access}
-          onBack={() => setCurrentStep(3)}
-          onNext={handleAccessNext}
-        />
-      )}
-
-      {currentStep === 5 && (
         <ReviewStep
           collected={mergedForReview}
           formErrors={formErrors}
           isSubmitting={isSubmitting}
-          onBack={() => setCurrentStep(4)}
+          onBack={() => setCurrentStep(3)}
           onPublish={handlePublish}
           timezoneLabel={timezoneLabel}
           performers={performers}
