@@ -58,7 +58,7 @@ export default function LiveAppDownloadModal({ open, onClose }) {
                   <div className="tw:flex tw:flex-col tw:sm:flex-row tw:gap-3 tw:mt-3 tw:w-full">
                     {/* Google Play button */}
                     <a
-                      href="https://drive.google.com/uc?export=download&id=1oRUyH4NyT13pdTB3yCoT9sxh3AW1B5Ly"
+                      href="https://zagasm-studios.b-cdn.net/apks/studio.apk"
                       onClick={onClose}
                       className="tw:flex-1 tw:inline-flex tw:flex-row tw:items-center tw:justify-center tw:gap-3 tw:rounded-xl tw:bg-black tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:hover:bg-gray-900 tw:transition"
                     >
