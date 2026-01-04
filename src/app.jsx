@@ -201,7 +201,7 @@ export function App() {
     "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
 
   const APK_DOWNLOAD_URL =
-    "https://zagasm-studios.b-cdn.net/apks/studio.apk";
+    "https://andriodapk.b-cdn.net/Zagasm%20Studios.apk";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
