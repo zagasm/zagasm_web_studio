@@ -1,5 +1,11 @@
 import React from "react";
 import "./ticket.css";
+import {
+  formatTicketDate,
+  formatTicketPrice,
+  formatTicketTime,
+  normalizeTicketStatus,
+} from "../../utils/ticketHelpers";
 
 const phaseStyles = {
   live: {
@@ -25,54 +31,22 @@ const phaseStyles = {
   },
 };
 
-function computePhase(eventDate, startTime) {
-  if (!eventDate) return "upcoming";
-  const datePart = eventDate;
-  const timePart = startTime || "00:00:00";
-  const start = new Date(`${datePart}T${timePart}`);
-  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
-  const now = new Date();
-  if (now < start) return "upcoming";
-  if (now >= start && now <= end) return "live";
-  return "ended";
-}
-
-function formatDate(eventDate) {
-  if (!eventDate) return "-";
-  const d = new Date(eventDate);
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
-}
-
-function formatTime(startTime) {
-  if (!startTime) return "";
-  const [h, m] = startTime.split(":");
-  const dt = new Date();
-  dt.setHours(Number(h), Number(m) || 0, 0, 0);
-  return dt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
-
 function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
   const event = ticket.event || {};
   const payment = ticket.payment || {};
   const currency = payment.currency || {};
   const title = event.title || "Event";
 
-  const dateLabel = formatDate(event.event_date);
-  const timeLabel = formatTime(event.start_time);
+  const dateLabel = formatTicketDate(event.event_date);
+  const timeLabel = formatTicketTime(event.start_time);
 
-  const phase =
-    phaseProp || computePhase(event.event_date, event.start_time || null);
+  const phase = phaseProp || normalizeTicketStatus(event.status);
   const phaseDef = phaseStyles[phase] || phaseStyles.upcoming;
 
-  const priceLabel =
-    event.fullPrice ||
-    (currency.symbol && payment.amount
-      ? `${currency.symbol} ${Number(payment.amount).toFixed(2)}`
-      : payment.amount || "—");
+  const priceLabel = formatTicketPrice(
+    payment.amount ?? event.price ?? event.fullPrice ?? "",
+    currency.symbol || event.currency || ""
+  );
 
   return (
     <div className="ticket-wrapper">

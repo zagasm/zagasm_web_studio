@@ -28,12 +28,12 @@ export default function AboutPanel({ user }) {
   const rows = isOrganiserProfileData
     ? [
         ["Organizer Name", organiserName],
-        ["Email", truncate(user?.email, 10)],
+        ["Email", truncate(user?.email, 12)],
         ["KYC Status", user?.kyc_status ?? user?.kyc?.status],
-        ["Total Events", user?.totalEventsCreated],
-        ["Followers", user?.numberOfFollowers],
-        ["Total Views", user?.total_views],
-        ["Successful Payments", user?.successfulPayments],
+        // ["Total Events", user?.organiser?.totalEventsCreated],
+        // ["Followers", user?.organiser?.numberOfFollowers],
+        // ["Total Views", user?.organiser?.total_views],
+        // ["Successful Payments", user?.organiser?.successfulPayments],
       ]
     : [
         ["Username", user?.userName],

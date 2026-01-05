@@ -1,24 +1,11 @@
 import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-
-function formatDate(dateStr) {
-  if (!dateStr) return "-";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
-}
-
-function formatTime(timeStr) {
-  if (!timeStr) return "";
-  const [h, m] = timeStr.split(":");
-  const dt = new Date();
-  dt.setHours(Number(h), Number(m) || 0, 0, 0);
-  return dt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
+import {
+  formatTicketDate,
+  formatTicketPrice,
+  formatTicketStatusLabel,
+  formatTicketTime,
+} from "../../utils/ticketHelpers";
 
 export default function TicketReceiptModal({ open, onClose, ticket }) {
   const event = ticket?.event || {};
@@ -26,15 +13,18 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
   const payment = ticket?.payment || {};
   const currency = payment.currency || {};
 
-  console.log(ticket, event);
-
-  const dateLabel = formatDate(event.event_date);
-  const timeLabel = formatTime(event.start_time);
-  const priceLabel =
-    event.fullPrice ||
-    (currency.symbol && payment.amount
-      ? `${currency.symbol}${Number(payment.amount).toLocaleString()}`
-      : payment.amount || "—");
+  const dateLabel = formatTicketDate(event.event_date, {
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+  const timeLabel = formatTicketTime(event.start_time);
+  const priceLabel = formatTicketPrice(
+    payment.amount ?? event.price ?? event.fullPrice ?? "",
+    currency.symbol || event.currency || ""
+  );
+  const statusLabel = formatTicketStatusLabel(event.status);
 
   return (
     <Transition show={open} as={Fragment} appear>
@@ -83,7 +73,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                         {event.title || "Event Ticket"}
                       </span>
                       <span className="tw:block tw:text-[10px] tw:font-medium tw:tracking-[0.2em] tw:text-gray-500 tw:uppercase">
-                        Ticket • {ticket?.status || "active"}
+                        Ticket • {statusLabel}
                       </span>
                     </div>
                     <button
