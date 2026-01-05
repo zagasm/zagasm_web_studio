@@ -1,5 +1,37 @@
 import React, { useEffect, useState } from "react";
 
+const formatNotificationText = (value) => {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => formatNotificationText(item))
+      .filter(Boolean)
+      .join(" ");
+  }
+  if (value && typeof value === "object") {
+    return Object.entries(value)
+      .map(([key, val]) => {
+        const formattedVal = formatNotificationText(val);
+        return formattedVal ? `${key}: ${formattedVal}` : key;
+      })
+      .filter(Boolean)
+      .join(" • ");
+  }
+  return "";
+};
+
+const pickNotificationText = (...values) => {
+  for (const value of values) {
+    const formatted = formatNotificationText(value);
+    if (formatted) {
+      return formatted;
+    }
+  }
+  return "";
+};
+
 /**
  * Props:
  * - notification: {
@@ -12,15 +44,16 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const actorName = notification?.data?.actor?.name || "Someone";
   const title =
-    notification?.data?.action ||
-    notification?.data?.message ||
-    notification?.message ||
-    "Notification";
+    pickNotificationText(
+      notification?.data?.action,
+      notification?.data?.message,
+      notification?.message
+    ) || "Notification";
   const messageBody =
-    notification?.data?.message ||
-    notification?.message ||
-    `${notification?.data?.actor?.name || "Someone"} updated your feed`;
+    pickNotificationText(notification?.data?.message, notification?.message) ||
+    `${actorName} updated your feed`;
   const previewText =
     messageBody.length > 120 ? `${messageBody.slice(0, 120)}…` : messageBody;
 

@@ -5,6 +5,7 @@ import { api, authHeaders } from "../../lib/apiClient";
 import { showError } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
 import { TicketIcon } from "lucide-react";
+import { normalizeTicketStatus } from "../../utils/ticketHelpers";
 
 const CACHE_KEY = "zagasm_tickets_cache_v1";
 
@@ -16,20 +17,6 @@ const TABS = [
 ];
 
 /** Same logic as in Ticket, but kept here for filtering */
-function computePhase(eventDate, startTime) {
-  if (!eventDate) return "upcoming";
-
-  const datePart = eventDate;
-  const timePart = startTime || "00:00:00";
-  const start = new Date(`${datePart}T${timePart}`);
-  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2h
-  const now = new Date();
-
-  if (now < start) return "upcoming";
-  if (now >= start && now <= end) return "live";
-  return "ended";
-}
-
 function TicketsPage() {
   const { token } = useAuth();
   const [tickets, setTickets] = useState([]);
@@ -91,7 +78,7 @@ function TicketsPage() {
     () =>
       tickets.map((t) => ({
         ...t,
-        phase: computePhase(t.event?.event_date, t.event?.start_time || null),
+        phase: normalizeTicketStatus(t.event?.status),
       })),
     [tickets]
   );
