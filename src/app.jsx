@@ -206,8 +206,16 @@ export function App() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Show on every fresh page load (initial and full reload)
-    setShowDownloadModal(true);
+    const modalFlag = "zagasm-download-modal-shown";
+    const hasSeenModal = Boolean(localStorage.getItem(modalFlag));
+
+    if (!hasSeenModal) {
+      setShowDownloadModal(true);
+      localStorage.setItem(modalFlag, "true");
+    }
+
+    // Previously the modal forced open on every full reload:
+    // setShowDownloadModal(true);
   }, []);
 
   const closeDownloadModal = () => {
