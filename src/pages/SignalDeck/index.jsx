@@ -127,7 +127,7 @@ export default function SignalDeck() {
                 </div>
               </div>
               <span className="tw:justify-self-start tw:rounded-full tw:bg-[#8f07e7] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:md:justify-self-end">
-                Get it
+                Download
               </span>
             </a>
           ))}
