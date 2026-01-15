@@ -19,7 +19,7 @@ const socialLinks = [
   {
     label: "Instagram",
     handle: "@zagasmstudios_hq",
-    url: "https://www.instagram.com/zagasmstudios_hq",
+    url: "https://www.instagram.com/studios_zagasm?igsh=MWU1amtnem9pcHN4dA==",
     icon: "fa-instagram",
   },
   {
@@ -31,7 +31,7 @@ const socialLinks = [
   {
     label: "YouTube",
     handle: "Zagasm Studios",
-    url: "https://www.youtube.com/@zagasmstudios",
+    url: "https://youtube.com/@zagasm_studios?si=zX-zad1XPLtF1tO4",
     icon: "fa-youtube",
   },
   {
@@ -97,10 +97,33 @@ export default function SignalDeck() {
             Signal Deck
           </span>
           <span className="tw:mx-auto tw:max-w-xl tw:text-lg tw:text-[#231f20]/80">
-            A glow-up portal for everything Zagasm. Tap in for the app downloads
-            and follow the studio everywhere we pulse.
+            Your official Zagasm jump point. Download the app, plug into the
+            socials, or head straight to the studio.
           </span>
         </div>
+
+        <a
+          href="/"
+          className="tw:mb-8 tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-2xl tw:border tw:border-[#8f07e7]/30 tw:bg-white/90 tw:px-5 tw:py-4 tw:text-[#3b165f] tw:shadow-[0_18px_45px_rgba(59,22,95,0.15)] tw:transition tw:duration-300 tw:hover:-translate-y-1 tw:hover:shadow-[0_26px_60px_rgba(59,22,95,0.2)]"
+        >
+          <span className="tw:flex tw:items-center tw:gap-4">
+            <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[#efe3ff] tw:text-xl tw:text-[#7a32d8]">
+              <i className="fa-solid fa-globe" aria-hidden />
+            </span>
+            <span className="tw:grid tw:gap-1">
+              <span className="tw:text-base tw:font-semibold">
+                Visit the Website
+              </span>
+              <span className="tw:text-sm tw:text-[#231f20]/60">
+                Explore events, creators, and updates
+              </span>
+            </span>
+          </span>
+          <span className="tw:inline-flex tw:items-center tw:gap-2 tw:font-semibold tw:text-[#7a32d8]">
+            Go home
+            <i className="fa-solid fa-arrow-right" aria-hidden />
+          </span>
+        </a>
 
         <section
           className="tw:grid tw:gap-4 tw:md:grid-cols-2"
