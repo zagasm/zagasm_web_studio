@@ -216,7 +216,7 @@ export default function AllOrganizers() {
 
                 {/* infinite scroll trigger */}
                 <div
-                  ref={hasMore ? loadMoreRef : undefined}
+                  ref={hasMore ? loadMoreRef : null}
                   className="tw:flex tw:justify-center tw:py-6"
                 >
                   {hasMore ? (

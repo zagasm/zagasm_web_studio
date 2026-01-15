@@ -72,6 +72,7 @@ import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
+import SignalDeck from "./pages/SignalDeck/index.jsx";
 
 const MainLayout = () => (
   <>
@@ -189,6 +190,17 @@ export function App() {
           keywords: "landing, Zagasm Studios, events platform, social tickets",
         },
       },
+      {
+        matcher: /^\/signal-deck/,
+        meta: {
+          title: "Zagasm Signal Deck",
+          description:
+            "Download Zagasm Studios and follow every official channel from the Signal Deck.",
+          keywords:
+            "Zagasm Studios, Signal Deck, app download, social links, community",
+          image: "/img/logo.png",
+        },
+      },
     ];
 
     const match = routes.find((route) => route.matcher.test(location.pathname));
@@ -259,6 +271,7 @@ export function App() {
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
       <Routes>
+        <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
           <Route path="/" element={<ZagasmLanding />} />
           <Route path="/about" element={<AboutPage />} />
