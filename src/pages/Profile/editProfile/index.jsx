@@ -238,7 +238,6 @@ function EditProfile() {
     }
   };
 
-  const primaryPhoneLocked = !!user?.phoneNumber; // lock only if it exists
   const recoveryPhoneLocked = !!user?.phoneNumber2; // lock only if it exists
 
   return (
@@ -289,7 +288,6 @@ function EditProfile() {
           updating={updating}
           setPasswordOpen={setPasswordOpen}
           setVerifyOpen={setVerifyOpen}
-          primaryPhoneLocked={primaryPhoneLocked}
           recoveryPhoneLocked={recoveryPhoneLocked}
         />
       </div>

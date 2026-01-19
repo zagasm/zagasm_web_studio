@@ -25,7 +25,6 @@ export default function ProfileInfoCard({
   updating,
   setPasswordOpen,
   setVerifyOpen,
-  primaryPhoneLocked,
   recoveryPhoneLocked,
 }) {
   return (
@@ -123,20 +122,13 @@ export default function ProfileInfoCard({
         {/* Primary phone – read-only + status */}
         <div>
           <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
-            Phone Number
+            Primary Phone Number
           </label>
-          <div
-            className={`tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 ${
-              primaryPhoneLocked
-                ? "tw:bg-[#f3f4f6] tw:opacity-80"
-                : "tw:bg-white tw:border tw:border-gray-200"
-            }`}
-          >
+          <div className="tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 tw:bg-white tw:border tw:border-gray-200">
             <PhoneInput
               value={phoneNumber}
               onChange={setPhoneNumber}
               country={"ng"}
-              disabled={primaryPhoneLocked}
               inputStyle={{
                 width: "100%",
                 border: "none",
