@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import PostSignupFormModal from "./ModalContainer";
-import PhoneEmailPostSignup from "./PhoneEmailPostSignup";
 import "./postSignupStyle.css";
 import axios from "axios";
 import { useAuth } from "../../../../pages/auth/AuthContext";
@@ -11,11 +10,10 @@ import { useModal } from "..";
 
 const DEFAULT_TIMER = 600; // seconds
 
-const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
+const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
   const inputRefs = useRef([]);
   const [code, setCode] = useState(["", "", "", "", ""]);
   const [newotpcode, setnewotpcode] = useState(Otpcode);
-  const [switchToForm, setSwitchToForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -53,9 +51,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
   const handleResendCode = async () => {
     if (!canResend) return;
 
-    const contact = type.includes("email")
-      ? userupdate?.email
-      : userupdate?.phone;
+    const contact = userupdate?.email;
     if (!contact) {
       const message = "No contact information available to resend the code.";
       setErrorMessage(message);
@@ -115,12 +111,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
 
   const handleFinish = async () => {
     const verificationCode = code.join("");
-    const verificationType =
-      type === "email" || type === "email_verification"
-        ? "email_verification"
-        : type === "phone" || type === "phone_verification"
-        ? "phone_verification"
-        : "password_reset";
+    const verificationType = "email_verification";
 
     setIsLoading(true);
     setErrorMessage(null);
@@ -181,24 +172,12 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
     closeModal();
   };
 
-  if (switchToForm) {
-    const altType =
-      type === "email" || type === "email_verification" ? "phone" : "email";
-    return (
-      <PhoneEmailPostSignup
-        token={token}
-        userupdate={userupdate}
-        type={altType}
-      />
-    );
-  }
-
   return (
     <PostSignupFormModal>
       <div className="tw:max-w-md tw:w-full tw:mx-auto tw:bg-white tw:rounded-3xl tw:shadow-2xl tw:px-6 tw:py-8 tw:space-y-5">
         <div className="tw:space-y-1">
           <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
-            We sent a code to your {type.includes("email") ? "email" : "phone"}
+            We sent a code to your email
           </span>
           <p className="tw:text-sm tw:text-gray-500">
             Enter the 5-digit verification code below. Your code is{" "}
@@ -249,14 +228,6 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type }) => {
             <strong className="tw:text-gray-900">{formatTime(timer)}</strong>
           </span>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setSwitchToForm(true)}
-          className="tw:text-sm tw:font-semibold tw:text-gray-600 tw:underline hover:tw:text-gray-900"
-        >
-          Use {type.includes("email") ? "phone number" : "email"} instead
-        </button>
 
         <div className="tw:flex tw:gap-3 tw:mt-3">
           <button

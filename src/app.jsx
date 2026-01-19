@@ -3,8 +3,8 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { Routes, Route, useLocation } from "react-router-dom";
 import AuthLayout from "./pages/auth/layout";
-import { SignUp } from "./pages/auth/signup";
-import { Signin } from "./pages/auth/signin";
+import { SignUp } from "./pages/auth/signup/SignupPage.jsx";
+import { Signin } from "./pages/auth/signin/SigninPage.jsx";
 import { CodeVerification } from "./pages/auth/CodeVerification";
 import { ForgetPassword } from "./pages/auth/Forgetpassword";
 import { Error404 } from "./pages/errors/pagenotfound";

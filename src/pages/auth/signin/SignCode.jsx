@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import authCodeImg from "../../../assets/authCode.png";
 import axios from "axios";
 import './signInStyle.css';
-import { isValidPhoneNumber } from 'react-phone-number-input';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
 import { showSuccess, showError } from "../../../component/ui/toast";
 
-export function SigninWithCode({ CodeType, CodeSource }) {
+export function SigninWithCode({ CodeSource }) {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [code, setCode] = useState(['', '', '', '', '']);
@@ -75,20 +71,13 @@ export function SigninWithCode({ CodeType, CodeSource }) {
 
   const validateSource = (source) => {
     if (!source.trim()) {
-      setSourceError(CodeType === 'phone' ? "Phone number is required" : "Email address is required");
+      setSourceError("Email address is required");
       return false;
     }
 
-    if (CodeType === 'phone') {
-      if (!isValidPhoneNumber(source)) {
-        setSourceError('Please enter a valid phone number with country code');
-        return false;
-      }
-    } else {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(source)) {
-        setSourceError('Please enter a valid email address');
-        return false;
-      }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(source)) {
+      setSourceError('Please enter a valid email address');
+      return false;
     }
 
     setSourceError('');
@@ -166,7 +155,7 @@ export function SigninWithCode({ CodeType, CodeSource }) {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/verify_code.ph`, {
         code: verificationCode,
-        type: CodeType,
+        type: "email",
         source: editedSource
       });
       const data = response.data;
@@ -191,7 +180,7 @@ export function SigninWithCode({ CodeType, CodeSource }) {
     setErrors({});
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/resend_code.php`, {
-        type: CodeType,
+        type: "email",
         source: editedSource
       });
       const data = response.data;
@@ -248,22 +237,15 @@ export function SigninWithCode({ CodeType, CodeSource }) {
         <motion.div variants={inputVariants} className="form-group">
           {isEditingSource ? (
             <>
-              {CodeType === 'phone' ? (
-                <PhoneInput
-                  country={'ng'}
-                  value={editedSource}
-                  onChange={(phone) => handleSourceChange('+' + phone)}
-                  inputProps={{
-                    ref: sourceInputRef,
-                    onBlur: handleSourceBlur,
-                    onKeyDown: handleSourceKeyDown,
-                    className: 'form-control edit-source-input'
-                  }}
-                  inputStyle={{ width: '100%', height: '38px' }}
-                />
-              ) : (
-                <input type="email" value={editedSource} onChange={(e) => handleSourceChange(e.target.value)} onBlur={handleSourceBlur} onKeyDown={handleSourceKeyDown} ref={sourceInputRef} className="form-control edit-source-input" />
-              )}
+              <input
+                type="email"
+                value={editedSource}
+                onChange={(e) => handleSourceChange(e.target.value)}
+                onBlur={handleSourceBlur}
+                onKeyDown={handleSourceKeyDown}
+                ref={sourceInputRef}
+                className="form-control edit-source-input"
+              />
               {sourceError && (<div className="invalid-feedback d-block">{sourceError}</div>)}
             </>
           ) : (

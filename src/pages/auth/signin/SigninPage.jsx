@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
-import PhoneInput from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
-import { isValidPhoneNumber } from 'react-phone-number-input';
 import { SigninWithCode } from "./SignCode";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
 export function Signin() {
-  const [loginMethod, setLoginMethod] = useState('phone');
   const [showPassword, setShowPassword] = useState(false);
   const [verificationSource, setVerificationSource] = useState("");
 
   const [formData, setFormData] = useState({
-    phone: "",
     email: "",
     password: ""
   });
@@ -29,9 +23,8 @@ export function Signin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const isCredentialFilled = loginMethod === 'phone'
-    ? formData.phone && isValidPhoneNumber(formData.phone)
-    : formData.email && /^[\w.]+@\w+\.\w{2,}$/.test(formData.email);
+  const isCredentialFilled =
+    formData.email && /^[\w.]+@\w+\.\w{2,}$/.test(formData.email);
   const isPasswordFilled = formData.password.length >= 6;
 
   const containerVariants = {
@@ -71,27 +64,13 @@ export function Signin() {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
   };
 
-  const handlePhoneChange = (value) => {
-    setFormData(prev => ({ ...prev, phone: value || "" }));
-    if (errors.phone) setErrors(prev => ({ ...prev, phone: null }));
-  };
-
   const validateCredential = () => {
     const newErrors = {};
-    const currentPhone = formData.phone;
 
-    if (loginMethod === 'phone') {
-      if (!currentPhone) {
-        newErrors.phone = "Phone number is required";
-      } else if (!isValidPhoneNumber(currentPhone)) {
-        newErrors.phone = "Please enter a valid phone number";
-      }
-    } else {
-      if (!formData.email.trim()) {
-        newErrors.email = "Email is required";
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newErrors.email = "Please enter a valid emaill";
-      }
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid emaill";
     }
 
     setErrors(newErrors);
@@ -113,8 +92,7 @@ export function Signin() {
 
   const handleContinue = () => {
     if (validateCredential()) {
-      const source = loginMethod === 'phone' ? formData.phone : formData.email;
-      setVerificationSource(source);
+      setVerificationSource(formData.email);
       setShowPasswordField(true);
     }
   };
@@ -122,18 +100,10 @@ export function Signin() {
   const handleVerificationCode = () => {
     const newErrors = {};
 
-    if (loginMethod === 'phone') {
-      if (!formData.phone) {
-        newErrors.phone = "Phone number is required";
-      } else if (!isValidPhoneNumber(formData.phone)) {
-        newErrors.phone = "Please enter a valid phone number";
-      }
-    } else {
-      if (!formData.email.trim()) {
-        newErrors.email = "Email address is required";
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newErrors.email = "Please enter a valid email addresss";
-      }
+    if (!formData.email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email addresss";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -141,8 +111,7 @@ export function Signin() {
       return;
     }
 
-    const source = loginMethod === 'phone' ? formData.phone : formData.email;
-    setVerificationSource(source);
+    setVerificationSource(formData.email);
     setShowVerification(true);
   };
 
@@ -154,7 +123,7 @@ export function Signin() {
 
     try {
       const payload = {
-        input: loginMethod === 'phone' ? formData.phone : formData.email,
+        input: formData.email,
         password: formData.password
       };
 
@@ -191,9 +160,9 @@ export function Signin() {
   if (showVerification) {
     return (
       <SigninWithCode
-        CodeType={loginMethod}
+        CodeType="email"
         CodeSource={verificationSource}
-        loginMethod={loginMethod}
+        loginMethod="email"
         formData={formData}
       />
     );
@@ -246,83 +215,33 @@ export function Signin() {
           </motion.div>
         )}
 
-        <div className="login-tabs">
-          <button
-            className={`login-tab ${loginMethod === 'phone' ? 'active' : ''}`}
-            type="button"
-            onClick={() => {
-              setLoginMethod('phone');
-              setShowPasswordField(false);
-            }}
-          >
-            Phone Number
-          </button>
-          <button
-            className={`login-tab ${loginMethod === 'email' ? 'active' : ''}`}
-            type="button"
-            onClick={() => {
-              setLoginMethod('email');
-              setShowPasswordField(false);
-            }}
-          >
-            Email Address
-          </button>
-        </div>
-
         <motion.div variants={inputVariants} className="form-group mb-4">
-          <label htmlFor={loginMethod} className="form-label">
-            {loginMethod === 'phone' ? 'Phone Number' : 'Email Address'}
+          <label htmlFor="email" className="form-label">
+            Email Address
           </label>
           <div className="position-relative">
-            {loginMethod === 'phone' ? (
-              <>
-                <PhoneInput
-                  id="PhoneInputInput"
-                  international
-                  defaultCountry="NG"
-                  value={formData.phone}
-                  onChange={handlePhoneChange}
-                  className={`phone-input ${errors.phone ? 'is-invalid' : ''}`}
-                  placeholder="Enter phone number"
-                 
-                  onBlur={() => console.log("Current phone value on blur:", formData.phone)}
-                />
-                {errors.phone && (
-                  <div className="invalid-feedback d-block mt-1">
-                    {errors.phone}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <i className="feather-mail position-absolute" style={{
-                  left: "15px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#666"
-                }}></i>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  
-                  className={`tw:w-full tw:pl-8 tw:pr-6 tw:py-4 tw:rounded-lg tw:border tw:border-gray-200 ${errors.email ? 'is-invalid' : ''}`}
-                  // style={{
-                  //   paddingLeft: "45px",
-                  //   height: "40px",
-                  //   borderRadius: "8px",
-                  //   border: "1px solid #ddd"
-                  // }}
-                  placeholder="Enter email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-                {errors.email && (
-                  <div className="invalid-feedback d-block mt-1">
-                    {errors.email}
-                  </div>
-                )}
-              </>
+            <i
+              className="feather-mail position-absolute"
+              style={{
+                left: "15px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#666"
+              }}
+            ></i>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className={`tw:w-full tw:pl-8 tw:pr-6 tw:py-4 tw:rounded-lg tw:border tw:border-gray-200 ${errors.email ? 'is-invalid' : ''}`}
+              placeholder="Enter email address"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && (
+              <div className="invalid-feedback d-block mt-1">
+                {errors.email}
+              </div>
             )}
           </div>
         </motion.div>
