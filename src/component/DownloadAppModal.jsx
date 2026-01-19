@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Apple, Download, X } from "lucide-react";
+import { Download, X } from "lucide-react";
 
 /**
  * Download modal used across the app. Styling matches the original inline version.
@@ -11,7 +11,7 @@ const DownloadAppModal = ({
   onAppStoreDownload = () => {},
   onApkDownload = () => {},
   onSkip = () => {},
-  apkCtaText = "Download Android APK",
+  apkCtaText = "Get it on Google Play",
 }) => {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -69,7 +69,11 @@ const DownloadAppModal = ({
                     >
                       <span className="tw:flex tw:items-center tw:gap-3">
                         <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-white/15 tw:ring-1 tw:ring-white/30">
-                          <Apple className="tw:size-5" />
+                          <img
+                            src="/images/icons/as.png"
+                            alt="App Store"
+                            className="tw:h-5 tw:w-5 tw:object-contain"
+                          />
                         </span>
                         <span className="tw:text-left">
                           <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-80">
@@ -93,11 +97,15 @@ const DownloadAppModal = ({
                     >
                       <span className="tw:flex tw:items-center tw:gap-3">
                         <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-purple-50 tw:text-purple-600">
-                          <Download className="tw:size-5" />
+                          <img
+                            src="/images/icons/ps.png"
+                            alt="Google Play"
+                            className="tw:h-5 tw:w-5 tw:object-contain"
+                          />
                         </span>
                         <span className="tw:text-left">
                           <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:text-purple-500">
-                            Direct APK
+                            Google Play
                           </span>
                           <span className="tw:block tw:text-sm tw:font-semibold">
                             {apkCtaText}
@@ -105,7 +113,7 @@ const DownloadAppModal = ({
                         </span>
                       </span>
                       <span className="tw:text-xs tw:font-medium tw:text-purple-500">
-                        Direct download
+                        Play Store
                       </span>
                     </button>
                   </div>
