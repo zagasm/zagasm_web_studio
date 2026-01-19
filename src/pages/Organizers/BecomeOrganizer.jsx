@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { Dialog as HeadlessDialog, Transition } from "@headlessui/react";
 
 // MUI (inputs, combos, modal, stepper)
 import {
-  Dialog,
+  Dialog as MuiDialog,
   DialogContent,
   DialogTitle,
   Step,
@@ -42,7 +43,7 @@ function saveBanksToCache(banks) {
   try {
     localStorage.setItem(
       BANKS_CACHE_KEY,
-      JSON.stringify({ banks, updatedAt: Date.now() })
+      JSON.stringify({ banks, updatedAt: Date.now() }),
     );
   } catch {
     // ignore
@@ -82,11 +83,12 @@ const BecomeOrganiser = () => {
   const [cryptoTag, setCryptoTag] = useState("");
 
   const [processingOpen, setProcessingOpen] = useState(false);
+  const [nameMismatchOpen, setNameMismatchOpen] = useState(false);
 
   const profileName = useMemo(
     () =>
       user?.name || `${user?.firstName || ""} ${user?.lastName || ""}`.trim(),
-    [user]
+    [user],
   );
 
   // fetch banks with cache only when user chose bank method
@@ -109,7 +111,7 @@ const BecomeOrganiser = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
         const list = res.data?.banks || [];
         setBanks(list);
@@ -157,7 +159,7 @@ const BecomeOrganiser = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         // optional toast while verifying
@@ -213,7 +215,7 @@ const BecomeOrganiser = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       await showPromise(promise, {
@@ -227,6 +229,13 @@ const BecomeOrganiser = () => {
       const message =
         e?.response?.data?.message ||
         "We couldn't save your bank details. Please try again.";
+      if (
+        message &&
+        message.includes("Account name does not match the name on your profile")
+      ) {
+        setNameMismatchOpen(true);
+        return;
+      }
       showError(message);
     } finally {
       setSavingBank(false);
@@ -249,7 +258,7 @@ const BecomeOrganiser = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       await showPromise(promise, {
@@ -258,7 +267,7 @@ const BecomeOrganiser = () => {
         error: "Failed to submit BVN",
       });
 
-      await refreshUser, login();
+      (await refreshUser, login());
       login({ user, token });
 
       setProcessingOpen(true);
@@ -287,7 +296,7 @@ const BecomeOrganiser = () => {
 
     // front-end only for now – just show promise UI
     const fakePromise = new Promise((resolve) =>
-      setTimeout(() => resolve(true), 1500)
+      setTimeout(() => resolve(true), 1500),
     );
 
     await showPromise(fakePromise, {
@@ -787,7 +796,7 @@ const BecomeOrganiser = () => {
       </div>
 
       {/* Processing modal */}
-      <Dialog open={processingOpen} maxWidth="xs" fullWidth>
+      <MuiDialog open={processingOpen} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
           Processing verification
         </DialogTitle>
@@ -807,7 +816,80 @@ const BecomeOrganiser = () => {
             </span>
           </div>
         </DialogContent>
-      </Dialog>
+      </MuiDialog>
+
+      <Transition appear show={nameMismatchOpen} as={Fragment}>
+        <HeadlessDialog
+          as="div"
+          className="tw:relative tw:z-120"
+          onClose={() => setNameMismatchOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="tw:ease-out tw:duration-200"
+            enterFrom="tw:opacity-0"
+            enterTo="tw:opacity-100"
+            leave="tw:ease-in tw:duration-150"
+            leaveFrom="tw:opacity-100"
+            leaveTo="tw:opacity-0"
+          >
+            <div className="tw:fixed tw:inset-0 tw:bg-black/40 tw:backdrop-blur-sm" />
+          </Transition.Child>
+
+          <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
+            <div className="tw:flex tw:min-h-full tw:items-center tw:justify-center tw:p-4">
+              <Transition.Child
+                as={Fragment}
+                enter="tw:ease-out tw:duration-200"
+                enterFrom="tw:opacity-0 tw:translate-y-2 tw:scale-95"
+                enterTo="tw:opacity-100 tw:translate-y-0 tw:scale-100"
+                leave="tw:ease-in tw:duration-150"
+                leaveFrom="tw:opacity-100 tw:translate-y-0 tw:scale-100"
+                leaveTo="tw:opacity-0 tw:translate-y-2 tw:scale-95"
+              >
+                <HeadlessDialog.Panel className="tw:w-full tw:max-w-md tw:rounded-3xl tw:bg-white tw:px-6 tw:py-6 tw:shadow-2xl tw:ring-1 tw:ring-black/5">
+                  <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
+                    Account name mismatch
+                  </span>
+                  <span className="tw:mt-2 tw:text-sm tw:text-gray-600">
+                    Your Zagasm account name must match the name on your bank
+                    account. Please update your bank details or edit your
+                    profile to continue.
+                  </span>
+
+                  <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:justify-end">
+                    <button
+                      style={{
+                        borderRadius: 12,
+                        fontSize: 12,
+                      }}
+                      type="button"
+                      onClick={() => setNameMismatchOpen(false)}
+                      className="tw:w-full tw:sm:w-auto tw:rounded-xl tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50 tw:transition"
+                    >
+                      Close
+                    </button>
+                    <button
+                      style={{
+                        borderRadius: 12,
+                        fontSize: 12,
+                      }}
+                      type="button"
+                      onClick={() => {
+                        setNameMismatchOpen(false);
+                        navigate("/profile/edit-profile");
+                      }}
+                      className="tw:w-full tw:sm:w-auto tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:hover:shadow-md tw:transition"
+                    >
+                      Edit profile
+                    </button>
+                  </div>
+                </HeadlessDialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </HeadlessDialog>
+      </Transition>
     </div>
   );
 };

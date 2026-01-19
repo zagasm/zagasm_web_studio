@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
-import { isValidPhoneNumber, getCountryCallingCode } from "react-phone-number-input";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
 export function SignUp() {
@@ -21,17 +17,11 @@ export function SignUp() {
     label: "",
     class: ""
   });
-  const [countryCode, setCountryCode] = useState("+234");
-  const [phoneError, setPhoneError] = useState("");
-  const [useEmail, setUseEmail] = useState(false); // toggle state
-
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    phone: "",
     email: "",
-    password: "",
-    country_code: "+234"
+    password: ""
   });
 
   useEffect(() => {
@@ -77,32 +67,6 @@ export function SignUp() {
     }));
   };
 
-  const handlePhoneChange = (value) => {
-    setFormData((prev) => ({
-      ...prev,
-      phone: value || ""
-    }));
-
-    if (value) {
-      try {
-        const code = `+${getCountryCallingCode(value)}`;
-        setCountryCode(code);
-        setFormData((prev) => ({
-          ...prev,
-          country_code: code
-        }));
-      } catch (e) {
-        console.error("Could not get country code", e);
-      }
-    }
-
-    if (value && !isValidPhoneNumber(value)) {
-      setPhoneError("Invalid phone number");
-    } else {
-      setPhoneError("");
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -112,41 +76,19 @@ export function SignUp() {
       return;
     }
 
-    if (useEmail) {
-      if (!formData.email) {
-        showError("Please enter a valid email");
-        return;
-      }
-    } else {
-      if (!formData.phone || !isValidPhoneNumber(formData.phone)) {
-        showError("Please enter a valid phone number");
-        return;
-      }
+    if (!formData.email) {
+      showError("Please enter a valid email");
+      return;
     }
 
     setIsLoading(true);
     try {
-      let payload;
-      if (useEmail) {
-        payload = {
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          email: formData.email,
-          password: formData.password
-        };
-      } else {
-        const phoneWithoutCountryCode = formData.phone.replace(
-          new RegExp(`^\\${formData.country_code}`),
-          ""
-        );
-        payload = {
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          phone: phoneWithoutCountryCode,
-          password: formData.password,
-          country_code_one: formData.country_code
-        };
-      }
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        password: formData.password
+      };
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/v1/users`,
@@ -175,19 +117,10 @@ export function SignUp() {
   };
 
   const isFormValid = () => {
-    if (useEmail) {
-      return (
-        formData.first_name.trim() !== "" &&
-        formData.last_name.trim() !== "" &&
-        formData.email.trim() !== "" &&
-        formData.password.trim() !== ""
-      );
-    }
     return (
       formData.first_name.trim() !== "" &&
       formData.last_name.trim() !== "" &&
-      formData.phone.trim() !== "" &&
-      isValidPhoneNumber(formData.phone) &&
+      formData.email.trim() !== "" &&
       formData.password.trim() !== ""
     );
   };
@@ -258,80 +191,28 @@ export function SignUp() {
           </motion.div>
         </div>
 
-        {!useEmail ? (
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-            className="form-group phone-input-section m-2"
-            style={{ background: "white" }}
-          >
-            <label htmlFor="PhoneNumber">Phone Number</label>
-            <div
-              className="phone-input-container"
-              style={{ background: "white" }}
-            >
-              <PhoneInput
-                id="PhoneNumber"
-                international
-                defaultCountry="NG"
-                value={formData.phone}
-                onChange={handlePhoneChange}
-                className={`phone-input ${phoneError ? "is-invalid" : ""}`}
-                placeholder="Enter phone number"
-                style={{ background: "white" }}
-              />
-              {phoneError && (
-                <div className="phone-error-message">{phoneError}</div>
-              )}
-            </div>
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="form-group m-2"
+        >
+          <label htmlFor="email">Email Address</label>
+          <div className="position-relative">
             <input
-              style={{ background: "white" }}
-              type="hidden"
-              name="country_code"
-              value={formData.country_code}
+              id="email"
+              type="email"
+              name="email"
+              className="tw:w-full input"
+              style={{ paddingLeft: "50px" }}
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={handleChange}
+              required
             />
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-            className="form-group m-2"
-          >
-            <label htmlFor="email">Email Address</label>
-            <div className="position-relative">
-              <input
-                id="email"
-                type="email"
-                name="email"
-                className="tw:w-full input"
-                style={{ paddingLeft: "50px" }}
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                required={useEmail}
-              />
-              <i className="input-icon feather-mail position-absolute"></i>
-            </div>
-          </motion.div>
-        )}
-
-        {/* switch button */}
-        <div className="form-group m-2 pb-4">
-          <div className="text-center  w-100 ">
-            <button
-              type="button"
-              className="btn btn-link p-0 float-right"
-              onClick={() => setUseEmail(!useEmail)}
-              style={{ fontSize: "14px",color:'rgba(143, 7, 231, 1)',textDecoration:'none' }}
-            >
-              {useEmail
-                ? "Use Phone Number Instead"
-                : "Use Email Instead"}
-            </button>
+            <i className="input-icon feather-mail position-absolute"></i>
           </div>
-        </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
