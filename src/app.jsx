@@ -82,17 +82,6 @@ const MainLayout = () => (
   </>
 );
 
-function normalizeApkUrl(url) {
-  if (!url) return "";
-  const driveMatch = url.match(
-    /https:\/\/drive\.google\.com\/file\/d\/([^/]+)/
-  );
-  if (!driveMatch) return url;
-
-  const id = driveMatch[1];
-  // This avoids the Drive UI and goes straight to download
-  return `https://drive.google.com/uc?export=download&id=${id}`;
-}
 export function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation(); // Detects route changes
@@ -212,8 +201,8 @@ export function App() {
   const APP_STORE_URL =
     "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
 
-  const APK_DOWNLOAD_URL =
-    "https://andriodapk.b-cdn.net/Zagasm%20Studios.apk";
+  const PLAY_STORE_URL =
+    "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -242,16 +231,9 @@ export function App() {
   };
 
   const handleApkDownload = () => {
-    const url = normalizeApkUrl(APK_DOWNLOAD_URL);
-    if (!url) return;
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.rel = "noopener noreferrer";
-    link.setAttribute("download", "Zagasm.apk");
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    if (PLAY_STORE_URL) {
+      window.open(PLAY_STORE_URL, "_blank", "noopener,noreferrer");
+    }
 
     closeDownloadModal();
   };
