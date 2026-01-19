@@ -74,7 +74,7 @@ export default function SignalDeck() {
       />
       <div
         aria-hidden
-        className="tw:absolute tw:right-[-60px] tw:top-28 tw:h-72 tw:w-72 tw:rounded-full tw:bg-[#8f07e7]/30 tw:blur-3xl tw:animate-[signal-float_12s_ease-in-out_infinite] tw:[animation-delay:-4s] tw:motion-reduce:animate-none"
+        className="tw:absolute tw:right-[-60px] tw:top-28 tw:h-72 tw:w-72 tw:rounded-full tw:bg-primary/30 tw:blur-3xl tw:animate-[signal-float_12s_ease-in-out_infinite] tw:[animation-delay:-4s] tw:motion-reduce:animate-none"
       />
       <div
         aria-hidden
@@ -104,7 +104,7 @@ export default function SignalDeck() {
 
         <a
           href="/"
-          className="tw:mb-8 tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-2xl tw:border tw:border-[#8f07e7]/30 tw:bg-white/90 tw:px-5 tw:py-4 tw:text-[#3b165f] tw:shadow-[0_18px_45px_rgba(59,22,95,0.15)] tw:transition tw:duration-300 tw:hover:-translate-y-1 tw:hover:shadow-[0_26px_60px_rgba(59,22,95,0.2)]"
+          className="tw:mb-8 tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-2xl tw:border tw:border-primary/30 tw:bg-white/90 tw:px-5 tw:py-4 tw:text-[#3b165f] tw:shadow-[0_18px_45px_rgba(59,22,95,0.15)] tw:transition tw:duration-300 tw:hover:-translate-y-1 tw:hover:shadow-[0_26px_60px_rgba(59,22,95,0.2)]"
         >
           <span className="tw:flex tw:items-center tw:gap-4">
             <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[#efe3ff] tw:text-xl tw:text-[#7a32d8]">
@@ -149,7 +149,7 @@ export default function SignalDeck() {
                   {app.note}
                 </div>
               </div>
-              <span className="tw:justify-self-start tw:rounded-full tw:bg-[#8f07e7] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:md:justify-self-end">
+              <span className="tw:justify-self-start tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:md:justify-self-end">
                 Download
               </span>
             </a>
@@ -160,7 +160,7 @@ export default function SignalDeck() {
           {socialLinks.map((social, index) => (
             <a
               key={social.label}
-              className="tw:group tw:grid tw:grid-cols-[auto_1fr] tw:items-center tw:gap-4 tw:rounded-2xl tw:border tw:border-black/10 tw:bg-white/90 tw:px-5 tw:py-4 tw:text-[#231f20] tw:transition tw:duration-300 tw:hover:-translate-y-1 tw:hover:border-[#8f07e7]/40 tw:md:grid-cols-[auto_1fr_auto] tw:opacity-0 tw:translate-y-4 tw:animate-[signal-rise_0.7s_ease_forwards]"
+              className="tw:group tw:grid tw:grid-cols-[auto_1fr] tw:items-center tw:gap-4 tw:rounded-2xl tw:border tw:border-black/10 tw:bg-white/90 tw:px-5 tw:py-4 tw:text-[#231f20] tw:transition tw:duration-300 tw:hover:-translate-y-1 tw:hover:border-primary/40 tw:md:grid-cols-[auto_1fr_auto] tw:opacity-0 tw:translate-y-4 tw:animate-[signal-rise_0.7s_ease_forwards]"
               href={social.url}
               target="_blank"
               rel="noreferrer"
