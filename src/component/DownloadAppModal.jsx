@@ -14,7 +14,7 @@ const DownloadAppModal = ({
   apkCtaText = "Get it on Google Play",
 }) => {
   return (
-    <Transition appear show={true} as={Fragment}>
+    <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="tw:relative tw:z-9999" onClose={onClose}>
         <Transition.Child
           as={Fragment}
