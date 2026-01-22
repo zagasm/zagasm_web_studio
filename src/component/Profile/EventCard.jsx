@@ -1,23 +1,38 @@
-// component/Events/EventCard.jsx
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Eye, Heart, Users, Pencil } from "lucide-react";
+import { Clock, Eye, Heart, Users, Pencil, Trash2 } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
 import MediaCarousel from "./MediaCarousel";
 import StartStreamAppDownloadModal from "../Events/StartStreamAppDownloadModal";
+import DeleteConfirmModal from "../DeleteConfirmModal";
 
 function collectMedia(poster = []) {
   const imgs = poster.filter((p) => p.type === "image");
   const vids = poster.filter((p) => p.type === "video");
   return [...imgs, ...vids];
 }
+function getApiErrorMessage(err) {
+  const data = err?.response?.data;
 
-export default function EventCard({ event, isOrganiserProfile }) {
+  if (typeof data?.message === "string" && data.message.trim())
+    return data.message;
+  if (typeof err?.message === "string" && err.message.trim())
+    return err.message;
+
+  return "Something went wrong. Please try again.";
+}
+
+export default function EventCard({ event, isOrganiserProfile, onDeleted }) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [openModal, setOpenModal] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -34,35 +49,75 @@ export default function EventCard({ event, isOrganiserProfile }) {
     const req = api.post(
       `/api/v1/events/${event.id}/toggle`,
       {},
-      authHeaders(token)
+      authHeaders(token),
     );
+
     await showPromise(req, {
       loading: isSaved ? "Removing…" : "Saving…",
       success: isSaved ? "Removed from saved" : "Saved",
       error: "Could not update",
     });
+
     setIsSaved((s) => !s);
+  };
+
+  const deleteEvent = async () => {
+    setDeleting(true);
+    setDeleteError("");
+
+    try {
+      await showPromise(
+        api.post(`/api/v1/delete/event/${event.id}`, {}, authHeaders(token)),
+        {
+          loading: "Deleting event…",
+          success: "Event deleted",
+          error: (err) => getApiErrorMessage(err), // IMPORTANT: allow function
+        },
+      );
+
+      setOpenDelete(false);
+      onDeleted?.(event.id);
+    } catch (err) {
+      setDeleteError(getApiErrorMessage(err));
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
     <article className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-white">
-      {/* Edit icon (only for owner) */}
+      {/* Top-right actions (only for owner) */}
       {event.isOwner && (
-        <button
-          style={{
-            borderRadius: 16,
-            fontSize: 12,
-          }}
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/event/edit/${event.id}`);
-          }}
-          className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-gray-500 tw:shadow-md hover:tw:bg-[#F4E6FD] hover:tw:text-primary tw:transition"
-          aria-label="Edit event"
-        >
-          <Pencil className="tw:w-4 tw:h-4" />
-        </button>
+        <div className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:flex tw:gap-2">
+          {/* Edit */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/event/edit/${event.id}`);
+            }}
+            className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-gray-500 tw:shadow-md hover:tw:bg-[#F4E6FD] hover:tw:text-primary tw:transition"
+            aria-label="Edit event"
+            title="Edit"
+          >
+            <Pencil className="tw:w-4 tw:h-4" />
+          </button>
+
+          {/* Delete */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteError("");
+              setOpenDelete(true);
+            }}
+            className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-red-600 tw:shadow-md hover:tw:bg-red-50 tw:transition"
+            aria-label="Delete event"
+            title="Delete"
+          >
+            <Trash2 className="tw:w-4 tw:h-4" />
+          </button>
+        </div>
       )}
 
       {/* Clickable media/title section navigates to streaming page */}
@@ -139,13 +194,9 @@ export default function EventCard({ event, isOrganiserProfile }) {
         {/* CTA */}
         {isOrganiserProfile ? (
           <button
-            style={{
-              borderRadius: 16,
-              fontSize: 12,
-            }}
             onClick={(e) => {
               e.stopPropagation();
-              onCreateChannel(); // opens download modal
+              onCreateChannel();
             }}
             className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
@@ -154,17 +205,12 @@ export default function EventCard({ event, isOrganiserProfile }) {
         ) : (
           !event.srt_ingest_url && (
             <button
-              style={{
-                borderRadius: 16,
-                fontSize: 12,
-              }}
               onClick={(e) => {
                 e.stopPropagation();
                 onCreateChannel();
               }}
               className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
             >
-              {/* keep your icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -182,6 +228,17 @@ export default function EventCard({ event, isOrganiserProfile }) {
       <StartStreamAppDownloadModal
         open={openModal}
         onClose={() => setOpenModal(false)}
+      />
+
+      <DeleteConfirmModal
+        open={openDelete}
+        onClose={() => (deleting ? null : setOpenDelete(false))}
+        title="Delete this event?"
+        description="This will permanently remove the event and its details. This action cannot be undone."
+        confirmText="Yes, delete"
+        cancelText="Cancel"
+        loading={deleting}
+        onConfirm={deleteEvent}
       />
     </article>
   );
