@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import EventCard from "./EventCard";
 import EventCardShimmer from "../Events/EventCardShimmer";
 
@@ -9,6 +9,17 @@ export default function EventsGrid({
   isOwnProfile,
   isOrganiserProfile,
 }) {
+  const [items, setItems] = useState(events ?? []);
+
+  // keep local list in sync when parent updates (new fetch, filter, etc.)
+  useEffect(() => {
+    setItems(events ?? []);
+  }, [events]);
+
+  const handleDeleted = (id) => {
+    setItems((prev) => prev.filter((e) => e.id !== id));
+  };
+
   if (loading) {
     return (
       <div className="row tw:mt-4">
@@ -25,7 +36,7 @@ export default function EventsGrid({
     );
   }
 
-  if (!events?.length) {
+  if (!items?.length) {
     return (
       <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:py-16 tw:text-center tw:text-gray-600">
         <div className="tw:text-6xl">📆</div>
@@ -37,12 +48,13 @@ export default function EventsGrid({
 
   return (
     <div className="tw:mt-4 tw:md:mt-6 row tw:mb-20 tw:md:mb-0">
-      {events.map((e) => (
+      {items.map((e) => (
         <EventCard
           key={e.id}
           event={e}
           isOwnProfile={isOwnProfile}
           isOrganiserProfile={isOrganiserProfile}
+          onDeleted={handleDeleted}
         />
       ))}
     </div>
