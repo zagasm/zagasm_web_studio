@@ -73,6 +73,7 @@ import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
 import SignalDeck from "./pages/SignalDeck/index.jsx";
+import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
 
 const MainLayout = () => (
   <>
@@ -320,6 +321,7 @@ export function App() {
               <Route path="blocked" element={<BlockedUsersPage />} />
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
               <Route path="fund-wallet" element={<FundWalletPage />} />
+              <Route path="payouts" element={<AccountPayouts />} />
               <Route
                 path="manage-notification"
                 element={<AccountNotification />}

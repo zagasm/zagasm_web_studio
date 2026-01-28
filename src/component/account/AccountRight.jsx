@@ -17,6 +17,7 @@ import {
   Coins,
   CircleAlert,
   PlusCircle,
+  Landmark,
 } from "lucide-react";
 import Switch from "@mui/material/Switch";
 import { api, authHeaders } from "../../lib/apiClient";
@@ -92,7 +93,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
         const token = localStorage.getItem("token");
         const res = await api.get(
           "/api/v1/me/notification-settings",
-          authHeaders(token)
+          authHeaders(token),
         );
         const data = res?.data?.data;
         if (data) {
@@ -134,7 +135,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
           push: nextState.push,
           email: nextState.email,
         },
-        authHeaders(token)
+        authHeaders(token),
       );
     } catch (err) {
       console.error("Failed to update notification settings", err);
@@ -172,6 +173,11 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       icon: PlusCircle,
       label: "Fund Wallet",
       to: "/account/fund-wallet",
+    },
+    {
+      icon: Landmark,
+      label: "Payouts",
+      to: "/account/payouts",
     },
   ];
 
