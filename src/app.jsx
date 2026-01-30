@@ -252,7 +252,7 @@ export function App() {
       <NetworkStatus />
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
-      {/* <DisableRightClick /> */}
+      <DisableRightClick />
       <Routes>
         <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
