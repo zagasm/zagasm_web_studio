@@ -8,11 +8,31 @@ import {
   TrendingUp,
   Wallet,
   AlertTriangle,
+  History,
+  Landmark,
+  RefreshCw,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from "@mui/material";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
+import { showError, showPromise } from "../../component/ui/toast";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
+
+const getCurrencySymbol = (currency) => {
+  const normalized = String(currency || "").toUpperCase();
+  if (normalized === "USD") return "$";
+  if (normalized === "EUR") return "€";
+  if (normalized === "GBP") return "£";
+  return "₦";
+};
 
 const formatMoney = (value, symbol = "₦") => {
   const num = Number(value ?? 0);
@@ -23,34 +43,20 @@ const formatMoney = (value, symbol = "₦") => {
   })}`;
 };
 
-const safeSymbol = (event) => event?.currency?.symbol || "₦";
-
-const PageShell = ({ title, subtitle, children }) => (
-  <div className="tw:w-full tw:pt-6 tw:md:pt-10 tw:pb-16">
-    <div className="tw:mb-5 tw:flex tw:items-start tw:justify-between tw:gap-3">
-      <div>
-        <h1 className="tw:text-xl tw:md:text-2xl tw:font-bold tw:text-gray-900">
-          {title}
-        </h1>
-        {subtitle ? (
-          <span className="tw:mt-1 tw:text-sm tw:text-gray-500">{subtitle}</span>
-        ) : null}
-      </div>
-    </div>
-    {children}
-  </div>
-);
+const safeSymbol = (event) =>
+  event?.currency?.symbol ||
+  getCurrencySymbol(event?.currency?.code || event?.currency);
 
 const SkeletonBlock = ({ className }) => (
   <div
-    className={cx("tw:animate-pulse tw:bg-gray-200 tw:rounded-2xl", className)}
+    className={cx("tw:animate-pulse tw:rounded-2xl tw:bg-gray-200", className)}
   />
 );
 
-const StatsSkeleton = () => (
-  <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:gap-3 tw:md:gap-4">
-    {Array.from({ length: 4 }).map((_, i) => (
-      <div key={i} className="tw:bg-white tw:rounded-3xl tw:p-4 tw:shadow-sm">
+const StatsSkeleton = ({ cards = 4 }) => (
+  <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4 tw:md:gap-4">
+    {Array.from({ length: cards }).map((_, index) => (
+      <div key={index} className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
         <SkeletonBlock className="tw:h-4 tw:w-24" />
         <SkeletonBlock className="tw:mt-3 tw:h-7 tw:w-32" />
         <SkeletonBlock className="tw:mt-3 tw:h-3 tw:w-20" />
@@ -61,10 +67,10 @@ const StatsSkeleton = () => (
 
 const ListSkeleton = () => (
   <div className="tw:mt-4 tw:space-y-3">
-    {Array.from({ length: 6 }).map((_, i) => (
+    {Array.from({ length: 5 }).map((_, index) => (
       <div
-        key={i}
-        className="tw:bg-white tw:rounded-3xl tw:p-4 tw:shadow-sm tw:flex tw:items-center tw:gap-4"
+        key={index}
+        className="tw:flex tw:items-center tw:gap-4 tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm"
       >
         <SkeletonBlock className="tw:h-14 tw:w-14 tw:rounded-2xl" />
         <div className="tw:flex-1">
@@ -79,101 +85,93 @@ const ListSkeleton = () => (
 );
 
 const StatCard = ({ icon: Icon, label, value, hint }) => (
-  <div className="tw:bg-white tw:rounded-3xl tw:p-4 tw:shadow-sm">
+  <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
     <div className="tw:flex tw:items-center tw:justify-between">
       <span className="tw:text-sm tw:text-gray-500">{label}</span>
-      {Icon ? <Icon className="tw:w-4 tw:h-4 tw:text-gray-400" /> : null}
+      {Icon ? <Icon className="tw:h-4 tw:w-4 tw:text-gray-400" /> : null}
     </div>
-    <div className="tw:mt-2 tw:text-lg tw:md:text-xl tw:font-bold tw:text-gray-900">
+    <div className="tw:mt-2 tw:text-lg tw:font-bold tw:text-gray-900 tw:md:text-xl">
       {value}
     </div>
-    {hint ? (
-      <div className="tw:mt-1 tw:text-xs tw:text-gray-500">{hint}</div>
-    ) : null}
+    {hint ? <div className="tw:mt-1 tw:text-xs tw:text-gray-500">{hint}</div> : null}
   </div>
 );
 
-const EventRow = ({ e }) => {
-  const symbol = safeSymbol(e);
-  const payout = e?.payout || {};
-  const posterUrl = e?.poster?.[0]?.url;
+const EventRow = ({ event }) => {
+  const symbol = safeSymbol(event);
+  const payout = event?.payout || {};
+  const posterUrl = event?.poster?.[0]?.url;
 
   return (
-    <div className="tw:bg-white tw:rounded-3xl tw:p-4 tw:shadow-sm tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:gap-4">
-      <div className="tw:flex tw:items-center tw:gap-4 tw:min-w-0">
-        <div className="tw:size-14 tw:md:size-32 tw:rounded-2xl tw:bg-gray-100 tw:overflow-hidden tw:flex tw:items-center tw:justify-center tw:shrink-0">
+    <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm tw:md:flex-row tw:md:items-center">
+      <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-4">
+        <div className="tw:flex tw:size-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-2xl tw:bg-gray-100 tw:md:size-32">
           {posterUrl ? (
             <img
               src={posterUrl}
-              alt={e?.title || "Event poster"}
+              alt={event?.title || "Event poster"}
               className="tw:h-full tw:w-full tw:object-cover"
               loading="lazy"
             />
           ) : (
-            <CalendarDays className="tw:w-5 tw:h-5 tw:text-gray-400" />
+            <CalendarDays className="tw:h-5 tw:w-5 tw:text-gray-400" />
           )}
         </div>
 
         <div className="tw:min-w-0">
-          <div className="tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
-            <span className="tw:font-semibold tw:text-gray-900 tw:truncate tw:max-w-[72vw] tw:md:max-w-[420px]">
-              {e?.title || "Untitled event"}
+          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <span className="tw:max-w-[72vw] tw:truncate tw:font-semibold tw:text-gray-900 tw:md:max-w-[420px]">
+              {event?.title || "Untitled event"}
             </span>
             <span
               className={cx(
-                "tw:text-xs tw:px-2 tw:py-1 tw:rounded-full",
-                e?.status === "live"
+                "tw:rounded-full tw:px-2 tw:py-1 tw:text-xs",
+                event?.status === "live"
                   ? "tw:bg-green-50 tw:text-green-700"
-                  : "tw:bg-gray-50 tw:text-gray-600",
+                  : "tw:bg-gray-50 tw:text-gray-600"
               )}
             >
-              {e?.status || "unknown"}
+              {event?.status || "unknown"}
             </span>
           </div>
 
-          <div className="tw:mt-1 tw:text-sm tw:text-gray-600 tw:flex tw:items-center tw:gap-3 tw:flex-wrap">
+          <div className="tw:mt-1 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-sm tw:text-gray-600">
             <span className="tw:flex tw:items-center tw:gap-1">
-              <CalendarDays className="tw:w-4 tw:h-4 tw:text-gray-400" />
-              {e?.eventDate || "No date"}
+              <CalendarDays className="tw:h-4 tw:w-4 tw:text-gray-400" />
+              {event?.eventDate || "No date"}
             </span>
             <span className="tw:flex tw:items-center tw:gap-1">
-              <Ticket className="tw:w-4 tw:h-4 tw:text-gray-400" />
-              {Number(e?.ticketsSold ?? 0).toLocaleString()} sold
+              <Ticket className="tw:h-4 tw:w-4 tw:text-gray-400" />
+              {Number(event?.ticketsSold ?? 0).toLocaleString()} sold
             </span>
           </div>
 
-          <div className="tw:mt-2 tw:text-xs tw:text-gray-500 tw:flex tw:items-center tw:gap-2 tw:flex-wrap">
-            <span>
-              Organizer share: {Number(payout?.organizer_share_percent ?? 0)}%
-            </span>
+          <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-xs tw:text-gray-500">
+            <span>Organizer share: {Number(payout?.organizer_share_percent ?? 0)}%</span>
             <span className="tw:text-gray-300">•</span>
-            <span>
-              Company share: {Number(payout?.company_share_percent ?? 0)}%
-            </span>
+            <span>Company share: {Number(payout?.company_share_percent ?? 0)}%</span>
             <span className="tw:text-gray-300">•</span>
-            <span>
-              Payments: {Number(payout?.successful_payments_count ?? 0)}
-            </span>
+            <span>Payments: {Number(payout?.successful_payments_count ?? 0)}</span>
           </div>
         </div>
       </div>
 
-      <div className="tw:flex tw:flex-col tw:md:items-end tw:gap-2 tw:md:ml-auto">
-        <div className="tw:flex tw:items-center tw:justify-between tw:md:justify-end tw:gap-4">
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:md:ml-auto tw:md:items-end">
+        <div className="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:md:justify-end">
           <div className="tw:text-sm tw:text-gray-500">Your payout</div>
           <div className="tw:text-base tw:font-bold tw:text-gray-900">
             {formatMoney(payout?.organizer_amount ?? 0, symbol)}
           </div>
         </div>
 
-        <div className="tw:grid tw:grid-cols-2 tw:gap-2 tw:w-full tw:md:w-auto">
-          <div className="tw:bg-gray-50 tw:rounded-2xl tw:px-3 tw:py-2">
+        <div className="tw:grid tw:w-full tw:grid-cols-2 tw:gap-2 tw:md:w-auto">
+          <div className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2">
             <div className="tw:text-[11px] tw:text-gray-500">Gross</div>
             <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
               {formatMoney(payout?.total_amount ?? 0, symbol)}
             </div>
           </div>
-          <div className="tw:bg-gray-50 tw:rounded-2xl tw:px-3 tw:py-2">
+          <div className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2">
             <div className="tw:text-[11px] tw:text-gray-500">Company</div>
             <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
               {formatMoney(payout?.company_amount ?? 0, symbol)}
@@ -185,27 +183,98 @@ const EventRow = ({ e }) => {
   );
 };
 
+function WithdrawDialog({
+  open,
+  onClose,
+  balance,
+  amount,
+  onAmountChange,
+  onSubmit,
+  submitting,
+}) {
+  const symbol = getCurrencySymbol(balance?.currency);
+  const availableBalance = Number(balance?.available_balance ?? 0);
+  const minimumAmount = Number(balance?.minimum_payout_amount ?? 0);
+  const canRequest = !!balance?.can_request_payout;
+
+  return (
+    <Dialog open={open} onClose={submitting ? undefined : onClose} fullWidth maxWidth="sm">
+      <DialogTitle>Request payout</DialogTitle>
+      <DialogContent dividers>
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3">
+          <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
+            <div className="tw:text-xs tw:text-gray-500">Available balance</div>
+            <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
+              {formatMoney(availableBalance, symbol)}
+            </div>
+          </div>
+          <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
+            <div className="tw:text-xs tw:text-gray-500">Minimum payout</div>
+            <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
+              {formatMoney(minimumAmount, symbol)}
+            </div>
+          </div>
+        </div>
+
+        <div className="tw:mt-4">
+          <TextField
+            label={`Amount (${balance?.currency || "NGN"})`}
+            type="number"
+            fullWidth
+            value={amount}
+            onChange={(event) => onAmountChange(event.target.value)}
+            inputProps={{ min: 0 }}
+          />
+        </div>
+
+        {!canRequest && (
+          <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
+            Payout requests are not available yet. Your available balance must
+            meet the minimum payout requirement first.
+          </div>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} disabled={submitting}>
+          Cancel
+        </Button>
+        <Button
+          onClick={onSubmit}
+          variant="contained"
+          disabled={submitting || !canRequest}
+        >
+          {submitting ? "Requesting..." : "Request payout"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function AccountPayouts() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const isOrganizer = !!user?.is_organiser_verified;
 
   const [events, setEvents] = useState([]);
+  const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [balanceLoading, setBalanceLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all"); // all | live | draft | ended etc.
+  const [status, setStatus] = useState("all");
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [submittingWithdraw, setSubmittingWithdraw] = useState(false);
 
-  const fetchPayouts = async () => {
+  const fetchPayoutEvents = async () => {
     setLoading(true);
     setErrMsg("");
 
     try {
-      const token = localStorage.getItem("token");
       const res = await api.get("/api/v1/user/events", authHeaders(token));
       const list = res?.data?.data || [];
       setEvents(Array.isArray(list) ? list : []);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       setErrMsg("Could not load payouts right now. Please try again.");
       setEvents([]);
     } finally {
@@ -213,8 +282,26 @@ export default function AccountPayouts() {
     }
   };
 
+  const fetchBalance = async () => {
+    setBalanceLoading(true);
+    try {
+      const res = await api.get("/organiser/payouts/balance", authHeaders(token));
+      setBalance(res?.data?.data || null);
+    } catch (error) {
+      console.error(error);
+      showError("Could not load organiser payout balance.");
+      setBalance(null);
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
+  const refreshPageData = async () => {
+    await Promise.all([fetchPayoutEvents(), fetchBalance()]);
+  };
+
   useEffect(() => {
-    fetchPayouts();
+    refreshPageData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -222,16 +309,18 @@ export default function AccountPayouts() {
     const q = query.trim().toLowerCase();
 
     return (events || [])
-      .filter((e) => (isOrganizer ? true : false))
-      .filter((e) => (status === "all" ? true : String(e?.status) === status))
-      .filter((e) => {
+      .filter(() => isOrganizer)
+      .filter((event) =>
+        status === "all" ? true : String(event?.status) === status
+      )
+      .filter((event) => {
         if (!q) return true;
         const haystack = [
-          e?.title,
-          e?.genre,
-          e?.location,
-          e?.eventDate,
-          e?.slug,
+          event?.title,
+          event?.genre,
+          event?.location,
+          event?.eventDate,
+          event?.slug,
         ]
           .filter(Boolean)
           .join(" ")
@@ -239,29 +328,28 @@ export default function AccountPayouts() {
         return haystack.includes(q);
       })
       .sort((a, b) => {
-        const aVal = Number(a?.payout?.organizer_amount ?? 0);
-        const bVal = Number(b?.payout?.organizer_amount ?? 0);
-        return bVal - aVal;
+        const aValue = Number(a?.payout?.organizer_amount ?? 0);
+        const bValue = Number(b?.payout?.organizer_amount ?? 0);
+        return bValue - aValue;
       });
   }, [events, isOrganizer, query, status]);
 
-  const summary = useMemo(() => {
+  const eventSummary = useMemo(() => {
     const list = filtered || [];
     const totalEvents = list.length;
     const totalTickets = list.reduce(
-      (sum, e) => sum + Number(e?.ticketsSold ?? 0),
-      0,
+      (sum, event) => sum + Number(event?.ticketsSold ?? 0),
+      0
     );
     const totalGross = list.reduce(
-      (sum, e) => sum + Number(e?.payout?.total_amount ?? 0),
-      0,
+      (sum, event) => sum + Number(event?.payout?.total_amount ?? 0),
+      0
     );
     const totalOrganizer = list.reduce(
-      (sum, e) => sum + Number(e?.payout?.organizer_amount ?? 0),
-      0,
+      (sum, event) => sum + Number(event?.payout?.organizer_amount ?? 0),
+      0
     );
 
-    // pick a symbol from the first item if present; otherwise default
     const symbol = list[0]?.currency?.symbol || "₦";
 
     return {
@@ -272,11 +360,57 @@ export default function AccountPayouts() {
     };
   }, [filtered]);
 
+  const balanceSymbol = getCurrencySymbol(balance?.currency);
+
+  const handleWithdraw = async () => {
+    const amount = Number(withdrawAmount);
+    const minimumAmount = Number(balance?.minimum_payout_amount ?? 0);
+    const availableBalance = Number(balance?.available_balance ?? 0);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      showError("Enter a valid payout amount.");
+      return;
+    }
+
+    if (amount < minimumAmount) {
+      showError(
+        `Minimum payout amount is ${formatMoney(minimumAmount, balanceSymbol)}.`
+      );
+      return;
+    }
+
+    if (amount > availableBalance) {
+      showError("Requested amount is higher than your available balance.");
+      return;
+    }
+
+    try {
+      setSubmittingWithdraw(true);
+      await showPromise(
+        api.post(
+          "/organiser/payouts/request",
+          { amount },
+          authHeaders(token)
+        ),
+        {
+          loading: "Submitting payout request…",
+          success: "Payout request submitted",
+          error: "Unable to submit payout request",
+        }
+      );
+      setWithdrawAmount("");
+      setWithdrawOpen(false);
+      fetchBalance();
+    } finally {
+      setSubmittingWithdraw(false);
+    }
+  };
+
   if (!isOrganizer) {
     return (
-      <      >
-        <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:shadow-sm tw:flex tw:items-start tw:gap-3 ">
-          <AlertTriangle className="tw:w-5 tw:h-5 tw:text-amber-500 tw:mt-0.5" />
+      <>
+        <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:shadow-sm tw:flex tw:items-start tw:gap-3">
+          <AlertTriangle className="tw:mt-0.5 tw:h-5 tw:w-5 tw:text-amber-500" />
           <div>
             <div className="tw:font-semibold tw:text-gray-900">
               Access restricted
@@ -286,7 +420,7 @@ export default function AccountPayouts() {
             </div>
             <Link
               to="/account"
-              className="tw:inline-flex tw:mt-3 tw:text-sm tw:font-semibold tw:text-gray-900"
+              className="tw:mt-3 tw:inline-flex tw:text-sm tw:font-semibold tw:text-gray-900"
             >
               Go back
             </Link>
@@ -297,115 +431,187 @@ export default function AccountPayouts() {
   }
 
   return (
-    <div className="tw:max-w-7xl tw:mx-auto tw:px-4 tw:sm:px-6 tw:lg:px-8 tw:pt-24 tw:md:pt-32 tw:pb-24">
-      <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-4">
-        <Link
-          to="/account"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900"
-        >
-          <ArrowLeft className="tw:w-4 tw:h-4" />
-          Back
-        </Link>
-        <span className="tw:text-lg tw:md:text-xl tw:lg:text-2xl tw:xl:text-3xl tw:text-center">
-            Payouts
-        </span>
-
-        <button
-        style={{
-            fontSize: 12,
-            borderRadius: '20px'
-        }}
-          onClick={fetchPayouts}
-          className="tw:bg-white tw:px-4 tw:py-2 tw:rounded-full tw:shadow-sm tw:hover:shadow-md tw:transition-all tw:text-sm tw:font-semibold tw:text-gray-900"
-        >
-          Refresh
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="tw:bg-white tw:rounded-3xl tw:p-4 tw:shadow-sm">
-        <div className="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:gap-3">
-          <div className="tw:flex-1 tw:flex tw:items-center tw:gap-2 tw:bg-gray-50 tw:rounded-2xl tw:px-3 tw:py-2">
-            <Search className="tw:w-4 tw:h-4 tw:text-gray-400" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by title, date, location..."
-              className="tw:w-full tw:bg-transparent tw:outline-none tw:text-sm tw:text-gray-800"
-            />
+    <>
+      <div className="tw:mx-auto tw:max-w-7xl tw:px-4 tw:pb-24 tw:pt-24 tw:sm:px-6 tw:md:pt-32 tw:lg:px-8">
+        <div className="tw:mb-4 tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+          <div className="tw:flex tw:items-center tw:gap-3">
+            <Link
+              to="/account"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900"
+            >
+              <ArrowLeft className="tw:h-4 tw:w-4" />
+              Back
+            </Link>
+            <span className="tw:text-lg tw:text-gray-900 tw:md:text-xl tw:lg:text-2xl tw:xl:text-3xl">
+              Payouts
+            </span>
           </div>
 
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="tw:bg-gray-50 tw:rounded-2xl tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none"
-          >
-            <option value="all">All statuses</option>
-            <option value="live">Live</option>
-            <option value="draft">Draft</option>
-            <option value="ended">Ended</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <Link
+              to="/account/payouts/history"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+            >
+              <History className="tw:h-4 tw:w-4" />
+              Payout history
+            </Link>
+            <button
+              type="button"
+              style={{
+                borderRadius: 12,
+                
+              }}
+              onClick={() => setWithdrawOpen(true)}
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm hover:tw:bg-primarySecond"
+            >
+              <Landmark className="tw:h-4 tw:w-4" />
+              Withdraw
+            </button>
+            <button
+              type="button"
+              onClick={refreshPageData}
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+            >
+              <RefreshCw className="tw:h-4 tw:w-4" />
+              Refresh
+            </button>
+          </div>
         </div>
 
-        {errMsg ? (
-          <div className="tw:mt-3 tw:text-sm tw:text-red-600">{errMsg}</div>
-        ) : null}
-      </div>
+        <div className="tw:mb-4">
+          {balanceLoading ? (
+            <StatsSkeleton />
+          ) : (
+            <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4 tw:md:gap-4">
+              <StatCard
+                icon={Wallet}
+                label="Available balance"
+                value={formatMoney(balance?.available_balance ?? 0, balanceSymbol)}
+                hint={
+                  balance?.can_request_payout
+                    ? "Ready for payout request"
+                    : `Minimum payout is ${formatMoney(
+                        balance?.minimum_payout_amount ?? 0,
+                        balanceSymbol
+                      )}`
+                }
+              />
+              <StatCard
+                icon={TrendingUp}
+                label="Organiser share"
+                value={formatMoney(balance?.organiser_share ?? 0, balanceSymbol)}
+                hint="Total revenue share"
+              />
+              <StatCard
+                icon={History}
+                label="Pending payouts"
+                value={formatMoney(balance?.pending_payouts ?? 0, balanceSymbol)}
+                hint="Not yet processed"
+              />
+              <StatCard
+                icon={Landmark}
+                label="Total paid out"
+                value={formatMoney(balance?.total_paid_out ?? 0, balanceSymbol)}
+                hint={`Currency: ${balance?.currency || "NGN"}`}
+              />
+            </div>
+          )}
+        </div>
 
-      {/* Stats */}
-      <div className="tw:mt-4">
+        <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+          <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center">
+            <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2">
+              <Search className="tw:h-4 tw:w-4 tw:text-gray-400" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by title, date, location..."
+                className="tw:w-full tw:bg-transparent tw:text-sm tw:text-gray-800 tw:outline-none"
+              />
+            </div>
+
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+              className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none"
+            >
+              <option value="all">All statuses</option>
+              <option value="live">Live</option>
+              <option value="draft">Draft</option>
+              <option value="ended">Ended</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {errMsg ? (
+            <div className="tw:mt-3 tw:text-sm tw:text-red-600">{errMsg}</div>
+          ) : null}
+        </div>
+
+        <div className="tw:mt-4">
+          {loading ? (
+            <StatsSkeleton />
+          ) : (
+            <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4 tw:md:gap-4">
+              <StatCard
+                icon={TrendingUp}
+                label="Total organiser payout"
+                value={eventSummary.totalOrganizer}
+                hint="Across filtered events"
+              />
+              <StatCard
+                icon={Wallet}
+                label="Total gross"
+                value={eventSummary.totalGross}
+                hint="Before splits"
+              />
+              <StatCard
+                icon={Ticket}
+                label="Tickets sold"
+                value={Number(eventSummary.totalTickets).toLocaleString()}
+                hint="Across filtered events"
+              />
+              <StatCard
+                icon={CalendarDays}
+                label="Events"
+                value={Number(eventSummary.totalEvents).toLocaleString()}
+                hint="In this view"
+              />
+            </div>
+          )}
+        </div>
+
         {loading ? (
-          <StatsSkeleton />
+          <ListSkeleton />
+        ) : filtered.length === 0 ? (
+          <div className="tw:mt-4 tw:rounded-3xl tw:bg-white tw:p-6 tw:shadow-sm">
+            <div className="tw:font-semibold tw:text-gray-900">No payouts found</div>
+            <div className="tw:mt-1 tw:text-sm tw:text-gray-600">
+              Try changing your filters, or check back after ticket sales.
+            </div>
+          </div>
         ) : (
-          <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:gap-3 tw:md:gap-4">
-            <StatCard
-              icon={TrendingUp}
-              label="Total organiser payout"
-              value={summary.totalOrganizer}
-              hint="Across filtered events"
-            />
-            <StatCard
-              icon={Wallet}
-              label="Total gross"
-              value={summary.totalGross}
-              hint="Before splits"
-            />
-            <StatCard
-              icon={Ticket}
-              label="Tickets sold"
-              value={Number(summary.totalTickets).toLocaleString()}
-              hint="Across filtered events"
-            />
-            <StatCard
-              icon={CalendarDays}
-              label="Events"
-              value={Number(summary.totalEvents).toLocaleString()}
-              hint="In this view"
-            />
+          <div className="tw:mt-4 tw:space-y-3">
+            {filtered.map((event) => (
+              <EventRow key={event?.id} event={event} />
+            ))}
           </div>
         )}
       </div>
 
-      {/* List */}
-      {loading ? (
-        <ListSkeleton />
-      ) : filtered.length === 0 ? (
-        <div className="tw:mt-4 tw:bg-white tw:rounded-3xl tw:p-6 tw:shadow-sm">
-          <div className="tw:text-gray-900 tw:font-semibold">
-            No payouts found
-          </div>
-          <div className="tw:mt-1 tw:text-sm tw:text-gray-600">
-            Try changing your filters, or check back after ticket sales.
-          </div>
-        </div>
-      ) : (
-        <div className="tw:mt-4 tw:space-y-3">
-          {filtered.map((e) => (
-            <EventRow key={e?.id} e={e} />
-          ))}
-        </div>
-      )}
-    </div>
+      <WithdrawDialog
+        open={withdrawOpen}
+        onClose={() => {
+          if (!submittingWithdraw) {
+            setWithdrawOpen(false);
+          }
+        }}
+        balance={balance}
+        amount={withdrawAmount}
+        onAmountChange={setWithdrawAmount}
+        onSubmit={handleWithdraw}
+        submitting={submittingWithdraw}
+      />
+    </>
   );
 }

@@ -2,10 +2,9 @@ import { ChevronLeft } from "lucide-react";
 import React from "react";
 
 const STEPS = [
-  "Event Information",
-  "Media Upload",
-  "Ticketing & Access",
-  "Review & Publish",
+  "Event Details",
+  "Ticketing",
+  "Preview",
 ];
 
 export default function ProgressSteps({ currentStep, completedSteps, onBack }) {

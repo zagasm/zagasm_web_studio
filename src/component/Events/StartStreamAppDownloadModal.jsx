@@ -2,7 +2,13 @@ import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { X, Smartphone } from "lucide-react";
 
-export default function StartStreamAppDownloadModal({ open, onClose }) {
+export default function StartStreamAppDownloadModal({
+  open,
+  onClose,
+  title = "Start Event Stream on mobile",
+  description = "To start streaming this event on mobile, download the Zagasm Studios app from your preferred app store.",
+  dismissLabel = "I’ll do this later",
+}) {
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="tw:relative tw:z-80" onClose={onClose}>
@@ -47,12 +53,11 @@ export default function StartStreamAppDownloadModal({ open, onClose }) {
                   </div>
 
                   <span className="tw:text-lg tw:md:text-xl tw:lg:text-2xl tw:font-semibold tw:text-gray-900">
-                    Start Event Stream on mobile
+                    {title}
                   </span>
 
                   <Dialog.Description className="tw:text-sm tw:text-gray-600 tw:max-w-sm">
-                    To start streaming this event on mobile, download the Zagasm
-                    Studios app from your preferred app store.
+                    {description}
                   </Dialog.Description>
 
                   <div className="tw:flex tw:flex-col tw:sm:flex-row tw:gap-3 tw:mt-3 tw:w-full">
@@ -105,7 +110,7 @@ export default function StartStreamAppDownloadModal({ open, onClose }) {
                     onClick={onClose}
                     className="tw:mt-3 tw:text-xs tw:text-gray-500 tw:hover:text-gray-700"
                   >
-                    I’ll do this later
+                    {dismissLabel}
                   </button>
                 </div>
               </Dialog.Panel>

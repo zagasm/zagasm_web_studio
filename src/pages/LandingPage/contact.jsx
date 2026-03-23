@@ -6,7 +6,7 @@ import ContactMetaSection from "../../component/contact/ContactMetaSection";
 
 export default function ContactPage() {
   return (
-    <div className="tw:relative tw:min-h-screen tw:overflow-hidden">
+    <div className="tw:relative tw:min-h-screen tw:overflow-x-hidden">
       <BlurBackdrop />
 
       <div className="tw:relative tw:z-10 tw:pt-10 tw:md:pt-24 tw:pb-20 tw:px-4">

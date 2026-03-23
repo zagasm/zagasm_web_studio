@@ -50,7 +50,7 @@ export default function Navbar() {
           <img
             src={"/images/logo.png"}
             alt="Zagasm Logo"
-            className="tw:w-24 tw:lg:w-40 tw:-ml-5 tw:object-contain"
+            className="tw:w-24 tw:lg:w-32 tw:-ml-5 tw:object-contain"
           />
         </Link>
 
@@ -102,7 +102,7 @@ export default function Navbar() {
           {/* Profile */}
           <Link
             to="/account"
-            className="tw:size-7 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
+            className="tw:size-10 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
           >
             {hasImage ? (
               <img

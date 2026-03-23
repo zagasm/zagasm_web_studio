@@ -1,0 +1,356 @@
+import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api, authHeaders } from "../../../../lib/apiClient";
+import { useAuth } from "../../../auth/AuthContext";
+import { showPromise, showError } from "../../../../component/ui/toast";
+
+import ProgressSteps from "./steps/ProgressSteps";
+import EventInformationStep from "./steps/EventInformationStep";
+import TicketingStep from "./steps/TicketingStep";
+import ReviewStep from "./steps/ReviewStep";
+import EventCreationSuccessModal from "../../../../component/Events/EventCreationSuccessModal";
+
+function mapEventToDefaults(event) {
+  if (!event?.currentEvent) {
+    return {
+      info: {
+        title: "",
+        description: "",
+        location: "Online",
+        organizer: "",
+        genre: "",
+        date: "",
+        time: "",
+        timezone: "",
+      },
+      ticketing: {
+        price: 0,
+        maxTickets: "unlimited",
+        ticketLimit: undefined,
+        currency: "",
+        currencyCode: "NGN",
+      },
+      streaming: {
+        streamingOption: "in_app",
+        enableReplay: true,
+        streamingDuration: "24",
+      },
+      access: {
+        visibility: "public",
+        matureContent: false,
+      },
+      media: {
+        posterImages: [],
+        posterVideos: [],
+        existingPoster: [],
+      },
+    };
+  }
+
+  const currentEvent = event.currentEvent;
+  const startDate = currentEvent.start_date || currentEvent.eventDateISO || "";
+  const startTime = currentEvent.start_time || "";
+  const timezone =
+    currentEvent.timezone_id || currentEvent.timezone || "";
+  const maxTickets = currentEvent.max_tickets ? "limited" : "unlimited";
+
+  return {
+    info: {
+      title: currentEvent.title || "",
+      description: currentEvent.description || "",
+      location: currentEvent.location || currentEvent.country || "Online",
+      organizer:
+        currentEvent.organizer?.name ||
+        currentEvent.hostName ||
+        currentEvent.user?.name ||
+        "",
+      genre: currentEvent.genre || "",
+      date: startDate ? String(startDate).slice(0, 10) : "",
+      time: startTime || "",
+      timezone: String(timezone || ""),
+    },
+    ticketing: {
+      price: Number(currentEvent.price || 0),
+      maxTickets,
+      ticketLimit:
+        maxTickets === "limited"
+          ? Number(currentEvent.max_tickets || 0)
+          : undefined,
+      currency: String(currentEvent.currency?.currencyId || currentEvent.currency?.id || ""),
+      currencyCode: String(currentEvent.currency?.code || "NGN").toUpperCase(),
+    },
+    streaming: {
+      streamingOption: currentEvent.streaming_option || "in_app",
+      enableReplay:
+        typeof currentEvent.enable_replay === "boolean"
+          ? currentEvent.enable_replay
+          : true,
+      streamingDuration: String(currentEvent.streaming_duration || 24),
+    },
+    access: {
+      visibility: currentEvent.visibility || "public",
+      matureContent: !!currentEvent.mature_content,
+    },
+    media: {
+      posterImages: [],
+      posterVideos: [],
+      existingPoster: (currentEvent.poster || []).map((media, index) => ({
+        id: media.id || index,
+        type: media.type,
+        url: media.url,
+      })),
+    },
+  };
+}
+
+export default function EventCreationWizard({
+  eventTypeId,
+  mode = "create",
+  eventId,
+  initialEvent,
+}) {
+  const isEdit = mode === "edit" && !!eventId;
+  const { token } = useAuth();
+  const navigate = useNavigate();
+
+  const mapped = useMemo(
+    () => mapEventToDefaults(initialEvent),
+    [initialEvent]
+  );
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState([]);
+  const [collected, setCollected] = useState({});
+  const [posterImages, setPosterImages] = useState(
+    mapped.media.posterImages || []
+  );
+  const [posterVideos, setPosterVideos] = useState(
+    mapped.media.posterVideos || []
+  );
+  const [existingPoster, setExistingPoster] = useState(
+    mapped.media.existingPoster || []
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [successModal, setSuccessModal] = useState({
+    open: false,
+    eventId: null,
+    variant: "created",
+  });
+
+  const markStepDone = (step) => {
+    setCompletedSteps((prev) =>
+      prev.includes(step) ? prev : [...prev, step]
+    );
+  };
+
+  const mergeCollected = (stepKey, data) => {
+    setCollected((prev) => ({
+      ...prev,
+      [stepKey]: { ...(prev[stepKey] || {}), ...data },
+    }));
+  };
+
+  const handleInfoNext = (values) => {
+    mergeCollected("step_1", values);
+    markStepDone(1);
+    setCurrentStep(2);
+  };
+
+  const handleTicketingNext = (values) => {
+    mergeCollected("step_2", values);
+    markStepDone(2);
+    setCurrentStep(3);
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModal((prev) => ({ ...prev, open: false }));
+    navigate(`/event/view/${successModal.eventId}`);
+  };
+
+  const goToStep = (step) => {
+    setCurrentStep(step);
+  };
+
+  const handlePublish = async () => {
+    try {
+      setIsSubmitting(true);
+      setFormErrors({});
+
+      const payload = new FormData();
+      const info = collected.step_1 || mapped.info;
+      const ticketing = collected.step_2 || {
+        ...mapped.ticketing,
+        ...mapped.access,
+      };
+      const streaming = mapped.streaming || {};
+
+      payload.append("title", info.title || "");
+      payload.append("description", info.description || "");
+      payload.append("location", info.location || "Online");
+      payload.append("organizer", info.organizer || "");
+      payload.append("genre", info.genre || "");
+      payload.append("event_date", info.date || "");
+      payload.append("start_time", info.time || "");
+      payload.append("time_zone_id", info.timezone || "");
+
+      if (eventTypeId) {
+        payload.append("event_type_id", eventTypeId);
+      }
+
+      posterImages.forEach((file, index) => {
+        payload.append(
+          `poster_images[${index}]`,
+          file,
+          file.name || `poster_image_${index}`
+        );
+      });
+
+      posterVideos.forEach((file, index) => {
+        payload.append(
+          `poster_videos[${index}]`,
+          file,
+          file.name || `poster_video_${index}`
+        );
+      });
+
+      if (isEdit && Array.isArray(existingPoster)) {
+        existingPoster.forEach((media, index) => {
+          payload.append(`keep_poster_ids[${index}]`, media.id);
+        });
+      }
+
+      payload.append("price", ticketing.price ?? 0);
+      payload.append("currency_id", ticketing.currency || "");
+      payload.append("ticket_limit", ticketing.maxTickets || "unlimited");
+      if (ticketing.maxTickets === "limited") {
+        payload.append("ticket_limit_number", ticketing.ticketLimit || 0);
+      }
+
+      payload.append("streaming_option", streaming.streamingOption || "in_app");
+      payload.append("enable_replay", streaming.enableReplay ? "1" : "0");
+      if (streaming.enableReplay) {
+        payload.append("replay_time", streaming.streamingDuration || "24");
+      }
+
+      payload.append("visibility", ticketing.visibility || "public");
+      payload.append(
+        "post_mature_content",
+        ticketing.matureContent ? "1" : "0"
+      );
+
+      const request = api.post(
+        isEdit ? `/api/v1/event/${eventId}/edit` : "/api/v1/event/store",
+        payload,
+        {
+          ...authHeaders(token),
+          headers: {
+            ...authHeaders(token).headers,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const response = await showPromise(request, {
+        loading: isEdit ? "Updating event…" : "Creating event…",
+        success: isEdit ? "Event updated" : "Event created",
+        error: "Could not save event",
+      });
+
+      const created = response?.data?.data || response?.data || {};
+      const createdId = created?.id || eventId;
+      setSuccessModal({
+        open: true,
+        eventId: createdId,
+        variant: isEdit ? "updated" : "created",
+      });
+    } catch (err) {
+      const data = err?.response?.data;
+      if (data?.errors) {
+        setFormErrors(data.errors);
+      }
+      showError(data?.message || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const mergedForReview = useMemo(
+    () => ({
+      ...(collected.step_1 || mapped.info),
+      ...(collected.step_2 || {
+        ...mapped.ticketing,
+        ...mapped.access,
+      }),
+    }),
+    [collected, mapped]
+  );
+
+  const infoStepDefaults = collected.step_1 || mapped.info;
+  const ticketStepDefaults = collected.step_2 || {
+    ...mapped.ticketing,
+    ...mapped.access,
+  };
+
+  if (isEdit && !initialEvent) {
+    return null;
+  }
+
+  return (
+    <div className="tw:mx-auto tw:max-w-5xl tw:px-1 tw:pb-20 tw:pt-10 tw:md:pt-0">
+      <ProgressSteps
+        currentStep={currentStep}
+        completedSteps={completedSteps}
+        onBack={() => {
+          if (currentStep === 1) {
+            navigate(-1);
+          } else {
+            setCurrentStep((step) => Math.max(1, step - 1));
+          }
+        }}
+      />
+
+      {currentStep === 1 && (
+        <EventInformationStep
+          defaultValues={infoStepDefaults}
+          onNext={handleInfoNext}
+          posterImages={posterImages}
+          setPosterImages={setPosterImages}
+          posterVideos={posterVideos}
+          setPosterVideos={setPosterVideos}
+          existingPoster={existingPoster}
+          setExistingPoster={setExistingPoster}
+        />
+      )}
+
+      {currentStep === 2 && (
+        <TicketingStep
+          defaultValues={ticketStepDefaults}
+          onBack={() => setCurrentStep(1)}
+          onNext={handleTicketingNext}
+        />
+      )}
+
+      {currentStep === 3 && (
+        <ReviewStep
+          collected={mergedForReview}
+          formErrors={formErrors}
+          isSubmitting={isSubmitting}
+          onBack={() => setCurrentStep(2)}
+          onPublish={handlePublish}
+          onGoToStep={goToStep}
+          posterImages={posterImages}
+          posterVideos={posterVideos}
+          existingPoster={existingPoster}
+        />
+      )}
+
+      <EventCreationSuccessModal
+        open={successModal.open}
+        onClose={closeSuccessModal}
+        eventId={successModal.eventId}
+        variant={successModal.variant}
+      />
+    </div>
+  );
+}

@@ -11,8 +11,6 @@ function EventType() {
 
   const { user, token } = useAuth();
   const navigate = useNavigate();
-  console.log("User info in EventType:", user);
-
   const isOrganiser =
     user?.is_organiser_verified ||
     user?.roles?.includes("organiser") ||
@@ -59,8 +57,35 @@ function EventType() {
 
   if (loading) {
     return (
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:flex tw:items-center tw:justify-center">
-        <span className="tw:block">Loading...</span>
+      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
+        <div className="tw:max-w-7xl tw:mx-auto">
+          <div className="tw:flex tw:flex-col tw:gap-2 tw:mb-6">
+            <div className="tw:h-8 tw:w-52 tw:rounded-xl tw:bg-gray-200 tw:animate-pulse" />
+            <div className="tw:h-4 tw:w-72 tw:rounded-xl tw:bg-gray-200 tw:animate-pulse" />
+            <div className="tw:h-3 tw:w-96 tw:max-w-full tw:rounded-xl tw:bg-gray-200 tw:animate-pulse" />
+          </div>
+
+          <div className="tw:mt-6 tw:grid! tw:grid-cols-1 tw:sm:grid-cols-3 tw:lg:grid-cols-4 tw:gap-4 tw:pb-10">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="tw:rounded-2xl tw:bg-white tw:p-4 tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:animate-pulse"
+                style={{ borderRadius: 16 }}
+              >
+                <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                  <div className="tw:flex tw:items-center tw:gap-3 tw:flex-1">
+                    <div className="tw:h-10 tw:w-10 tw:rounded-full tw:bg-[#F4E6FD]" />
+                    <div className="tw:flex-1">
+                      <div className="tw:h-4 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+                      <div className="tw:mt-2 tw:h-3 tw:w-full tw:max-w-[150px] tw:rounded-full tw:bg-gray-100" />
+                    </div>
+                  </div>
+                  <div className="tw:h-8 tw:w-8 tw:rounded-full tw:bg-gray-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

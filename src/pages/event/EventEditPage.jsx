@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../auth/AuthContext";
-import EventCreationWizard from "./CreateEvent/EventForm"; // same wizard as Create
+import EventCreationWizard from "./CreateEvent/EventForm/EventCreationWizard"; // same wizard as Create
 
 export default function EditEvent() {
   const { eventId } = useParams();
@@ -52,7 +52,6 @@ export default function EditEvent() {
     );
   }
   const eventTypeId = event.currentEvent.eventTypeFullDetails.id
-  console.log(event, eventId, eventTypeId)
 
 
   return (
