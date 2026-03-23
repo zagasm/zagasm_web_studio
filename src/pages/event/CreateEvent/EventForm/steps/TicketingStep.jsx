@@ -1,317 +1,290 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showError } from "../../../../../component/ui/toast";
 import SelectField from "../../../../../component/form/SelectField";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
+
+const DISPLAY_CURRENCIES = [
+  {
+    value: "NGN",
+    label: "Nigerian Naira",
+    subLabel: "Minimum ticket price: ₦3,000",
+    symbol: "₦",
+    minimum: 3000,
+  },
+  {
+    value: "USD",
+    label: "US Dollar",
+    subLabel: "Minimum ticket price: $3",
+    symbol: "$",
+    minimum: 3,
+  },
+];
 
 const VISIBILITY_OPTIONS = [
   { value: "public", label: "Public" },
   { value: "private", label: "Private" },
 ];
 
+function normalizeAmountInput(rawValue) {
+  const raw = String(rawValue || "");
+  const stripped = raw.replace(/,/g, "").replace(/[^\d.]/g, "");
+
+  if (!stripped) return "";
+
+  const firstDotIndex = stripped.indexOf(".");
+  if (firstDotIndex === -1) {
+    return stripped.replace(/^0+(?=\d)/, "");
+  }
+
+  const integerPart = stripped.slice(0, firstDotIndex).replace(/^0+(?=\d)/, "");
+  const decimalPart = stripped
+    .slice(firstDotIndex + 1)
+    .replace(/\./g, "")
+    .slice(0, 2);
+
+  return `${integerPart || "0"}.${decimalPart}`;
+}
+
+function formatAmountDisplay(value) {
+  if (value === "" || value === null || value === undefined) {
+    return "";
+  }
+
+  const normalized = normalizeAmountInput(value);
+  if (!normalized) return "";
+
+  const [integerPart, decimalPart] = normalized.split(".");
+  const formattedInteger = Number(integerPart || 0).toLocaleString("en-NG");
+  return decimalPart !== undefined
+    ? `${formattedInteger}.${decimalPart}`
+    : formattedInteger;
+}
+
+function parseAmount(value) {
+  const cleaned = String(value || "").replace(/,/g, "");
+  if (!cleaned) return null;
+
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function findCurrencyByCode(currencies, code) {
+  return currencies.find((currency) => {
+    const normalizedCode = String(currency?.code || "").toUpperCase();
+    const normalizedSymbol = String(currency?.symbol || "").toUpperCase();
+    const normalizedName = String(currency?.name || "").toUpperCase();
+
+    return (
+      normalizedCode === code ||
+      normalizedSymbol === code ||
+      normalizedName.includes(code)
+    );
+  });
+}
+
 const schema = z
   .object({
-    price: z.number().min(0, "Ticket price must be at least 0"),
+    priceInput: z.string().min(1, "Enter a ticket price"),
     maxTickets: z.enum(["limited", "unlimited"]),
-    ticketLimit: z
-      .number()
-      .min(1, "Ticket limit must be at least 1")
-      .optional(),
-    currency: z.string().min(1, "Please select a currency"),
-    hasBackstage: z.boolean().optional(),
-    backstagePrice: z
-      .number()
-      .min(1, "Backstage price must be at least 1")
-      .optional(),
+    ticketLimit: z.string().optional(),
+    currencyCode: z.enum(["NGN", "USD"]),
     visibility: z.enum(["public", "private"]),
     matureContent: z.boolean(),
   })
-  .refine((d) => d.maxTickets !== "limited" || d.ticketLimit, {
-    message: "Ticket limit is required when tickets are limited",
-    path: ["ticketLimit"],
-  })
-  .refine((d) => !d.hasBackstage || !!d.backstagePrice, {
-    message: "Backstage price is required when backstage is enabled",
-    path: ["backstagePrice"],
+  .superRefine((values, ctx) => {
+    const selectedCurrency = DISPLAY_CURRENCIES.find(
+      (currency) => currency.value === values.currencyCode
+    );
+    const price = parseAmount(values.priceInput);
+
+    if (price === null || price <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["priceInput"],
+        message: "Enter a valid ticket price",
+      });
+    } else if (selectedCurrency && price < selectedCurrency.minimum) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["priceInput"],
+        message: `Minimum ticket price for ${selectedCurrency.label} is ${selectedCurrency.symbol}${selectedCurrency.minimum.toLocaleString("en-NG")}`,
+      });
+    }
+
+    if (values.maxTickets === "limited") {
+      const parsedLimit = Number(values.ticketLimit || "");
+      if (!Number.isFinite(parsedLimit) || parsedLimit < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["ticketLimit"],
+          message: "Ticket limit must be at least 1",
+        });
+      }
+    }
   });
 
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const { token } = useAuth();
   const [currencies, setCurrencies] = useState([]);
-  const [loadingCurrencies, setLoadingCurrencies] = useState(true);
-  const [suggestedCurrency, setSuggestedCurrency] = useState(null);
-
-  // FX preview state
-  const [fxPreview, setFxPreview] = useState(null); // holds API payload
-  const [fxLoading, setFxLoading] = useState(false);
-  const [fxError, setFxError] = useState(null);
 
   const {
+    control,
     handleSubmit,
     register,
-    formState: { errors },
     watch,
     setValue,
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      price: 0,
-      maxTickets: "unlimited",
-      currency: "",
-      hasBackstage: false,
-      backstagePrice: undefined,
-      visibility: "public",
-      matureContent: false,
-      ...defaultValues,
+      priceInput: formatAmountDisplay(defaultValues.price ?? 0) || "0",
+      maxTickets: defaultValues.maxTickets || "unlimited",
+      ticketLimit:
+        defaultValues.ticketLimit !== undefined &&
+        defaultValues.ticketLimit !== null
+          ? String(defaultValues.ticketLimit)
+          : "",
+      currencyCode: defaultValues.currencyCode === "USD" ? "USD" : "NGN",
+      visibility: defaultValues.visibility || "public",
+      matureContent: !!defaultValues.matureContent,
     },
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
+  const selectedCurrencyCode = watch("currencyCode");
   const maxTickets = watch("maxTickets");
-  const currencyVal = watch("currency");
-  const hasBackstage = watch("hasBackstage");
-  const priceVal = watch("price");
-  const visibilityVal = watch("visibility");
+  const visibility = watch("visibility");
+  const selectedCurrency = useMemo(
+    () =>
+      DISPLAY_CURRENCIES.find(
+        (currency) => currency.value === selectedCurrencyCode
+      ) || DISPLAY_CURRENCIES[0],
+    [selectedCurrencyCode]
+  );
 
-  // Fetch currencies
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
-        setLoadingCurrencies(true);
         const res = await api.get("/api/v1/currency", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const list = res?.data?.currencies || res?.data?.data || [];
-        if (mounted) setCurrencies(Array.isArray(list) ? list : []);
+        if (!mounted) return;
+
+        const normalized = Array.isArray(list) ? list : [];
+        setCurrencies(normalized);
+
+        if (!defaultValues.currencyCode && defaultValues.currency) {
+          const matchedById = normalized.find(
+            (currency) => String(currency.id) === String(defaultValues.currency)
+          );
+          if (matchedById?.code) {
+            const code = String(matchedById.code).toUpperCase();
+            if (code === "NGN" || code === "USD") {
+              setValue("currencyCode", code, { shouldValidate: true });
+            }
+          }
+        }
       } catch {
         showError("Failed to load currencies");
-      } finally {
-        mounted && setLoadingCurrencies(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
-  }, [token]);
+  }, [defaultValues.currency, defaultValues.currencyCode, setValue, token]);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await api.get("/api/v1/currency/suggest", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const suggestion =
-          res?.data?.suggestions?.[0] ||
-          res?.data?.data?.suggestions?.[0] ||
-          null;
-        if (mounted && suggestion) {
-          setSuggestedCurrency({
-            value: String(suggestion.id),
-            label: `${suggestion.symbol} - ${suggestion.name} (${suggestion.code})`,
-            raw: suggestion,
-          });
-        }
-      } catch (err) {
-        console.error("Currency suggestion failed", err);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [token]);
-
-  const currencyOptions = useMemo(
-    () =>
-      currencies.map((c) => ({
-        value: String(c.id),
-        label: `${c.symbol} - ${c.name} (${c.code})`,
-      })),
-    [currencies]
-  );
-
-  useEffect(() => {
-    if (currencyVal) return;
-    if (suggestedCurrency) {
-      setValue("currency", suggestedCurrency.value, { shouldValidate: true });
+  const onSubmit = (values) => {
+    const matchedCurrency = findCurrencyByCode(currencies, values.currencyCode);
+    if (!matchedCurrency?.id) {
+      showError("Currency setup is not ready yet. Please try again.");
       return;
     }
 
-    if (currencyOptions.length) {
-      setValue("currency", currencyOptions[0].value, {
-        shouldValidate: true,
-      });
-    }
-  }, [currencyOptions, currencyVal, setValue, suggestedCurrency]);
-
-  // FX rate preview: price → USD using backend endpoint
-  useEffect(() => {
-    const numericPrice =
-      typeof priceVal === "number" ? priceVal : Number(priceVal);
-
-    // reset when no currency or invalid price
-    if (
-      !currencyVal ||
-      !numericPrice ||
-      isNaN(numericPrice) ||
-      numericPrice <= 0
-    ) {
-      setFxPreview(null);
-      setFxError(null);
-      return;
-    }
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setFxLoading(true);
-        setFxError(null);
-
-        const res = await api.get("/api/v1/fx/rate-to-usd", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          params: {
-            currency_id: currencyVal,
-            price: numericPrice,
-          },
-        });
-
-        const payload = res?.data?.data || res?.data;
-        if (!cancelled) {
-          setFxPreview(payload || null);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setFxPreview(null);
-          setFxError("Could not fetch USD equivalent right now.");
-        }
-      } finally {
-        !cancelled && setFxLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currencyVal, priceVal, token]);
-
-  const onSubmit = async (vals) => {
-    // Enforce the $1 minimum using the FX endpoint result
-    const priceInUsd = fxPreview ? Number(fxPreview.price_in_usd) : null;
-
-    if (priceInUsd !== null && !isNaN(priceInUsd) && priceInUsd < 1) {
-      showError("Ticket price is below $1. Please increase the amount.");
-      return;
-    }
-
-    // If we don’t have FX data but we have a price & currency, you can either:
-    // - trust backend to enforce it, or
-    // - optionally fire a quick check here before calling onNext.
-    // For now, we let the backend double-check.
-
-    onNext(vals);
+    onNext({
+      price: parseAmount(values.priceInput) ?? 0,
+      maxTickets: values.maxTickets,
+      ticketLimit:
+        values.maxTickets === "limited"
+          ? Number(values.ticketLimit || 0)
+          : undefined,
+      currency: String(matchedCurrency.id),
+      currencyCode: values.currencyCode,
+      visibility: values.visibility,
+      matureContent: values.matureContent,
+    });
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
+      className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
     >
-      <span className="tw:block tw:text-lg tw:lg:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
-        Ticketing &amp; Pricing
-      </span>
+      <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
+        <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:lg:text-2xl">
+          Ticketing
+        </span>
+        <span className="tw:text-sm tw:text-slate-500">
+          Set pricing, ticket availability, and attendee visibility controls.
+        </span>
+      </div>
 
       <div className="tw:space-y-5">
-        {/* Ticket price + USD helper */}
-        <div>
-          <label className="tw:block tw:text-[15px] tw:mb-1">
-            Ticket Price*
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            {...register("price", { valueAsNumber: true })}
-            className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-          />
-          {errors.price && (
-            <p className="tw:text-red-500 tw:text-xs tw:mt-1">
-              {errors.price.message}
-            </p>
-          )}
+        <SelectField
+          label="Currency"
+          value={selectedCurrencyCode}
+          onChange={(value) =>
+            setValue("currencyCode", value, { shouldValidate: true })
+          }
+          options={DISPLAY_CURRENCIES}
+          error={errors?.currencyCode?.message}
+        />
 
-          {/* FX preview line */}
-          {currencyVal && priceVal > 0 && (
-            <>
-              {fxLoading && (
-                <span className="tw:block tw:text-[11px] tw:text-slate-500 tw:mt-1">
-                  Checking USD equivalent…
-                </span>
-              )}
-              {fxError && (
-                <span className="tw:block tw:text-[11px] tw:text-red-500 tw:mt-1">
-                  {fxError}
-                </span>
-              )}
-              {fxPreview && !fxError && (
-                <span className="tw:block tw:text-[11px] tw:mt-1">
-                  ≈{" "}
-                  <span className="tw:font-semibold">
-                    ${Number(fxPreview.price_in_usd || 0).toFixed(2)}
-                  </span>{" "}
-                  USD{" "}
-                  {Number(fxPreview.price_in_usd || 0) < 1 && (
-                    <span className="tw:text-amber-700 tw:ml-1">
-                      (minimum allowed is $1.00)
-                    </span>
-                  )}
-                </span>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Currency as Autocomplete combo box */}
         <div>
-          <label className="tw:block tw:text-[15px] tw:mb-1">Currency*</label>
-          <Autocomplete
-            options={currencyOptions}
-            getOptionLabel={(option) => option.label || ""}
-            value={
-              currencyOptions.find((opt) => opt.value === currencyVal) || null
-            }
-            onChange={(event, newValue) => {
-              setValue("currency", newValue ? newValue.value : "", {
-                shouldValidate: true,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder={loadingCurrencies ? "Loading…" : "Select currency"}
-                size="small"
-                error={!!errors.currency}
-                helperText={errors.currency?.message}
-              />
+          <label className="tw:mb-1 tw:block tw:text-[15px]">Ticket price</label>
+          <Controller
+            name="priceInput"
+            control={control}
+            render={({ field }) => (
+              <div className="tw:relative">
+                <span className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-sm tw:text-slate-500">
+                  {selectedCurrency.symbol}
+                </span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={field.value}
+                  onChange={(event) => {
+                    const normalized = normalizeAmountInput(event.target.value);
+                    field.onChange(normalized ? formatAmountDisplay(normalized) : "");
+                  }}
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                  placeholder={`Enter ticket price in ${selectedCurrency.label}`}
+                />
+              </div>
             )}
           />
-          {suggestedCurrency && (
-            <p className="tw:text-[11px] tw:text-gray-500 tw:mt-1">
-              Suggested for you: {suggestedCurrency.label}.
+          {errors.priceInput && (
+            <p className="tw:mt-1 tw:text-xs tw:text-red-500">
+              {errors.priceInput.message}
             </p>
           )}
         </div>
 
-        {/* Ticket availability */}
         <SelectField
-          label="Ticket Availability*"
-          value={watch("maxTickets")}
-          onChange={(v) => setValue("maxTickets", v, { shouldValidate: true })}
+          label="Ticket availability"
+          value={maxTickets}
+          onChange={(value) =>
+            setValue("maxTickets", value, { shouldValidate: true })
+          }
           options={[
             { value: "unlimited", label: "Unlimited tickets" },
             { value: "limited", label: "Limited tickets" },
@@ -321,95 +294,60 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
 
         {maxTickets === "limited" && (
           <div>
-            <label className="tw:block tw:text-[15px] tw:mb-1">
-              Total Number of Tickets*
+            <label className="tw:mb-1 tw:block tw:text-[15px]">
+              Total number of tickets
             </label>
             <input
               type="number"
               min="1"
-              {...register("ticketLimit", { valueAsNumber: true })}
-              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+              {...register("ticketLimit")}
+              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
             />
             {errors.ticketLimit && (
-              <p className="tw:text-red-500 tw:text-xs tw:mt-1">
+              <p className="tw:mt-1 tw:text-xs tw:text-red-500">
                 {errors.ticketLimit.message}
               </p>
             )}
           </div>
         )}
 
-        {/* Backstage access */}
-        <div className="tw:flex tw:items-center tw:gap-3">
-          <input
-            id="has_backstage"
-            type="checkbox"
-            {...register("hasBackstage")}
-            className="tw:h-4 tw:w-4 tw:rounded tw:border-gray-300"
-          />
-          <label
-            htmlFor="has_backstage"
-            className="tw:text-[15px] tw:select-none"
-          >
-            Offer backstage access
-          </label>
-        </div>
-
-        {hasBackstage && (
-          <div>
-            <label className="tw:block tw:text-[15px] tw:mb-1">
-              Backstage Price*
-            </label>
-            <input
-              type="number"
-              min="1"
-              {...register("backstagePrice", { valueAsNumber: true })}
-              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-            />
-            {errors.backstagePrice && (
-              <p className="tw:text-red-500 tw:text-xs tw:mt-1">
-                {errors.backstagePrice.message}
-              </p>
-            )}
-          </div>
-        )}
-
         <SelectField
-          label="Event Visibility*"
-          value={visibilityVal}
-          onChange={(v) =>
-            setValue("visibility", v, { shouldValidate: true })
+          label="Event visibility"
+          value={visibility}
+          onChange={(value) =>
+            setValue("visibility", value, { shouldValidate: true })
           }
           options={VISIBILITY_OPTIONS}
           error={errors?.visibility?.message}
         />
 
-        <div className="tw:flex tw:items-center tw:justify-between">
+        <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:px-4 tw:py-3">
           <label className="tw:text-[15px]">
             This event contains mature content
           </label>
           <input
             type="checkbox"
             {...register("matureContent")}
-            className="tw:accent-primary"
+            className="tw:h-4 tw:w-4 tw:accent-primary"
           />
         </div>
       </div>
 
-      <div className="tw:flex tw:justify-between tw:mt-6">
+      <div className="tw:mt-6 tw:flex tw:justify-between">
         <button
-          style={{ borderRadius: 20 }}
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 hover:tw:bg-gray-50"
+          className="tw:rounded-full tw:border tw:border-gray-200 tw:px-4 tw:py-2.5 hover:tw:bg-gray-50"
+          style={{ borderRadius: 20 }}
         >
           Back
         </button>
         <button
-          style={{ borderRadius: 20 }}
           type="submit"
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond"
+          style={{ borderRadius: 20 }}
         >
-          Next
+          Continue to preview
         </button>
       </div>
     </form>

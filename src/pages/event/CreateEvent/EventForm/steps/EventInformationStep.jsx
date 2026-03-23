@@ -1,349 +1,308 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import moment from "moment";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { showError } from "../../../../../component/ui/toast";
-// import SelectField from "../../../../../component/form/SelectField"; // no longer needed
-import countries from "i18n-iso-countries";
-import enLocale from "i18n-iso-countries/langs/en.json";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
+import PosterMediaFields from "./PosterMediaFields";
 
-countries.registerLocale(enLocale);
-
-const countryList = Object.entries(
-  countries.getNames("en", { select: "official" })
-).map(([code, name]) => ({ name, code }));
-
-const GENRES = [
-  "Music & Entertainment",
-  "Performance & Arts",
-  "Education / Training",
-  "Faith & Spirituality",
-  "Wellness & Lifestyle",
-  "Business & Networking",
-  "Cultural & Social",
-];
-
-const schema = z
-  .object({
-    title: z.string().min(10, "Event title must be at least 10 characters"),
-    description: z
-      .string()
-      .min(20, "Description must be at least 20 characters"),
-    location: z.string().min(1, "Please select a location"),
-    organizer: z
-      .string()
-      .min(3, "Organizer name must be at least 3 characters"),
-    genre: z.string().min(1, "Please select a genre"),
-    date: z.string().refine(
-      (v) => {
-        if (!v) return false;
-        const now = new Date();
-        const todayStart = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate()
-        );
-        const selected = new Date(v);
-        return selected.getTime() >= todayStart.getTime();
-      },
-      {
-        message: "Event date cannot be in the past",
-      }
+const schema = z.object({
+  title: z.string().min(5, "Event title must be at least 5 characters"),
+  description: z.string().min(5, "Description must be at least 5 characters"),
+  dateTime: z
+    .any()
+    .refine((value) => value && moment(value).isValid(), "Select the event date and time")
+    .refine(
+      (value) => (value ? moment(value).isAfter(moment()) : false),
+      "Event date and time must be in the future"
     ),
-    time: z.string().min(1, "Please select a time"),
-    timezone: z.string().min(1, "Please select a timezone"),
-  })
-  .superRefine((values, ctx) => {
-    const { date, time } = values;
-    if (!date || !time) return;
+});
 
-    const selected = new Date(`${date}T${time}`);
-    if (!Number.isFinite(selected.getTime())) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["time"],
-        message: "Invalid date or time",
-      });
-      return;
+function buildInitialDateTime(defaultValues) {
+  const combined = defaultValues.date && defaultValues.time
+    ? moment(`${defaultValues.date} ${defaultValues.time}`, [
+        "YYYY-MM-DD HH:mm",
+        "YYYY-MM-DD HH:mm:ss",
+      ])
+    : null;
+
+  return combined?.isValid() ? combined : null;
+}
+
+function getDefaultTimezoneId(timeZones, existingTimezone) {
+  if (existingTimezone) {
+    const byId = timeZones.find(
+      (timezone) => String(timezone.id) === String(existingTimezone)
+    );
+    if (byId?.id) {
+      return String(byId.id);
     }
 
-    if (selected.getTime() <= Date.now()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["time"],
-        message: "Event time must be in the future",
-      });
+    const byName = timeZones.find(
+      (timezone) => String(timezone.name) === String(existingTimezone)
+    );
+    if (byName?.id) {
+      return String(byName.id);
     }
-  });
+  }
+
+  const lagos = timeZones.find((timezone) => timezone.name === "Africa/Lagos");
+  if (lagos?.id) {
+    return String(lagos.id);
+  }
+
+  return timeZones[0]?.id ? String(timeZones[0].id) : "";
+}
 
 export default function EventInformationStep({
   defaultValues = {},
   onNext,
-  eventTypeId,
+  posterImages,
+  setPosterImages,
+  posterVideos,
+  setPosterVideos,
+  existingPoster,
+  setExistingPoster,
 }) {
   const { user, token } = useAuth();
   const [timeZones, setTimeZones] = useState([]);
-  const [loadingTZ, setLoadingTZ] = useState(true);
+  const [mediaError, setMediaError] = useState("");
+
   const locationDefault = defaultValues.location || "Online";
 
-  const [eventTypes, setEventTypes] = useState([]);
-  const [loadingET, setLoadingET] = useState(true);
-
   const {
+    control,
     handleSubmit,
     register,
     setValue,
     formState: { errors, isValid },
-    watch,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      title: "",
-      description: "",
+      title: defaultValues.title || "",
+      description: defaultValues.description || "",
       location: locationDefault,
-      organizer: user?.name || user?.lastName || "",
-      genre: "",
-      date: "",
-      time: "",
-      timezone: "",
-      ...defaultValues,
+      organizer:
+        defaultValues.organizer ||
+        user?.name ||
+        user?.fullName ||
+        user?.lastName ||
+        "",
+      genre: defaultValues.genre || "",
+      timezone: defaultValues.timezone || "",
+      dateTime: buildInitialDateTime(defaultValues),
     },
     mode: "onChange",
     reValidateMode: "onChange",
   });
 
-  const watchVals = watch();
-
   useEffect(() => {
-    setValue("location", locationDefault, { shouldValidate: true });
+    setValue("location", locationDefault, { shouldValidate: false });
   }, [locationDefault, setValue]);
 
-  // Time zones
+  useEffect(() => {
+    const totalPosterCount =
+      (posterImages?.length || 0) +
+      (posterVideos?.length || 0) +
+      (existingPoster?.length || 0);
+
+    if (totalPosterCount > 0 && mediaError) {
+      setMediaError("");
+    }
+  }, [existingPoster, mediaError, posterImages, posterVideos]);
+
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
-        setLoadingTZ(true);
         const res = await api.get("/api/v1/time-zone", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const list = res?.data?.timeZones || res?.data?.data || [];
-        if (mounted) setTimeZones(Array.isArray(list) ? list : []);
+        if (!mounted) return;
+
+        const normalized = Array.isArray(list) ? list : [];
+        setTimeZones(normalized);
+        const defaultTimezoneId = getDefaultTimezoneId(
+          normalized,
+          defaultValues.timezone
+        );
+        if (defaultTimezoneId) {
+          setValue("timezone", defaultTimezoneId, {
+            shouldValidate: false,
+          });
+        }
       } catch {
         showError("Error fetching timezones");
-      } finally {
-        mounted && setLoadingTZ(false);
       }
     })();
-    return () => (mounted = false);
-  }, [token]);
 
-  // Build options
-  const tzOptions = useMemo(
+    return () => {
+      mounted = false;
+    };
+  }, [defaultValues.timezone, setValue, token]);
+
+  const timeZoneOptions = useMemo(
     () =>
       timeZones.map((tz) => ({
-        value: tz.id || tz.value || tz.name,
-        label: `${tz.name || tz.label}${
+        value: String(tz.id || tz.value || tz.name || ""),
+        label: `${tz.name || tz.label || ""}${
           tz.gmt_offset ? ` (GMT ${tz.gmt_offset})` : ""
         }`,
       })),
     [timeZones]
   );
 
-  useEffect(() => {
-    if (!tzOptions.length || watchVals.timezone) return;
-    const first = tzOptions[0]?.value;
-    if (first) {
-      setValue("timezone", first, { shouldValidate: true });
+  const onSubmit = (values) => {
+    const totalPosterCount =
+      (posterImages?.length || 0) +
+      (posterVideos?.length || 0) +
+      (existingPoster?.length || 0);
+
+    if (totalPosterCount === 0) {
+      setMediaError("Add at least one event poster image or promo video.");
+      return;
     }
-  }, [tzOptions, setValue, watchVals.timezone]);
 
-  const typeOptions = useMemo(
-    () => eventTypes.map((t) => ({ value: t.id, label: t.name })),
-    [eventTypes]
-  );
+    const dateTime = moment(values.dateTime);
+    const timezone = getDefaultTimezoneId(
+      timeZones,
+      values.timezone || defaultValues.timezone
+    );
+    if (!timezone) {
+      showError("Timezone setup is not ready yet. Please wait a moment.");
+      return;
+    }
 
-  const countryOptions = useMemo(
-    () => countryList.map((c) => ({ value: c.name, label: c.name })),
-    []
-  );
+    const timezoneLabel =
+      timeZoneOptions.find((option) => option.value === String(timezone))
+        ?.label || "";
 
-  const genreOptions = useMemo(
-    () => GENRES.map((g) => ({ value: g, label: g })),
-    []
-  );
-
-  const onSubmit = (values) => onNext(values);
+    onNext({
+      ...values,
+      location: locationDefault,
+      organizer:
+        values.organizer ||
+        defaultValues.organizer ||
+        user?.name ||
+        user?.fullName ||
+        user?.lastName ||
+        "",
+      genre: defaultValues.genre || "",
+      timezone,
+      timezone_label: timezoneLabel,
+      date: dateTime.format("YYYY-MM-DD"),
+      time: dateTime.format("HH:mm"),
+    });
+  };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="tw:bg-white tw:rounded-2xl tw:p-5 tw:sm:p-7 tw:border tw:border-gray-100"
-    >
-      <span className="tw:block tw:text-lg tw:md:text-2xl tw:sm:text-lg tw:font-semibold tw:mb-5">
-        Basic event details
-      </span>
-
-      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-5">
-        {/* Title */}
-        <div className="tw:md:col-span-2">
-          <span className="tw:block tw:text-[15px] tw:mb-1">Event Title</span>
-          <input
-            {...register("title")}
-            placeholder="Enter event title"
-            className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-          />
-          {errors.title && (
-            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
-              {errors.title.message}
-            </span>
-          )}
-        </div>
-
-        {/* Description */}
-        <div className="tw:md:col-span-2">
-          <span className="tw:block tw:text-[15px] tw:mb-1">Description*</span>
-          <textarea
-            {...register("description")}
-            rows={4}
-            placeholder="Describe your event in detail"
-            className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-          />
-          {errors.description && (
-            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
-              {errors.description.message}
-            </span>
-          )}
-        </div>
-
-        {/* Location field intentionally hidden—set to Online by default */}
-        <input
-          type="hidden"
-          value={locationDefault}
-          {...register("location")}
-        />
-
-        {/* Organizer */}
-        <div>
-          <span className="tw:block tw:text-[15px] tw:mb-1">
-            Organizer’s Name
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="tw:rounded-4xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
+      >
+        <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
+          <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:md:text-2xl">
+            Event details
           </span>
-          <input
-            {...register("organizer")}
-            readOnly
-            className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-[15px]"
-          />
-          {errors.organizer && (
-            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
-              {errors.organizer.message}
-            </span>
-          )}
+          <span className="tw:text-sm tw:text-slate-500">
+            Add the core event information and upload the media attendees will
+            see first.
+          </span>
         </div>
 
-        {/* Genre as Autocomplete */}
-        <div>
-          <span className="tw:block tw:text-[15px] tw:mb-1">Genre*</span>
-          <Autocomplete
-            options={genreOptions}
-            getOptionLabel={(option) => option.label || ""}
-            value={
-              genreOptions.find((opt) => opt.value === watchVals.genre) || null
-            }
-            onChange={(event, newValue) => {
-              setValue("genre", newValue ? newValue.value : "", {
-                shouldValidate: true,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Select Genre"
-                size="small"
-                error={!!errors.genre}
-                helperText={errors.genre?.message}
+        <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[minmax(0,0.95fr)_minmax(340px,1.05fr)]">
+          <div className="tw:space-y-5">
+            <div>
+              <span className="tw:mb-1 tw:block tw:text-[15px]">Event title</span>
+              <input
+                {...register("title")}
+                placeholder="Enter event title"
+                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
               />
-            )}
-          />
-        </div>
+              {errors.title && (
+                <span className="tw:mt-1 tw:block tw:text-xs tw:text-red-500">
+                  {errors.title.message}
+                </span>
+              )}
+            </div>
 
-        {/* Date */}
-        <div>
-          <span className="tw:block tw:text-[15px] tw:mb-1">Event Date*</span>
-          <input
-            type="date"
-            min={new Date().toISOString().split("T")[0]}
-            {...register("date")}
-            className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-          />
-          {errors.date && (
-            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
-              {errors.date.message}
-            </span>
-          )}
-        </div>
-
-        {/* Time */}
-        <div>
-          <span className="tw:block tw:text-[15px] tw:mb-1">Event Time*</span>
-          <input
-            type="time"
-            {...register("time")}
-            className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
-          />
-          {errors.time && (
-            <span className="tw:block tw:text-red-500 tw:text-xs tw:mt-1">
-              {errors.time.message}
-            </span>
-          )}
-        </div>
-
-        {/* Timezone Autocomplete */}
-        <div className="tw:md:col-span-2">
-          <span className="tw:block tw:text-[15px] tw:mb-1">Timezone*</span>
-          <Autocomplete
-            options={tzOptions}
-            getOptionLabel={(option) => option.label || ""}
-            value={
-              tzOptions.find((opt) => opt.value === watchVals.timezone) || null
-            }
-            onChange={(event, newValue) => {
-              setValue("timezone", newValue ? newValue.value : "", {
-                shouldValidate: true,
-              });
-            }}
-            disabled
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder={loadingTZ ? "Loading…" : "Timezone locked"}
-                size="small"
-                error={!!errors.timezone}
-                helperText={errors.timezone?.message}
+            <div>
+              <span className="tw:mb-1 tw:block tw:text-[15px]">Description</span>
+              <textarea
+                {...register("description")}
+                rows={7}
+                placeholder="Describe your event in detail"
+                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
               />
-            )}
-          />
-          {tzOptions[0] && (
-            <p className="tw:mt-2 tw:text-[11px] tw:text-gray-500">
-              Your Timezone is fixed to {tzOptions[0].label}.
-            </p>
-          )}
-        </div>
-      </div>
+              {errors.description && (
+                <span className="tw:mt-1 tw:block tw:text-xs tw:text-red-500">
+                  {errors.description.message}
+                </span>
+              )}
+            </div>
 
-      <div className="tw:flex tw:justify-end tw:mt-6">
-        <button
-          style={{ borderRadius: 20 }}
-          type="submit"
-          disabled={!isValid}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
-        >
-          Next
-        </button>
-      </div>
-    </form>
+            <div>
+              <span className="tw:mb-1 tw:block tw:text-[15px]">
+                Event date & time
+              </span>
+              <Controller
+                name="dateTime"
+                control={control}
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value}
+                    onChange={(newValue) => field.onChange(newValue)}
+                    disablePast
+                    ampm
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        size: "small",
+                        error: !!errors.dateTime,
+                        helperText: errors.dateTime?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          <input type="hidden" value={locationDefault} {...register("location")} />
+          <input type="hidden" {...register("organizer")} />
+          <input type="hidden" {...register("genre")} />
+          <input type="hidden" {...register("timezone")} />
+
+          <PosterMediaFields
+            posterImages={posterImages}
+            setPosterImages={setPosterImages}
+            posterVideos={posterVideos}
+            setPosterVideos={setPosterVideos}
+            existingPoster={existingPoster}
+            setExistingPoster={setExistingPoster}
+            error={mediaError}
+          />
+        </div>
+
+        <div className="tw:mt-6 tw:flex tw:justify-end">
+          <button
+            type="submit"
+            disabled={!isValid}
+            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+            style={{ borderRadius: 20 }}
+          >
+            Continue to ticketing
+          </button>
+        </div>
+      </form>
+    </LocalizationProvider>
   );
 }

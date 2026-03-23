@@ -24,13 +24,11 @@ export default function BlurBackdrop() {
   const blob3Y = useTransform(sy, (v) => v * -0.02);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
     const onMove = (e) => {
-      const rect = el.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
+      const width = window.innerWidth || 0;
+      const height = window.innerHeight || 0;
+      const x = e.clientX - width / 2;
+      const y = e.clientY - height / 2;
       mx.set(x);
       my.set(y);
     };
@@ -40,11 +38,11 @@ export default function BlurBackdrop() {
       my.set(0);
     };
 
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerleave", onLeave);
     return () => {
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerleave", onLeave);
     };
   }, [mx, my]);
 
@@ -52,7 +50,7 @@ export default function BlurBackdrop() {
     <div
       ref={containerRef}
       aria-hidden
-      className="tw:absolute tw:inset-0 tw:overflow-hidden"
+      className="tw:pointer-events-none tw:absolute tw:inset-0 tw:overflow-hidden"
     >
       {/* existing blob layers (animated via CSS keyframes) */}
       <motion.div className="blob blob-1" style={{ x: blob1X, y: blob1Y }} />

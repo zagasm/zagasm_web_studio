@@ -1,6 +1,6 @@
 import SideBarNav from '../../pageAssets/SideBarNav';
 import RightBarComponent from '../../../component/RightBarComponent';
-import EventCreationWizard from './EventForm';
+import EventCreationWizard from './EventForm/EventCreationWizard';
 import SEO from '../../../component/SEO';
 import { useParams } from 'react-router-dom';
 

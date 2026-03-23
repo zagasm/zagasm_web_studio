@@ -66,14 +66,16 @@ import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
 import EventEditPage from "./pages/event/EventEditPage.jsx";
-import DisableRightClick from "./component/DisableRightClick.jsx";
+// import DisableRightClick from "./component/DisableRightClick.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
+import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
 import SignalDeck from "./pages/SignalDeck/index.jsx";
 import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
+import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
 
 const MainLayout = () => (
   <>
@@ -252,7 +254,7 @@ export function App() {
       <NetworkStatus />
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
-      <DisableRightClick />
+      {/* <DisableRightClick /> */}
       <Routes>
         <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
@@ -304,6 +306,7 @@ export function App() {
             <Route path="/event" element={<Event />}>
               <Route path="view/share/:slug" element={<EventShareRedirect />} />
               <Route path="view/:eventId" element={<ViewEvent />} />
+              <Route path="stream/:eventId" element={<EventStreamControlPage />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
               <Route path="select-event-type" element={<EventType />} />
               <Route
@@ -322,6 +325,10 @@ export function App() {
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
               <Route path="fund-wallet" element={<FundWalletPage />} />
               <Route path="payouts" element={<AccountPayouts />} />
+              <Route
+                path="payouts/history"
+                element={<AccountPayoutHistory />}
+              />
               <Route
                 path="manage-notification"
                 element={<AccountNotification />}

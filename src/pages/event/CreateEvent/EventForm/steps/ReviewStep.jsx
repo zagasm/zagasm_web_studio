@@ -1,8 +1,103 @@
-import React from "react";
+import React, { useMemo } from "react";
+import moment from "moment";
 import {
   flattenLaravelErrors,
   prettifyPath,
 } from "../../../../../utils/helpers";
+import { currencySymbol, formatMoney } from "../../../../../utils/pricingHelpers";
+
+function PreviewMedia({ posterImages, posterVideos, existingPoster }) {
+  const imagePreviewUrls = useMemo(
+    () =>
+      posterImages.map((file) => ({
+        name: file.name,
+        url: URL.createObjectURL(file),
+      })),
+    [posterImages]
+  );
+
+  const videoPreviewUrls = useMemo(
+    () =>
+      posterVideos.map((file) => ({
+        name: file.name,
+        url: URL.createObjectURL(file),
+      })),
+    [posterVideos]
+  );
+
+  React.useEffect(() => {
+    return () => {
+      imagePreviewUrls.forEach((item) => URL.revokeObjectURL(item.url));
+      videoPreviewUrls.forEach((item) => URL.revokeObjectURL(item.url));
+    };
+  }, [imagePreviewUrls, videoPreviewUrls]);
+
+  const mediaItems = [
+    ...(existingPoster || []).map((item) => ({
+      type: item.type,
+      url: item.url,
+      name: item.type,
+      existing: true,
+    })),
+    ...imagePreviewUrls.map((item) => ({
+      type: "image",
+      ...item,
+      existing: false,
+    })),
+    ...videoPreviewUrls.map((item) => ({
+      type: "video",
+      ...item,
+      existing: false,
+    })),
+  ];
+
+  if (!mediaItems.length) {
+    return (
+      <div className="tw:flex tw:h-48 tw:items-center tw:justify-center tw:rounded-[28px] tw:border tw:border-dashed tw:border-gray-200 tw:bg-slate-50 tw:text-sm tw:text-slate-500">
+        No poster media added yet.
+      </div>
+    );
+  }
+
+  return (
+    <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2 tw:xl:grid-cols-3">
+      {mediaItems.map((item, index) => (
+        <figure
+          key={`${item.type}-${item.name}-${index}`}
+          className="tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-gray-100 tw:bg-white tw:shadow-sm"
+        >
+          <div className="tw:relative">
+            {item.type === "image" ? (
+              <img
+                src={item.url}
+                alt={item.name || `poster-${index}`}
+                className="tw:h-52 tw:w-full  tw:object-cover"
+              />
+            ) : (
+              <video
+                src={item.url}
+                controls
+                className="tw:h-52 tw:w-full tw:bg-black tw:object-cover"
+              />
+            )}
+
+            <span className="tw:absolute tw:left-3 tw:top-3 tw:rounded-full tw:bg-black/65 tw:px-2.5 tw:py-1 tw:text-[11px] tw:uppercase tw:text-white">
+              {item.type}
+            </span>
+            {item.existing && (
+              <span className="tw:absolute tw:right-3 tw:top-3 tw:rounded-full tw:bg-white tw:px-2.5 tw:py-1 tw:text-[11px] tw:text-slate-700">
+                Existing
+              </span>
+            )}
+          </div>
+          <figcaption className="tw:truncate tw:px-3 tw:py-2 tw:text-xs tw:text-slate-500">
+            {item.name || item.type}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
 
 export default function ReviewStep({
   collected,
@@ -10,63 +105,54 @@ export default function ReviewStep({
   isSubmitting,
   onBack,
   onPublish,
-  timezoneLabel,
-  performers,
   onGoToStep,
   posterImages = [],
   posterVideos = [],
+  existingPoster = [],
 }) {
   const {
     title,
-    organizer,
     date,
     time,
     location,
-    genre,
     description,
     price,
-    currency,
+    currencyCode,
     maxTickets,
     ticketLimit,
-    streamingOption,
-    enableReplay,
-    streamingDuration,
     visibility,
     matureContent,
-    hasBackstage,
-    backstagePrice,
   } = collected || {};
 
-
-  const flat = React.useMemo(
+  const flat = useMemo(
     () => flattenLaravelErrors(formErrors),
     [formErrors]
   );
-  const needPoster = Boolean(formErrors?.step_3?.poster?.length);
 
-  const hasImages = Array.isArray(posterImages) && posterImages.length > 0;
-  const hasVideos = Array.isArray(posterVideos) && posterVideos.length > 0;
-  const hasAnyPoster = hasImages || hasVideos;
+  const currencyMark = currencySymbol(currencyCode || "NGN");
+  const dateLabel =
+    date && time
+      ? moment(`${date} ${time}`, "YYYY-MM-DD HH:mm").format("dddd, MMMM D, YYYY [at] h:mm A")
+      : "Date and time not set";
 
   return (
-    <div className="tw:bg-white tw:rounded-2xl tw:p-4 tw:sm:p-6 tw:border tw:border-gray-100">
+    <div className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7">
       {!!flat.length && (
-        <div className="tw:mb-4 tw:rounded-xl tw:bg-red-50 tw:border tw:border-red-200 tw:p-3">
-          <div className="tw:text-sm tw:text-red-700 tw:font-medium">
+        <div className="tw:mb-5 tw:rounded-[24px] tw:border tw:border-red-200 tw:bg-red-50 tw:p-4">
+          <div className="tw:text-sm tw:font-medium tw:text-red-700">
             Please fix the errors below:
           </div>
-          <ul className="tw:text-sm tw:text-red-700 tw:mt-1 tw:list-disc tw:list-inside tw:space-y-1">
+          <ul className="tw:mt-2 tw:list-inside tw:list-disc tw:space-y-1 tw:text-sm tw:text-red-700">
             {flat.map(({ path, messages }) => (
               <li key={path}>
                 <button
                   type="button"
-                  className="tw:underline tw:underline-offset-2 tw:text-red-700 tw:hover:text-red-800"
+                  className="tw:text-red-700 tw:underline tw:underline-offset-2 hover:tw:text-red-800"
                   onClick={() => {
                     const match = path.match(/^step_(\d+)/);
                     if (!match || !onGoToStep) return;
-                    const rawStep = Number(match[1]);
-                    const resolvedStep = rawStep >= 3 ? 3 : rawStep;
-                    onGoToStep(resolvedStep);
+                    const step = Math.min(3, Math.max(1, Number(match[1])));
+                    onGoToStep(step);
                   }}
                 >
                   {prettifyPath(path)}:
@@ -78,260 +164,162 @@ export default function ReviewStep({
         </div>
       )}
 
-      {needPoster && (
-        <div className="tw:bg-yellow-50 tw:border tw:border-yellow-200 tw:text-yellow-800 tw:text-sm tw:rounded-xl tw:p-3 tw:mb-4">
-          Add at least one <b>poster</b> in <b>Media</b>.
-        </div>
-      )}
+      <div className="tw:mb-6 tw:overflow-hidden tw:rounded-[28px] tw:bg-linear-to-br tw:from-[#1f1536] tw:via-[#33165e] tw:to-[#7b1be0] tw:p-6 tw:text-white">
+        <div className="tw:flex tw:flex-col tw:gap-6 tw:lg:flex-row tw:lg:items-end tw:lg:justify-between">
+          <div className="tw:max-w-2xl">
+            <div className="tw:inline-flex tw:rounded-full tw:bg-white/10 tw:px-3 tw:py-1 tw:text-[11px] tw:uppercase tw:tracking-[0.2em]">
+              Final preview
+            </div>
+            <span className="tw:block tw:mt-3 tw:text-2xl tw:font-semibold tw:md:text-4xl">
+              {title || "Untitled event"}
+            </span>
+            <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:text-white/80 tw:md:text-base">
+              {description || "Add a short description to tell attendees what to expect."}
+            </p>
+          </div>
 
-      {/* ✅ Poster Media (images + videos) */}
-      <section className="tw:mb-6">
-        <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">
-            Poster Media{" "}
-            {hasAnyPoster && (
-              <span className="tw:text-gray-500 tw:font-normal tw:ml-1">
-                (
-                {hasImages
-                  ? `${posterImages.length} image${posterImages.length > 1 ? "s" : ""
-                  }`
-                  : ""}
-                {hasImages && hasVideos ? ", " : ""}
-                {hasVideos
-                  ? `${posterVideos.length} video${posterVideos.length > 1 ? "s" : ""
-                  }`
-                  : ""}
-                )
-              </span>
-            )}
-          </span>
-          <button
-            type="button"
-            className="tw:text-primary"
-            onClick={() => onGoToStep?.(2)}
-          >
-            Edit
-          </button>
+          <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
+            <div className="tw:rounded-2xl tw:border tw:border-white/15 tw:bg-white/10 tw:px-4 tw:py-3 tw:backdrop-blur">
+              <div className="tw:text-xs tw:text-white/60">Date & time</div>
+              <div className="tw:mt-1 tw:text-sm tw:font-medium">{dateLabel}</div>
+            </div>
+            <div className="tw:rounded-2xl tw:border tw:border-white/15 tw:bg-white/10 tw:px-4 tw:py-3 tw:backdrop-blur">
+              <div className="tw:text-xs tw:text-white/60">Ticket price</div>
+              <div className="tw:mt-1 tw:text-sm tw:font-medium">
+                {currencyMark}
+                {formatMoney(Number(price || 0))}
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {!hasAnyPoster ? (
-          <div className="tw:h-40 tw:flex tw:flex-col tw:items-center tw:justify-center tw:rounded-xl tw:bg-gray-50 tw:text-gray-500">
-            No posters added yet
+      <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[1.15fr_0.85fr]">
+        <section className="tw:space-y-4">
+          <div className="tw:flex tw:items-center tw:justify-between">
+            <div>
+              <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                Poster media
+              </div>
+              <div className="tw:text-sm tw:text-slate-500">
+                Review the images and videos that will represent this event.
+              </div>
+            </div>
             <button
               type="button"
-              className="tw:mt-2 tw:text-primary tw:underline"
-              onClick={() => onGoToStep?.(2)}
-            >
-              Add posters
-            </button>
-          </div>
-        ) : (
-          <div className="tw:space-y-4">
-            {hasImages && (
-              <div>
-                <div className="tw:text-xs tw:text-gray-500 tw:mb-2">
-                  Images
-                </div>
-                <div className="tw:grid tw:grid-cols-2 tw:sm:grid-cols-3 tw:md:grid-cols-4 tw:gap-3">
-                  {posterImages.map((f, i) => (
-                    <figure
-                      key={`img-${i}-${f.name}`}
-                      className="tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-white tw:shadow-sm"
-                    >
-                      <img
-                        src={URL.createObjectURL(f)}
-                        alt={f.name || `poster-image-${i}`}
-                        className="tw:w-full tw:h-40 tw:object-cover"
-                      />
-                      <figcaption className="tw:text-[11px] tw:text-gray-600 tw:px-2 tw:py-1 tw:truncate">
-                        {f.name || "image"}
-                      </figcaption>
-                    </figure>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {hasVideos && (
-              <div>
-                <div className="tw:text-xs tw:text-gray-500 tw:mb-2">
-                  Videos
-                </div>
-                <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:md:grid-cols-3 tw:gap-3">
-                  {posterVideos.map((f, i) => (
-                    <figure
-                      key={`vid-${i}-${f.name}`}
-                      className="tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-200 tw:bg-white tw:shadow-sm"
-                    >
-                      <video
-                        src={URL.createObjectURL(f)}
-                        controls
-                        className="tw:w-full tw:h-44 tw:bg-black tw:object-contain"
-                      />
-                      <figcaption className="tw:text-[11px] tw:text-gray-600 tw:px-2 tw:py-1 tw:truncate">
-                        {f.name || "video"}
-                      </figcaption>
-                    </figure>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* Performers */}
-      {performers?.length > 0 && (
-        <section className="tw:mb-6">
-          <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-            <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Guest Performers</span>
-            <button
-              type="button"
-              className="tw:text-primary"
-              onClick={() => onGoToStep?.(2)}
+              className="tw:text-sm tw:text-primary"
+              onClick={() => onGoToStep?.(1)}
             >
               Edit
             </button>
           </div>
-          <div className="tw:grid tw:grid-cols-3 tw:sm:grid-cols-4 tw:md:grid-cols-6 tw:gap-3">
-            {performers.map((p) => (
-              <div key={p.id} className="tw:text-center">
-                <div className="tw:h-20 tw:w-20 tw:mx-auto tw:rounded-full tw:overflow-hidden tw:bg-gray-100 tw:flex tw:items-center tw:justify-center">
-                  {p.image ? (
-                    <img
-                      src={URL.createObjectURL(p.image)}
-                      className="tw:h-full tw:w-full tw:object-cover"
-                      alt={p.name || "Performer"}
-                    />
-                  ) : (
-                    <span className="tw:text-gray-400">👤</span>
-                  )}
-                </div>
-                <div className="tw:text-xs tw:mt-1 tw:truncate">
-                  {p.name || "Unnamed"}
-                </div>
-                {p.user_name && (
-                  <div className="tw:text-[11px] tw:text-gray-500 tw:truncate">
-                    {p.user_name}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+
+          <PreviewMedia
+            posterImages={posterImages}
+            posterVideos={posterVideos}
+            existingPoster={existingPoster}
+          />
         </section>
-      )}
 
-      {/* Details */}
-      <section className="tw:mb-6">
-        <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Event Details</span>
-          <button
-            type="button"
-            className="tw:text-primary"
-            onClick={() => onGoToStep?.(1)}
-          >
-            Edit
-          </button>
-        </div>
-        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Title</div>
-            <div>{title || "—"}</div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Organizer</div>
-            <div>{organizer || "—"}</div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Date & Time</div>
-            <div>
-              {date ? new Date(date).toLocaleDateString() : "—"}{" "}
-              {time ? `at ${time}` : ""}
-              <div className="tw:text-xs tw:text-gray-500">{timezoneLabel}</div>
+        <div className="tw:space-y-4">
+          <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:p-5">
+            <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between">
+              <div>
+                <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                  Event summary
+                </div>
+                <div className="tw:text-sm tw:text-slate-500">
+                  Core details attendees will care about.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="tw:text-sm tw:text-primary"
+                onClick={() => onGoToStep?.(1)}
+              >
+                Edit
+              </button>
             </div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Location</div>
-            <div>{location || "—"}</div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Genre</div>
-            <div>{genre || "—"}</div>
-          </div>
-          <div className="tw:md:col-span-2">
-            <div className="tw:text-xs tw:text-gray-500">Description</div>
-            <div>{description || "—"}</div>
-          </div>
-        </div>
-      </section>
 
-      {/* Ticketing */}
-      <section className="tw:mb-6">
-        <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Ticketing</span>
-          <button
-            type="button"
-            className="tw:text-primary"
-            onClick={() => onGoToStep?.(3)}
-          >
-            Edit
-          </button>
-        </div>
-        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Availability</div>
-            <div className="tw:capitalize">
-              {maxTickets === "limited"
-                ? `Limited (${ticketLimit || "?"})`
-                : "Unlimited"}
+            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2">
+              <div>
+                <div className="tw:text-xs tw:text-slate-500">Title</div>
+                <div className="tw:mt-1 tw:text-sm tw:font-medium tw:text-slate-900">
+                  {title || "—"}
+                </div>
+              </div>
+              <div>
+                <div className="tw:text-xs tw:text-slate-500">Location</div>
+                <div className="tw:mt-1 tw:text-sm tw:font-medium tw:text-slate-900">
+                  {location || "Online"}
+                </div>
+              </div>
+              <div className="tw:sm:col-span-2">
+                <div className="tw:text-xs tw:text-slate-500">Description</div>
+                <div className="tw:mt-1 tw:text-sm tw:text-slate-700">
+                  {description || "—"}
+                </div>
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Price</div>
-            <div>
-              {typeof price === "number" ? price.toFixed(2) : price || "0.00"}
-            </div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Backstage</div>
-            <div>
-              {hasBackstage
-                ? `Yes${backstagePrice ? ` - ${backstagePrice}` : ""}`
-                : "No"}
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* Access */}
-      <section className="tw:mb-2">
-        <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
-          <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold">Access & Visibility</span>
-          <button
-            type="button"
-            className="tw:text-primary"
-            onClick={() => onGoToStep?.(4)}
-          >
-            Edit
-          </button>
-        </div>
-        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Visibility</div>
-            <div className="tw:capitalize">{visibility || "public"}</div>
-          </div>
-          <div>
-            <div className="tw:text-xs tw:text-gray-500">Mature Content</div>
-            <div>{matureContent ? "Yes" : "No"}</div>
-          </div>
-        </div>
-      </section>
+          <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-white tw:p-5">
+            <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between">
+              <div>
+                <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                  Ticketing summary
+                </div>
+                <div className="tw:text-sm tw:text-slate-500">
+                  Pricing, capacity, and attendee access.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="tw:text-sm tw:text-primary"
+                onClick={() => onGoToStep?.(2)}
+              >
+                Edit
+              </button>
+            </div>
 
-      <div className="tw:flex tw:justify-between tw:mt-6">
+            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2">
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Price</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {currencyMark}
+                  {formatMoney(Number(price || 0))}
+                </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Availability</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {maxTickets === "limited"
+                    ? `${formatMoney(Number(ticketLimit || 0))} tickets`
+                    : "Unlimited tickets"}
+                </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Visibility</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:capitalize tw:text-slate-900">
+                  {visibility || "public"}
+                </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Mature content</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {matureContent ? "Yes" : "No"}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div className="tw:mt-6 tw:flex tw:justify-between">
         <button
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
+          className="tw:rounded-full tw:border tw:border-gray-200 tw:px-4 tw:py-2.5 tw:hover:bg-gray-50"
           style={{ borderRadius: 20 }}
         >
           Back
@@ -340,10 +328,10 @@ export default function ReviewStep({
           type="button"
           onClick={onPublish}
           disabled={isSubmitting}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white tw:hover:bg-primarySecond tw:disabled:opacity-70"
+          className="tw:rounded-full tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-white disabled:tw:opacity-70"
           style={{ borderRadius: 20 }}
         >
-          {isSubmitting ? "Submitting..." : "Submit Event"}
+          {isSubmitting ? "Submitting..." : "Submit event"}
         </button>
       </div>
     </div>

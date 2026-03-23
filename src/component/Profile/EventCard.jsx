@@ -5,7 +5,6 @@ import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
 import MediaCarousel from "./MediaCarousel";
-import StartStreamAppDownloadModal from "../Events/StartStreamAppDownloadModal";
 import DeleteConfirmModal from "../DeleteConfirmModal";
 
 function collectMedia(poster = []) {
@@ -24,10 +23,14 @@ function getApiErrorMessage(err) {
   return "Something went wrong. Please try again.";
 }
 
-export default function EventCard({ event, isOrganiserProfile, onDeleted }) {
+export default function EventCard({
+  event,
+  isOwnProfile,
+  isOrganiserProfile,
+  onDeleted,
+}) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
-  const [openModal, setOpenModal] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -36,13 +39,14 @@ export default function EventCard({ event, isOrganiserProfile, onDeleted }) {
   const { token } = useAuth();
   const navigate = useNavigate();
 
-  const goToStreaming = () => {
-    navigate(`/creator/channel/new?eventId=${event.id}`);
+  const isOwnerEvent = Boolean(event?.isOwner || isOwnProfile);
+
+  const goToEvent = () => {
+    navigate(`/event/view/${event.id}`);
   };
 
-  const onCreateChannel = async () => {
-    setOpenModal(true);
-    return;
+  const goToStreamControl = () => {
+    navigate(`/event/stream/${event.id}`);
   };
 
   const toggleSave = async () => {
@@ -120,15 +124,15 @@ export default function EventCard({ event, isOrganiserProfile, onDeleted }) {
         </div>
       )}
 
-      {/* Clickable media/title section navigates to streaming page */}
-      <div className="tw:cursor-pointer" onClick={goToStreaming}>
+      {/* Clickable media/title section navigates to event page */}
+      <div className="tw:cursor-pointer" onClick={goToEvent}>
         <MediaCarousel items={media} alt={event.title} />
       </div>
 
       <div className="tw:p-5 tw:space-y-2">
         <div className="tw:flex tw:items-start tw:gap-2">
           <div
-            onClick={goToStreaming}
+            onClick={goToEvent}
             className="tw:uppercase tw:text-left tw:block tw:text-lg tw:text-black tw:font-semibold tw:flex-1"
           >
             {event.title}
@@ -192,43 +196,32 @@ export default function EventCard({ event, isOrganiserProfile, onDeleted }) {
         </div>
 
         {/* CTA */}
-        {isOrganiserProfile ? (
+        {isOwnerEvent ? (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onCreateChannel();
+              goToStreamControl();
             }}
             className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
-            <span className="tw:mr-2">Join event</span>
+            <span className="tw:mr-2">
+              {event?.status === "live" ? "Manage live stream" : "Start stream"}
+            </span>
           </button>
         ) : (
-          !event.srt_ingest_url && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCreateChannel();
-              }}
-              className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="tw:size-4"
-              >
-                <path d="M4.5 4.5a3 3 0 0 0-3 3v9a3 3 0 0 0 3 3h8.25a3 3 0 0 0 3-3v-9a3 3 0 0 0-3-3H4.5ZM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06Z" />
-              </svg>
-              <span className="tw:mr-2">Start Streaming Now</span>
-            </button>
-          )
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              goToEvent();
+            }}
+            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
+          >
+            <span className="tw:mr-2">
+              {isOrganiserProfile ? "Join event" : "View event"}
+            </span>
+          </button>
         )}
       </div>
-
-      <StartStreamAppDownloadModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-      />
 
       <DeleteConfirmModal
         open={openDelete}
