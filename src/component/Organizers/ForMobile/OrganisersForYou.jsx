@@ -23,6 +23,7 @@ export default function MobileSingleOrganizers() {
 
   const getInitials = (organizer) => {
     const name =
+      organizer.userName ||
       organizer.organiser ||
       [organizer.firstName, organizer.lastName].filter(Boolean).join(" ") ||
       "";
@@ -52,10 +53,12 @@ export default function MobileSingleOrganizers() {
     try {
       setLoadingList(true);
 
-      const res = await api.get(
-        "/api/v1/organiser/for-you/get",
-        authHeaders(token)
-      );
+      const res = await api.get("/api/v1/organiser/for-you/get", {
+        params: {
+          per_page: 20,
+        },
+        ...authHeaders(token),
+      });
 
       const list = Array.isArray(res?.data?.data) ? res.data.data : [];
 
@@ -177,6 +180,7 @@ export default function MobileSingleOrganizers() {
             const followUserId = getFollowId(organizer);
 
             const name =
+              organizer.userName ||
               organizer.organiser ||
               [organizer.firstName, organizer.lastName]
                 .filter(Boolean)

@@ -164,9 +164,9 @@ export default function SetPasswordModal({ open, onClose }) {
               >
                 <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-2xl tw:bg-white tw:shadow-2xl tw:border tw:border-gray-100 tw:p-4 tw:sm:p-6">
                   {/* Header */}
-                  <Dialog.Title className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-gray-900">
+                  <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-gray-900">
                     Set Password
-                  </Dialog.Title>
+                  </span>
                   <p className="tw:mt-1 tw:text-sm tw:text-gray-500">
                     Keep your account secure by choosing a strong password.
                   </p>

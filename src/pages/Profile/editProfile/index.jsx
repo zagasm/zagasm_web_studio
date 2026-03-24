@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../../auth/AuthContext";
 import default_profilePicture from "../../../assets/avater_pix.avif";
 import SetPasswordModal from "../../../component/Profile/SetPasswordModal";
+import SetUsernameModal from "../../../component/Profile/SetUsernameModal";
 import { showSuccess, showError } from "../../../component/ui/toast";
 import { ChevronLeft } from "lucide-react";
 import ProfileInfoCard from "./ProfileInfoCard";
@@ -13,7 +14,7 @@ import { api, authHeaders } from "../../../lib/apiClient"; // ✅ use axios inst
 function EditProfile() {
   const { user, login, token } = useAuth();
 
-  console.log(user);
+  // console.log(user);
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [recoveryPhoneNumber, setRecoveryPhoneNumber] = useState("");
@@ -25,7 +26,12 @@ function EditProfile() {
   const [uploading, setUploading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
+  const [usernameOpen, setUsernameOpen] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
+  const [usernameInfo, setUsernameInfo] = useState({
+    username: "",
+    canChange: false,
+  });
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -104,6 +110,24 @@ function EditProfile() {
       setDobDate(parseDOB(user.dob));
     }
   }, [user]);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (!token) return;
+
+      try {
+        const { data } = await api.get("/api/v1/username", authHeaders(token));
+        setUsernameInfo({
+          username: data?.data?.username || "",
+          canChange: !!data?.data?.can_change,
+        });
+      } catch (err) {
+        console.error("Failed to fetch username:", err);
+      }
+    };
+
+    fetchUsername();
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -275,6 +299,8 @@ function EditProfile() {
         <ProfileInfoCard
           formData={formData}
           onChange={handleChange}
+          username={usernameInfo.username}
+          canChangeUsername={usernameInfo.canChange}
           phoneNumber={phoneNumber}
           setPhoneNumber={setPhoneNumber}
           recoveryPhoneNumber={recoveryPhoneNumber}
@@ -286,6 +312,7 @@ function EditProfile() {
           dobDate={dobDate}
           setDobDate={setDobDate}
           updating={updating}
+          setUsernameOpen={setUsernameOpen}
           setPasswordOpen={setPasswordOpen}
           setVerifyOpen={setVerifyOpen}
           recoveryPhoneLocked={recoveryPhoneLocked}
@@ -331,6 +358,15 @@ function EditProfile() {
       <SetPasswordModal
         open={passwordOpen}
         onClose={() => setPasswordOpen(false)}
+      />
+      <SetUsernameModal
+        open={usernameOpen}
+        onClose={() => setUsernameOpen(false)}
+        currentUsername={usernameInfo.username}
+        canChange={usernameInfo.canChange}
+        onUsernameUpdated={(username) =>
+          setUsernameInfo((prev) => ({ ...prev, username }))
+        }
       />
       {/* hook verifyOpen into your verify modal when ready */}
     </div>

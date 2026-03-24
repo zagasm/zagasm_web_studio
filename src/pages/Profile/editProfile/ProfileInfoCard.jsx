@@ -6,12 +6,20 @@ import {
   FormControl,
 } from "@mui/material";
 import DatePicker from "react-datepicker";
-import { FiAlertCircle, FiCheckCircle, FiLock, FiMail } from "react-icons/fi";
+import {
+  FiAlertCircle,
+  FiCheckCircle,
+  FiLock,
+  FiMail,
+  FiUser,
+} from "react-icons/fi";
 import PhoneInput from "react-phone-input-2";
 
 export default function ProfileInfoCard({
   formData,
   onChange,
+  username,
+  canChangeUsername,
   phoneNumber,
   setPhoneNumber,
   recoveryPhoneNumber,
@@ -23,6 +31,7 @@ export default function ProfileInfoCard({
   dobDate,
   setDobDate,
   updating,
+  setUsernameOpen,
   setPasswordOpen,
   setVerifyOpen,
   recoveryPhoneLocked,
@@ -255,6 +264,34 @@ export default function ProfileInfoCard({
 
       {/* Security rows */}
       <div className="tw:pt-4 tw:space-y-3">
+        <button
+          type="button"
+          onClick={() => setUsernameOpen(true)}
+          className="tw:flex tw:items-center tw:justify-between tw:w-full tw:rounded-2xl tw:border tw:border-gray-100 tw:hover:border-gray-200 tw:bg-gray-50 tw:hover:bg-gray-100 tw:px-4 tw:py-3 tw:transition"
+        >
+          <span className="tw:flex tw:items-center tw:gap-2 tw:text-gray-800">
+            <FiUser className="tw:text-gray-500" />
+            <span className="tw:flex tw:flex-col tw:items-start">
+              <span className="tw:font-medium tw:text-sm">Set Username</span>
+              <span className="tw:text-xs tw:text-gray-500">
+                {username ? `@${username}` : "No username set"}
+              </span>
+            </span>
+          </span>
+          <span className="tw:flex tw:items-center tw:gap-2">
+            <span
+              className={`tw:text-xs tw:px-2 tw:py-1 tw:rounded-full ${
+                canChangeUsername
+                  ? "tw:bg-emerald-50 tw:text-emerald-700"
+                  : "tw:bg-gray-100 tw:text-gray-600"
+              }`}
+            >
+              {canChangeUsername ? "Available" : "Locked"}
+            </span>
+            <span className="tw:text-gray-400 tw:text-lg">›</span>
+          </span>
+        </button>
+
         <button
           type="button"
           onClick={() => setPasswordOpen(true)}

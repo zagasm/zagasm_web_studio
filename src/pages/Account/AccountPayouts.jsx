@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   ArrowLeft,
   Search,
@@ -12,14 +13,6 @@ import {
   Landmark,
   RefreshCw,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-} from "@mui/material";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showError, showPromise } from "../../component/ui/toast";
@@ -198,55 +191,114 @@ function WithdrawDialog({
   const canRequest = !!balance?.can_request_payout;
 
   return (
-    <Dialog open={open} onClose={submitting ? undefined : onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Request payout</DialogTitle>
-      <DialogContent dividers>
-        <div className="tw:grid tw:grid-cols-2 tw:gap-3">
-          <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
-            <div className="tw:text-xs tw:text-gray-500">Available balance</div>
-            <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
-              {formatMoney(availableBalance, symbol)}
-            </div>
-          </div>
-          <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
-            <div className="tw:text-xs tw:text-gray-500">Minimum payout</div>
-            <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
-              {formatMoney(minimumAmount, symbol)}
-            </div>
-          </div>
-        </div>
-
-        <div className="tw:mt-4">
-          <TextField
-            label={`Amount (${balance?.currency || "NGN"})`}
-            type="number"
-            fullWidth
-            value={amount}
-            onChange={(event) => onAmountChange(event.target.value)}
-            inputProps={{ min: 0 }}
-          />
-        </div>
-
-        {!canRequest && (
-          <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
-            Payout requests are not available yet. Your available balance must
-            meet the minimum payout requirement first.
-          </div>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={submitting}>
-          Cancel
-        </Button>
-        <Button
-          onClick={onSubmit}
-          variant="contained"
-          disabled={submitting || !canRequest}
+    <Transition show={open} as={Fragment} appear>
+      <Dialog
+        as="div"
+        className="tw:relative tw:z-50"
+        onClose={submitting ? () => { } : onClose}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="tw:transition tw:ease-out tw:duration-200"
+          enterFrom="tw:opacity-0"
+          enterTo="tw:opacity-100"
+          leave="tw:transition tw:ease-in tw:duration-150"
+          leaveFrom="tw:opacity-100"
+          leaveTo="tw:opacity-0"
         >
-          {submitting ? "Requesting..." : "Request payout"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <div className="tw:fixed tw:inset-0 tw:bg-black/40" />
+        </Transition.Child>
+
+        <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
+          <div className="tw:flex tw:min-h-full tw:items-center tw:justify-center tw:p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="tw:transition tw:ease-out tw:duration-200"
+              enterFrom="tw:opacity-0 tw:translate-y-2 tw:sm:translate-y-0 tw:sm:scale-95"
+              enterTo="tw:opacity-100 tw:translate-y-0 tw:sm:scale-100"
+              leave="tw:transition tw:ease-in tw:duration-150"
+              leaveFrom="tw:opacity-100 tw:sm:scale-100"
+              leaveTo="tw:opacity-0 tw:translate-y-2 tw:sm:translate-y-0 tw:sm:scale-95"
+            >
+              <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:sm:p-6">
+                <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+                  Request payout
+                </span>
+                <p className="tw:mt-1 tw:text-xs tw:text-gray-500">
+                  Withdraw part of your available organiser balance.
+                </p>
+
+                <div className="tw:mt-5 tw:grid tw:grid-cols-2 tw:gap-3">
+                  <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
+                    <div className="tw:text-xs tw:text-gray-500">
+                      Available balance
+                    </div>
+                    <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
+                      {formatMoney(availableBalance, symbol)}
+                    </div>
+                  </div>
+                  <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
+                    <div className="tw:text-xs tw:text-gray-500">
+                      Minimum payout
+                    </div>
+                    <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
+                      {formatMoney(minimumAmount, symbol)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="tw:mt-4">
+                  <label className="tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-700">
+                    Amount ({balance?.currency || "NGN"})
+                  </label>
+                  <input
+                    type="number"
+                    value={amount}
+                    min="0"
+                    onChange={(event) => onAmountChange(event.target.value)}
+                    className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:text-sm tw:text-gray-900 tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
+                  />
+                </div>
+
+                {!canRequest && (
+                  <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-xs tw:text-amber-800">
+                    Payout requests are not available yet. Your available
+                    balance must meet the minimum payout requirement first.
+                  </div>
+                )}
+
+                <div className="tw:mt-6 tw:flex tw:items-center tw:justify-end tw:gap-2">
+                  <button
+                    style={{
+                      fontSize: 12,
+                      borderRadius: 20,
+                    }}
+                    type="button"
+                    onClick={onClose}
+                    disabled={submitting}
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition hover:tw:bg-gray-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    style={{
+                      fontSize: 12,
+                      borderRadius: 20,
+                    }}
+                    type="button"
+                    onClick={onSubmit}
+                    disabled={submitting || !canRequest}
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  >
+                    {submitting ? "Requesting..." : "Request payout"}
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
   );
 }
 
@@ -285,7 +337,7 @@ export default function AccountPayouts() {
   const fetchBalance = async () => {
     setBalanceLoading(true);
     try {
-      const res = await api.get("/organiser/payouts/balance", authHeaders(token));
+      const res = await api.get("/api/v1/organiser/payouts/balance", authHeaders(token));
       setBalance(res?.data?.data || null);
     } catch (error) {
       console.error(error);
@@ -440,9 +492,8 @@ export default function AccountPayouts() {
               className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
-              Back
             </Link>
-            <span className="tw:text-lg tw:text-gray-900 tw:md:text-xl tw:lg:text-2xl tw:xl:text-3xl">
+            <span className="tw:text-lg tw:font-bold tw:text-gray-900 tw:md:text-xl tw:lg:text-2xl tw:xl:text-3xl">
               Payouts
             </span>
           </div>
@@ -459,7 +510,7 @@ export default function AccountPayouts() {
               type="button"
               style={{
                 borderRadius: 12,
-                
+
               }}
               onClick={() => setWithdrawOpen(true)}
               className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm hover:tw:bg-primarySecond"
@@ -491,9 +542,9 @@ export default function AccountPayouts() {
                   balance?.can_request_payout
                     ? "Ready for payout request"
                     : `Minimum payout is ${formatMoney(
-                        balance?.minimum_payout_amount ?? 0,
-                        balanceSymbol
-                      )}`
+                      balance?.minimum_payout_amount ?? 0,
+                      balanceSymbol
+                    )}`
                 }
               />
               <StatCard

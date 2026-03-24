@@ -6,8 +6,9 @@ import { Ticket } from "lucide-react";
 export default function PodiumCard({ org, position, onToggleFollow, loading }) {
   const navigate = useNavigate();
 
-  const name = org?.organiser || "Organizer";
-  const initials = getInitials(name);
+  const displayName = org?.userName || org?.organiser || "Organizer";
+  const secondaryText = org?.organiser || org?.email || org?.slug || "";
+  const initials = getInitials(displayName);
   const showImage = hasProfileImage(org?.profileImage);
   const followersCount = org?.numberOfFollowers ?? 0;
   const isFollowing =
@@ -52,7 +53,7 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
           {showImage ? (
             <img
               src={org.profileImage}
-              alt={name}
+              alt={displayName}
               className="tw:w-full tw:h-full tw:object-cover"
               loading="lazy"
             />
@@ -70,8 +71,8 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
 
       <div className="tw:mt-5 tw:flex tw:flex-col tw:items-center">
         <div className="tw:flex tw:items-center tw:gap-2">
-          <span className="tw:text-[12px] tw:sm:text-base tw:font-semibold tw:text-gray-900">
-            {truncate(name, 12)}
+          <span className="tw:text-[12px] tw:first-letter:uppercase tw:sm:text-base tw:font-semibold tw:text-gray-900">
+            {truncate(displayName, 12)}
           </span>
           {org.has_active_subscription && (
             <img
@@ -81,9 +82,9 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
             />
           )}
         </div>
-        <span className="tw:block tw:text-[10px] tw:sm:text-xs tw:text-gray-500 tw:truncate">
-          {truncate(org?.userName || org?.email || org?.slug || "", 10)}
-        </span>
+        {/* <span className="tw:block tw:text-[10px] tw:sm:text-xs tw:text-gray-500 tw:truncate">
+          {truncate(secondaryText, 10)}
+        </span> */}
 
         <span className="tw:text-[11px] tw:sm:text-xs tw:text-gray-600">
           {followersCount} <span className="tw:text-gray-500">followers</span>

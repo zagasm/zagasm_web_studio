@@ -47,7 +47,19 @@ function getEventFromViewResponse(payload) {
 }
 
 function getEventFromStreamResponse(payload) {
-  return payload?.event || payload?.data?.event || payload?.data || null;
+  if (payload?.event || payload?.data?.event || payload?.data) {
+    return payload?.event || payload?.data?.event || payload?.data || null;
+  }
+
+  if (payload?.stream) {
+    return {
+      stream: payload.stream,
+      stream_status: payload.stream?.status || null,
+      status: payload.stream?.status || null,
+    };
+  }
+
+  return null;
 }
 
 function mergeEventData(baseEvent, streamEvent) {
@@ -184,6 +196,10 @@ function ActionButton({
 }) {
   return (
     <button
+      style={{
+        fontSize: 12,
+        borderRadius: 20,
+      }}
       type="button"
       onClick={onClick}
       disabled={disabled || loading}
@@ -270,10 +286,10 @@ export default function EventStreamControlPage() {
   const isEnded = status === "ended";
   const hasStartedStream = Boolean(
     stream?.id ||
-      stream?.stream_key ||
-      streamingApi?.streamKey ||
-      stream?.rtmp_url ||
-      streamingApi?.rtmp_server,
+    stream?.stream_key ||
+    streamingApi?.streamKey ||
+    stream?.rtmp_url ||
+    streamingApi?.rtmp_server,
   );
 
   const rtmpServer =
@@ -337,13 +353,13 @@ export default function EventStreamControlPage() {
       },
       ...(webrtcUrl
         ? [
-            {
-              label: "WebRTC URL",
-              value: webrtcUrl,
-              helperText: "Low-latency playback endpoint returned by the API.",
-              icon: CheckCircle2,
-            },
-          ]
+          {
+            label: "WebRTC URL",
+            value: webrtcUrl,
+            helperText: "Low-latency playback endpoint returned by the API.",
+            icon: CheckCircle2,
+          },
+        ]
         : []),
     ],
     [playbackUrl, rtmpKey, rtmpServer, rtmpUrl, srtKey, srtServer, webrtcUrl],
@@ -465,11 +481,7 @@ export default function EventStreamControlPage() {
 
   if (loading) {
     return (
-      <div className="row tw:px-3 tw:py-6 tw:md:px-6">
-        <div className="col-md-1 col-lg-2 col-xl-2 tw:hidden tw:lg:block">
-          <SideBarNav />
-        </div>
-
+      <div className="tw:px-3 tw:py-6 tw:md:px-6">
         <div className="col-md-12 col-lg-10 col-xl-10 tw:lg:ml-30 tw:py-24">
           <div className="tw:animate-pulse tw:space-y-4">
             <div className="tw:h-10 tw:w-64 tw:rounded-2xl tw:bg-gray-200" />
@@ -631,7 +643,7 @@ export default function EventStreamControlPage() {
                   </div>
                 </div>
 
-                <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3">
+                <div className="tw:mt-5 tw:grid tw:grid-cols-3 tw:gap-3">
                   {!hasStartedStream ? (
                     <ActionButton
                       onClick={handleStart}

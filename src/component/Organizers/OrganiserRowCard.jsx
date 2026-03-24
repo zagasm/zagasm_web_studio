@@ -9,8 +9,9 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const name = org?.organiser || "Organizer";
-  const initials = getInitials(name);
+  const displayName = org?.userName || org?.organiser || "Organizer";
+  // const secondaryText = org?.organiser || org?.email || org?.slug || "";
+  const initials = getInitials(displayName);
   const showImage = hasProfileImage(org?.profileImage);
   const followersCount = org?.numberOfFollowers ?? 0;
   const isFollowing =
@@ -26,7 +27,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
         {showImage ? (
           <img
             src={org.profileImage}
-            alt={name}
+            alt={displayName}
             className="tw:w-full tw:h-full tw:object-cover"
             loading="lazy"
           />
@@ -48,8 +49,8 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
       {/* meta */}
       <div className="tw:flex-1 tw:min-w-0">
         <div className="tw:flex tw:items-center">
-          <span className="tw:block tw:text-xs tw:sm:text-lg tw:font-semibold tw:text-gray-900 tw:truncate">
-            {name}
+          <span className="tw:block tw:first-letter:uppercase tw:text-xs tw:sm:text-lg tw:font-semibold tw:text-gray-900 tw:truncate">
+            {displayName}
           </span>
           {org.has_active_subscription && (
             <img
@@ -60,9 +61,9 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
           )}
         </div>
 
-        <span className="tw:block tw:text-[10px] tw:sm:text-xs tw:text-gray-500 tw:truncate">
-          {org?.userName || org?.email || org?.slug || ""}
-        </span>
+        {/* <span className="tw:block tw:text-[10px] tw:sm:text-xs tw:text-gray-500 tw:truncate">
+          {secondaryText}
+        </span> */}
 
         <span className="tw:block tw:mt-1.5 tw:text-[11px] tw:sm:text-xs tw:text-gray-600">
           {followersCount} <span className="tw:text-gray-500">followers</span>

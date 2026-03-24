@@ -144,9 +144,8 @@ export default function EventCard({
                 e.stopPropagation();
                 toggleSave();
               }}
-              className={`tw:rounded-xl tw:p-2 tw:transition ${
-                isSaved ? "tw:text-primary" : "tw:text-gray-600 "
-              }`}
+              className={`tw:rounded-xl tw:p-2 tw:transition ${isSaved ? "tw:text-primary" : "tw:text-gray-600 "
+                }`}
               aria-label="Save"
               title={isSaved ? "Unsave" : "Save"}
             >
@@ -198,6 +197,10 @@ export default function EventCard({
         {/* CTA */}
         {isOwnerEvent ? (
           <button
+            style={{
+              fontSize: 12,
+              borderRadius: 20,
+            }}
             onClick={(e) => {
               e.stopPropagation();
               goToStreamControl();

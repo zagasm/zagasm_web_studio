@@ -1,7 +1,7 @@
 // src/page/Home/Home.jsx
 import React, { useState, useEffect, useRef } from "react";
 import EventTemplate from "../../component/Events/SingleEvent";
-import MobileSingleOrganizers from "../../component/Organizers/ForMobile";
+import MobileSingleOrganizers from "../../component/Organizers/ForMobile/OrganisersForYou";
 import SEO from "../../component/SEO";
 import { Link } from "react-router-dom";
 import "./Homestyle.css";

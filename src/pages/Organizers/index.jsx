@@ -9,11 +9,10 @@ import {
 } from "../../component/Organizers/OrganisersShimmer";
 import PodiumSection from "../../component/Organizers/PodiumSection";
 import OrganizerRowCard from "../../component/Organizers/OrganiserRowCard";
-import { rankSafe } from "../../component/Organizers/organiser.utils";
+import { api, authHeaders } from "../../lib/apiClient";
 
 export default function AllOrganizers() {
   const { token } = useAuth();
-  const baseUrl = import.meta.env.VITE_API_URL;
   const perPage = 20;
 
   const [organizers, setOrganizers] = useState([]);
@@ -33,25 +32,20 @@ export default function AllOrganizers() {
     async (pageToLoad = 1, isMore = false) => {
       try {
         isMore ? setLoadingMore(true) : setLoadingList(true);
-
-        const endpoint = `${baseUrl}/top-organisers?per_page=${perPage}&page=${pageToLoad}`;
-
-        const res = await fetch(endpoint, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+        const { data } = await api.get("/api/v1/top-organisers", {
+          params: {
+            per_page: perPage,
+            page: pageToLoad,
           },
+          ...authHeaders(token),
         });
-
-        if (!res.ok) throw new Error("Failed to fetch organisers");
-
-        const data = await res.json();
         const list = Array.isArray(data?.data) ? data.data : [];
 
         const normalized = list.map((o) => {
           const isFollowing =
-            typeof o.isFollowing === "boolean" ? o.isFollowing : !!o.following;
+            typeof o.isFollowing === "boolean"
+              ? o.isFollowing
+              : !!o.following;
 
           return {
             ...o,
@@ -88,7 +82,7 @@ export default function AllOrganizers() {
         setLoadingMore(false);
       }
     },
-    [token, baseUrl]
+    [token, perPage]
   );
 
   useEffect(() => {
@@ -101,12 +95,8 @@ export default function AllOrganizers() {
     }
   }, [inView, hasMore, loadingMore, nextPage, fetchOrganisers]);
 
-  const sorted = useMemo(() => {
-    return [...organizers].sort((a, b) => rankSafe(a) - rankSafe(b));
-  }, [organizers]);
-
-  const top3 = sorted.slice(0, 3);
-  const rest = sorted.slice(3);
+  const top3 = useMemo(() => organizers.slice(0, 3), [organizers]);
+  const rest = useMemo(() => organizers.slice(3), [organizers]);
 
   const [followLoading, setFollowLoading] = useState({});
 
@@ -115,20 +105,11 @@ export default function AllOrganizers() {
 
     setFollowLoading((p) => ({ ...p, [organizerUserId]: true }));
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/follow/${organizerUserId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const { data: result } = await api.post(
+        `/api/v1/follow/${organizerUserId}`,
+        {},
+        authHeaders(token)
       );
-
-      if (!res.ok) throw new Error("Failed to toggle follow");
-
-      const result = await res.json();
       const isNowFollowing =
         typeof result.following === "boolean"
           ? result.following
