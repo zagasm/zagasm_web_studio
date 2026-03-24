@@ -46,7 +46,7 @@ export default function Nav() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div className="tw:md:fixed tw:top-0 tw:left-0 tw:right-0 tw:z-40">
+    <div className="tw:md:fixed tw:top-0 tw:left-0 tw:right-0 tw:z-40 tw:overflow-x-hidden">
       <div className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:py-3 tw:md:py-4">
         <motion.div
           className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-white/60 tw:bg-[rgba(250,247,255,0.85)] tw:backdrop-blur-xl tw:shadow-[0_18px_50px_rgba(15,23,42,0.16)] tw:px-4 tw:md:px-6 tw:py-1.5 tw:md:py-2.5"

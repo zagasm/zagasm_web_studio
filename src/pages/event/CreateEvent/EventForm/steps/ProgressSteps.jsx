@@ -35,7 +35,7 @@ export default function ProgressSteps({ currentStep, completedSteps, onBack }) {
       </div>
 
       {/* Desktop rail */}
-      <div className="tw:hidden tw:sm:flex tw:gap-3 tw:overflow-x-auto">
+      <div className="tw:hidden tw:sm:flex tw:sm:justify-center tw:sm:items-center tw:gap-3 tw:overflow-x-auto">
         {STEPS.map((label, i) => {
           const n = i + 1;
           const done = completedSteps.includes(n);

@@ -33,7 +33,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="tw:relative tw:bg-white tw:border-t tw:border-gray-100">
+    <footer className="tw:relative tw:bg-white tw:border-t tw:border-gray-100 ">
       {/* Top content */}
       <div className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:pt-12 tw:pb-24">
         {/* Brand + grid */}
