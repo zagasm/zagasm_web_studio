@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -111,31 +111,7 @@ function getStatusTone(status) {
   return "tw:bg-emerald-50 tw:text-emerald-700 tw:border-emerald-200";
 }
 
-async function copyText(value, label) {
-  if (!value) {
-    showError(`No ${label.toLowerCase()} available yet.`);
-    return;
-  }
-
-  try {
-    if (navigator?.clipboard?.writeText) {
-      await navigator.clipboard.writeText(value);
-    } else {
-      const textArea = document.createElement("textarea");
-      textArea.value = value;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-    }
-
-    showSuccess(`${label} copied`);
-  } catch {
-    showError(`Could not copy ${label.toLowerCase()}.`);
-  }
-}
-
-function DetailCard({ icon: Icon, label, value, helperText }) {
+function DetailCard({ icon: Icon, label, value, helperText, onCopy, copied }) {
   return (
     <div className="tw:rounded-3xl tw:border tw:border-[#ece8ff] tw:bg-white tw:p-4 tw:shadow-sm">
       <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
@@ -147,12 +123,16 @@ function DetailCard({ icon: Icon, label, value, helperText }) {
         </div>
 
         <button
+          style={{ borderRadius: 20, fontSize: 12 }}
           type="button"
-          onClick={() => copyText(value, label)}
-          className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:text-primary hover:tw:bg-[#faf7ff]"
+          onClick={() => onCopy?.(value, label)}
+          className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
           aria-label={`Copy ${label}`}
         >
           <Copy className="tw:h-4 tw:w-4" />
+          <span className="tw:text-xs tw:font-semibold">
+            {copied ? "Copied" : "Copy"}
+          </span>
         </button>
       </div>
 
@@ -229,6 +209,9 @@ export default function EventStreamControlPage() {
   const [error, setError] = useState("");
   const [pendingAction, setPendingAction] = useState("");
   const [watchModalOpen, setWatchModalOpen] = useState(false);
+  const [copiedLabel, setCopiedLabel] = useState("");
+  const [stageOverride, setStageOverride] = useState("");
+  const copyTimeoutRef = useRef(null);
 
   const loadEventDetails = useCallback(
     async ({ background = false } = {}) => {
@@ -277,6 +260,14 @@ export default function EventStreamControlPage() {
     loadEventDetails();
   }, [loadEventDetails]);
 
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const stream = eventData?.stream || {};
   const streamingApi = stream?.streaming_api || {};
 
@@ -300,25 +291,57 @@ export default function EventStreamControlPage() {
     streamingApi?.streamKey ||
     stream?.stream_key ||
     "";
-  const rtmpUrl =
-    stream?.rtmp_url ||
-    [rtmpServer, rtmpKey].filter(Boolean).join("/");
-  const srtServer = streamingApi?.srt_server || "";
-  const srtKey = streamingApi?.srt_key || stream?.stream_key || "";
-  const playbackUrl =
-    stream?.playback_variants?.llhls ||
-    stream?.playback_variants?.hls ||
-    stream?.playback_url ||
-    streamingApi?.playback_url ||
-    "";
-  const webrtcUrl = stream?.playback_variants?.webrtc || "";
+  const isPreLiveStage =
+    hasStartedStream && !isEnded && stageOverride === "started";
+  const showGoLive =
+    hasStartedStream && !isEnded && (isPreLiveStage || (!isLive && !isPaused));
+  const showPause =
+    hasStartedStream &&
+    !isEnded &&
+    !isPreLiveStage &&
+    (isLive || isPaused || stageOverride === "live");
+  const showEnd = hasStartedStream && !isEnded;
+  const showWatch = hasStartedStream && !isEnded;
 
-  const quickStartCards = useMemo(
+  const handleCopy = async (value, label) => {
+    if (!value) {
+      showError(`No ${label.toLowerCase()} available yet.`);
+      return;
+    }
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = value;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+
+      setCopiedLabel(label);
+      // showSuccess(`${label} copied to clipboard.`);
+
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+
+      copyTimeoutRef.current = setTimeout(() => {
+        setCopiedLabel("");
+      }, 900);
+    } catch {
+      showError(`Could not copy ${label.toLowerCase()}.`);
+    }
+  };
+
+  const priorityCards = useMemo(
     () => [
       {
         label: "RTMP Server",
         value: rtmpServer,
-        helperText: "Set OBS service to Custom and paste this into Server.",
+        helperText: "Paste this into the OBS Server field.",
         icon: Radio,
       },
       {
@@ -327,42 +350,8 @@ export default function EventStreamControlPage() {
         helperText: "Paste this into the OBS Stream Key field.",
         icon: Video,
       },
-      {
-        label: "RTMP URL",
-        value: rtmpUrl,
-        helperText: "Full publish URL if you need the combined RTMP target.",
-        icon: Signal,
-      },
-      {
-        label: "SRT Server",
-        value: srtServer,
-        helperText: "Use this if you prefer SRT instead of RTMP.",
-        icon: MonitorPlay,
-      },
-      {
-        label: "SRT Key",
-        value: srtKey,
-        helperText: "Use the same stream key when your encoder asks for it.",
-        icon: Copy,
-      },
-      {
-        label: "Playback URL",
-        value: playbackUrl,
-        helperText: "Share this internally for testing or playback checks.",
-        icon: PlayCircle,
-      },
-      ...(webrtcUrl
-        ? [
-          {
-            label: "WebRTC URL",
-            value: webrtcUrl,
-            helperText: "Low-latency playback endpoint returned by the API.",
-            icon: CheckCircle2,
-          },
-        ]
-        : []),
     ],
-    [playbackUrl, rtmpKey, rtmpServer, rtmpUrl, srtKey, srtServer, webrtcUrl],
+    [rtmpKey, rtmpServer],
   );
 
   const instructionSteps = useMemo(
@@ -437,8 +426,10 @@ export default function EventStreamControlPage() {
       successText: "Stream details ready. Configure OBS, then go live.",
     });
 
-  const handleGoLive = () =>
-    runAction({
+  const handleGoLive = async () => {
+    setStageOverride("live");
+    try {
+      await runAction({
       key: "go-live",
       request: () =>
         api.post(
@@ -448,7 +439,12 @@ export default function EventStreamControlPage() {
         ),
       loadingText: "Taking event live…",
       successText: "Event is now live.",
-    });
+      });
+    } catch (error) {
+      setStageOverride("started");
+      throw error;
+    }
+  };
 
   const handleTogglePause = () =>
     runAction({
@@ -477,6 +473,7 @@ export default function EventStreamControlPage() {
       loadingText: "Ending stream…",
       successText: "Stream ended.",
     });
+    setStageOverride("");
   };
 
   if (loading) {
@@ -529,11 +526,6 @@ export default function EventStreamControlPage() {
     eventData?.eventDateISO || eventData?.date || eventData?.eventDate,
     eventData?.startTime || eventData?.time || "",
   );
-  const canGoLive = hasStartedStream && !isLive && !isEnded && !isPaused;
-  const canPause = hasStartedStream && (isLive || isPaused) && !isEnded;
-  const canEnd = hasStartedStream && !isEnded;
-  const canWatch = Boolean(playbackUrl) && (isLive || isPaused);
-
   return (
     <>
       <div className="tw:px-3 tw:py-4 tw:md:px-6">
@@ -554,9 +546,9 @@ export default function EventStreamControlPage() {
                   <span>Back</span>
                 </button>
 
-                <h1 className="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-900 tw:md:text-3xl">
+                <span className="tw:mt-3 tw:text-2xl tw:md:text-3xl tw:font-bold tw:text-gray-900 tw:block">
                   Stream Event
-                </h1>
+                </span>
                 <p className="tw:mt-2 tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
                   Generate your stream details, configure OBS, then switch the event live when you are ready for viewers.
                 </p>
@@ -581,6 +573,33 @@ export default function EventStreamControlPage() {
                 ) : null}
               </div>
             </div>
+
+            <section className="">
+              <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-end tw:md:justify-between">
+                <div>
+                  <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900">
+                    OBS details
+                  </span>
+                  <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
+                    Start with these two values first so you can connect OBS immediately.
+                  </p>
+                </div>
+              </div>
+
+              <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2">
+                {priorityCards.map((item) => (
+                  <DetailCard
+                    key={item.label}
+                    icon={item.icon}
+                    label={item.label}
+                    value={item.value}
+                    helperText={item.helperText}
+                    onCopy={handleCopy}
+                    copied={copiedLabel === item.label}
+                  />
+                ))}
+              </div>
+            </section>
 
             <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[1.25fr_0.85fr]">
               <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ede7ff] tw:bg-white tw:shadow-sm">
@@ -607,9 +626,9 @@ export default function EventStreamControlPage() {
                       </span>
                     </div>
 
-                    <h2 className="tw:mt-4 tw:text-2xl tw:font-bold tw:text-gray-900">
+                    <span className="tw:mt-4 tw:text-2xl tw:font-bold tw:text-gray-900">
                       {eventData?.title || "Untitled event"}
-                    </h2>
+                    </span>
 
                     <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-4 tw:text-sm tw:text-gray-600">
                       <span className="tw:inline-flex tw:items-center tw:gap-2">
@@ -646,7 +665,15 @@ export default function EventStreamControlPage() {
                 <div className="tw:mt-5 tw:grid tw:grid-cols-3 tw:gap-3">
                   {!hasStartedStream ? (
                     <ActionButton
-                      onClick={handleStart}
+                      onClick={async () => {
+                        setStageOverride("started");
+                        try {
+                          await handleStart();
+                        } catch (error) {
+                          setStageOverride("");
+                          throw error;
+                        }
+                      }}
                       loading={pendingAction === "start"}
                       className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
                       icon={Radio}
@@ -655,7 +682,7 @@ export default function EventStreamControlPage() {
                     </ActionButton>
                   ) : null}
 
-                  {canGoLive ? (
+                  {showGoLive ? (
                     <ActionButton
                       onClick={handleGoLive}
                       loading={pendingAction === "go-live"}
@@ -666,7 +693,7 @@ export default function EventStreamControlPage() {
                     </ActionButton>
                   ) : null}
 
-                  {canPause ? (
+                  {showPause ? (
                     <ActionButton
                       onClick={handleTogglePause}
                       loading={pendingAction === "pause"}
@@ -677,7 +704,7 @@ export default function EventStreamControlPage() {
                     </ActionButton>
                   ) : null}
 
-                  {canEnd ? (
+                  {showEnd ? (
                     <ActionButton
                       onClick={handleEnd}
                       loading={pendingAction === "end"}
@@ -688,7 +715,7 @@ export default function EventStreamControlPage() {
                     </ActionButton>
                   ) : null}
 
-                  {canWatch ? (
+                  {showWatch ? (
                     <ActionButton
                       onClick={() => setWatchModalOpen(true)}
                       className="tw:bg-[#fff4f2] tw:text-[#d93a23] hover:tw:bg-[#ffe9e4]"
@@ -721,36 +748,11 @@ export default function EventStreamControlPage() {
             </div>
 
             <section className="tw:rounded-[32px] tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
-              <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-end tw:md:justify-between">
-                <div>
-                  <h3 className="tw:text-xl tw:font-semibold tw:text-gray-900">
-                    Quick start
-                  </h3>
-                  <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                    Copy the stream target details directly into OBS or another encoder.
-                  </p>
-                </div>
-              </div>
-
-              <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2 tw:xl:grid-cols-3">
-                {quickStartCards.map((item) => (
-                  <DetailCard
-                    key={item.label}
-                    icon={item.icon}
-                    label={item.label}
-                    value={item.value}
-                    helperText={item.helperText}
-                  />
-                ))}
-              </div>
-            </section>
-
-            <section className="tw:rounded-[32px] tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
               <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                 <div>
-                  <h3 className="tw:text-xl tw:font-semibold tw:text-gray-900">
+                  <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
                     How to stream this event using OBS Studio
-                  </h3>
+                  </span>
                   <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
                     Use these steps to connect OBS to Zagasm Studios before you press Go Live.
                   </p>
