@@ -13,12 +13,14 @@ import { rankSafe } from "../../component/Organizers/organiser.utils";
 
 export default function AllOrganizers() {
   const { token } = useAuth();
+  const baseUrl = import.meta.env.VITE_API_URL;
+  const perPage = 20;
 
   const [organizers, setOrganizers] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [initialError, setInitialError] = useState(null);
 
-  const [nextPageUrl, setNextPageUrl] = useState(null);
+  const [nextPage, setNextPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -28,12 +30,11 @@ export default function AllOrganizers() {
   });
 
   const fetchOrganisers = useCallback(
-    async (url = null, isMore = false) => {
+    async (pageToLoad = 1, isMore = false) => {
       try {
         isMore ? setLoadingMore(true) : setLoadingList(true);
 
-        const endpoint =
-          url || `${import.meta.env.VITE_API_URL}/api/v1/top-organisers`;
+        const endpoint = `${baseUrl}/top-organisers?per_page=${perPage}&page=${pageToLoad}`;
 
         const res = await fetch(endpoint, {
           method: "GET",
@@ -55,7 +56,7 @@ export default function AllOrganizers() {
           return {
             ...o,
             isFollowing,
-            following: isFollowing, // keep both in sync so old components don’t break
+            following: isFollowing, // keep both in sync so old components don't break
           };
         });
 
@@ -63,36 +64,42 @@ export default function AllOrganizers() {
           isMore ? [...prev, ...normalized] : normalized
         );
 
-        const next = data?.links?.next ?? null;
-        setNextPageUrl(next);
-        setHasMore(!!next);
+        const meta = data?.meta || {};
+        const currentPage = meta.current_page ?? pageToLoad;
+        const lastPage = meta.last_page ?? currentPage;
+        const moreAvailable = currentPage < lastPage;
+
+        setNextPage(moreAvailable ? currentPage + 1 : null);
+        setHasMore(moreAvailable);
 
         if (!isMore) setInitialError(null);
       } catch (e) {
         if (isMore) {
           setHasMore(false);
-          setNextPageUrl(null);
+          setNextPage(null);
         } else {
           setInitialError("We couldn't load organizers right now.");
           setOrganizers([]);
+          setHasMore(false);
+          setNextPage(null);
         }
       } finally {
         setLoadingList(false);
         setLoadingMore(false);
       }
     },
-    [token]
+    [token, baseUrl]
   );
 
   useEffect(() => {
-    fetchOrganisers();
+    fetchOrganisers(1, false);
   }, [fetchOrganisers]);
 
   useEffect(() => {
-    if (inView && hasMore && !loadingMore) {
-      fetchOrganisers(nextPageUrl, true);
+    if (inView && hasMore && !loadingMore && nextPage) {
+      fetchOrganisers(nextPage, true);
     }
-  }, [inView, hasMore, loadingMore, nextPageUrl, fetchOrganisers]);
+  }, [inView, hasMore, loadingMore, nextPage, fetchOrganisers]);
 
   const sorted = useMemo(() => {
     return [...organizers].sort((a, b) => rankSafe(a) - rankSafe(b));
@@ -102,7 +109,6 @@ export default function AllOrganizers() {
   const rest = sorted.slice(3);
 
   const [followLoading, setFollowLoading] = useState({});
-  console.log(organizers);
 
   const toggleFollow = async (organizerUserId) => {
     if (!organizerUserId) return;
@@ -223,7 +229,7 @@ export default function AllOrganizers() {
                     loadingMore ? (
                       <div className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-600">
                         <div className="tw:h-4 tw:w-4 tw:rounded-full tw:border-2 tw:border-gray-300 tw:border-t-gray-700 tw:animate-spin" />
-                        <span className="tw:text-sm">Loading more…</span>
+                        <span className="tw:text-sm">Loading more...</span>
                       </div>
                     ) : (
                       <span className="tw:text-xs tw:text-gray-500">
