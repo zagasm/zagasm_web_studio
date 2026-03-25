@@ -20,7 +20,6 @@ import { useAuth } from "../auth/AuthContext";
 import {
   showError,
   showPromise,
-  showSuccess,
 } from "../../component/ui/toast";
 import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDownloadModal";
 import { formatEventDateTime } from "../../utils/ui";
@@ -78,6 +77,27 @@ function mergeEventData(baseEvent, streamEvent) {
       baseEvent?.stream_status ||
       null,
   };
+}
+
+function hasStreamAccessDetails(event) {
+  const stream = event?.stream;
+  const streamingApi = stream?.streaming_api;
+
+  return Boolean(
+    streamingApi?.rtmp_server ||
+    stream?.rtmp_url,
+  );
+}
+
+function hasGeneratedStream(event) {
+  const stream = event?.stream;
+  const streamingApi = stream?.streaming_api;
+
+  return Boolean(
+    stream?.id ||
+    stream?.stream_key ||
+    streamingApi?.streamKey,
+  );
 }
 
 function formatStartedAt(value) {
@@ -236,10 +256,23 @@ export default function EventStreamControlPage() {
         const streamPayload =
           streamResult.status === "fulfilled" ? streamResult.value?.data : null;
 
-        const merged = mergeEventData(
+        let merged = mergeEventData(
           getEventFromViewResponse(viewPayload),
           getEventFromStreamResponse(streamPayload),
         );
+
+        if (merged && hasGeneratedStream(merged) && !hasStreamAccessDetails(merged)) {
+          const startResult = await api.post(
+            `/api/v1/events/${eventId}/streams/start`,
+            {},
+            authHeaders(token),
+          );
+
+          merged = mergeEventData(
+            merged,
+            getEventFromStreamResponse(startResult?.data),
+          );
+        }
 
         if (!merged) {
           throw new Error("Could not load stream details for this event.");
@@ -405,11 +438,18 @@ export default function EventStreamControlPage() {
     setPendingAction(key);
 
     try {
-      await showPromise(request(), {
+      const response = await showPromise(request(), {
         loading: loadingText,
         success: successText,
         error: (err) => getErrorMessage(err),
       });
+
+      const responsePayload = response?.data;
+      const streamEvent = getEventFromStreamResponse(responsePayload);
+
+      if (streamEvent) {
+        setEventData((currentEvent) => mergeEventData(currentEvent, streamEvent));
+      }
 
       await loadEventDetails({ background: true });
     } finally {
@@ -482,10 +522,10 @@ export default function EventStreamControlPage() {
         <div className="col-md-12 col-lg-10 col-xl-10 tw:lg:ml-30 tw:py-24">
           <div className="tw:animate-pulse tw:space-y-4">
             <div className="tw:h-10 tw:w-64 tw:rounded-2xl tw:bg-gray-200" />
-            <div className="tw:h-56 tw:rounded-[32px] tw:bg-gray-200" />
+            <div className="tw:h-56 tw:rounded-4xl tw:bg-gray-200" />
             <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-2">
-              <div className="tw:h-64 tw:rounded-[32px] tw:bg-gray-200" />
-              <div className="tw:h-64 tw:rounded-[32px] tw:bg-gray-200" />
+              <div className="tw:h-64 tw:rounded-4xl tw:bg-gray-200" />
+              <div className="tw:h-64 tw:rounded-4xl tw:bg-gray-200" />
             </div>
           </div>
         </div>
@@ -501,7 +541,7 @@ export default function EventStreamControlPage() {
         </div>
 
         <div className="col-md-12 col-lg-10 col-xl-10 tw:lg:ml-30 tw:py-24">
-          <div className="tw:rounded-[32px] tw:border tw:border-red-100 tw:bg-red-50 tw:p-6 tw:text-red-700">
+          <div className="tw:rounded-4xl tw:border tw:border-red-100 tw:bg-red-50 tw:p-6 tw:text-red-700">
             <div className="tw:text-lg tw:font-semibold">
               Could not load stream details
             </div>
@@ -602,7 +642,7 @@ export default function EventStreamControlPage() {
             </section>
 
             <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[1.25fr_0.85fr]">
-              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ede7ff] tw:bg-white tw:shadow-sm">
+              <section className="tw:overflow-hidden tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:shadow-sm">
                 <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[280px_1fr]">
                   <div className="tw:h-56 tw:bg-[#f5f0ff] tw:lg:h-full">
                     {posterUrl ? (
@@ -650,7 +690,7 @@ export default function EventStreamControlPage() {
                 </div>
               </section>
 
-              <aside className="tw:rounded-[32px] tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+              <aside className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div>
                     <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
@@ -747,7 +787,7 @@ export default function EventStreamControlPage() {
               </aside>
             </div>
 
-            <section className="tw:rounded-[32px] tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+            <section className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
               <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                 <div>
                   <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
