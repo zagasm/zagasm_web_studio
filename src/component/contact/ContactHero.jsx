@@ -140,7 +140,7 @@ export default function ContactHero() {
                 <span className="tw:block">
                   Prefer email?{" "}
                   <span className="tw:font-medium tw:text-white">
-                    support@zagasm.com
+                    support@studios.zagasm.com
                   </span>
                 </span>
                 <span className="tw:block">

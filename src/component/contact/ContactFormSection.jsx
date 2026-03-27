@@ -194,7 +194,7 @@ export default function ContactFormSection() {
                   <div>
                     <span className="tw:block tw:text-white/60">Email</span>
                     <span className="tw:block tw:text-white tw:font-medium">
-                      support@zagasm.com
+                      support@studios.zagasm.com
                     </span>
                   </div>
                 </div>

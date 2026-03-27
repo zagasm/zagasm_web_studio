@@ -14,11 +14,11 @@ export default function ContactBox() {
           <div className="tw:text-sm tw:text-gray-500">
             Data Protection Officer
           </div>
-          <div className="tw:font-medium">privacy@zagasm.com</div>
+          <div className="tw:font-medium">privacy@studios.zagasm.com</div>
         </div>
         <div className="tw:bg-gray-50 tw:rounded-xl tw:p-4">
           <div className="tw:text-sm tw:text-gray-500">Support Team</div>
-          <div className="tw:font-medium">support@zagasm.com</div>
+          <div className="tw:font-medium">support@studios.zagasm.com</div>
         </div>
         <div className="tw:bg-gray-50 tw:rounded-xl tw:p-4">
           <div className="tw:text-sm tw:text-gray-500">Response Time</div>

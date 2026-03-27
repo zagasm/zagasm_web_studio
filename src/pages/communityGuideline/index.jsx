@@ -44,10 +44,10 @@ export default function CommunityGuidelinesPage() {
             <span className="tw:block">
               Contact:{" "}
               <a
-                href="mailto:support@zagasm.com"
+                href="mailto:support@studios.zagasm.com"
                 className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
               >
-                support@zagasm.com
+                support@studios.zagasm.com
               </a>
             </span>
             <span className="tw:block">
@@ -665,10 +665,10 @@ export default function CommunityGuidelinesPage() {
                         <strong>Appeals:</strong> You can contest moderation
                         decisions by emailing{" "}
                         <a
-                          href="mailto:support@zagasm.com"
+                          href="mailto:support@studios.zagasm.com"
                           className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                         >
-                          support@zagasm.com
+                          support@studios.zagasm.com
                         </a>{" "}
                         with context and evidence.
                       </span>
@@ -690,10 +690,10 @@ export default function CommunityGuidelinesPage() {
                     If you see content or behavior that breaks these Guidelines,
                     please report it. Use the in-app report controls or email{" "}
                     <a
-                      href="mailto:abuse@zagasm.com"
+                      href="mailto:abuse@studios.zagasm.com"
                       className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
-                      abuse@zagasm.com
+                      abuse@studios.zagasm.com
                     </a>{" "}
                     with links, timestamps, and any supporting evidence you can
                     safely share.

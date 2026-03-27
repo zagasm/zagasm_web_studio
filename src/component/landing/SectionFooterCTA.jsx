@@ -56,7 +56,7 @@ export default function Footer() {
                 </div>
                 <div className="tw:flex tw:items-center tw:gap-2 text-dark">
                   <Mail size={16} className="tw:text-[#8F07E7]" />
-                  <span>support@zagasm.com</span>
+                  <span>support@studios.zagasm.com</span>
                 </div>
                 <address className="tw:not-italic tw:text-gray-500 tw:mt-2">
                   16192 Coastal Highway Lewes,{" "}

@@ -141,7 +141,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                             {currency.code || ""} {payment.amount || ""}
                           </p>
                         </div>
-                        
+
                       </div>
                     </div>
 
@@ -152,7 +152,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                     <p>
                       Need help? Contact{" "}
                       <span className="tw:text-primary tw:font-medium">
-                        support@zagasm.com
+                        support@studios.zagasm.com
                       </span>
                     </p>
                     <button

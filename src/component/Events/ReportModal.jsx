@@ -52,9 +52,9 @@ export default function ReportModal({ open, onClose, onSubmit }) {
             leaveTo="tw:opacity-0 tw:translate-y-1"
           >
             <Dialog.Panel className="tw:w-full tw:max-w-md tw:bg-white tw:rounded-2xl tw:shadow-lg tw:p-5">
-              <Dialog.Title className="tw:text-lg tw:font-semibold tw:mb-2">
+              <span className="tw:block tw:text-xl tw:font-semibold tw:mb-2">
                 Report event
-              </Dialog.Title>
+              </span>
               <p className="tw:text-sm tw:text-gray-600 tw:mb-4">
                 Select a reason. We’ll review this report.
               </p>

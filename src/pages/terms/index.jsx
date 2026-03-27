@@ -44,10 +44,10 @@ export default function TermsOfServicePage() {
             <span className="tw:block">
               Contact:{" "}
               <a
-                href="mailto:support@zagasm.com"
+                href="mailto:support@studios.zagasm.com"
                 className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
               >
-                support@zagasm.com
+                support@studios.zagasm.com
               </a>
             </span>
             <span className="tw:block">
@@ -692,10 +692,10 @@ export default function TermsOfServicePage() {
                       for a defined period, or permanently ban accounts,
                       depending on severity and history. Appeals can be sent to{" "}
                       <a
-                        href="mailto:support@zagasm.com"
+                        href="mailto:support@studios.zagasm.com"
                         className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
-                        support@zagasm.com
+                        support@studios.zagasm.com
                       </a>
                       .
                     </span>
@@ -794,10 +794,10 @@ export default function TermsOfServicePage() {
                       <strong>Submission process:</strong> Send rights or policy
                       complaints to{" "}
                       <a
-                        href="mailto:support@zagasm.com"
+                        href="mailto:support@studios.zagasm.com"
                         className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
-                        support@zagasm.com
+                        support@studios.zagasm.com
                       </a>{" "}
                       with relevant details, including your contact information,
                       URLs or IDs of affected content, and evidence supporting

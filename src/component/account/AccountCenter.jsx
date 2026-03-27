@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import {
+  PiBookmarkDuotone,
+  PiBookmarkSimple,
+  PiBookOpenText,
+  PiHeadset,
+  PiLockKey,
+  PiMoney,
+  PiPower,
+  PiProhibitInset,
+  PiShieldSlash,
+  PiWallet,
+} from "react-icons/pi";
 import { showError, showSuccess } from "../ui/toast";
 import { getInitials, hasProfileImage } from "../Organizers/organiser.utils";
 import VerificationModal from "./VerificationModal";
@@ -27,17 +38,15 @@ const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed 
       ) : Icon ? (
         <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-[18px] tw:border tw:border-white/50 tw:bg-white/35 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-xl">
           <Icon
-            className={`tw:size-3 tw:md:size-5 ${
-              isRed ? "tw:text-red-500" : "tw:text-gray-700"
-            }`}
+            className={`tw:size-6 tw:md:size-8 tw:text-primary ${isRed ? "tw:text-red-500" : "tw:text-gray-700"
+              }`}
           />
         </span>
       ) : null}
 
       <span
-        className={`tw:relative tw:text-[11px] tw:md:text-sm tw:font-medium tw:leading-5 ${
-          isRed ? "tw:text-red-600" : "tw:text-gray-900"
-        }`}
+        className={`tw:relative tw:text-[11px] tw:md:text-sm tw:font-medium tw:leading-5 ${isRed ? "tw:text-red-600" : "tw:text-gray-900"
+          }`}
       >
         {label}
       </span>
@@ -86,7 +95,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
 
   const securityItems = [
     {
-      icon: "/account-center/disable.png",
+      iconComponent: PiShieldSlash,
       label: "Blocked Organizers / Users",
       to: "/account/blocked",
     },
@@ -94,22 +103,22 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
 
   const supportItems = [
     {
-      icon: "/account-center/online-service.png",
+      iconComponent: PiHeadset,
       label: "Community Guidelines",
       to: "/community-guidelines",
     },
     {
-      icon: "/account-center/law.png",
+      iconComponent: PiBookOpenText,
       label: "Terms of Service",
       to: "/terms-of-service",
     },
     {
-      icon: "/account-center/privacy-policy.png",
+      iconComponent: PiLockKey,
       label: "Privacy Policy",
       to: "/privacy-policy",
     },
     {
-      icon: "/account-center/disable.png",
+      iconComponent: PiProhibitInset,
       label: "Deactivate Account",
       onClick: onDeactivate,
       isRed: false,
@@ -138,9 +147,8 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
               className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-4 tw:rounded-[30px] tw:border tw:border-white/45 tw:bg-white/24 tw:p-4 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition hover:tw:bg-white/32"
             >
               <div
-                className={`tw:flex tw:h-16 tw:w-16 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-white/55 tw:shadow-[0_8px_20px_rgba(148,163,184,0.18)] ${
-                  showProfileImage ? "tw:bg-white/30" : "tw:bg-white/45"
-                }`}
+                className={`tw:flex tw:h-16 tw:w-16 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-white/55 tw:shadow-[0_8px_20px_rgba(148,163,184,0.18)] ${showProfileImage ? "tw:bg-white/30" : "tw:bg-white/45"
+                  }`}
               >
                 {showProfileImage ? (
                   <img
@@ -167,40 +175,43 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                       alt=""
                     />
                   ) : null}
-                  <Link
-                    to="/profile/edit-profile"
-                    onClick={(event) => event.stopPropagation()}
-                    className="tw:ml-1 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/55 tw:bg-white/45 tw:text-gray-500 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-xl tw:transition hover:tw:bg-white/65 hover:tw:text-gray-900"
-                    aria-label="Edit profile"
-                    title="Edit profile"
-                  >
-                    <Pencil className="tw:h-4 tw:w-4" />
-                  </Link>
                 </div>
-                <span className="tw:mt-1 tw:block tw:truncate tw:text-sm tw:text-gray-500">
-                  {user?.email || "user@example.com"}
+                <span className="tw:mt-1 tw:block tw:text-sm tw:font-medium tw:text-gray-500">
+                  View public profile
                 </span>
               </div>
             </div>
 
-            {!user?.subscription?.isActive ? (
-              <div className="tw:flex tw:w-full tw:flex-col tw:gap-3 tw:rounded-[28px] tw:bg-blue-700 tw:p-5 tw:text-white tw:lg:max-w-md">
-                <div>
-                  <span className="tw:block tw:text-sm tw:font-semibold">
-                    Zagasm Studios Verification Badge
-                  </span>
-                  <span className="tw:mt-1 tw:block tw:text-sm tw:text-white/90">
-                    Get the blue checkmark and unlock premium features.
-                  </span>
-                </div>
+            {user?.subscription?.isActive ? (
+              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[28px] tw:bg-primary tw:p-5 tw:text-white tw:lg:max-w-md">
+                <span className="tw:pointer-events-none tw:absolute tw:-right-6 tw:-top-6 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/10 tw:blur-2xl" />
+                <span className="tw:pointer-events-none tw:absolute tw:-left-5 tw:bottom-0 tw:h-20 tw:w-20 tw:rounded-full tw:bg-sky-300/10 tw:blur-2xl" />
+                <img
+                  src="/images/verifiedIcon.svg"
+                  alt=""
+                  className="tw:pointer-events-none tw:absolute tw:-right-4 tw:top-1/2 tw:h-28 tw:w-28 tw:-translate-y-1/2 tw:opacity-[0.14] tw:grayscale tw:brightness-[2.4] tw:contrast-125 tw:md:h-36 tw:md:w-36"
+                />
 
-                <Link
-                  to="/subscription"
-                  style={{ borderRadius: 12 }}
-                  className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition hover:tw:bg-white/90"
-                >
-                  Subscribe Now
-                </Link>
+                <div className="tw:relative tw:flex tw:w-full tw:flex-col tw:gap-3">
+                  <div>
+                    <span className="tw:block tw:text-sm tw:font-semibold">
+                      Zagasm Studios Verification Badge
+                    </span>
+                    <span className="tw:mt-1 tw:block tw:text-sm tw:text-white/90">
+                      Get the blue checkmark and unlock premium features.
+                    </span>
+                  </div>
+
+                  <Link
+                    to="/subscription"
+                    style={{ borderRadius: 12 }}
+                    className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition hover:tw:bg-white/90"
+                  >
+                    <span className="tw:text-primary">
+                      Subscribe Now
+                    </span>
+                  </Link>
+                </div>
               </div>
             ) : null}
           </div>
@@ -228,13 +239,13 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
 
         <section className="tw:grid tw:grid-cols-2 tw:gap-4 tw:md:grid-cols-3">
           <QuickActionCard
-            icon="/images/saveIcon.svg"
+            iconComponent={PiBookmarkDuotone}
             label="View Saved Events"
             to="/event/saved-events"
           />
           {isOrganizer ? (
             <QuickActionCard
-              icon="/account-center/wallet.png"
+              iconComponent={PiMoney}
               label="Payout"
               to="/account/wallet"
             />
@@ -242,7 +253,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
           {securityItems.map((item) => (
             <QuickActionCard
               key={item.label}
-              icon={item.icon}
+              iconComponent={item.iconComponent}
               label={item.label}
               to={item.to}
               onClick={item.onClick}
@@ -252,7 +263,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
           {supportItems.map((item) => (
             <QuickActionCard
               key={item.label}
-              icon={item.icon}
+              iconComponent={item.iconComponent}
               label={item.label}
               to={item.to}
               onClick={item.onClick}
@@ -260,7 +271,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
             />
           ))}
           <QuickActionCard
-            icon="/account-center/switch.png"
+            iconComponent={PiPower}
             label="Logout"
             onClick={onLogout}
             isRed

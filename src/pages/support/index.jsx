@@ -15,7 +15,7 @@ function Support() {
         "Make sure your internet connection is stable.",
         "Update the app to the latest version from your app store.",
         "If you use social login, confirm the correct account is selected.",
-        "If the problem persists, contact us at support@zagasm.com.",
+        "If the problem persists, contact us at support@studios.zagasm.com.",
       ],
     },
     {
@@ -89,7 +89,7 @@ function Support() {
       answer: [
         "Make sure you’re logged into the same account used for purchase.",
         "From the event page, tap Access Ticket to link your purchase.",
-        "If you still can’t join, contact support@zagasm.com with your payment reference.",
+        "If you still can’t join, contact support@studios.zagasm.com with your payment reference.",
       ],
     },
     {
@@ -151,7 +151,7 @@ function Support() {
         <p>Still need help? We’d love to hear from you 💌</p>
         <ul>
           <li>
-            📧 Email: <a href="mailto:support@zagasm.com">support@zagasm.com</a>
+            📧 Email: <a href="mailto:support@studios.zagasm.com">support@studios.zagasm.com</a>
           </li>
           <li>
             🌐 Website:{" "}

@@ -37,10 +37,10 @@ export default function PrivacyPolicyPage() {
           <div className="tw:mt-2 tw:text-xs tw:md:text-sm tw:text-slate-500">
             Contact:{" "}
             <a
-              href="mailto:support@zagasm.com"
+              href="mailto:support@studios.zagasm.com"
               className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
             >
-              support@zagasm.com
+              support@studios.zagasm.com
             </a>{" "}
             · Address:{" "}
             <span className="tw:font-medium">
@@ -89,10 +89,10 @@ export default function PrivacyPolicyPage() {
                   For any inquiries, concerns, or to exercise your privacy
                   rights, you can contact our Data Protection Officer (DPO) at{" "}
                   <a
-                    href="mailto:support@zagasm.com"
+                    href="mailto:support@studios.zagasm.com"
                     className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
-                    support@zagasm.com
+                    support@studios.zagasm.com
                   </a>
                   . We aim to respond to valid requests within one month,
                   extendable in limited cases as permitted by law. This policy
@@ -689,10 +689,10 @@ export default function PrivacyPolicyPage() {
                 <p className="tw:mt-3 tw:text-xs tw:md:text-sm tw:text-slate-500">
                   To exercise your rights, contact us at{" "}
                   <a
-                    href="mailto:support@zagasm.com"
+                    href="mailto:support@studios.zagasm.com"
                     className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
-                    support@zagasm.com
+                    support@studios.zagasm.com
                   </a>{" "}
                   or use the in-app privacy request tools. We may need to verify
                   your identity before acting on your request.
@@ -899,10 +899,10 @@ export default function PrivacyPolicyPage() {
                   <li>
                     <strong>Email:</strong>{" "}
                     <a
-                      href="mailto:support@zagasm.com"
+                      href="mailto:support@studios.zagasm.com"
                       className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
-                      support@zagasm.com
+                      support@studios.zagasm.com
                     </a>
                   </li>
                   <li>

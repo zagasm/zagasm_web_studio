@@ -19,8 +19,8 @@ export const EventStructuredData = ({ event }) => {
     "startDate": event.eventDate ? `${event.eventDate}T${event.startTime || '00:00'}` : undefined,
     "endDate": event.endDate ? `${event.endDate}T${event.endTime || '23:59'}` : undefined,
     "eventStatus": "https://schema.org/EventScheduled",
-    "eventAttendanceMode": event.eventType === 'virtual' 
-      ? "https://schema.org/OnlineEventAttendanceMode" 
+    "eventAttendanceMode": event.eventType === 'virtual'
+      ? "https://schema.org/OnlineEventAttendanceMode"
       : "https://schema.org/OfflineEventAttendanceMode",
     "location": {
       "@type": event.eventType === 'virtual' ? "VirtualLocation" : "Place",
@@ -74,7 +74,7 @@ export const OrganizationStructuredData = () => {
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "Customer Service",
-      "email": "support@zagasm.com"
+      "email": "support@studios.zagasm.com"
     }
   };
 

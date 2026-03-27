@@ -1,20 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import SideBarNav from "../../pageAssets/SideBarNav";
 import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
 
-import GuestPerformers from "../../../component/Events/GuestPerformers";
-import Remarks from "../../../component/Events/Remarks";
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
-import MobileStickyBar from "../../../component/Events/MobileStickyBar";
 import ReportModal from "../../../component/Events/ReportModal";
 import AccessTypeModal from "../../../component/Events/AccessTypeModal";
 import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
 
-import { formatEventDateTime, randomAvatar } from "../../../utils/ui";
+import { formatEventDateTime } from "../../../utils/ui";
 import { useAuth } from "../../auth/AuthContext";
 import {
   CountdownPill,
@@ -26,22 +22,59 @@ import {
   CalendarDays,
   Share2,
   Flag,
-  Star,
-  Users,
-  Share,
   ArrowLeft,
   Ticket,
   MapPin,
-  Bookmark,
 } from "lucide-react";
 import EventShareModal from "../../../component/Events/EvenetShareModal";
 import TicketPromptModal from "../../../component/Events/TicketPromptModal";
-import HlsVideoPlayer from "../../../component/HlsVideoPlayer";
+
 function isUuid(value = "") {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     String(value)
   );
 }
+
+function normalizeViewEvent(rawEvent) {
+  if (!rawEvent) return null;
+
+  const poster =
+    Array.isArray(rawEvent.poster) && rawEvent.poster.length > 0
+      ? rawEvent.poster
+      : rawEvent.icon_url
+      ? [{ type: "image", url: rawEvent.icon_url }]
+      : [];
+
+  return {
+    ...rawEvent,
+    poster,
+    status: String(rawEvent.status || "upcoming").toLowerCase(),
+    hostName:
+      rawEvent.hostName ||
+      rawEvent.userName ||
+      rawEvent.organizer_name ||
+      "Event Organizer",
+    organiserId:
+      rawEvent.organiserId ||
+      rawEvent.organizerId ||
+      rawEvent.hostId ||
+      rawEvent.user_id,
+    eventType:
+      rawEvent.eventType ||
+      rawEvent.eventTypeFullDetails?.name ||
+      rawEvent.event_type ||
+      "Event",
+    hostHasActiveSubscription:
+      rawEvent.hostHasActiveSubscription ||
+      rawEvent.hostSubscription?.isActive ||
+      false,
+    is_saved: !!rawEvent.is_saved,
+    is_following_organizer: !!(
+      rawEvent.is_following_organizer || rawEvent.is_following
+    ),
+  };
+}
+
 /* ---------- Page ---------- */
 export default function ViewEvent() {
   const { eventId } = useParams();
@@ -49,7 +82,6 @@ export default function ViewEvent() {
   const [event, setEvent] = useState(null);
   const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(null);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -119,12 +151,12 @@ export default function ViewEvent() {
 
         const recommendations =
           data?.recommendations ||
-          data?.recommended.data ||
+          data?.recommended?.data ||
           data?.recs ||
           data?.data?.recommendations ||
           [];
 
-        setEvent(ev);
+        setEvent(normalizeViewEvent(ev));
         setRecs(recommendations);
 
         setIsSaved(!!ev?.is_saved);
@@ -305,8 +337,6 @@ export default function ViewEvent() {
 
   if (!event) return null;
 
-  const remarks = Array.isArray(event.remarks) ? event.remarks : [];
-
   const formattedDateTime = formatEventDateTime(
     event.eventDate,
     event.startTime
@@ -321,8 +351,6 @@ export default function ViewEvent() {
     (event.eventType?.toLowerCase() === "virtual"
       ? "Online event"
       : "Location to be announced");
-
-  console.log({ event });
 
   return (
     <>
@@ -391,10 +419,10 @@ export default function ViewEvent() {
       </Helmet>
 
       {/* PAGE BG */}
-      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:pb-10 tw:text-black">
+      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[radial-gradient(circle_at_top,#e8f1ff_0%,#f8fafc_38%,#eef2f7_100%)] tw:pt-20 tw:pb-10 tw:text-black">
         <div className="tw:max-w-6xl tw:mx-auto tw:px-2 tw:md:px-6 tw:lg:px-8">
           {/* TOP BAR */}
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-5 tw:mt-10">
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-5 tw:mt-10 tw:rounded-[28px] tw:border tw:border-white/60 tw:bg-white/65 tw:px-3 tw:py-3 tw:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:backdrop-blur-xl">
             <button
               style={{
                 borderRadius: "50%",
@@ -410,6 +438,9 @@ export default function ViewEvent() {
               <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate tw:uppercase">
                 {event.title}
               </span>
+              <p className="tw:mt-2 tw:max-w-2xl tw:text-center tw:text-sm tw:leading-6 tw:text-gray-600 tw:line-clamp-2 md:tw:line-clamp-3">
+                {event.description || "No description available for this event yet."}
+              </p>
               <div className="tw:mt-1 tw:inline-flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
                 <span className="tw:bg-[#E5E7EB] tw:text-[10px] tw:px-2.5 tw:py-1 tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:text-gray-700">
                   <Ticket className="tw:w-3 tw:h-3" />
@@ -445,7 +476,7 @@ export default function ViewEvent() {
           </div>
 
           {/* MAIN CARD */}
-          <div className="tw:bg-white tw:border tw:border-gray-100 tw:rounded-3xl tw:overflow-hidden tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+          <div className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-white/65 tw:bg-white/75 tw:shadow-[0_24px_70px_rgba(15,23,42,0.08)] tw:backdrop-blur-xl">
             {/* HERO POSTER */}
             <div className="tw:relative tw:h-[230px] tw:md:h-[430px] tw:w-full tw:overflow-hidden">
               {posterUrl ? (
@@ -459,11 +490,11 @@ export default function ViewEvent() {
               )}
 
               {/* Soft linear overlay bottom */}
-              <div className="tw:absolute tw:inset-x-0 tw:bottom-0 tw:h-28 tw:bg-linear-to-t tw:from-black/60 tw:via-black/20 tw:to-transparent" />
+              <div className="tw:absolute tw:inset-0 tw:bg-linear-to-t tw:from-black/70 tw:via-black/18 tw:to-transparent" />
 
               {/* Live / Upcoming / Sold out badge */}
               <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
-                <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:bg-black/70 tw:text-white tw:text-[11px] tw:rounded-full tw:backdrop-blur-sm">
+                <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-full tw:border tw:border-white/20 tw:bg-black/45 tw:text-white tw:text-[11px] tw:backdrop-blur-md">
                   <span
                     className={`tw:inline-block tw:size-2 tw:rounded-full ${
                       isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
@@ -480,7 +511,7 @@ export default function ViewEvent() {
 
               {/* Meta strip at bottom of poster */}
               <div className="tw:absolute tw:bottom-4 tw:left-4 tw:right-4">
-                <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:px-3.5 tw:py-3 tw:bg-black/70 tw:rounded-2xl tw:text-xs tw:text-gray-100 tw:backdrop-blur-sm">
+                <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:rounded-[22px] tw:border tw:border-white/15 tw:bg-black/35 tw:px-3.5 tw:py-3 tw:text-xs tw:text-gray-100 tw:backdrop-blur-md">
                   <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
                     <div className="tw:inline-flex tw:items-center tw:gap-1.5">
                       <CalendarDays className="tw:w-4 tw:h-4" />
@@ -493,12 +524,15 @@ export default function ViewEvent() {
                       </span>
                     </div>
                   </div>
+                  <div className="tw:inline-flex tw:items-center tw:rounded-full tw:bg-white/12 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium">
+                    {priceDisplay}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* SUMMARY STRIP */}
-            <div className="tw:px-4 tw:md:px-8 tw:py-4 tw:border-b tw:border-gray-100 tw:bg-[#F9FAFB]">
+            <div className="tw:border-b tw:border-gray-100 tw:bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw:px-4 tw:py-4 tw:md:px-8">
               <div className="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:justify-between tw:gap-4">
                 {/* Left: Organizer + countdown */}
                 <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-3">
@@ -539,11 +573,13 @@ export default function ViewEvent() {
                     </div>
                   </div>
 
-                  <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:text-zinc-600">
-                    <div className="tw:flex tw:items-center tw:gap-2">
-                      <CountdownPill target={startDate} />
+                  {event.status !== "ended" && (
+                    <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:text-zinc-600">
+                      <div className="tw:flex tw:items-center tw:gap-2">
+                        <CountdownPill target={startDate} />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Right: Price + CTA */}
@@ -628,7 +664,7 @@ export default function ViewEvent() {
             </div>
 
             {/* BODY SECTIONS */}
-            <div className="tw:bg-[#F7F7F9]">
+            <div className="tw:bg-[linear-gradient(180deg,#f8fafc_0%,#f3f6fb_100%)]">
               {/* ORGANIZER CARD */}
               <div className="tw:px-4 tw:md:px-6 tw:pt-5 tw:pb-6">
                 <div className="tw:w-full tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-8 tw:py-5 tw:shadow-[0_10px_30px_rgba(15,23,42,0.06)] tw:relative">
@@ -715,138 +751,6 @@ export default function ViewEvent() {
                 </div>
               </div>
 
-              {/* SPECIAL GUESTS */}
-              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
-                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                  <div className="tw:flex tw:items-center tw:justify-between tw:mb-3">
-                    <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:text-gray-900">
-                      Special Guests
-                    </span>
-                  </div>
-
-                  <div
-                    className="
-                      tw:overflow-x-auto tw:pb-1
-                      tw:[&::-webkit-scrollbar]:hidden
-                      tw:[-ms-overflow-style:'none']
-                      tw:[scrollbar-width:'none']
-                    "
-                  >
-                    <div className="tw:flex tw:flex-nowrap tw:gap-4 tw:min-w-max">
-                      <GuestPerformers performers={event.eventPerformers} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* DESCRIPTION */}
-              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
-                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                  <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:mb-3 tw:block">
-                    Event Description
-                  </span>
-
-                  <div className="tw:w-full tw:bg-[#F3F4F6] tw:rounded-xl tw:px-4 tw:py-3 tw:text-sm tw:text-gray-700 tw:leading-relaxed">
-                    <p
-                      className={
-                        expanded ? "" : "tw:line-clamp-3 tw:md:line-clamp-4"
-                      }
-                    >
-                      {event.description ||
-                        "No description available for this event yet."}
-                    </p>
-
-                    {event.description?.length > 140 && (
-                      <button
-                        className="tw:text-primary tw:text-xs tw:font-medium tw:mt-1"
-                        onClick={() => setExpanded(!expanded)}
-                      >
-                        {expanded ? "Read less" : "Read more…"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* EVENT STATS */}
-              <div className="tw:px-4 tw:md:px-6 tw:pb-6">
-                <div className="tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-6 tw:py-4 tw:shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                  <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:mb-4 tw:block">
-                    Event Stats
-                  </span>
-
-                  <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-3">
-                    {/* Rating */}
-                    <div className="tw:flex tw:items-center tw:gap-3 tw:bg-[#F3F4F6] tw:rounded-xl tw:px-3 tw:py-2.5">
-                      <div className="tw:flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:rounded-full tw:bg-white">
-                        <Star className="tw:w-4 tw:h-4 tw:text-[#FACC15] tw:fill-[#FACC15]" />
-                      </div>
-                      <div>
-                        <div className="tw:text-xs tw:text-gray-500">
-                          Rating
-                        </div>
-                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
-                          {event.rating || "4.9"}{" "}
-                          <span className="tw:text-[11px] tw:text-gray-500">
-                            ({event.reviews_count || "1,240"} reviews)
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Attending */}
-                    <div className="tw:flex tw:items-center tw:gap-3 tw:bg-[#F3F4F6] tw:rounded-xl tw:px-3 tw:py-2.5">
-                      <div className="tw:flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:rounded-full tw:bg-white">
-                        <Users className="tw:w-4 tw:h-4 tw:text-gray-700" />
-                      </div>
-                      <div>
-                        <div className="tw:text-xs tw:text-gray-500">
-                          Attending
-                        </div>
-                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
-                          {event.attending_count || "+60k"} people
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Shares */}
-                    <div className="tw:flex tw:items-center tw:gap-3 tw:bg-[#F3F4F6] tw:rounded-xl tw:px-3 tw:py-2.5">
-                      <div className="tw:flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:rounded-full tw:bg-white">
-                        <Share className="tw:w-4 tw:h-4 tw:text-gray-700" />
-                      </div>
-                      <div>
-                        <div className="tw:text-xs tw:text-gray-500">
-                          Shares
-                        </div>
-                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
-                          {event.shares_count || "+60k"} shares
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* TOP COMMENT REVIEW + REMARK BOX */}
-              <div className="tw:px-4 tw:md:px-8 tw:py-6 tw:bg-white">
-                <span className="tw:text-lg tw:md:text-2xl tw:font-semibold tw:my-3 tw:pt-2 tw:block">
-                  Top Comment Review
-                </span>
-
-                <Remarks
-                  eventId={eventId}
-                  remarks={remarks}
-                  onAppend={(r) =>
-                    setEvent((p) => ({
-                      ...p,
-                      remarks: [r, ...(p?.remarks || [])],
-                    }))
-                  }
-                />
-              </div>
-
-              {/* Spacer for mobile sticky bar */}
-              <div className="tw:block tw:md:hidden tw:h-20" />
             </div>
           </div>
 
@@ -903,3 +807,4 @@ export default function ViewEvent() {
     </>
   );
 }
+
