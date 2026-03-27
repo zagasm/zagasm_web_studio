@@ -178,24 +178,6 @@ const AccountLeft = ({ user }) => {
           </div>
         )}
 
-        {/* 2. Dashboard Banner */}
-        {/* <Link className="tw:block">
-          <div className="tw:bg-[#F3E8FF] tw:rounded-3xl tw:p-5 tw:flex tw:items-center tw:justify-between tw:transition-opacity tw:hover:opacity-90">
-            <div className="tw:flex tw:items-center tw:gap-4">
-              <img className="tw:size-7" src="/images/dashIcon.svg" alt="" />
-              <div className="tw:flex tw:flex-col">
-                <span className="tw:text-[15px] tw:font-bold tw:text-gray-900">
-                  My Dashboard
-                </span>
-                <span className="tw:text-[12px] tw:text-gray-600">
-                  See all my activity metrics
-                </span>
-              </div>
-            </div>
-            <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-500" />
-          </div>
-        </Link> */}
-
         {/* 4. Quick Stats Grid */}
         <div className="row g-3">
           <div className="col-6">

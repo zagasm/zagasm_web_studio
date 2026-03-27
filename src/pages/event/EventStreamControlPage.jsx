@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Copy,
+  KeyRound,
   LoaderCircle,
   MonitorPlay,
   PauseCircle,
@@ -89,14 +90,16 @@ function hasStreamAccessDetails(event) {
   );
 }
 
-function hasGeneratedStream(event) {
-  const stream = event?.stream;
-  const streamingApi = stream?.streaming_api;
+function shouldHydrateStartedStream(event) {
+  const eventStatus = String(event?.status || "").toLowerCase();
+  const streamStatus = String(event?.stream_status || "").toLowerCase();
+  const isPaused = eventStatus === "paused" || Boolean(event?.stream?.is_paused);
 
-  return Boolean(
-    stream?.id ||
-    stream?.stream_key ||
-    streamingApi?.streamKey,
+  if (isPaused) return false;
+
+  return (
+    eventStatus === "live" ||
+    (streamStatus && streamStatus !== "not_started" && streamStatus !== "ended")
   );
 }
 
@@ -131,7 +134,15 @@ function getStatusTone(status) {
   return "tw:bg-emerald-50 tw:text-emerald-700 tw:border-emerald-200";
 }
 
-function DetailCard({ icon: Icon, label, value, helperText, onCopy, copied }) {
+function DetailCard({
+  icon: Icon,
+  label,
+  value,
+  helperText,
+  onCopy,
+  copied,
+  children,
+}) {
   return (
     <div className="tw:rounded-3xl tw:border tw:border-[#ece8ff] tw:bg-white tw:p-4 tw:shadow-sm">
       <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
@@ -142,23 +153,29 @@ function DetailCard({ icon: Icon, label, value, helperText, onCopy, copied }) {
           <span>{label}</span>
         </div>
 
-        <button
-          style={{ borderRadius: 20, fontSize: 12 }}
-          type="button"
-          onClick={() => onCopy?.(value, label)}
-          className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
-          aria-label={`Copy ${label}`}
-        >
-          <Copy className="tw:h-4 tw:w-4" />
-          <span className="tw:text-xs tw:font-semibold">
-            {copied ? "Copied" : "Copy"}
-          </span>
-        </button>
+        {onCopy ? (
+          <button
+            style={{ borderRadius: 20, fontSize: 12 }}
+            type="button"
+            onClick={() => onCopy?.(value, label)}
+            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
+            aria-label={`Copy ${label}`}
+          >
+            <Copy className="tw:h-4 tw:w-4" />
+            <span className="tw:text-xs tw:font-semibold">
+              {copied ? "Copied" : "Copy"}
+            </span>
+          </button>
+        ) : null}
       </div>
 
-      <div className="tw:mt-4 tw:break-all tw:text-sm tw:font-semibold tw:text-gray-900">
-        {value || "Will appear after you start the stream."}
-      </div>
+      {children ? (
+        <div className="tw:mt-4">{children}</div>
+      ) : (
+        <div className="tw:mt-4 tw:break-all tw:text-sm tw:font-semibold tw:text-gray-900">
+          {value || "Will appear after you start the stream."}
+        </div>
+      )}
 
       {helperText ? (
         <div className="tw:mt-2 tw:text-xs tw:text-gray-500">{helperText}</div>
@@ -246,22 +263,19 @@ export default function EventStreamControlPage() {
       setError("");
 
       try {
-        const [viewResult, streamResult] = await Promise.allSettled([
-          api.get(`/api/v1/events/${eventId}/view`, authHeaders(token)),
-          api.get(`/api/v1/events/${eventId}/streams`, authHeaders(token)),
-        ]);
-
-        const viewPayload =
-          viewResult.status === "fulfilled" ? viewResult.value?.data : null;
-        const streamPayload =
-          streamResult.status === "fulfilled" ? streamResult.value?.data : null;
-
-        let merged = mergeEventData(
-          getEventFromViewResponse(viewPayload),
-          getEventFromStreamResponse(streamPayload),
+        const viewResult = await api.get(
+          `/api/v1/events/${eventId}/view`,
+          authHeaders(token),
         );
+        const viewPayload = viewResult?.data;
 
-        if (merged && hasGeneratedStream(merged) && !hasStreamAccessDetails(merged)) {
+        let merged = getEventFromViewResponse(viewPayload);
+
+        if (
+          merged &&
+          shouldHydrateStartedStream(merged) &&
+          !hasStreamAccessDetails(merged)
+        ) {
           const startResult = await api.post(
             `/api/v1/events/${eventId}/streams/start`,
             {},
@@ -278,7 +292,7 @@ export default function EventStreamControlPage() {
           throw new Error("Could not load stream details for this event.");
         }
 
-        setEventData(merged);
+        setEventData((currentEvent) => mergeEventData(currentEvent, merged));
       } catch (err) {
         setError(getErrorMessage(err, "Could not load this stream page."));
       } finally {
@@ -368,24 +382,6 @@ export default function EventStreamControlPage() {
       showError(`Could not copy ${label.toLowerCase()}.`);
     }
   };
-
-  const priorityCards = useMemo(
-    () => [
-      {
-        label: "RTMP Server",
-        value: rtmpServer,
-        helperText: "Paste this into the OBS Server field.",
-        icon: Radio,
-      },
-      {
-        label: "Stream Key",
-        value: rtmpKey,
-        helperText: "Paste this into the OBS Stream Key field.",
-        icon: Video,
-      },
-    ],
-    [rtmpKey, rtmpServer],
-  );
 
   const instructionSteps = useMemo(
     () => [
@@ -590,7 +586,9 @@ export default function EventStreamControlPage() {
                   Stream Event
                 </span>
                 <p className="tw:mt-2 tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
-                  Generate your stream details, configure OBS, then switch the event live when you are ready for viewers.
+                  {isEnded
+                    ? "This event has ended. Streaming controls and OBS setup are no longer available for this session."
+                    : "Start the stream to generate your OBS credentials, then switch the event live when you are ready for viewers."}
                 </p>
               </div>
 
@@ -614,211 +612,284 @@ export default function EventStreamControlPage() {
               </div>
             </div>
 
-            <section className="">
-              <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-end tw:md:justify-between">
-                <div>
-                  <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900">
-                    OBS details
-                  </span>
-                  <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                    Start with these two values first so you can connect OBS immediately.
-                  </p>
-                </div>
-              </div>
-
-              <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2">
-                {priorityCards.map((item) => (
-                  <DetailCard
-                    key={item.label}
-                    icon={item.icon}
-                    label={item.label}
-                    value={item.value}
-                    helperText={item.helperText}
-                    onCopy={handleCopy}
-                    copied={copiedLabel === item.label}
-                  />
-                ))}
-              </div>
-            </section>
-
-            <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[1.25fr_0.85fr]">
-              <section className="tw:overflow-hidden tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:shadow-sm">
-                <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[280px_1fr]">
-                  <div className="tw:h-56 tw:bg-[#f5f0ff] tw:lg:h-full">
-                    {posterUrl ? (
-                      <img
-                        src={posterUrl}
-                        alt={eventData?.title || "Event poster"}
-                        className="tw:h-full tw:w-full tw:object-cover"
-                      />
-                    ) : (
-                      <div className="tw:flex tw:h-full tw:w-full tw:items-center tw:justify-center tw:text-primary">
-                        <Video className="tw:h-10 tw:w-10" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="tw:p-5 tw:md:p-6">
-                    <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-                      <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-[#f5f1ff] tw:px-3 tw:py-1 tw:text-xs tw:font-semibold tw:text-primary">
-                        <Radio className="tw:h-3.5 tw:w-3.5" />
-                        Event Stream Control
-                      </span>
+            {isEnded ? (
+              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ece7ff] tw:bg-[linear-gradient(135deg,#ffffff_0%,#faf7ff_52%,#f4efff_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
+                <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[1.15fr_0.85fr]">
+                  <div>
+                    <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/90 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:shadow-sm">
+                      <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
+                      Broadcast complete
                     </div>
 
-                    <span className="tw:mt-4 tw:text-2xl tw:font-bold tw:text-gray-900">
-                      {eventData?.title || "Untitled event"}
+                    <span className="tw:block tw:mt-5 tw:text-2xl tw:font-semibold tw:text-gray-900 tw:md:text-3xl">
+                      This live session has ended
                     </span>
+                    <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:leading-7 tw:text-gray-600 tw:md:text-base">
+                      OBS connection details, stream controls, and setup instructions are hidden because this event is no longer active. If you need help reviewing what happened or have feedback about the streaming experience, contact{" "}
+                      <a
+                        href="mailto:support@studios.zagasm.com"
+                        className="tw:font-semibold tw:text-primary hover:tw:underline"
+                      >
+                        support@studios.zagasm.com
+                      </a>
+                      .
+                    </p>
 
-                    <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-4 tw:text-sm tw:text-gray-600">
-                      <span className="tw:inline-flex tw:items-center tw:gap-2">
-                        <CalendarDays className="tw:h-4 tw:w-4 tw:text-primary" />
-                        {formattedDate || "Date not available"}
-                      </span>
-                      <span className="tw:inline-flex tw:items-center tw:gap-2">
-                        <Signal className="tw:h-4 tw:w-4 tw:text-primary" />
-                        Stream started: {formatStartedAt(stream?.started_at)}
-                      </span>
+                    <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-3">
+                      <div className="tw:rounded-3xl tw:border tw:border-white/80 tw:bg-white/90 tw:p-4">
+                        <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
+                          <CalendarDays className="tw:h-4 tw:w-4 tw:text-primary" />
+                          Event date
+                        </div>
+                        <div className="tw:mt-2 tw:text-sm tw:leading-6 tw:text-gray-600">
+                          {formattedDate || "Date not available"}
+                        </div>
+                      </div>
+
+                      <div className="tw:rounded-3xl tw:border tw:border-white/80 tw:bg-white/90 tw:p-4">
+                        <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
+                          <Signal className="tw:h-4 tw:w-4 tw:text-primary" />
+                          Final status
+                        </div>
+                        <div className="tw:mt-2 tw:text-sm tw:leading-6 tw:text-gray-600">
+                          Ended
+                        </div>
+                      </div>
+
+                      <div className="tw:rounded-3xl tw:border tw:border-white/80 tw:bg-white/90 tw:p-4">
+                        <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
+                          <Video className="tw:h-4 tw:w-4 tw:text-primary" />
+                          Event title
+                        </div>
+                        <div className="tw:mt-2 tw:text-sm tw:leading-6 tw:text-gray-600">
+                          {eventData?.title || "Untitled event"}
+                        </div>
+                      </div>
                     </div>
-
-                    {eventData?.description ? (
-                      <p className="tw:mt-4 tw:max-w-3xl tw:text-sm tw:leading-7 tw:text-gray-600">
-                        {eventData.description}
-                      </p>
-                    ) : null}
                   </div>
+
+                  <aside className="tw:rounded-[28px] tw:border tw:border-white/80 tw:bg-white/90 tw:p-5 tw:shadow-sm tw:md:p-6">
+                    <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
+                      Need anything after the event?
+                    </div>
+                    <div className="tw:mt-3 tw:space-y-3 tw:text-sm tw:leading-7 tw:text-gray-600">
+                      <p>Share any issues you noticed during setup, broadcast, or wrap-up.</p>
+                      <p>Include the event title and what happened so support can investigate faster.</p>
+                      <p>
+                        Email{" "}
+                        <a
+                          href="mailto:support@studios.zagasm.com"
+                          className="tw:font-semibold tw:text-primary hover:tw:underline"
+                        >
+                          support@studios.zagasm.com
+                        </a>
+                        {" "}if you need help.
+                      </p>
+                    </div>
+                  </aside>
                 </div>
               </section>
-
-              <aside className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
-                <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
-                  <div>
-                    <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
-                      Stream actions
+            ) : (
+              <>
+                <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[1.1fr_0.9fr]">
+                  <section>
+                    <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-end tw:md:justify-between">
+                      <div>
+                        <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900">
+                          OBS details
+                        </span>
+                        <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
+                          Start the stream first, then copy these values into OBS.
+                        </p>
+                      </div>
                     </div>
-                    <div className="tw:mt-1 tw:text-sm tw:text-gray-500">
-                      Start the stream, switch live, pause, resume, or end it from here.
+
+                    <div className="tw:mt-6">
+                      <DetailCard
+                        icon={KeyRound}
+                        label="RTMP Server and Stream Key"
+                        helperText="Set OBS Service to Custom, then paste the RTMP server and stream key into their matching fields."
+                      >
+                        <div className="tw:space-y-4">
+                          <div>
+                            <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-gray-500">
+                              RTMP Server
+                            </div>
+                            <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-start tw:sm:justify-between">
+                              <div className="tw:break-all tw:text-sm tw:font-semibold tw:text-gray-900">
+                                {rtmpServer || "Will appear after you start the stream."}
+                              </div>
+                              <button
+                                style={{ borderRadius: 20, fontSize: 12 }}
+                                type="button"
+                                onClick={() => handleCopy(rtmpServer, "RTMP Server")}
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
+                                aria-label="Copy RTMP Server"
+                              >
+                                <Copy className="tw:h-4 tw:w-4" />
+                                <span className="tw:text-xs tw:font-semibold">
+                                  {copiedLabel === "RTMP Server" ? "Copied" : "Copy"}
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="tw:border-t tw:border-[#f0ebff] tw:pt-4">
+                            <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-gray-500">
+                              Stream Key
+                            </div>
+                            <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-start tw:sm:justify-between">
+                              <div className="tw:break-all tw:text-sm tw:font-semibold tw:text-gray-900">
+                                {rtmpKey || "Will appear after you start the stream."}
+                              </div>
+                              <button
+                                style={{ borderRadius: 20, fontSize: 12 }}
+                                type="button"
+                                onClick={() => handleCopy(rtmpKey, "Stream Key")}
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
+                                aria-label="Copy Stream Key"
+                              >
+                                <Copy className="tw:h-4 tw:w-4" />
+                                <span className="tw:text-xs tw:font-semibold">
+                                  {copiedLabel === "Stream Key" ? "Copied" : "Copy"}
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </DetailCard>
+                    </div>
+                  </section>
+
+                  <aside className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+                    <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                      <div>
+                        <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
+                          Stream actions
+                        </div>
+                        <div className="tw:mt-1 tw:text-sm tw:text-gray-500">
+                          Start the stream, switch live, pause, resume, or end it from here.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
+                      {!hasStartedStream ? (
+                        <ActionButton
+                          onClick={async () => {
+                            setStageOverride("started");
+                            try {
+                              await handleStart();
+                            } catch (error) {
+                              setStageOverride("");
+                              throw error;
+                            }
+                          }}
+                          loading={pendingAction === "start"}
+                          className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
+                          icon={Radio}
+                        >
+                          Start stream
+                        </ActionButton>
+                      ) : null}
+
+                      {showGoLive ? (
+                        <ActionButton
+                          onClick={handleGoLive}
+                          loading={pendingAction === "go-live"}
+                          className="tw:bg-red-500 tw:text-white hover:tw:bg-red-600"
+                          icon={PlayCircle}
+                        >
+                          Go live
+                        </ActionButton>
+                      ) : null}
+
+                      {showPause ? (
+                        <ActionButton
+                          onClick={handleTogglePause}
+                          loading={pendingAction === "pause"}
+                          className="tw:bg-[#f7f3ff] tw:text-primary hover:tw:bg-[#efe6ff]"
+                          icon={PauseCircle}
+                        >
+                          {isPaused ? "Resume stream" : "Pause stream"}
+                        </ActionButton>
+                      ) : null}
+
+                      {showEnd ? (
+                        <ActionButton
+                          onClick={handleEnd}
+                          loading={pendingAction === "end"}
+                          className="tw:bg-gray-900 tw:text-white hover:tw:bg-black"
+                          icon={Square}
+                        >
+                          End stream
+                        </ActionButton>
+                      ) : null}
+
+                      {showWatch ? (
+                        <ActionButton
+                          onClick={() => setWatchModalOpen(true)}
+                          className="tw:bg-[#fff4f2] tw:text-[#d93a23] hover:tw:bg-[#ffe9e4]"
+                          icon={MonitorPlay}
+                        >
+                          Join live
+                        </ActionButton>
+                      ) : null}
+                    </div>
+
+                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#faf7ff] tw:p-4">
+                      <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
+                        <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
+                        What to do next
+                      </div>
+
+                      <div className="tw:mt-3 tw:text-sm tw:leading-7 tw:text-gray-600">
+                        {!hasStartedStream
+                          ? "Use Start stream to generate the RTMP server and stream key. Those OBS details will appear here immediately after."
+                          : isLive
+                            ? "Your event is live. You can pause it temporarily, let viewers join, or end it when the broadcast is over."
+                            : isPaused
+                              ? "The event is currently paused. Resume it when you are ready for viewers to continue watching."
+                              : "OBS details are ready. Start encoding from OBS, then press Go Live here when the feed is stable."}
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+
+                <section className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+                  <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+                    <div>
+                      <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+                        How to stream this event using OBS Studio
+                      </span>
+                      <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
+                        Use these steps to connect OBS to Zagasm Studios before you press Go Live.
+                      </p>
+                    </div>
+
+                    <div className="tw:flex tw:flex-wrap tw:gap-2">
+                      <span className="tw:rounded-full tw:border tw:border-[#ece8ff] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
+                        OBS Studio
+                      </span>
+                      <span className="tw:rounded-full tw:border tw:border-[#ece8ff] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
+                        Recommended: OBS Studio 28+
+                      </span>
                     </div>
                   </div>
-                </div>
 
-                <div className="tw:mt-5 tw:grid tw:grid-cols-3 tw:gap-3">
-                  {!hasStartedStream ? (
-                    <ActionButton
-                      onClick={async () => {
-                        setStageOverride("started");
-                        try {
-                          await handleStart();
-                        } catch (error) {
-                          setStageOverride("");
-                          throw error;
-                        }
-                      }}
-                      loading={pendingAction === "start"}
-                      className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
-                      icon={Radio}
-                    >
-                      Start stream
-                    </ActionButton>
-                  ) : null}
-
-                  {showGoLive ? (
-                    <ActionButton
-                      onClick={handleGoLive}
-                      loading={pendingAction === "go-live"}
-                      className="tw:bg-red-500 tw:text-white hover:tw:bg-red-600"
-                      icon={PlayCircle}
-                    >
-                      Go live
-                    </ActionButton>
-                  ) : null}
-
-                  {showPause ? (
-                    <ActionButton
-                      onClick={handleTogglePause}
-                      loading={pendingAction === "pause"}
-                      className="tw:bg-[#f7f3ff] tw:text-primary hover:tw:bg-[#efe6ff]"
-                      icon={PauseCircle}
-                    >
-                      {isPaused ? "Resume event" : "Pause event"}
-                    </ActionButton>
-                  ) : null}
-
-                  {showEnd ? (
-                    <ActionButton
-                      onClick={handleEnd}
-                      loading={pendingAction === "end"}
-                      className="tw:bg-gray-900 tw:text-white hover:tw:bg-black"
-                      icon={Square}
-                    >
-                      End stream
-                    </ActionButton>
-                  ) : null}
-
-                  {showWatch ? (
-                    <ActionButton
-                      onClick={() => setWatchModalOpen(true)}
-                      className="tw:bg-[#fff4f2] tw:text-[#d93a23] hover:tw:bg-[#ffe9e4]"
-                      icon={MonitorPlay}
-                    >
-                      Watch live
-                    </ActionButton>
-                  ) : null}
-                </div>
-
-                <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#faf7ff] tw:p-4">
-                  <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
-                    <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
-                    What to do next
+                  <div className="tw:mt-8 tw:space-y-6">
+                    {instructionSteps.map((step, index) => (
+                      <StepItem
+                        key={step.title}
+                        index={index + 1}
+                        title={step.title}
+                        description={step.description}
+                      />
+                    ))}
                   </div>
-
-                  <div className="tw:mt-3 tw:text-sm tw:leading-7 tw:text-gray-600">
-                    {!hasStartedStream
-                      ? "Generate your RTMP and SRT details first. We will show the full server URLs and stream keys here."
-                      : isEnded
-                        ? "This stream has ended. You can return to the event page or create another live session for a future event."
-                        : isLive
-                          ? "Your event is live. You can pause it temporarily, copy playback details, or end it when the broadcast is over."
-                          : isPaused
-                            ? "The event is currently paused. Resume it when you are ready for viewers to continue watching."
-                            : "OBS details are ready. Start encoding from OBS, then press Go Live here when the feed is stable."}
-                  </div>
-                </div>
-              </aside>
-            </div>
-
-            <section className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
-              <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
-                <div>
-                  <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
-                    How to stream this event using OBS Studio
-                  </span>
-                  <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                    Use these steps to connect OBS to Zagasm Studios before you press Go Live.
-                  </p>
-                </div>
-
-                <div className="tw:flex tw:flex-wrap tw:gap-2">
-                  <span className="tw:rounded-full tw:border tw:border-[#ece8ff] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
-                    OBS Studio
-                  </span>
-                  <span className="tw:rounded-full tw:border tw:border-[#ece8ff] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
-                    Recommended: OBS Studio 28+
-                  </span>
-                </div>
-              </div>
-
-              <div className="tw:mt-8 tw:space-y-6">
-                {instructionSteps.map((step, index) => (
-                  <StepItem
-                    key={step.title}
-                    index={index + 1}
-                    title={step.title}
-                    description={step.description}
-                  />
-                ))}
-              </div>
-            </section>
+                </section>
+              </>
+            )}
           </div>
         </div>
       </div>

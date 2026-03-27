@@ -1,20 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import EventCard from "./EventCard";
 import EventCardShimmer from "../Events/EventCardShimmer";
 
 export default function EventsGrid({
   events,
   loading,
+  loadingMore,
+  hasMore,
+  onLoadMore,
   error,
   isOwnProfile,
   isOrganiserProfile,
 }) {
   const [items, setItems] = useState(events ?? []);
+  const observerRef = useRef(null);
+  const loadMoreRef = useRef(null);
 
   // keep local list in sync when parent updates (new fetch, filter, etc.)
   useEffect(() => {
     setItems(events ?? []);
   }, [events]);
+
+  useEffect(() => {
+    loadMoreRef.current = onLoadMore;
+  }, [onLoadMore]);
+
+  useEffect(() => {
+    if (!hasMore || loading || loadingMore || !observerRef.current) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry?.isIntersecting) {
+          loadMoreRef.current?.();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "200px 0px",
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(observerRef.current);
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, items.length]);
 
   const handleDeleted = (id) => {
     setItems((prev) => prev.filter((e) => e.id !== id));
@@ -47,16 +78,28 @@ export default function EventsGrid({
   }
 
   return (
-    <div className="tw:mt-4 tw:md:mt-6 row tw:mb-20 tw:md:mb-0">
-      {items.map((e) => (
-        <EventCard
-          key={e.id}
-          event={e}
-          isOwnProfile={isOwnProfile}
-          isOrganiserProfile={isOrganiserProfile}
-          onDeleted={handleDeleted}
-        />
-      ))}
-    </div>
+    <>
+      <div className="tw:mt-4 tw:md:mt-6 row tw:mb-6 tw:md:mb-0">
+        {items.map((e) => (
+          <EventCard
+            key={e.id}
+            event={e}
+            isOwnProfile={isOwnProfile}
+            isOrganiserProfile={isOrganiserProfile}
+            onDeleted={handleDeleted}
+          />
+        ))}
+      </div>
+
+      <div ref={observerRef} className="tw:h-4 tw:w-full" />
+
+      {loadingMore ? (
+        <div className="row tw:pb-12">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <EventCardShimmer key={`more-${i}`} />
+          ))}
+        </div>
+      ) : null}
+    </>
   );
 }

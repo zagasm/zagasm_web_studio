@@ -23,6 +23,46 @@ function getApiErrorMessage(err) {
   return "Something went wrong. Please try again.";
 }
 
+function normalizeEventStatus(status) {
+  const normalized = (status ?? "").toString().toLowerCase().trim();
+
+  if (["live"].includes(normalized)) return "live";
+  if (["paused"].includes(normalized)) return "paused";
+  if (["ended", "completed", "past"].includes(normalized)) return "ended";
+  if (["upcoming", "soon"].includes(normalized)) return "upcoming";
+
+  return "upcoming";
+}
+
+function getStatusBadgeConfig(status) {
+  const normalized = normalizeEventStatus(status);
+
+  const badgeMap = {
+    live: {
+      label: "Live",
+      className: "tw:bg-red-50 tw:text-red-700 tw:border-red-100",
+      dotClassName: "tw:bg-red-500",
+    },
+    paused: {
+      label: "Paused",
+      className: "tw:bg-sky-50 tw:text-sky-700 tw:border-sky-100",
+      dotClassName: "tw:bg-sky-500",
+    },
+    upcoming: {
+      label: "Upcoming",
+      className: "tw:bg-amber-50 tw:text-amber-700 tw:border-amber-100",
+      dotClassName: "tw:bg-amber-500",
+    },
+    ended: {
+      label: "Ended",
+      className: "tw:bg-gray-100 tw:text-gray-700 tw:border-gray-200",
+      dotClassName: "tw:bg-gray-500",
+    },
+  };
+
+  return badgeMap[normalized];
+}
+
 export default function EventCard({
   event,
   isOwnProfile,
@@ -30,6 +70,14 @@ export default function EventCard({
   onDeleted,
 }) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
+  const normalizedStatus = useMemo(
+    () => normalizeEventStatus(event?.status),
+    [event?.status],
+  );
+  const statusBadge = useMemo(
+    () => getStatusBadgeConfig(event?.status),
+    [event?.status],
+  );
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [deleteError, setDeleteError] = useState("");
 
@@ -95,6 +143,9 @@ export default function EventCard({
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:flex tw:gap-2">
           {/* Edit */}
           <button
+            style={{
+              borderRadius: 20,
+            }}
             type="button"
             onClick={(e) => {
               e.stopPropagation();
@@ -109,6 +160,9 @@ export default function EventCard({
 
           {/* Delete */}
           <button
+            style={{
+              borderRadius: 20,
+            }}
             type="button"
             onClick={(e) => {
               e.stopPropagation();
@@ -126,6 +180,15 @@ export default function EventCard({
 
       {/* Clickable media/title section navigates to event page */}
       <div className="tw:cursor-pointer" onClick={goToEvent}>
+        <div
+          className={`tw:absolute tw:left-4 tw:top-4 tw:z-10 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-semibold tw:backdrop-blur-sm ${statusBadge.className}`}
+        >
+          <span
+            className={`tw:inline-block tw:h-2 tw:w-2 tw:rounded-full ${statusBadge.dotClassName}`}
+          />
+          <span>{statusBadge.label}</span>
+        </div>
+
         <MediaCarousel items={media} alt={event.title} />
       </div>
 
@@ -133,7 +196,7 @@ export default function EventCard({
         <div className="tw:flex tw:items-start tw:gap-2">
           <div
             onClick={goToEvent}
-            className="tw:uppercase tw:text-left tw:block tw:text-lg tw:text-black tw:font-semibold tw:flex-1"
+            className="tw:uppercase tw:text-left tw:block tw:text-[16px] tw:text-black tw:font-semibold tw:flex-1"
           >
             {event.title}
           </div>
@@ -156,8 +219,6 @@ export default function EventCard({
           )}
         </div>
 
-        <span className="tw:text-gray-400">{event.hostName}</span>
-
         <div className="tw:flex tw:items-center tw:justify-between tw:pt-1">
           <div className="tw:text-xs tw:inline-flex tw:items-center tw:gap-2 tw:text-gray-600">
             <Clock size={14} />
@@ -168,7 +229,7 @@ export default function EventCard({
           </div>
         </div>
 
-        <div className="tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-5 tw:text-gray-500">
+        {/* <div className="tw:mt-3 tw:flex tw:items-center tw:justify-between tw:gap-5 tw:text-gray-500">
           <div className="tw:space-x-5">
             <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm">
               <Eye size={14} /> 0
@@ -192,7 +253,7 @@ export default function EventCard({
               0
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* CTA */}
         {isOwnerEvent ? (
@@ -208,7 +269,13 @@ export default function EventCard({
             className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
             <span className="tw:mr-2">
-              {event?.status === "live" ? "Manage live stream" : "Start stream"}
+              {normalizedStatus === "live"
+                ? "Manage live stream"
+                : normalizedStatus === "paused"
+                  ? "Resume Event"
+                  : normalizedStatus === "ended"
+                    ? "View Event"
+                    : "Start stream"}
             </span>
           </button>
         ) : (

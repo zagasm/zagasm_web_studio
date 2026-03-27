@@ -7,16 +7,15 @@ export default function ProfileTabs({ user, isOwnProfile }) {
   const [statusTab, setStatusTab] = useState("all");
 
   // ---------- MY PROFILE ----------
-  const apiFilter = useMemo(() => {
-    if (statusTab === "upcoming") return "soon";
-    if (statusTab === "all") return "all";
-    return statusTab; // live, ended
-  }, [statusTab]);
+  const apiFilter = useMemo(() => statusTab, [statusTab]);
 
   const {
     events: myEvents,
     loading: myEventsLoading,
+    loadingMore: myEventsLoadingMore,
     error: myEventsError,
+    hasMore: myEventsHasMore,
+    loadMore: loadMoreMyEvents,
   } = useMyEvents(apiFilter, user?.id);
 
   // ---------- ORGANISER PROFILE ----------
@@ -52,7 +51,9 @@ export default function ProfileTabs({ user, isOwnProfile }) {
   // ---------- choose source ----------
   const events = isOrganiserProfileData ? organiserEventsByTab : myEvents;
   const loading = isOrganiserProfileData ? false : myEventsLoading;
+  const loadingMore = isOrganiserProfileData ? false : myEventsLoadingMore;
   const error = isOrganiserProfileData ? null : myEventsError;
+  const hasMore = isOrganiserProfileData ? false : myEventsHasMore;
 
   const heading = isOwnProfile ? "My Events" : "Events";
 
@@ -72,6 +73,9 @@ export default function ProfileTabs({ user, isOwnProfile }) {
         <EventsGrid
           events={events}
           loading={loading}
+          loadingMore={loadingMore}
+          hasMore={hasMore}
+          onLoadMore={loadMoreMyEvents}
           error={error}
           isOwnProfile={isOwnProfile}
           isOrganiserProfile={isOrganiserProfileData}
