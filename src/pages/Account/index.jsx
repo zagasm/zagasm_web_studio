@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 // Components
-import AccountLeft from "../../component/account/AccountLeft";
-import AccountRight from "../../component/account/AccountRight";
+import AccountCenter from "../../component/account/AccountCenter";
 import DeactivateAccountModal from "../../component/account/DeactivateAccountModal";
 
 // CSS
@@ -39,27 +38,13 @@ function Account() {
 
   return (
     <Fragment>
-      {/* Main Container with Light Grey Background */}
-      <div className="tw:font-sans account-page-wrapper tw:w-full tw:bg-[#F9FAFB] tw:pt-20">
-        <div className="container-fluid">
-          <div className="tw:grid tw:grid-cols-2 tw:gap-4">
-            {/* LEFT COLUMN */}
-            <div className="tw:col-span-2 tw:lg:col-span-1 account-scroll-area hide-scrollbar tw:bg-[#F9FAFB]">
-              <div className="tw:lg:mr-0">
-                <AccountLeft user={user} />
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN */}
-            <div className="tw:col-span-2 tw:lg:col-span-1 account-scroll-area hide-scrollbar tw:bg-[#F9FAFB]">
-              <div className="tw:max-w-2xl">
-                <AccountRight
-                  onLogout={handleForceLogout}
-                  onDeactivate={handleOpenConfirm}
-                />
-              </div>
-            </div>
-          </div>
+      <div className="tw:min-h-screen tw:w-full tw:bg-[#F6F7FB] tw:px-3 tw:pb-24 tw:pt-24 tw:font-sans tw:md:px-6 tw:lg:px-8">
+        <div className="tw:mx-auto tw:w-full tw:max-w-6xl">
+          <AccountCenter
+            user={user}
+            onLogout={handleForceLogout}
+            onDeactivate={handleOpenConfirm}
+          />
         </div>
       </div>
 

@@ -70,6 +70,7 @@ import EventEditPage from "./pages/event/EventEditPage.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
+import WalletHub from "./pages/Account/WalletHub.jsx";
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
@@ -322,6 +323,7 @@ export function App() {
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
               <Route path="blocked" element={<BlockedUsersPage />} />
+              <Route path="wallet" element={<WalletHub />} />
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
               <Route path="fund-wallet" element={<FundWalletPage />} />
               <Route path="payouts" element={<AccountPayouts />} />
