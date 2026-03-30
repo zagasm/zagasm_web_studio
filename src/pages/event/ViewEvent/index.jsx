@@ -4,16 +4,13 @@ import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
-
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import ReportModal from "../../../component/Events/ReportModal";
 import AccessTypeModal from "../../../component/Events/AccessTypeModal";
 import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
-
 import { formatEventDateTime } from "../../../utils/ui";
 import { useAuth } from "../../auth/AuthContext";
 import {
-  CountdownPill,
   eventStartDate,
   formatMetaLine,
   priceText,
@@ -25,9 +22,36 @@ import {
   ArrowLeft,
   Ticket,
   MapPin,
+  Clock,
 } from "lucide-react";
 import EventShareModal from "../../../component/Events/EvenetShareModal";
 import TicketPromptModal from "../../../component/Events/TicketPromptModal";
+import Countdown from "react-countdown";
+
+export function CountdownPill({ target }) {
+  if (!target) return null;
+
+  return (
+    <div className="tw:flex tw:items-center tw:gap-2 tw:text-base tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
+      <Clock className="tw:w-4 tw:h-4 tw:opacity-80" />
+
+      <Countdown
+        date={target.getTime()}
+        daysInHours={false}
+        renderer={({ days, hours, minutes, seconds }) => {
+          return (
+            <span>
+              {String(days).padStart(2, "0")}D:
+              {String(hours).padStart(2, "0")}H:
+              {String(minutes).padStart(2, "0")}M:
+              {String(seconds).padStart(2, "0")}S
+            </span>
+          );
+        }}
+      />
+    </div>
+  );
+}
 
 function isUuid(value = "") {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -42,8 +66,8 @@ function normalizeViewEvent(rawEvent) {
     Array.isArray(rawEvent.poster) && rawEvent.poster.length > 0
       ? rawEvent.poster
       : rawEvent.icon_url
-      ? [{ type: "image", url: rawEvent.icon_url }]
-      : [];
+        ? [{ type: "image", url: rawEvent.icon_url }]
+        : [];
 
   return {
     ...rawEvent,
@@ -59,6 +83,18 @@ function normalizeViewEvent(rawEvent) {
       rawEvent.organizerId ||
       rawEvent.hostId ||
       rawEvent.user_id,
+    hostId:
+      rawEvent.hostId ||
+      rawEvent.organiserId ||
+      rawEvent.organizerId ||
+      rawEvent.user_id,
+    hostImage:
+      rawEvent.hostImage ||
+      rawEvent.host_image ||
+      rawEvent.organizer_image ||
+      rawEvent.user?.profileUrl ||
+      rawEvent.user?.profile_image_id ||
+      "",
     eventType:
       rawEvent.eventType ||
       rawEvent.eventTypeFullDetails?.name ||
@@ -75,33 +111,69 @@ function normalizeViewEvent(rawEvent) {
   };
 }
 
-/* ---------- Page ---------- */
+function getTicketPromptStorageKey(eventIdentifier) {
+  return `zagasm:event-ticket-prompt-seen:${eventIdentifier}`;
+}
+
+function EventDetailShimmer() {
+  return (
+    <div className="tw:min-h-screen tw:w-full tw:bg-[radial-gradient(circle_at_top_left,#d9ebff_0%,#f6f9fc_34%,#eef4fb_72%,#f8fbff_100%)] tw:pb-12 tw:pt-20">
+      <div className="tw:mx-auto tw:max-w-7xl tw:px-3 tw:md:px-6 tw:lg:px-8">
+        <div className="tw:mb-6 tw:mt-10 tw:h-[74px] tw:animate-pulse tw:rounded-[28px] tw:border tw:border-white/70 tw:bg-white/55 tw:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:backdrop-blur-2xl" />
+
+        <div className="tw:overflow-hidden tw:rounded-[36px] tw:border tw:border-white/70 tw:bg-white/50 tw:p-4 tw:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:backdrop-blur-2xl tw:md:p-8">
+          <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[1.25fr_0.75fr]">
+            <div className="tw:space-y-6">
+              <div className="tw:h-80 tw:animate-pulse tw:rounded-4xl tw:bg-white/70 tw:md:h-[520px]" />
+
+              <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-4">
+                {[...Array(4)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="tw:h-[116px] tw:animate-pulse tw:rounded-[26px] tw:bg-white/70"
+                  />
+                ))}
+              </div>
+
+              <div className="tw:rounded-[30px] tw:bg-white/70 tw:p-6">
+                <div className="tw:h-4 tw:w-28 tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
+                <div className="tw:mt-5 tw:h-8 tw:w-3/4 tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
+                <div className="tw:mt-4 tw:space-y-3">
+                  <div className="tw:h-4 tw:w-full tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
+                  <div className="tw:h-4 tw:w-full tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
+                  <div className="tw:h-4 tw:w-5/6 tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
+                </div>
+              </div>
+            </div>
+
+            <div className="tw:space-y-6">
+              <div className="tw:h-[360px] tw:animate-pulse tw:rounded-[30px] tw:bg-white/70" />
+              <div className="tw:h-[280px] tw:animate-pulse tw:rounded-[30px] tw:bg-white/70" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ViewEvent() {
   const { eventId } = useParams();
-
   const [event, setEvent] = useState(null);
   const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [shareOpen, setShareOpen] = useState(false);
-
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [purchaseModalOpen, setPurchaseModalOpen] = useState(false);
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
   const [initiatingPayment, setInitiatingPayment] = useState(false);
-
   const navigate = useNavigate();
   const { token } = useAuth();
-
-  // local UI mirrors API
   const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
-
-  // report modal
   const [reportOpen, setReportOpen] = useState(false);
-
-  // access-type modal
   const [accessModalOpen, setAccessModalOpen] = useState(false);
 
   function initialsFromName(name = "") {
@@ -126,29 +198,19 @@ export default function ViewEvent() {
         setError(null);
         setModalAutoTrigger(true);
         setPurchaseModalOpen(false);
-
         const isId = isUuid(eventId);
-
         const res = isId
           ? await api.get(`/api/v1/events/${eventId}/view`, authHeaders(token))
           : await api.get(
-              `/api/v1/event/recommended/${eventId}`,
-              authHeaders(token)
-            );
+            `/api/v1/event/recommended/${eventId}`,
+            authHeaders(token)
+          );
 
         if (!mounted) return;
 
-        // Handle BOTH response shapes safely
         const data = res?.data?.data || res?.data || {};
-
-        // ID endpoint shape (what you already use):
-        // data.currentEvent, data.recommendations
         const ev =
-          data?.currentEvent ||
-          data?.event || // slug endpoint likely
-          data?.data?.event || // extra fallback
-          null;
-
+          data?.currentEvent || data?.event || data?.data?.event || null;
         const recommendations =
           data?.recommendations ||
           data?.recommended?.data ||
@@ -158,7 +220,6 @@ export default function ViewEvent() {
 
         setEvent(normalizeViewEvent(ev));
         setRecs(recommendations);
-
         setIsSaved(!!ev?.is_saved);
         setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
       } catch (e) {
@@ -181,11 +242,18 @@ export default function ViewEvent() {
 
     const priceValue = Number(event?.price ?? 0);
     const hasPrice = priceValue > 0 || Boolean(event?.price_display);
+    const promptKey = getTicketPromptStorageKey(event?.id || eventId);
+    const hasSeenPrompt =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(promptKey) === "1";
 
-    if (!event?.hasPaid && hasPrice) {
+    if (!event?.hasPaid && hasPrice && !hasSeenPrompt) {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(promptKey, "1");
+      }
       setPurchaseModalOpen(true);
     }
-  }, [event, modalAutoTrigger]);
+  }, [event, eventId, modalAutoTrigger]);
 
   const closePurchaseModal = () => {
     setPurchaseModalOpen(false);
@@ -218,24 +286,23 @@ export default function ViewEvent() {
       const payload = res?.data || {};
 
       if (payload.status === false && payload.message) {
-        // Already paid scenario, or backend-specific error
         showError(payload.message);
         return;
       }
 
       if (payload.url) {
-        showSuccess(`Preparing ticket for “${event?.title || "Event"}”…`);
+        showSuccess(`Preparing ticket for "${event?.title || "Event"}"...`);
         window.location.href = payload.url;
       } else {
         showError("Payment initiation failed: no redirect URL received.");
       }
-    } catch (error) {
+    } catch (paymentError) {
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
+        paymentError?.response?.data?.message ||
+        paymentError?.message ||
         "Failed to initiate payment.";
       showError(errorMessage);
-      console.error("Payment initiation error:", error);
+      console.error("Payment initiation error:", paymentError);
     } finally {
       setInitiatingPayment(false);
     }
@@ -252,29 +319,25 @@ export default function ViewEvent() {
 
     try {
       setFollowLoading(true);
-
-      // Using the endpoint pattern: /api/v1/follow/{organizerId}
       const res = await api.post(
         `/api/v1/follow/${event.hostId}`,
         null,
         authHeaders(token)
       );
 
-      // Try different response shapes, fallback to toggling locally
       const isNowFollowing =
         res?.data?.data?.is_following ??
         res?.data?.is_following ??
         !isFollowing;
 
       setIsFollowing(isNowFollowing);
-
-      if (isNowFollowing) {
-        showSuccess("You’re now following this organizer.");
-      } else {
-        showSuccess("You’ve unfollowed this organizer.");
-      }
-    } catch (e) {
-      console.error(e);
+      showSuccess(
+        isNowFollowing
+          ? "You're now following this organizer."
+          : "You've unfollowed this organizer."
+      );
+    } catch (followError) {
+      console.error(followError);
       showError("Unable to update follow status. Please try again.");
     } finally {
       setFollowLoading(false);
@@ -282,12 +345,12 @@ export default function ViewEvent() {
   };
 
   const isLiveNow = event?.status === "live";
+  const isUpcoming = event?.status === "upcoming";
+  const isPaused = event?.status === "paused";
+  const isEnded = event?.status === "ended";
   const isSoldOut = !!event?.is_sold_out;
   const hasPaid = !!event?.hasPaid;
 
-  // When user has paid and event is live -> "Enter Live Room"
-  // When user has paid and event not live yet -> "Ticket Purchased"
-  // Else fall back to normal states
   let primaryCtaLabel;
   if (hasPaid && isLiveNow) {
     primaryCtaLabel = "Join Live Event";
@@ -295,40 +358,26 @@ export default function ViewEvent() {
     primaryCtaLabel = "Ticket Purchased";
   } else if (isSoldOut) {
     primaryCtaLabel = "Sold Out";
-  } else if (isLiveNow) {
-    primaryCtaLabel = "Buy Ticket";
   } else {
     primaryCtaLabel = "Buy Ticket";
   }
 
-  // Disable CTA when:
-  // - Sold out and user hasn't paid
-  // - User has paid but event is not live yet
   const ctaDisabled = (!hasPaid && isSoldOut) || (hasPaid && !isLiveNow);
 
   const handleEnterLive = () => {
-    // When event is live and user has paid, show the app download modal
     if (hasPaid && isLiveNow) {
       setDownloadModalOpen(true);
-      return;
     }
   };
 
   if (loading) {
-    return (
-      <div className="tw:w-full tw:h-[60vh] tw:flex tw:items-center tw:justify-center tw:bg-[#F5F5F7]">
-        <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
-          <div className="tw:h-8 tw:w-8 tw:border-2 tw:border-primary/30 tw:border-t-primary tw:rounded-full tw:animate-spin" />
-          <p className="tw:text-sm tw:text-gray-600">Loading event details…</p>
-        </div>
-      </div>
-    );
+    return <EventDetailShimmer />;
   }
 
   if (error) {
     return (
-      <div className="tw:w-full tw:h-[60vh] tw:flex tw:items-center tw:justify-center tw:bg-[#FEF2F2]">
-        <p className="tw:text-sm tw:text-red-600 tw:px-4 tw:text-center">
+      <div className="tw:flex tw:h-[60vh] tw:w-full tw:items-center tw:justify-center tw:bg-[#FEF2F2]">
+        <p className="tw:px-4 tw:text-center tw:text-sm tw:text-red-600">
           {error}
         </p>
       </div>
@@ -343,8 +392,6 @@ export default function ViewEvent() {
   );
 
   const startDate = eventStartDate(event);
-  const ticketLabel = `Buy Ticket (${priceText(event)})`;
-
   const formattedLocation =
     event.location ||
     event.address ||
@@ -365,11 +412,9 @@ export default function ViewEvent() {
             ? event.description.slice(0, 155)
             : "Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!"
         }
-        keywords={`zagasm studios, ${event?.title || "event"}, ${
-          event?.eventType || "event"
-        }, event tickets, ${
-          event?.hostName || "event organizer"
-        }, live events, entertainment`}
+        keywords={`zagasm studios, ${event?.title || "event"}, ${event?.eventType || "event"
+          }, event tickets, ${event?.hostName || "event organizer"
+          }, live events, entertainment`}
         image={posterUrl}
         type="article"
       />
@@ -395,10 +440,10 @@ export default function ViewEvent() {
               event.eventType?.toLowerCase() === "virtual"
                 ? { "@type": "VirtualLocation", url: event.streamUrl || "" }
                 : {
-                    "@type": "Place",
-                    name: event.location || "Event Location",
-                    address: event.address || "",
-                  },
+                  "@type": "Place",
+                  name: event.location || "Event Location",
+                  address: event.address || "",
+                },
             offers: {
               "@type": "Offer",
               price: event.price || 0,
@@ -418,344 +463,383 @@ export default function ViewEvent() {
         </script>
       </Helmet>
 
-      {/* PAGE BG */}
-      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[radial-gradient(circle_at_top,#e8f1ff_0%,#f8fafc_38%,#eef2f7_100%)] tw:pt-20 tw:pb-10 tw:text-black">
-        <div className="tw:max-w-6xl tw:mx-auto tw:px-2 tw:md:px-6 tw:lg:px-8">
-          {/* TOP BAR */}
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:mb-5 tw:mt-10 tw:rounded-[28px] tw:border tw:border-white/60 tw:bg-white/65 tw:px-3 tw:py-3 tw:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:backdrop-blur-xl">
-            <button
-              style={{
-                borderRadius: "50%",
-              }}
-              type="button"
-              onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50"
-            >
-              <ArrowLeft className="tw:w-4 tw:h-4" />
-            </button>
-
-            <div className="tw:flex tw:flex-col tw:items-center tw:flex-1 tw:min-w-0">
-              <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900 tw:text-center tw:truncate tw:uppercase">
-                {event.title}
-              </span>
-              <p className="tw:mt-2 tw:max-w-2xl tw:text-center tw:text-sm tw:leading-6 tw:text-gray-600 tw:line-clamp-2 md:tw:line-clamp-3">
-                {event.description || "No description available for this event yet."}
-              </p>
-              <div className="tw:mt-1 tw:inline-flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2">
-                <span className="tw:bg-[#E5E7EB] tw:text-[10px] tw:px-2.5 tw:py-1 tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:text-gray-700">
-                  <Ticket className="tw:w-3 tw:h-3" />
-                  <span>{event.eventType}</span>
-                </span>
-                {event.genre && (
-                  <span className="tw:bg-[#EEF2FF] tw:text-[10px] tw:px-2.5 tw:py-1 tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:text-[#4F46E5]">
-                    {event.genre}
-                  </span>
-                )}
-                {isLiveNow && (
-                  <span className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2.5 tw:py-1 tw:rounded-full tw:bg-red-500/10 tw:text-[10px] tw:text-red-600">
-                    <span className="tw:inline-block tw:size-2 tw:rounded-full tw:bg-red-500 tw:animate-pulse" />
-                    Live now
-                  </span>
-                )}
+      <div className="tw:min-h-screen tw:w-full tw:bg-[radial-gradient(circle_at_top_left,#d9ebff_0%,#f6f9fc_34%,#eef4fb_72%,#f8fbff_100%)] tw:pb-12 tw:pt-20 tw:font-sans tw:text-slate-900">
+        <div className="tw:mx-auto tw:max-w-7xl tw:px-3 tw:md:px-6 tw:lg:px-8">
+          <div className="tw:mb-6 tw:mt-10 tw:flex tw:items-center tw:justify-between tw:gap-3 tw:rounded-[28px] tw:border tw:border-white/70 tw:bg-white/55 tw:px-4 tw:py-3 tw:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:backdrop-blur-2xl">
+            <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="tw:inline-flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white"
+                style={{ borderRadius: "9999px" }}
+              >
+                <ArrowLeft className="tw:h-4 tw:w-4" />
+              </button>
+              <div className="tw:min-w-0">
+                <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.22em] tw:text-slate-500">
+                  Event Detail
+                </div>
+                <div className="tw:truncate tw:text-base tw:font-semibold tw:text-slate-900 tw:md:text-lg">
+                  {event.title}
+                </div>
               </div>
             </div>
 
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <button
-              style={{
-                borderRadius: "50%"
-              }}
-                type="button"
-                onClick={() => setShareOpen(true)}
-                className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50"
-                aria-label="Share event"
-              >
-                <Share2 className="tw:size-5 tw:text-gray-800" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShareOpen(true)}
+              className="tw:inline-flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white"
+              aria-label="Share event"
+              style={{ borderRadius: "9999px" }}
+            >
+              <Share2 className="tw:h-4 tw:w-4" />
+            </button>
           </div>
 
-          {/* MAIN CARD */}
-          <div className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-white/65 tw:bg-white/75 tw:shadow-[0_24px_70px_rgba(15,23,42,0.08)] tw:backdrop-blur-xl">
-            {/* HERO POSTER */}
-            <div className="tw:relative tw:h-[230px] tw:md:h-[430px] tw:w-full tw:overflow-hidden">
-              {posterUrl ? (
-                <img
-                  src={posterUrl}
-                  alt={event.title}
-                  className="tw:w-full tw:h-full tw:object-cover"
-                />
-              ) : (
-                <div className="tw:w-full tw:h-full tw:bg-linear-to-br tw:from-[#E5E7EB] tw:to-[#E0ECFF]" />
-              )}
+          <section className="tw:relative tw:overflow-hidden tw:rounded-[36px] tw:border tw:border-white/70 tw:bg-white/50 tw:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:backdrop-blur-2xl">
+            <div className="tw:absolute tw:-left-20 tw:top-16 tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#d7e8ff] tw:blur-3xl" />
+            <div className="tw:absolute tw:right-0 tw:top-0 tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#f3d9ff] tw:blur-3xl" />
 
-              {/* Soft linear overlay bottom */}
-              <div className="tw:absolute tw:inset-0 tw:bg-linear-to-t tw:from-black/70 tw:via-black/18 tw:to-transparent" />
+            <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-6 tw:p-4 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
+              <div className="tw:space-y-6">
+                <div className="tw:relative tw:overflow-hidden tw:rounded-4xl tw:border tw:border-white/70 tw:bg-white/35 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)] tw:backdrop-blur-xl">
+                  <div className="tw:relative tw:h-80 tw:w-full tw:overflow-hidden tw:md:h-[520px]">
+                    {posterUrl ? (
+                      <img
+                        src={posterUrl}
+                        alt={event.title}
+                        className="tw:h-full tw:w-full tw:object-cover"
+                      />
+                    ) : (
+                      <div className="tw:h-full tw:w-full tw:bg-[linear-gradient(135deg,#dbeafe_0%,#f8fafc_50%,#f3e8ff_100%)]" />
+                    )}
 
-              {/* Live / Upcoming / Sold out badge */}
-              <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
-                <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-full tw:border tw:border-white/20 tw:bg-black/45 tw:text-white tw:text-[11px] tw:backdrop-blur-md">
-                  <span
-                    className={`tw:inline-block tw:size-2 tw:rounded-full ${
-                      isLiveNow ? "tw:bg-red-500" : "tw:bg-amber-400"
-                    } tw:animate-pulse`}
-                  />
-                  <span>{isLiveNow ? "Live" : event.status || "Upcoming"}</span>
-                </div>
-                {isSoldOut && !hasPaid && (
-                  <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:bg-red-600 tw:text-white tw:text-[11px] tw:rounded-full">
-                    Sold Out
-                  </div>
-                )}
-              </div>
+                    <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.18)_35%,rgba(15,23,42,0.75)_100%)]" />
 
-              {/* Meta strip at bottom of poster */}
-              <div className="tw:absolute tw:bottom-4 tw:left-4 tw:right-4">
-                <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:rounded-[22px] tw:border tw:border-white/15 tw:bg-black/35 tw:px-3.5 tw:py-3 tw:text-xs tw:text-gray-100 tw:backdrop-blur-md">
-                  <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-                    <div className="tw:inline-flex tw:items-center tw:gap-1.5">
-                      <CalendarDays className="tw:w-4 tw:h-4" />
-                      <span>{formatMetaLine(event)}</span>
-                    </div>
-                    <div className="tw:inline-flex tw:items-center tw:gap-1.5">
-                      <MapPin className="tw:w-4 tw:h-4" />
-                      <span className="tw:max-w-[220px] tw:truncate">
-                        {formattedLocation}
+                    <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:flex-wrap tw:gap-2">
+                      
+                      <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-white/20 tw:bg-white/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:backdrop-blur-xl">
+                        <Ticket className="tw:h-3 tw:w-3" />
+                        {event.eventType}
                       </span>
-                    </div>
-                  </div>
-                  <div className="tw:inline-flex tw:items-center tw:rounded-full tw:bg-white/12 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium">
-                    {priceDisplay}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SUMMARY STRIP */}
-            <div className="tw:border-b tw:border-gray-100 tw:bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw:px-4 tw:py-4 tw:md:px-8">
-              <div className="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:justify-between tw:gap-4">
-                {/* Left: Organizer + countdown */}
-                <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-3">
-                  <div className="tw:flex tw:items-center tw:gap-3">
-                    <div className="tw:h-12 tw:w-12 tw:rounded-full tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
-                      {hostHasImage ? (
-                        <img
-                          src={event.hostImage}
-                          alt={hostName}
-                          className="tw:w-full tw:h-full tw:object-cover"
-                        />
-                      ) : (
-                        <span className="tw:text-[13px] tw:font-semibold tw:text-primary">
-                          {hostInitials}
+                      {event.genre && (
+                        <span className="tw:rounded-full tw:border tw:border-white/20 tw:bg-white/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:backdrop-blur-xl">
+                          {event.genre}
                         </span>
                       )}
                     </div>
 
-                    <div>
-                      <div className="tw:text-[11px] tw:text-gray-500">
-                        Hosted by
-                      </div>
-                      <div className="tw:flex tw:items-center tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
-                        <span>{event.hostName || "Event Organizer"}</span>
-                        {event.hostHasActiveSubscription && (
-                          <img
-                            className="tw:inline-block tw:size-4"
-                            src="/images/verifiedIcon.svg"
-                            alt="Verified"
-                          />
-                        )}
-                      </div>
-                      <div className="tw:text-[11px] tw:text-gray-400 tw:mt-0.5">
-                        {event.organizer_since
-                          ? `Active since ${event.organizer_since}`
-                          : "Trusted host"}
+                    <div className="tw:absolute tw:right-4 tw:top-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
+                      {isSoldOut && !hasPaid && (
+                        <span className="tw:rounded-full tw:bg-[#ef4444] tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:shadow-lg">
+                          Sold out
+                        </span>
+                      )}
+                      {hasPaid && (
+                        <span className="tw:rounded-full tw:bg-emerald-500/90 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:shadow-lg">
+                          Ticket purchased
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:p-4 tw:md:p-6">
+                      <div className="tw:rounded-[28px] tw:border tw:border-white/15 tw:bg-white/14 tw:p-4 tw:text-white tw:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:backdrop-blur-2xl tw:md:p-6">
+                        <div className="tw:flex tw:flex-col tw:gap-5">
+                          <div className="tw:space-y-3">
+                            <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-white/72">
+                              Featured Experience
+                            </div>
+                            <span className="tw:max-w-3xl tw:block tw:text-3xl tw:font-semibold tw:leading-tight tw:text-white tw:md:text-5xl">
+                              {event.title}
+                            </span>
+                            <span className="tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-white/84 tw:md:text-base">
+                              {event.description ||
+                                "No description available for this event yet."}
+                            </span>
+                          </div>
+
+                          <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-3">
+                            <div className="tw:rounded-2xl tw:border tw:border-white/15 tw:bg-black/18 tw:p-3.5">
+                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-white/55">
+                                Date & Time
+                              </div>
+                              <div className="tw:mt-2 tw:text-sm tw:font-medium tw:text-white">
+                                {formattedDateTime || formatMetaLine(event)}
+                              </div>
+                            </div>
+
+                            <div className="tw:rounded-2xl tw:border tw:border-white/15 tw:bg-black/18 tw:p-3.5">
+                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-white/55">
+                                Ticket Price
+                              </div>
+                              <div className="tw:mt-2 tw:text-sm tw:font-medium tw:text-white">
+                                {priceDisplay}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {event.status !== "ended" && (
-                    <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:text-zinc-600">
-                      <div className="tw:flex tw:items-center tw:gap-2">
-                        <CountdownPill target={startDate} />
-                      </div>
-                    </div>
-                  )}
                 </div>
 
-                {/* Right: Price + CTA */}
-                <div className="tw:flex tw:flex-col tw:items-stretch tw:md:items-end tw:gap-2 tw:w-full tw:max-w-xs">
-                  {hasPaid && (
-                    <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1.5 tw:text-[11px] tw:text-emerald-700">
-                      <span className="tw:inline-block tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-500" />
-                      <span>You already paid for this event</span>
+                <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-4">
+                  <div className="tw:rounded-[26px] tw:border tw:border-white/75 tw:bg-white/65 tw:p-5 tw:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:backdrop-blur-xl">
+                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                      Event Schedule
                     </div>
-                  )}
-
-                  <div className="tw:flex tw:items-baseline tw:gap-2">
-                    <span className="tw:text-[11px] tw:text-gray-500">
-                      Ticket price
-                    </span>
-                    <span className="tw:text-2xl tw:font-semibold tw:text-gray-900">
-                      {priceDisplay}
-                    </span>
+                    <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
+                      {formatMetaLine(event)}
+                    </div>
                   </div>
 
-                  <button
-                    style={{
-                      borderRadius: "12px",
-                    }}
-                    type="button"
-                    disabled={ctaDisabled}
-                    onClick={() => {
-                      if (ctaDisabled) return;
+                  <div className="tw:rounded-[26px] tw:border tw:border-white/75 tw:bg-white/65 tw:p-5 tw:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:backdrop-blur-xl">
+                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                      Access Window
+                    </div>
+                    <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
+                      {event.status === "ended"
+                        ? "Event has ended"
+                        : hasPaid
+                          ? isLiveNow
+                            ? "Join now"
+                            : "Ticket secured"
+                          : "Tickets are available for purchase"}
+                    </div>
+                  </div>
 
-                      if (hasPaid && isLiveNow) {
-                        // user has paid and event is live -> enter live
-                        handleEnterLive();
-                        return;
-                      }
+                  <div className="tw:rounded-[26px] tw:border tw:border-white/75 tw:bg-white/65 tw:p-5 tw:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:backdrop-blur-xl">
+                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                      Hosted By
+                    </div>
+                    <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
+                      {event.hostName || "Event Organizer"}
+                    </div>
+                  </div>
 
-                      // normal purchase flow
-                      if (
-                        isLiveNow &&
-                        !event.hasBackstage &&
-                        !event.combined_price
-                      ) {
-                        handleGetTicket("main");
-                      } else {
-                        setAccessModalOpen(true);
-                      }
-                    }}
-                    className={`tw:h-11 tw:px-6 tw:min-w-[170px] tw:flex tw:items-center tw:justify-center tw:text-sm tw:font-semibold tw:transition tw:duration-200 tw:rounded-full ${
-                      ctaDisabled
-                        ? "tw:bg-gray-200 tw:text-gray-500 tw:cursor-not-allowed"
-                        : "tw:bg-primary tw:tw:hover:bg-primarySecond tw:text-white"
-                    }`}
-                  >
-                    {primaryCtaLabel}
-                    {!ctaDisabled && !hasPaid && (
-                      <span className="tw:ml-1 tw:text-xs tw:opacity-80">
-                        ({priceDisplay})
+                  <div className="tw:rounded-[26px] tw:border tw:border-white/75 tw:bg-white/65 tw:p-5 tw:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:backdrop-blur-xl">
+                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                      Countdown
+                    </div>
+                    <div className="tw:mt-3">
+                      {event.status !== "ended" ? (
+                        <CountdownPill target={startDate} />
+                      ) : (
+                        <span className="tw:text-sm tw:font-medium tw:text-slate-900">
+                          Closed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="tw:rounded-[30px] tw:border tw:border-white/75 tw:bg-white/68 tw:p-5 tw:shadow-[0_20px_60px_rgba(148,163,184,0.12)] tw:backdrop-blur-2xl tw:md:p-7">
+                  <div className="tw:flex tw:flex-col tw:gap-6 tw:md:flex-row tw:md:items-start tw:md:justify-between">
+                    <div className="tw:max-w-3xl">
+                      <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                        About This Event
+                      </div>
+                      <spam className="tw:block tw:mt-4 tw:text-sm tw:leading-7 tw:text-slate-600 tw:md:text-[15px]">
+                        {event.description ||
+                          "This event does not have a published description yet."}
+                      </spam>
+                    </div>
+
+                    <div className="tw:w-full tw:max-w-sm tw:rounded-3xl tw:border tw:border-[#fee2e2] tw:bg-[linear-gradient(180deg,#fff7f7_0%,#fffdfd_100%)] tw:p-4">
+                      <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-[#dc2626]">
+                        <Flag className="tw:h-4 tw:w-4" />
+                        Need to flag this event?
+                      </div>
+                      <span className="tw:block tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-600">
+                        Report suspicious or inappropriate listings and our team will review them.
                       </span>
-                    )}
-                  </button>
-
-                  <div className="tw:text-[11px] tw:text-gray-400 tw:mt-0.5 tw:text-right">
-                    {hasPaid
-                      ? isLiveNow
-                        ? "You already have access. Tap “Enter Live Room” to join."
-                        : "You’ve already paid. We’ll notify you when it’s live."
-                      : "Secure checkout • Instant ticket access"}
+                      <button
+                        style={{
+                          borderRadius: 12
+                        }}
+                        type="button"
+                        onClick={() => setReportOpen(true)}
+                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-[#dc2626] tw:shadow-sm hover:tw:bg-red-50"
+                      >
+                        Report this event
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* REPORT ROW */}
-            <div className="tw:px-4 tw:md:px-8 tw:py-3 tw:border-b tw:border-[#FEE2E2] tw:bg-[#FFFBFB]">
-              <button
-                type="button"
-                onClick={() => setReportOpen(true)}
-                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:md:text-sm tw:bg-red-50 tw:px-4 tw:py-2 tw:rounded-full tw:text-[#F04438] tw:hover:bg-red-100"
-              >
-                <Flag className="tw:w-4 tw:h-4" />
-                <span>Report this event</span>
-              </button>
-            </div>
+              <aside className="tw:flex tw:flex-col tw:gap-6">
+                <div className="tw:rounded-[30px] tw:border tw:border-white/75 tw:bg-white/70 tw:p-5 tw:shadow-[0_20px_60px_rgba(148,163,184,0.14)] tw:backdrop-blur-2xl tw:md:sticky tw:md:top-28">
+                  <div className="tw:rounded-3xl tw:border tw:border-white/80 tw:bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] tw:p-5">
+                    <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+                      <div>
+                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                          Ticket Access
+                        </div>
+                        <div className="tw:mt-3 tw:text-3xl tw:font-semibold tw:text-slate-900">
+                          {priceDisplay}
+                        </div>
+                      </div>
+                      <div className="tw:text-[11px] tw:font-medium">
+                        <span className={`tw:px-3 tw:py-1 tw:rounded-full ${isEnded === "ended" ? "tw:bg-gray-500/20 tw:text-gray-700" : isLiveNow ? "tw:bg-red-500/20 tw:text-red-600" : isPaused ? "tw:bg-blue-300/30 tw:text-blue-800" : "tw:bg-amber-300/30 tw:text-amber-800"}`}>
 
-            {/* BODY SECTIONS */}
-            <div className="tw:bg-[linear-gradient(180deg,#f8fafc_0%,#f3f6fb_100%)]">
-              {/* ORGANIZER CARD */}
-              <div className="tw:px-4 tw:md:px-6 tw:pt-5 tw:pb-6">
-                <div className="tw:w-full tw:bg-white tw:rounded-2xl tw:px-4 tw:md:px-8 tw:py-5 tw:shadow-[0_10px_30px_rgba(15,23,42,0.06)] tw:relative">
-                  <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-center tw:md:items-start tw:gap-4">
-                    {/* avatar + meta */}
-                    <div className="tw:flex-1 tw:flex tw:flex-col tw:items-center tw:md:items-start tw:gap-2">
-                      <div className="tw:h-14 tw:w-14 tw:rounded-full tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:overflow-hidden">
+                          {isLiveNow ? "Happening now" : event.status || "Upcoming"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="tw:mt-5 tw:space-y-3">
+                      <div className="tw:flex tw:items-start tw:gap-3 tw:rounded-2xl tw:bg-[#f6f9ff] tw:px-4 tw:py-3">
+                        <CalendarDays className="tw:mt-0.5 tw:h-4 tw:w-4 tw:text-primary" />
+                        <div>
+                          <div className="tw:text-xs tw:text-slate-500">When</div>
+                          <div className="tw:text-sm tw:font-medium tw:text-slate-900">
+                            {formattedDateTime || "Date not available"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {hasPaid && (
+                      <div className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1.5 tw:text-[11px] tw:text-emerald-700">
+                        <span className="tw:inline-block tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-500" />
+                        <span>You already paid for this event</span>
+                      </div>
+                    )}
+
+                    <button
+                      style={{
+                        borderRadius: 24
+                      }}
+                      type="button"
+                      disabled={ctaDisabled}
+                      onClick={() => {
+                        if (ctaDisabled) return;
+
+                        if (hasPaid && isLiveNow) {
+                          handleEnterLive();
+                          return;
+                        }
+
+                        if (
+                          isLiveNow &&
+                          !event.hasBackstage &&
+                          !event.combined_price
+                        ) {
+                          handleGetTicket("main");
+                        } else {
+                          setAccessModalOpen(true);
+                        }
+                      }}
+                      className={`tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-5 tw:text-sm tw:font-semibold tw:transition ${ctaDisabled
+                        ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
+                        : "tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+                        }`}
+                    >
+                      {primaryCtaLabel}
+                      {!ctaDisabled && !hasPaid && (
+                        <span className="tw:ml-1 tw:text-xs tw:opacity-80">
+                          ({priceText(event)})
+                        </span>
+                      )}
+                    </button>
+
+                    <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                      {hasPaid
+                        ? isLiveNow
+                          ? "You already have access. Tap the button above to join the live experience."
+                          : "Your ticket is secured. We will notify you when the event starts."
+                        : "Secure checkout and fast access to your purchased ticket."}
+                    </p>
+                  </div>
+
+                  <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-white/80 tw:bg-white/70 tw:p-5 tw:shadow-[0_12px_30px_rgba(148,163,184,0.12)]">
+                    <div className="tw:flex tw:items-start tw:gap-4">
+                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-[#ece8ff]">
                         {hostHasImage ? (
                           <img
-                            className="tw:w-full tw:h-full tw:object-cover"
                             src={event.hostImage}
                             alt={hostName}
+                            className="tw:h-full tw:w-full tw:object-cover"
                           />
                         ) : (
-                          <span className="tw:text-[16px] tw:font-semibold tw:text-primary">
+                          <span className="tw:text-sm tw:font-semibold tw:text-primary">
                             {hostInitials}
                           </span>
                         )}
                       </div>
 
-                      <div className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900 tw:text-center tw:md:text-left">
-                        {event.hostName || "Organizer"}
-                      </div>
+                      <div className="tw:min-w-0 tw:flex-1">
+                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                          Organizer
+                        </div>
+                        <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2 tw:text-lg tw:font-semibold tw:text-slate-900">
+                          <span className="tw:truncate">
+                            {event.hostName || "Organizer"}
+                          </span>
+                          {event.hostHasActiveSubscription && (
+                            <img
+                              className="tw:h-4 tw:w-4"
+                              src="/images/verifiedIcon.svg"
+                              alt="Verified"
+                            />
+                          )}
+                        </div>
 
-                      <div className="tw:text-[11px] tw:text-gray-400 tw:mt-1">
-                        {event.organizer_since
-                          ? `On Zagasm since ${event.organizer_since}`
-                          : "Part of Zagasm Studios community"}
-                      </div>
-                    </div>
-
-                    {/* Rank badge */}
-                    <div className="tw:md:absolute tw:md:right-6 tw:md:top-6 tw:flex tw:items-center tw:justify-center tw:mt-4 tw:md:mt-0">
-                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:bg-black tw:text-white tw:text-xs tw:rounded-2xl">
-                        <span className="tw:inline-flex tw:h-6 tw:w-6 tw:items-center tw:justify-center tw:bg-[#111827] tw:rounded-full">
-                          <img
-                            className="tw:w-4"
-                            src="/images/icons/globe.png"
-                            alt=""
-                          />
-                        </span>
-                        <span>#{event.organizer_rank || 2} Organizer</span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-3">
-                    <button
-                      style={{
-                        borderRadius: "12px",
-                      }}
-                      type="button"
-                      onClick={handleToggleFollow}
-                      disabled={followLoading || !event.hostId}
-                      className={`tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:rounded-[10px] tw:border tw:transition tw:duration-150 ${
-                        isFollowing
-                          ? "tw:bg-white tw:border-primary/30 tw:text-primary"
-                          : "tw:bg-[#F3F4F6] tw:border-transparent tw:text-gray-800 tw:hover:bg-[#E5E7EB]"
-                      } ${
-                        followLoading
-                          ? "tw:opacity-70 tw:cursor-not-allowed"
-                          : ""
-                      }`}
-                    >
-                      {followLoading
-                        ? "Updating…"
-                        : isFollowing
-                        ? "Following"
-                        : "Follow Organizer"}
-                    </button>
+                    <div className="tw:mt-4 tw:flex tw:flex-wrap tw:gap-2">
 
-                    <Link
-                      to={
-                        event.organiserId
-                          ? `/profile/${event.organiserId}`
-                          : "/organizers"
-                      }
-                      className="tw:h-10 tw:flex tw:items-center tw:justify-center tw:text-xs tw:md:text-sm tw:font-medium tw:bg-primary text-white tw:rounded-[10px] tw:hover:bg-primarySecond"
-                    >
-                      View Profile
-                    </Link>
+                      {isSaved && (
+                        <div className="tw:inline-flex tw:items-center tw:rounded-full tw:bg-[#eef4ff] tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#3158c9]">
+                          Saved
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3">
+                      <button
+                        style={{
+                          borderRadius: 24
+                        }}
+                        type="button"
+                        onClick={handleToggleFollow}
+                        disabled={followLoading || !event.hostId}
+                        className={`tw:flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:text-sm tw:font-medium tw:transition ${isFollowing
+                          ? "tw:border-primary/25 tw:bg-white tw:text-primary"
+                          : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 hover:tw:bg-[#ebf1f8]"
+                          } ${followLoading ? "tw:cursor-not-allowed tw:opacity-70" : ""
+                          }`}
+                      >
+                        {followLoading
+                          ? "Updating..."
+                          : isFollowing
+                            ? "Following"
+                            : "Follow Organizer"}
+                      </button>
+
+                      <Link
+                        style={{
+                          color: "white"
+                        }}
+                        to={
+                          event.organiserId
+                            ? `/profile/${event.organiserId}`
+                            : "/organizers"
+                        }
+                        className="tw:flex tw:h-11 tw:items-center tw:justify-center tw:rounded-3xl tw:bg-primary tw:text-sm tw:font-medium tw:text-white hover:tw:bg-primarySecond"
+                      >
+                        View Profile
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-
+              </aside>
             </div>
-          </div>
+          </section>
 
-          {/* MORE FROM ORGANIZER / RECS */}
-          <div className="tw:mt-6 tw:px-1">
+          <div className="tw:mt-8">
             <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
           </div>
         </div>
@@ -777,11 +861,10 @@ export default function ViewEvent() {
       <EventShareModal
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        eventId={event?.id} // IMPORTANT: use actual id even when page was opened via slug
+        eventId={event?.id}
         token={token}
         title="Share this event"
       />
-
       <AccessTypeModal
         open={accessModalOpen}
         onClose={() => setAccessModalOpen(false)}
@@ -791,7 +874,6 @@ export default function ViewEvent() {
           setAccessModalOpen(false);
         }}
       />
-
       <TicketPromptModal
         open={purchaseModalOpen}
         onClose={closePurchaseModal}
@@ -799,7 +881,6 @@ export default function ViewEvent() {
         onBuy={() => handleGetTicket("main")}
         buying={initiatingPayment}
       />
-
       <LiveAppDownloadModal
         open={downloadModalOpen}
         onClose={() => setDownloadModalOpen(false)}
@@ -807,4 +888,3 @@ export default function ViewEvent() {
     </>
   );
 }
-
