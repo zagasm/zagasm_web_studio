@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { api, authHeaders } from "../lib/apiClient";
 import { useAuth } from "../pages/auth/AuthContext";
 import { resolveMediaUrl } from "../utils/media";
@@ -109,94 +110,66 @@ function extractEventsPayload(payload) {
   };
 }
 
+const EMPTY_PAGINATION = {
+  currentPage: 1,
+  perPage: 10,
+  total: 0,
+  hasMore: false,
+  lastPage: 1,
+};
+
 export default function useMyEvents(activeFilter = "all") {
   const { token } = useAuth();
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    perPage: 10,
-    total: 0,
-    hasMore: false,
-    lastPage: 1,
+
+  const eventsQuery = useInfiniteQuery({
+    queryKey: ["profile", "my-events", token ?? "guest", activeFilter],
+    enabled: !!token,
+    staleTime: 1000 * 60 * 2,
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const params = { page: pageParam };
+      if (activeFilter !== "all") {
+        params.status = activeFilter;
+      }
+
+      const response = await api.get("/api/v1/user/events", {
+        ...authHeaders(token),
+        params,
+      });
+
+      return extractEventsPayload(response?.data);
+    },
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.hasMore
+        ? lastPage.pagination.currentPage + 1
+        : undefined,
   });
 
-  const fetchPage = useCallback(
-    async (page = 1, append = false) => {
-      if (!token) return;
-
-      try {
-        setError(null);
-        if (page === 1) {
-          setLoading(true);
-        } else {
-          setLoadingMore(true);
-        }
-
-        const params = { page };
-        if (activeFilter !== "all") {
-          params.status = activeFilter;
-        }
-
-        const response = await api.get(
-          "/api/v1/user/events",
-          {
-            ...authHeaders(token),
-            params,
-          },
-        );
-
-        const { events: nextEvents, pagination: nextPagination } =
-          extractEventsPayload(response?.data);
-
-        setEvents((current) =>
-          append ? [...current, ...nextEvents] : nextEvents,
-        );
-        setPagination(nextPagination);
-      } catch (e) {
-        setError(e?.message || "Failed to fetch events");
-        if (page === 1) {
-          setEvents([]);
-          setPagination({
-            currentPage: 1,
-            perPage: 10,
-            total: 0,
-            hasMore: false,
-            lastPage: 1,
-          });
-        }
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
-    [activeFilter, token],
+  const events = useMemo(
+    () =>
+      eventsQuery.data?.pages?.flatMap((page) =>
+        Array.isArray(page?.events) ? page.events : [],
+      ) ?? [],
+    [eventsQuery.data],
   );
 
-  useEffect(() => {
-    setEvents([]);
-    setPagination({
-      currentPage: 1,
-      perPage: 10,
-      total: 0,
-      hasMore: false,
-      lastPage: 1,
-    });
+  const pagination = useMemo(() => {
+    const lastPage =
+      eventsQuery.data?.pages?.[eventsQuery.data.pages.length - 1] ?? null;
+    return lastPage?.pagination ?? EMPTY_PAGINATION;
+  }, [eventsQuery.data]);
 
-    if (!token) {
-      setLoading(false);
+  const loadMore = useCallback(() => {
+    if (
+      eventsQuery.isLoading ||
+      eventsQuery.isFetchingNextPage ||
+      !eventsQuery.hasNextPage
+    ) {
       return;
     }
 
-    fetchPage(1, false);
-  }, [fetchPage, token]);
-
-  const loadMore = useCallback(() => {
-    if (loading || loadingMore || !pagination.hasMore) return;
-    fetchPage(pagination.currentPage + 1, true);
-  }, [fetchPage, loading, loadingMore, pagination]);
+    eventsQuery.fetchNextPage();
+  }, [eventsQuery]);
 
   const filteredEvents = useMemo(() => {
     const list = Array.isArray(events) ? events : [];
@@ -207,12 +180,12 @@ export default function useMyEvents(activeFilter = "all") {
   return {
     events: filteredEvents,
     rawEvents: events,
-    loading,
-    loadingMore,
-    error,
-    hasMore: pagination.hasMore,
+    loading: !!token ? eventsQuery.isLoading : false,
+    loadingMore: eventsQuery.isFetchingNextPage,
+    error: eventsQuery.error?.message || null,
+    hasMore: !!eventsQuery.hasNextPage,
     pagination,
     loadMore,
-    refresh: () => fetchPage(1, false),
+    refresh: eventsQuery.refetch,
   };
 }

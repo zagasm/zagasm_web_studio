@@ -164,7 +164,7 @@ function AllNotification() {
               follows, and community updates live in one place.
             </span>
           </div>
-          <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-lg md:tw:flex-row md:tw:items-center md:tw:justify-between">
+          <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-lg tw:md:flex-row tw:md:items-center tw:md:justify-between">
             <div className="tw:flex tw:gap-6 tw:flex-wrap">
               <div className="tw:flex tw:flex-col">
                 <span className="tw:text-3xl tw:font-bold tw:text-slate-900">
@@ -202,11 +202,10 @@ function AllNotification() {
               }}
               type="button"
               onClick={() => setFilter("all")}
-              className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${
-                filter === "all"
+              className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${filter === "all"
                   ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
                   : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
-              }`}
+                }`}
             >
               All updates
             </button>
@@ -216,11 +215,10 @@ function AllNotification() {
               }}
               type="button"
               onClick={() => setFilter("unread")}
-              className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${
-                filter === "unread"
+              className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${filter === "unread"
                   ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
                   : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
-              }`}
+                }`}
             >
               Unread only
               {unreadCount > 0 && (

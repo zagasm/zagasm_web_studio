@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useProfile from "../../../hooks/useProfile";
 import ProfileHeader from "../../../component/Profile/ProfileHeader";
@@ -10,6 +11,45 @@ import { ChevronLeft } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
+
+const pickIsFollowing = (data) => {
+  if (!data) return false;
+  if (typeof data.isFollowing === "boolean") return data.isFollowing;
+  if (typeof data.is_following === "boolean") return data.is_following;
+  if (typeof data.following === "boolean") return data.following;
+  if (typeof data.is_following_organizer === "boolean") {
+    return data.is_following_organizer;
+  }
+  return false;
+};
+
+const normalizeViewedOrganiserProfile = (response) => {
+  const payload = response?.data?.data ?? null;
+  const organiserData =
+    payload?.organiser ??
+    response?.data?.data ??
+    response?.data?.user ??
+    response?.data ??
+    null;
+  const eventsBuckets = payload?.events ?? null;
+
+  if (!organiserData) return null;
+
+  return {
+    ...organiserData,
+    events: eventsBuckets || organiserData?.events || null,
+    allEvents:
+      eventsBuckets?.all ??
+      organiserData?.allEvents ??
+      organiserData?.events?.all ??
+      [],
+    upcomingEvents:
+      eventsBuckets?.upcoming ??
+      organiserData?.upcomingEvents ??
+      organiserData?.events?.upcoming ??
+      [],
+  };
+};
 
 const ProfileSkeleton = () => (
   <div className="tw:animate-pulse tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
@@ -73,6 +113,7 @@ const ProfileSkeleton = () => (
 
 export default function ViewProfile() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { profileId: routeUserId } = useParams();
 
   // logged-in user (you)
@@ -85,11 +126,6 @@ export default function ViewProfile() {
     loading: myProfileLoading,
     error: myProfileError,
   } = useProfile();
-
-  // generic "profile being viewed" state (could be you or another organiser)
-  const [profileUser, setProfileUser] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [profileError, setProfileError] = useState(null);
 
   // follow state (only meaningful when viewing another organiser)
   const [isFollowing, setIsFollowing] = useState(false);
@@ -109,92 +145,35 @@ export default function ViewProfile() {
     };
   }, [isOwnProfile, myProfile, myOrganiser]);
 
-  /* ------------------ load profile data ------------------ */
+  const viewedOrganiserProfileQuery = useQuery({
+    queryKey: ["profile", "organiser", routeUserId, token ?? "guest"],
+    enabled: !isOwnProfile && !!routeUserId && !!token,
+    staleTime: 1000 * 60 * 2,
+    queryFn: async () => {
+      const res = await api.get(
+        `/api/v1/organiser/${routeUserId}`,
+        authHeaders(token)
+      );
+
+      return normalizeViewedOrganiserProfile(res);
+    },
+  });
+
+  const finalProfileUser = isOwnProfile
+    ? mergedOwnProfile
+    : viewedOrganiserProfileQuery.data ?? null;
+
   useEffect(() => {
     if (isOwnProfile) return;
-    if (!routeUserId) return;
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setProfileLoading(true);
-        setProfileError(null);
-
-        const res = await api.get(
-          `/api/v1/organiser/${routeUserId}`,
-          authHeaders(token)
-        );
-
-        // NEW SHAPE:
-        // res.data.data = { organiser: {...}, events: {...buckets} }
-        const payload = res?.data?.data ?? null;
-
-        // fallback for older shapes
-        const organiserData =
-          payload?.organiser ??
-          res?.data?.data ??
-          res?.data?.user ??
-          res?.data ??
-          null;
-
-        const eventsBuckets = payload?.events ?? null;
-
-        if (cancelled) return;
-
-        // attach buckets in a predictable way for tabs/components
-        const normalised = organiserData
-          ? {
-              ...organiserData,
-
-              // ✅ new format
-              events: eventsBuckets || organiserData?.events || null,
-
-              // ✅ backward-compat for older code paths (optional but helps)
-              allEvents:
-                eventsBuckets?.all ??
-                organiserData?.allEvents ??
-                organiserData?.events?.all ??
-                [],
-              upcomingEvents:
-                eventsBuckets?.upcoming ??
-                organiserData?.upcomingEvents ??
-                organiserData?.events?.upcoming ??
-                [],
-            }
-          : null;
-
-        setProfileUser(normalised);
-
-        // fix following flag picking (your backend uses isFollowing)
-        const pickIsFollowing = (d) => {
-          if (!d) return false;
-          if (typeof d.isFollowing === "boolean") return d.isFollowing;
-          if (typeof d.is_following === "boolean") return d.is_following;
-          if (typeof d.following === "boolean") return d.following;
-          if (typeof d.is_following_organizer === "boolean")
-            return d.is_following_organizer;
-          return false;
-        };
-
-        setIsFollowing(pickIsFollowing(normalised));
-      } catch (e) {
-        if (!cancelled) setProfileError("Unable to load profile.");
-      } finally {
-        if (!cancelled) setProfileLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isOwnProfile, routeUserId, token]);
-
-  const finalProfileUser = isOwnProfile ? mergedOwnProfile : profileUser;
+    setIsFollowing(pickIsFollowing(finalProfileUser));
+  }, [finalProfileUser, isOwnProfile]);
 
   const isLoading = isOwnProfile
     ? myProfileLoading && !mergedOwnProfile && !myProfileError
-    : profileLoading;
+    : viewedOrganiserProfileQuery.isLoading;
+  const profileError = isOwnProfile
+    ? myProfileError
+    : viewedOrganiserProfileQuery.error?.message || null;
 
   /* ------------------ organiser / KYC logic (only for own profile) ------------------ */
   const isOrganiser =
@@ -249,9 +228,16 @@ export default function ViewProfile() {
 
       setIsFollowing(isNowFollowing);
 
-      // also keep local profileUser in sync so ProfileHeader sees it too
-      setProfileUser((p) =>
-        p ? { ...p, isFollowing: isNowFollowing, following: isNowFollowing } : p
+      queryClient.setQueryData(
+        ["profile", "organiser", routeUserId, token ?? "guest"],
+        (current) =>
+          current
+            ? {
+                ...current,
+                isFollowing: isNowFollowing,
+                following: isNowFollowing,
+              }
+            : current
       );
 
       if (isNowFollowing) {

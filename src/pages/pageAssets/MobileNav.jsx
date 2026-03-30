@@ -78,8 +78,8 @@ export default function MobileNav() {
   ];
 
   return (
-    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-5 tw:z-999 tw:block">
-      <div className="tw:flex tw:items-center tw:justify-between tw:px-6">
+    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-3 tw:z-999 tw:block">
+      <div className="tw:flex tw:items-center tw:justify-between tw:px-4">
         {navItems.map((item) => {
           const active = location.pathname === item.to;
 
@@ -87,7 +87,7 @@ export default function MobileNav() {
             <Link
               key={item.name}
               to={item.to}
-              className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:text-xs tw:font-medium"
+              className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0.5 tw:text-xs tw:font-medium"
             >
               {item.icon(active)}
               <span

@@ -1,49 +1,31 @@
 // src/hooks/useProfile.js
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../pages/auth/AuthContext";
 import { api, authHeaders } from "../lib/apiClient";
 
 export default function useProfile() {
   const { token } = useAuth();
 
-  const [user, setUser] = useState(null);
-  const [organiser, setOrganiser] = useState(null);
+  const profileQuery = useQuery({
+    queryKey: ["profile", "me", token ?? "guest"],
+    enabled: !!token,
+    staleTime: 1000 * 60 * 2,
+    queryFn: async () => {
+      const res = await api.get("/api/v1/profile", authHeaders(token));
+      const payload = res?.data?.data ?? res?.data ?? {};
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+      return {
+        user: payload?.user ?? null,
+        organiser: payload?.organiser ?? payload?.organizer ?? null,
+      };
+    },
+  });
 
-  useEffect(() => {
-    if (!token) return;
-
-    let mounted = true;
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const res = await api.get("/api/v1/profile", authHeaders(token));
-
-        // supports either {user, organiser} or {data:{user, organiser}}
-        const payload = res?.data?.data ?? res?.data ?? {};
-        const u = payload?.user ?? null;
-        const o = payload?.organiser ?? payload?.organizer ?? null;
-
-        if (!mounted) return;
-
-        setUser(u);
-        setOrganiser(o);
-      } catch (e) {
-        if (mounted) setError(e?.message || "Failed to fetch profile");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [token]);
-
-  return { user, organiser, loading, error };
+  return {
+    user: profileQuery.data?.user ?? null,
+    organiser: profileQuery.data?.organiser ?? null,
+    loading: !!token ? profileQuery.isLoading : false,
+    error: profileQuery.error?.message || null,
+    refetch: profileQuery.refetch,
+  };
 }

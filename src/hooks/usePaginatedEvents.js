@@ -1,75 +1,78 @@
-import { useState, useEffect, useCallback } from "react";
-import { api, authHeaders } from "../lib/apiClient"; // adjust path
+import { useCallback, useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { api, authHeaders } from "../lib/apiClient";
 import { useAuth } from "../pages/auth/AuthContext";
 
 export default function usePaginatedEvents(endpoint) {
   const { token, user } = useAuth();
+  const userKey = user?.user_id || user?.id || "anonymous";
 
-  const [items, setItems] = useState([]);
-  const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0 });
-  const [loading, setLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
+  const query = useInfiniteQuery({
+    queryKey: ["paginated-events", endpoint, userKey],
+    enabled: Boolean(user && endpoint),
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await api.get(endpoint, {
+        ...authHeaders(token),
+        params: { page: pageParam },
+      });
 
-  const fetchPage = useCallback(
-    async (page = 1, append = false) => {
-      if (!endpoint) return;
+      const data = res?.data?.data ?? [];
+      const meta = res?.data?.meta ?? {
+        current_page: pageParam,
+        last_page: 1,
+        total: data.length,
+      };
 
-      try {
-        setError(null);
-        page === 1 ? setLoading(true) : setLoadingMore(true);
-
-        // Let axios handle query params properly (avoids manual "?"/"&" logic)
-        const res = await api.get(endpoint, {
-          ...authHeaders(token),
-          params: { page },
-        });
-
-        const data = res?.data?.data ?? [];
-        const m = res?.data?.meta ?? {
-          current_page: page,
-          last_page: 1,
-          total: data.length,
-        };
-
-        setItems((prev) => (append ? [...prev, ...data] : data));
-        setMeta({
-          current_page: Number(m.current_page ?? page),
-          last_page: Number(m.last_page ?? 1),
-          total: Number(m.total ?? data.length),
-        });
-      } catch (e) {
-        setError(e);
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
+      return {
+        items: data,
+        meta: {
+          current_page: Number(meta.current_page ?? pageParam),
+          last_page: Number(meta.last_page ?? 1),
+          total: Number(meta.total ?? data.length),
+        },
+      };
     },
-    [endpoint, token]
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.current_page >= lastPage.meta.last_page) {
+        return undefined;
+      }
+
+      return lastPage.meta.current_page + 1;
+    },
+  });
+
+  const items = useMemo(
+    () => query.data?.pages?.flatMap((page) => page.items) ?? [],
+    [query.data]
   );
 
-  // initial + endpoint change
-  useEffect(() => {
-    setItems([]);
-    setMeta({ current_page: 1, last_page: 1, total: 0 });
+  const meta = useMemo(() => {
+    return (
+      query.data?.pages?.[query.data.pages.length - 1]?.meta ?? {
+        current_page: 1,
+        last_page: 1,
+        total: 0,
+      }
+    );
+  }, [query.data]);
 
-    // if your endpoint is public, remove user/token checks
-    if (user && endpoint) fetchPage(1, false);
-  }, [user, endpoint, fetchPage]);
+  const refresh = useCallback(() => {
+    query.refetch();
+  }, [query]);
 
   const loadNext = useCallback(() => {
-    if (loadingMore) return;
-    if (meta.current_page >= meta.last_page) return;
-    fetchPage(meta.current_page + 1, true);
-  }, [loadingMore, meta.current_page, meta.last_page, fetchPage]);
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    query.fetchNextPage();
+  }, [query]);
 
   return {
     items,
     meta,
-    loading,
-    loadingMore,
-    error,
-    refresh: () => fetchPage(1, false),
+    loading: query.isLoading,
+    loadingMore: query.isFetchingNextPage,
+    error: query.error,
+    refresh,
     loadNext,
   };
 }

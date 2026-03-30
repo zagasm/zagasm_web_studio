@@ -26,17 +26,17 @@ const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed 
       to={to}
       type={to ? undefined : "button"}
       onClick={onClick}
-      className="tw:relative tw:flex tw:min-h-24 tw:w-full tw:flex-col tw:items-start tw:justify-between tw:gap-4 tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-white/45 tw:bg-white/30 tw:p-4 tw:text-left tw:shadow-[0_18px_50px_rgba(148,163,184,0.18)] tw:backdrop-blur-2xl tw:transition hover:tw:-translate-y-0.5 hover:tw:border-white/60 hover:tw:bg-white/40 hover:tw:shadow-[0_22px_60px_rgba(148,163,184,0.24)]"
+      className="tw:relative tw:flex tw:min-h-20 tw:w-full tw:flex-col tw:items-start tw:justify-between tw:gap-3 tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-white/45 tw:bg-white/30 tw:p-3 tw:text-left tw:shadow-[0_18px_50px_rgba(148,163,184,0.18)] tw:backdrop-blur-2xl tw:transition hover:tw:-translate-y-0.5 hover:tw:border-white/60 hover:tw:bg-white/40 hover:tw:shadow-[0_22px_60px_rgba(148,163,184,0.24)] tw:md:min-h-24 tw:md:gap-4 tw:md:rounded-[28px] tw:md:p-4"
     >
       <span className="tw:pointer-events-none tw:absolute tw:inset-x-3 tw:top-0 tw:h-px tw:bg-white/70" />
       <span className="tw:pointer-events-none tw:absolute tw:-right-8 tw:top-3 tw:h-16 tw:w-16 tw:rounded-full tw:bg-white/25 tw:blur-2xl" />
 
       {icon ? (
-        <div className="tw:relative tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-[18px] tw:border tw:border-white/50 tw:bg-white/35 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-xl">
+        <div className="tw:relative tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-[16px] tw:border tw:border-white/50 tw:bg-white/35 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-xl tw:md:h-12 tw:md:w-12 tw:md:rounded-[18px]">
           <img src={icon} alt="" className="tw:size-7 tw:md:size-8 tw:shrink-0" />
         </div>
       ) : Icon ? (
-        <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-[18px] tw:border tw:border-white/50 tw:bg-white/35 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-xl">
+        <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-[16px] tw:border tw:border-white/50 tw:bg-white/35 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-xl tw:md:h-12 tw:md:w-12 tw:md:rounded-[18px]">
           <Icon
             className={`tw:size-6 tw:md:size-8 tw:text-primary ${isRed ? "tw:text-red-500" : "tw:text-gray-700"
               }`}
@@ -45,7 +45,7 @@ const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed 
       ) : null}
 
       <span
-        className={`tw:relative tw:text-[11px] tw:md:text-sm tw:font-medium tw:leading-5 ${isRed ? "tw:text-red-600" : "tw:text-gray-900"
+        className={`tw:relative tw:text-[10px] tw:md:text-sm tw:font-medium tw:leading-4 tw:md:leading-5 ${isRed ? "tw:text-red-600" : "tw:text-gray-900"
           }`}
       >
         {label}
@@ -127,13 +127,13 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
 
   return (
     <>
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-5xl tw:flex-col tw:gap-6">
-        <section className="tw:relative tw:overflow-hidden tw:rounded-[36px] tw:border tw:border-white/50 tw:bg-[linear-gradient(135deg,rgba(255,255,255,0.54)_0%,rgba(244,248,255,0.36)_46%,rgba(235,242,255,0.46)_100%)] tw:p-2 tw:shadow-[0_24px_80px_rgba(148,163,184,0.2)] tw:backdrop-blur-3xl tw:md:p-7">
+      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-5xl tw:flex-col tw:gap-4 tw:md:gap-6">
+        <section className="tw:relative tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-white/50 tw:bg-[linear-gradient(135deg,rgba(255,255,255,0.54)_0%,rgba(244,248,255,0.36)_46%,rgba(235,242,255,0.46)_100%)] tw:p-1.5 tw:shadow-[0_24px_80px_rgba(148,163,184,0.2)] tw:backdrop-blur-3xl tw:md:rounded-[36px] tw:md:p-7">
           <span className="tw:pointer-events-none tw:absolute tw:-left-12 tw:top-6 tw:h-28 tw:w-28 tw:rounded-full tw:bg-white/35 tw:blur-3xl" />
           <span className="tw:pointer-events-none tw:absolute tw:-right-10 tw:bottom-4 tw:h-32 tw:w-32 tw:rounded-full tw:bg-sky-100/30 tw:blur-3xl" />
           <span className="tw:pointer-events-none tw:absolute tw:inset-x-6 tw:top-0 tw:h-px tw:bg-white/80" />
 
-          <div className="tw:flex tw:flex-col tw:gap-5 tw:lg:flex-row tw:lg:items-center tw:lg:justify-between">
+          <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-center tw:lg:justify-between tw:md:gap-5">
             <div
               role="link"
               tabIndex={0}
@@ -144,10 +144,10 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                   navigate(profilePath);
                 }
               }}
-              className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-4 tw:rounded-[30px] tw:border tw:border-white/45 tw:bg-white/24 tw:p-4 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition hover:tw:bg-white/32"
+              className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-[24px] tw:border tw:border-white/45 tw:bg-white/24 tw:p-3 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition hover:tw:bg-white/32 tw:md:gap-4 tw:md:rounded-[30px] tw:md:p-4"
             >
               <div
-                className={`tw:flex tw:h-16 tw:w-16 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-white/55 tw:shadow-[0_8px_20px_rgba(148,163,184,0.18)] ${showProfileImage ? "tw:bg-white/30" : "tw:bg-white/45"
+                className={`tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-white/55 tw:shadow-[0_8px_20px_rgba(148,163,184,0.18)] tw:md:h-16 tw:md:w-16 ${showProfileImage ? "tw:bg-white/30" : "tw:bg-white/45"
                   }`}
               >
                 {showProfileImage ? (
@@ -157,7 +157,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                     className="tw:h-full tw:w-full tw:object-cover"
                   />
                 ) : (
-                  <span className="tw:text-lg tw:font-semibold tw:text-primary">
+                  <span className="tw:text-base tw:font-semibold tw:text-primary tw:md:text-lg">
                     {initials}
                   </span>
                 )}
@@ -165,7 +165,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
 
               <div className="tw:min-w-0 tw:flex-1">
                 <div className="tw:flex tw:items-center tw:gap-1.5">
-                  <span className="tw:truncate tw:text-base tw:md:text-xl tw:font-semibold tw:text-gray-900">
+                  <span className="tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900 tw:md:text-xl">
                     {fullName}
                   </span>
                   {user?.subscription?.isActive ? (
@@ -176,14 +176,14 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                     />
                   ) : null}
                 </div>
-                <span className="tw:mt-1 tw:block tw:text-sm tw:font-medium tw:text-gray-500">
+                <span className="tw:mt-1 tw:block tw:text-xs tw:font-medium tw:text-gray-500 tw:md:text-sm">
                   View public profile
                 </span>
               </div>
             </div>
 
             {!user?.subscription?.isActive ? (
-              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[28px] tw:bg-primary tw:p-5 tw:text-white tw:lg:max-w-md">
+              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-primary tw:p-4 tw:text-white tw:lg:max-w-md tw:md:rounded-[28px] tw:md:p-5">
                 <span className="tw:pointer-events-none tw:absolute tw:-right-6 tw:-top-6 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/10 tw:blur-2xl" />
                 <span className="tw:pointer-events-none tw:absolute tw:-left-5 tw:bottom-0 tw:h-20 tw:w-20 tw:rounded-full tw:bg-sky-300/10 tw:blur-2xl" />
                 <img
@@ -194,10 +194,10 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
 
                 <div className="tw:relative tw:flex tw:w-full tw:flex-col tw:gap-3">
                   <div>
-                    <span className="tw:block tw:text-sm tw:font-semibold">
+                    <span className="tw:block tw:text-xs tw:font-semibold tw:md:text-sm">
                       Zagasm Studios Verification Badge
                     </span>
-                    <span className="tw:mt-1 tw:block tw:text-sm tw:text-white/90">
+                    <span className="tw:mt-1 tw:block tw:text-xs tw:text-white/90 tw:md:text-sm">
                       Get the blue checkmark and unlock premium features.
                     </span>
                   </div>
@@ -237,7 +237,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
           ) : null}
         </section>
 
-        <section className="tw:grid tw:grid-cols-2 tw:gap-4 tw:md:grid-cols-3">
+          <section className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-3 tw:md:gap-4">
           <QuickActionCard
             iconComponent={PiBookmarkDuotone}
             label="View Saved Events"
