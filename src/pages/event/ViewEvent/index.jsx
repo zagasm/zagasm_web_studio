@@ -549,7 +549,7 @@ export default function ViewEvent() {
                             <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-white/72">
                               Featured Experience
                             </div>
-                            <span className="tw:max-w-3xl tw:block tw:text-3xl tw:font-semibold tw:leading-tight tw:text-white tw:md:text-5xl">
+                            <span className="tw:max-w-3xl tw:block tw:text-3xl tw:font-semibold tw:leading-tight tw:text-white tw:md:text-3xl">
                               {event.title}
                             </span>
                             <span className="tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-white/84 tw:md:text-base">

@@ -19,8 +19,8 @@ import EventActionsSheet from "../EventsActionSheet";
 
 /* ---- Shimmer ---- */
 export const EventShimmer = () => (
-  <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-    <div className="shadow-s rounded h-100 blog-card border-0 position-relative">
+  <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4 tw:flex">
+    <div className="shadow-s rounded h-100 tw:w-full blog-card border-0 position-relative">
       <div className="shimmer-container">
         <div className="shimmer-image"></div>
         <div className="shimmer-content">
@@ -38,6 +38,17 @@ export function firstImageFromPoster(poster = []) {
   const img = poster.find((p) => p?.type === "image" && p?.url);
   if (img) return img.url;
   return "/images/event-dummy.jpg";
+}
+
+function preloadEventImages(events = []) {
+  events.forEach((event) => {
+    const imageUrl = firstImageFromPoster(event?.poster);
+    if (!imageUrl) return;
+
+    const img = new Image();
+    img.decoding = "async";
+    img.src = imageUrl;
+  });
 }
 
 export function formatMetaLine(event) {
@@ -208,6 +219,7 @@ export function CountdownPill({ target }) {
 /* ---- Single Card (shared for all variants) ---- */
 export function EventCard({
   event,
+  index = 0,
   variant = "default",
   onMore,
   hidePrice = false,
@@ -229,7 +241,10 @@ export function EventCard({
 
   const isEnded =
     event?.status === "ended" ||
-    (startDate && startDate.getTime() < Date.now() && event?.status !== "live");
+    (startDate &&
+      startDate.getTime() < Date.now() &&
+      event?.status !== "live" &&
+      event?.status !== "paused");
 
   const ticketLabel = `Buy Ticket ${!hidePrice ? `(${priceText(event)})` : ''} `;
 
@@ -258,8 +273,8 @@ export function EventCard({
   };
 
   return (
-    <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-      <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full blog-card border-0 tw:relative">
+    <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4 tw:flex">
+      <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full tw:w-full blog-card border-0 tw:relative">
         {/* three dots */}
         <button
           style={{
@@ -279,6 +294,9 @@ export function EventCard({
               className="tw:w-full tw:h-full tw:object-cover"
               src={firstImageFromPoster(event?.poster)}
               alt={event?.title || "Event"}
+              loading={index < 6 ? "eager" : "lazy"}
+              fetchPriority={index < 3 ? "high" : "auto"}
+              decoding="async"
             />
 
             {/* LIVE badge */}
@@ -302,7 +320,7 @@ export function EventCard({
             )}
             {isPaused && (
               <>
-                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-neutral-800 tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
+                <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-blue-500 tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
                   <span>Paused</span>
                   <Pause className="tw:size-4" />
                 </div>
@@ -326,11 +344,11 @@ export function EventCard({
         {/* Content */}
         <div className="tw:px-3 tw:pt-3 tw:flex tw:flex-col tw:gap-3 tw:flex-1">
           {/* Title + price */}
-          <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
-            <div className="tw:flex-1">
-              <span className="tw:text-[16px] tw:font-semibold tw:text-black tw:leading-snug tw:uppercase">
-                {event?.title?.length > 40
-                  ? event.title.slice(0, 40) + "…"
+          <div className="tw:flex tw:items-start tw:justify-between tw:gap-2 tw:min-h-[58px]">
+            <div className="tw:flex-1 tw:min-w-0">
+              <span className="tw:block tw:text-[16px] tw:font-semibold tw:text-black tw:leading-snug tw:uppercase tw:min-h-[44px] tw:break-words">
+                {event?.title?.length > 15
+                  ? event.title.slice(0, 15) + "…"
                   : event?.title}
               </span>
             </div>
@@ -344,11 +362,11 @@ export function EventCard({
           </div>
 
           {/* Host row */}
-          <div className="tw:flex tw:items-center tw:gap-3 tw:-mt-3">
+          <div className="tw:flex tw:items-center tw:gap-3 tw:-mt-3 tw:min-h-[52px]">
             <button
               type="button"
               onClick={goToHostProfile}
-              className="tw:px-3 tw:py-1.5 tw:bg-[#f5f5f5] tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2 tw:text-left"
+              className="tw:w-full tw:px-3 tw:py-1.5 tw:bg-[#f5f5f5] tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2 tw:text-left"
             >
               <span className="tw:w-8 tw:h-8 tw:rounded-full tw:bg-lightPurple tw:overflow-hidden tw:-ml-1 tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-semibold tw:text-primary">
                 {event?.hostImage ? (
@@ -362,7 +380,7 @@ export function EventCard({
                 )}
               </span>
 
-              <div className="tw:flex tw:items-center">
+              <div className="tw:flex tw:items-center tw:min-w-0">
                 <span className="tw:truncate">{hostName(event)}</span>
                 {event.hostHasActiveSubscription && (
                   <img
@@ -376,7 +394,7 @@ export function EventCard({
           </div>
 
           {/* META BLOCK (ALWAYS RENDERED TO KEEP CTA ALIGNED) */}
-          <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600 tw:min-h-14">
+          <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600 tw:min-h-[72px]">
             {isLive ? (
               <>
                 <div className="tw:flex tw:items-center tw:gap-2">
@@ -483,7 +501,7 @@ export default function EventTemplate({
   all = false,
 }) {
   const {
-    items: serverEvents,
+    items,
     meta,
     loading,
     loadingMore,
@@ -491,46 +509,19 @@ export default function EventTemplate({
   } = usePaginatedEvents(endpoint);
 
   const [visibleEvents, setVisibleEvents] = useState([]);
-  const [cacheLoaded, setCacheLoaded] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  const cacheKey = React.useMemo(
-    () => `zagasm_events_cache_${endpoint}`,
-    [endpoint]
-  );
-
-  /* ---- 1. Load CACHE instantly on mount ---- */
   React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem(cacheKey);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
+    if (!Array.isArray(items)) return;
+    setVisibleEvents(items);
+  }, [items]);
 
-      if (Array.isArray(parsed.events)) {
-        setVisibleEvents(parsed.events);
-      }
-    } catch (err) {
-      console.error("CACHE READ ERROR", err);
-    }
-
-    setCacheLoaded(true);
-  }, [cacheKey]);
-
-  /* ---- 2. When API loads, override cache ---- */
   React.useEffect(() => {
-    if (serverEvents === undefined || serverEvents === null) return;
+    if (!visibleEvents.length) return;
+    preloadEventImages(visibleEvents.slice(0, 12));
+  }, [visibleEvents]);
 
-    setVisibleEvents(serverEvents);
-
-    try {
-      const payload = { events: serverEvents, meta };
-      localStorage.setItem(cacheKey, JSON.stringify(payload));
-    } catch (err) {
-      console.error("CACHE WRITE ERROR", err);
-    }
-  }, [serverEvents, meta, cacheKey]);
-
-  /* ---- 3. Infinite scroll trigger ---- */
+  /* ---- Infinite scroll trigger ---- */
   const { ref: loadMoreRef, inView } = useInView({ rootMargin: "300px" });
 
   React.useEffect(() => {
@@ -541,7 +532,6 @@ export default function EventTemplate({
 
   const variant = live ? "live" : upcoming ? "upcoming" : "all";
 
-  /* ---- 4. SHOW SHIMMER WHEN: cache not loaded + loading ---- */
   const showShimmer = loading && visibleEvents.length === 0;
 
   return (
@@ -558,10 +548,11 @@ export default function EventTemplate({
       {/* EVENTS */}
       {!showShimmer && (
         <div className="row tw:mx-0">
-          {visibleEvents.map((event) => (
+          {visibleEvents.map((event, index) => (
             <EventCard
               key={event.id}
               event={event}
+              index={index}
               variant={variant}
               onMore={() => setSelectedEvent(event)}
             />

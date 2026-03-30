@@ -101,6 +101,11 @@ function PersonRow({ item, onClick }) {
   const subtitle = isOrganiser ? "Event organiser" : "User";
   const avatarUrl = getAvatarUrl(item);
   const initials = initialsFromName(name);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [avatarUrl]);
 
   // console.log(item)
 
@@ -111,11 +116,12 @@ function PersonRow({ item, onClick }) {
       className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:hover:bg-zinc-50 tw:transition-colors"
     >
       <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold">
-        {avatarUrl ? (
+        {avatarUrl && !avatarFailed ? (
           <img
             src={avatarUrl}
             alt={name}
             className="tw:w-full tw:h-full tw:object-cover"
+            onError={() => setAvatarFailed(true)}
           />
         ) : (
           <span className="tw:text-primary">{initials}</span>
