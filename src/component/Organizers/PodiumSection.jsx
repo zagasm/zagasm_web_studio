@@ -8,7 +8,7 @@ export default function PodiumSection({
 }) {
   return (
     <div className="tw:relative tw:rounded-3xl tw:bg-white">
-      <div className="tw:grid tw:grid-cols-3 tw:items-end tw:gap-4 tw:md:gap-6 tw:py-2">
+      <div className="tw:grid tw:grid-cols-3 tw:items-stretch tw:gap-2 tw:py-2 tw:sm:gap-4 tw:md:gap-6">
         <div className="tw:flex tw:justify-center">
           {top3[1] ? (
             <PodiumCard

@@ -46,10 +46,13 @@ export default function AllOrganizers() {
             typeof o.isFollowing === "boolean"
               ? o.isFollowing
               : !!o.following;
+          const isFollowedBy =
+            typeof o.isFollowedBy === "boolean" ? o.isFollowedBy : false;
 
           return {
             ...o,
             isFollowing,
+            isFollowedBy,
             following: isFollowing, // keep both in sync so old components don't break
           };
         });
@@ -149,10 +152,10 @@ export default function AllOrganizers() {
           {/* header (spans only) */}
           <div className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:mt-5 tw:md:mt-0">
             <div className="tw:flex tw:flex-col">
-              <span className="tw:text-2xl tw:md:text-3xl tw:font-semibold tw:text-gray-900">
+              <span className="tw:text-2xl tw:font-semibold tw:leading-none tw:text-gray-900 tw:sm:text-[28px] tw:md:text-3xl">
                 Top Organizers
               </span>
-              <span className="tw:text-xs tw:md:text-sm tw:text-gray-600 tw:mt-1">
+              <span className="tw:mt-1 tw:text-[11px] tw:leading-5 tw:text-gray-600 tw:md:text-sm">
                 See best rated organizers globally
               </span>
             </div>

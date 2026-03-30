@@ -261,7 +261,7 @@ export default function EventActionsSheet({
   const goToHostProfile = (e) => {
     e?.stopPropagation?.();
     if (!hostId) return;
-    navigate(`/profile/${event.organiserId}`);
+    navigate(`/profile/${event.organiser_id}`);
     onClose?.();
   };
 

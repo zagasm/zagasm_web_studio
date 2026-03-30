@@ -3,6 +3,7 @@ import { App } from "./app.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Provider as ReduxProvider } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./assets/vendor/icons/feather.css";
@@ -13,6 +14,7 @@ import "./styles/tailwind.css";
 import { AuthProvider, useAuth } from "./pages/auth/AuthContext/index.jsx";
 import { HelmetProvider } from "react-helmet-async";
 import { ModalProvider } from "./component/assets/ModalContext/index.jsx";
+import { store } from "./store";
 
 // window.onerror = (msg, url, line) => {
 //   debugger;
@@ -44,13 +46,15 @@ const RootWrapper = () => {
 };
 
 createRoot(document.getElementById("root")).render(
-  <AuthProvider>
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <ModalProvider>
-          <RootWrapper />
-        </ModalProvider>
-      </HelmetProvider>
-    </QueryClientProvider>
-  </AuthProvider>
+  <ReduxProvider store={store}>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <ModalProvider>
+            <RootWrapper />
+          </ModalProvider>
+        </HelmetProvider>
+      </QueryClientProvider>
+    </AuthProvider>
+  </ReduxProvider>
 );

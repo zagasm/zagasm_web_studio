@@ -43,19 +43,19 @@ export default function Navbar() {
       {/* DESKTOP NAV (Hidden on Mobile) */}
       {/* FIX: Use tw:hidden on mobile and tw:flex on md: to prevent it from ever displaying/overflowing on small screens.
               Also, cleaned up px class to ensure consistency. */}
-      <div className="tw:flex tw:w-full tw:h-[85px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-8 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
+      <div className="tw:flex tw:w-full tw:h-[74px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-4 tw:md:px-6 tw:lg:px-7 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
         {/* LEFT SECTION */}
-        <Link to={'/feed'} className="tw:flex tw:items-center tw:gap-6">
+        <Link to={'/feed'} className="tw:flex tw:items-center tw:gap-4 tw:md:gap-5">
           {/* Logo */}
           <img
             src={"/images/logo.png"}
             alt="Zagasm Logo"
-            className="tw:w-24 tw:lg:w-32 tw:-ml-5 tw:object-contain"
+            className="tw:w-20 tw:md:w-24 tw:lg:w-28 tw:-ml-2 tw:md:-ml-3 tw:object-contain"
           />
         </Link>
 
         {/* CENTER NAV LINKS */}
-        <div className="tw:hidden tw:md:flex tw:md:justify-center tw:gap-12 tw:mr-16">
+        <div className="tw:hidden tw:md:flex tw:md:justify-center tw:gap-8 tw:lg:gap-10 tw:mr-8 tw:lg:mr-12">
           {nav.map((item) => {
             const active = location.pathname === item.to;
             const Icon = item.icon;
@@ -64,7 +64,7 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 to={item.to}
-                className="tw:flex tw:flex-col tw:items-center tw:gap-1"
+                className="tw:flex tw:flex-col tw:items-center tw:gap-0.5"
               >
                 <Icon
                   className={`tw:size-5 ${
@@ -87,7 +87,7 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT ACTION ICONS */}
-        <div className="tw:flex tw:items-center tw:gap-4">
+        <div className="tw:flex tw:items-center tw:gap-3 tw:md:gap-3.5">
           {/* Search */}
           <Link to='/search'>
             <Search className="tw:size-5 tw:text-gray-700 tw:cursor-pointer" />
@@ -102,7 +102,7 @@ export default function Navbar() {
           {/* Profile */}
           <Link
             to="/account"
-            className="tw:size-10 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
+            className="tw:size-9 tw:md:size-10 tw:rounded-full tw:overflow-hidden tw:cursor-pointer"
           >
             {hasImage ? (
               <img

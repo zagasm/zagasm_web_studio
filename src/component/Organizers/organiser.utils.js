@@ -26,3 +26,37 @@ export const rankSafe = (o) => {
   const r = Number(o?.rank);
   return Number.isFinite(r) ? r : 999999;
 };
+
+export const getFollowState = (organizer) => {
+  const isFollowing =
+    typeof organizer?.isFollowing === "boolean"
+      ? organizer.isFollowing
+      : !!organizer?.following;
+  const isFollowedBy =
+    typeof organizer?.isFollowedBy === "boolean" ? organizer.isFollowedBy : false;
+
+  if (isFollowing) {
+    return {
+      isFollowing: true,
+      isFollowedBy,
+      label: "Unfollow",
+      buttonClass: "tw:bg-white tw:text-gray-900 tw:ring-gray-200",
+    };
+  }
+
+  if (isFollowedBy) {
+    return {
+      isFollowing: false,
+      isFollowedBy: true,
+      label: "Follow back",
+      buttonClass: "tw:bg-primary tw:text-white tw:ring-primary",
+    };
+  }
+
+  return {
+    isFollowing: false,
+    isFollowedBy: false,
+    label: "Follow",
+    buttonClass: "tw:bg-primary tw:text-white tw:ring-primary",
+  };
+};
