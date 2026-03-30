@@ -187,6 +187,7 @@ export const ChangePasswordTemplate = ({ onClose }) => {
             onClose(); // Close the modal on success
             if (formData.logout_status == '1') {
               logout();
+              window.location.replace("/auth/signin");
             }
           } else {
             setMessage({

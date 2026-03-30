@@ -182,7 +182,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
               </div>
             </div>
 
-            {user?.subscription?.isActive ? (
+            {!user?.subscription?.isActive ? (
               <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[28px] tw:bg-primary tw:p-5 tw:text-white tw:lg:max-w-md">
                 <span className="tw:pointer-events-none tw:absolute tw:-right-6 tw:-top-6 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/10 tw:blur-2xl" />
                 <span className="tw:pointer-events-none tw:absolute tw:-left-5 tw:bottom-0 tw:h-20 tw:w-20 tw:rounded-full tw:bg-sky-300/10 tw:blur-2xl" />

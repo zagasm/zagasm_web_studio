@@ -121,6 +121,7 @@ export default function ReviewStep({
     maxTickets,
     ticketLimit,
     visibility,
+    enableReplay,
     matureContent,
   } = collected || {};
 
@@ -248,13 +249,7 @@ export default function ReviewStep({
                   {title || "—"}
                 </div>
               </div>
-              <div>
-                <div className="tw:text-xs tw:text-slate-500">Location</div>
-                <div className="tw:mt-1 tw:text-sm tw:font-medium tw:text-slate-900">
-                  {location || "Online"}
-                </div>
-              </div>
-              <div className="tw:sm:col-span-2">
+              <div className="">
                 <div className="tw:text-xs tw:text-slate-500">Description</div>
                 <div className="tw:mt-1 tw:text-sm tw:text-slate-700">
                   {description || "—"}
@@ -282,7 +277,7 @@ export default function ReviewStep({
               </button>
             </div>
 
-            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2">
+            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-3">
               <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
                 <div className="tw:text-xs tw:text-slate-500">Price</div>
                 <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
@@ -302,6 +297,12 @@ export default function ReviewStep({
                 <div className="tw:text-xs tw:text-slate-500">Visibility</div>
                 <div className="tw:mt-1 tw:text-base tw:font-semibold tw:capitalize tw:text-slate-900">
                   {visibility || "public"}
+                </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Replay enabled</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {enableReplay ? "Yes" : "No"}
                 </div>
               </div>
               <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">

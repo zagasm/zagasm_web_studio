@@ -29,6 +29,7 @@ function mapEventToDefaults(event) {
         ticketLimit: undefined,
         currency: "",
         currencyCode: "NGN",
+        enableReplay: true,
       },
       streaming: {
         streamingOption: "in_app",
@@ -78,6 +79,10 @@ function mapEventToDefaults(event) {
           : undefined,
       currency: String(currentEvent.currency?.currencyId || currentEvent.currency?.id || ""),
       currencyCode: String(currentEvent.currency?.code || "NGN").toUpperCase(),
+      enableReplay:
+        typeof currentEvent.enable_replay === "boolean"
+          ? currentEvent.enable_replay
+          : true,
     },
     streaming: {
       streamingOption: currentEvent.streaming_option || "in_app",
@@ -183,8 +188,6 @@ export default function EventCreationWizard({
         ...mapped.ticketing,
         ...mapped.access,
       };
-      const streaming = mapped.streaming || {};
-
       payload.append("title", info.title || "");
       payload.append("description", info.description || "");
       payload.append("location", info.location || "Online");
@@ -227,10 +230,16 @@ export default function EventCreationWizard({
         payload.append("ticket_limit_number", ticketing.ticketLimit || 0);
       }
 
-      payload.append("streaming_option", streaming.streamingOption || "in_app");
-      payload.append("enable_replay", streaming.enableReplay ? "1" : "0");
-      if (streaming.enableReplay) {
-        payload.append("replay_time", streaming.streamingDuration || "24");
+      payload.append(
+        "streaming_option",
+        (mapped.streaming || {}).streamingOption || "in_app"
+      );
+      payload.append("enable_replay", ticketing.enableReplay ? "1" : "0");
+      if (ticketing.enableReplay) {
+        payload.append(
+          "replay_time",
+          (mapped.streaming || {}).streamingDuration || "24"
+        );
       }
 
       payload.append("visibility", ticketing.visibility || "public");

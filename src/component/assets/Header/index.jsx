@@ -14,9 +14,9 @@ import { useParams } from 'react-router-dom';
 function Header() {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const [currentPage, setcurrentPage] = useState('');
-  // const navigate = useNavigate();
   console.log(user);
   useEffect(() => {
     const pathname = window.location.pathname;
@@ -28,6 +28,11 @@ function Header() {
       setcurrentPage("POKI VILLAGE");
     }
   }, [])
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/signin", { replace: true });
+  };
   return (
     <>
       {/* header */}
@@ -210,7 +215,7 @@ function Header() {
                     <span className="fa fa-cog"></span>
                   </Link>
                   {user && <Link
-                    onClick={() => logout()}
+                    onClick={handleLogout}
                     className=""
                   >
                     <span>Sign out</span>
@@ -469,7 +474,7 @@ function Header() {
                           </a>
                         </li>
                         <li>
-                          <a onClick={() => logout()} title="">
+                          <a onClick={handleLogout} title="">
                             <i className="ti-power-off"></i> log out
                           </a>
                         </li>

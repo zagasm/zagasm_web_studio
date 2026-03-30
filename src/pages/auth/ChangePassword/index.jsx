@@ -5,6 +5,7 @@ import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { showSuccess, showError } from "../../../component/ui/toast";
+import { useAuth } from "../AuthContext";
 
 export function ChangePassword({ ResetPasswordVerificationData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +17,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Extract data from props
   const { input, reset_token } = ResetPasswordVerificationData || {};
@@ -80,21 +82,23 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
       );
 
       const data = response.data;
-      
-      if (data.message && data.user) {
-        // Success case
+      const nextUser = data?.user || data?.data?.user || null;
+      const nextToken = data?.token || data?.data?.token || null;
+
+      if (data.message && nextUser && nextToken) {
         showSuccess(data.message);
-        //  login({
-        //   user: data.user,
-        //   token: data.token
-        // });
+        login({
+          user: nextUser,
+          token: nextToken,
+        });
         setTimeout(() => {
-          navigate("/auth/signin");
-        }, 800);
+          navigate("/feed", { replace: true });
+        }, 500);
       } else {
-        // Unexpected response format
-        showError("Password reset successful but unexpected response format.");
-        navigate("/auth/signin");
+        showError(
+          "Password reset succeeded, but automatic sign-in is unavailable. Please sign in manually."
+        );
+        navigate("/auth/signin", { replace: true });
       }
     } catch (err) {
       let errorMessage = "An error occurred. Please try again.";

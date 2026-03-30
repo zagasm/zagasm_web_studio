@@ -2,6 +2,7 @@ import React, { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { clearActiveAuthStorage } from "../../lib/authStorage";
 
 // Components
 import AccountCenter from "../../component/account/AccountCenter";
@@ -23,7 +24,7 @@ function Account() {
 
   const handleForceLogout = () => {
     try {
-      localStorage.clear();
+      clearActiveAuthStorage();
     } catch (e) {
       console.error("Failed to clear localStorage", e);
     }

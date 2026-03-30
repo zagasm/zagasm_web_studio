@@ -1,6 +1,7 @@
 // lib/apiClient.js
 import axios from "axios";
 import { showError } from "../component/ui/toast"; // <-- adjust path if different
+import { clearActiveAuthStorage } from "./authStorage";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
@@ -73,8 +74,8 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (window.location.pathname !== "/auth/signin") { 
-      localStorage.clear();
+    if (window.location.pathname !== "/auth/signin") {
+      clearActiveAuthStorage();
       window.location.replace("/auth/signin");
     }
 

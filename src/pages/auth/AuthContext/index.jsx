@@ -1,6 +1,10 @@
 // pages/auth/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { api, authHeaders } from "../../../lib/apiClient";
+import {
+  clearActiveAuthStorage,
+  rememberAccount,
+} from "../../../lib/authStorage";
 
 const AuthContext = createContext();
 
@@ -31,6 +35,7 @@ export const AuthProvider = ({ children }) => {
     setUser(u);
     setToken(t);
     persist(u, t);
+    if (u) rememberAccount(u);
   };
 
   const refreshUser = async () => {
@@ -48,6 +53,7 @@ export const AuthProvider = ({ children }) => {
       setOrganiser(freshOrganiser);
       localStorage.setItem("userdata", JSON.stringify(freshUser));
       localStorage.setItem("organiserdata", JSON.stringify(freshOrganiser));
+      rememberAccount(freshUser);
     } catch (err) {
       console.error("Failed to refresh user", err);
     }
@@ -64,14 +70,15 @@ export const AuthProvider = ({ children }) => {
       setUser(u);
       if (u) localStorage.setItem("userdata", JSON.stringify(u));
       else localStorage.removeItem("userdata");
+      if (u) rememberAccount(u);
     }
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("userdata");
-    localStorage.removeItem("token");
+    setOrganiser(null);
+    clearActiveAuthStorage();
   };
 
   /** BUGFIX: this should be true when we HAVE a token/user */

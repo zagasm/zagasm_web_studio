@@ -93,6 +93,7 @@ const schema = z
     ticketLimit: z.string().optional(),
     currencyCode: z.enum(["NGN", "USD"]),
     visibility: z.enum(["public", "private"]),
+    enableReplay: z.boolean(),
     matureContent: z.boolean(),
   })
   .superRefine((values, ctx) => {
@@ -150,6 +151,10 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           : "",
       currencyCode: defaultValues.currencyCode === "USD" ? "USD" : "NGN",
       visibility: defaultValues.visibility || "public",
+      enableReplay:
+        typeof defaultValues.enableReplay === "boolean"
+          ? defaultValues.enableReplay
+          : true,
       matureContent: !!defaultValues.matureContent,
     },
     mode: "onChange",
@@ -219,6 +224,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       currency: String(matchedCurrency.id),
       currencyCode: values.currencyCode,
       visibility: values.visibility,
+      enableReplay: values.enableReplay,
       matureContent: values.matureContent,
     });
   };
@@ -320,6 +326,15 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           options={VISIBILITY_OPTIONS}
           error={errors?.visibility?.message}
         />
+
+        <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:px-4 tw:py-3">
+          <label className="tw:text-[15px]">Enable event replay</label>
+          <input
+            type="checkbox"
+            {...register("enableReplay")}
+            className="tw:h-4 tw:w-4 tw:accent-primary"
+          />
+        </div>
 
         <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:px-4 tw:py-3">
           <label className="tw:text-[15px]">

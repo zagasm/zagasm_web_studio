@@ -14,6 +14,7 @@ import { useAuth } from "../../../../pages/auth/AuthContext";
 import { showToast } from "../../../ToastAlert";
 import { showError, showSuccess } from "../../../ui/toast";
 import { api } from "../../../../lib/apiClient";
+import { clearActiveAuthStorage } from "../../../../lib/authStorage";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -81,7 +82,7 @@ const PostSignupForm = () => {
       });
 
       if (response.status === 401) {
-        localStorage.clear();
+        clearActiveAuthStorage();
         navigate("/auth/signin");
         return;
       }
