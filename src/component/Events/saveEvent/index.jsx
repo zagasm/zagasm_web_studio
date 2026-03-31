@@ -147,9 +147,7 @@ export default function SaveEventTemplate() {
               >
                 <span className="tw:flex tw:items-center tw:gap-1">
                   <span>{tab.label}</span>
-                  <span className="tw:text-xs tw:font-normal tw:text-gray-500">
-                    ({count})
-                  </span>
+                  
                 </span>
               
               </button>

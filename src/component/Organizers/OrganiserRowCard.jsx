@@ -76,9 +76,9 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
       </div>
 
       {user.id !== org?.userId && (
-        <div className="tw:w-[96px] tw:shrink-0 tw:sm:w-[120px]">
+        <div className="tw:w-24 tw:shrink-0 tw:sm:w-[120px]">
           <button
-            style={{ borderRadius: 16 }}
+            style={{ borderRadius: 16, fontSize: 11 }}
             type="button"
             disabled={loading}
             onClick={(e) => {
