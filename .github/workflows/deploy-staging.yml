@@ -3,7 +3,7 @@ name: Deploy staging frontend to Bunny
 on:
   push:
     branches:
-      - staging
+      - dev
 
 concurrency:
   group: deploy-staging-frontend
