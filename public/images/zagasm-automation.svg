@@ -1,0 +1,106 @@
+<svg width="1080" height="720" viewBox="0 0 1080 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- ====== defs ====== -->
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(820 360) rotate(90) scale(360 420)">
+      <stop stop-color="#8F07E7" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#8F07E7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFFFFF" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity=".78"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8F07E7"/>
+      <stop offset="1" stop-color="#C115B5"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+  </defs>
+
+  <!-- soft purple backdrop -->
+  <rect width="1080" height="720" fill="url(#bg)"/>
+
+  <!-- ====== live player card ====== -->
+  <g transform="translate(520,90)">
+    <rect width="520" height="300" rx="22" fill="url(#glass)" stroke="rgba(255,255,255,.8)"/>
+    <!-- video surface -->
+    <rect x="14" y="14" width="492" height="272" rx="18"
+          fill="#0F0A1F" />
+    <!-- glow -->
+    <rect x="14" y="14" width="492" height="272" rx="18"
+          fill="#8F07E7" opacity=".18" filter="url(#soft)"/>
+    <!-- play triangle -->
+    <path d="M270 150l-56-32v64l56-32z" fill="#FFFFFF" opacity=".92"/>
+    <!-- LIVE badge -->
+    <g transform="translate(26,28)">
+      <rect rx="12" width="96" height="28" fill="url(#accent)"/>
+      <circle cx="16" cy="14" r="5" fill="#FF4D6D"/>
+      <text x="30" y="18" font-family="Geist, sans-serif" font-size="13" fill="#fff" font-weight="700">LIVE</text>
+    </g>
+    <!-- viewers -->
+    <g transform="translate(420,28)">
+      <rect rx="12" width="72" height="28" fill="#FFFFFF" opacity=".9"/>
+      <text x="14" y="18" font-family="Geist, sans-serif" font-size="12" fill="#5A4A70">2.8k</text>
+    </g>
+
+    <!-- timeline with auto-clip markers -->
+    <g transform="translate(24,300)">
+      <rect x="0" y="24" width="472" height="6" rx="3" fill="#EAD7F7"/>
+      <rect x="0" y="24" width="220" height="6" rx="3" fill="url(#accent)"/>
+      <!-- markers (auto clips) -->
+      <g>
+        <rect x="110" y="14" width="8" height="26" rx="3" fill="#8F07E7"/>
+        <rect x="198" y="14" width="8" height="26" rx="3" fill="#C115B5"/>
+        <rect x="310" y="14" width="8" height="26" rx="3" fill="#8F07E7"/>
+        <rect x="382" y="14" width="8" height="26" rx="3" fill="#C115B5"/>
+      </g>
+      <text x="0" y="12" font-family="Geist, sans-serif" font-size="11" fill="#8A8197">Auto-clip moments</text>
+    </g>
+  </g>
+
+  <!-- ====== chat bubbles (right edge of player) ====== -->
+  <g transform="translate(1040,130)">
+    <g transform="translate(-220,0)">
+      <rect width="200" height="60" rx="14" fill="url(#glass)" stroke="rgba(255,255,255,.8)"/>
+      <circle cx="26" cy="30" r="10" fill="#8F07E7" opacity=".2"/>
+      <text x="44" y="28" font-family="Geist, sans-serif" font-size="14" fill="#3A2E4B" font-weight="600">Ada:</text>
+      <text x="44" y="44" font-family="Geist, sans-serif" font-size="12" fill="#6E5D85">That drop was crazy 🔥</text>
+    </g>
+    <g transform="translate(-200,74)">
+      <rect width="180" height="56" rx="14" fill="url(#glass)" stroke="rgba(255,255,255,.8)"/>
+      <circle cx="26" cy="28" r="10" fill="#8F07E7" opacity=".2"/>
+      <text x="44" y="26" font-family="Geist, sans-serif" font-size="14" fill="#3A2E4B" font-weight="600">Khalid:</text>
+      <text x="44" y="42" font-family="Geist, sans-serif" font-size="12" fill="#6E5D85">Clip this moment!</text>
+    </g>
+  </g>
+
+  <!-- ====== multistream targets (left column) ====== -->
+  <g transform="translate(480,128)">
+    <!-- youtube -->
+    <g transform="translate(-160,0)">
+      <rect width="120" height="64" rx="16" fill="url(#glass)" stroke="rgba(255,255,255,.8)"/>
+      <rect x="18" y="18" width="28" height="28" rx="6" fill="#FF3D3D" />
+      <polygon points="34,26 34,38 46,32" fill="#fff"/>
+      <text x="56" y="39" font-family="Geist, sans-serif" font-size="13" fill="#5A4A70">YouTube</text>
+    </g>
+    <!-- twitch -->
+    <g transform="translate(-160,84)">
+      <rect width="120" height="64" rx="16" fill="url(#glass)" stroke="rgba(255,255,255,.8)"/>
+      <rect x="18" y="18" width="28" height="28" rx="6" fill="#9146FF" />
+      <rect x="25" y="26" width="6" height="12" fill="#fff"/>
+      <rect x="34" y="26" width="6" height="12" fill="#fff"/>
+      <text x="56" y="39" font-family="Geist, sans-serif" font-size="13" fill="#5A4A70">Twitch</text>
+    </g>
+    <!-- tiktok -->
+    <g transform="translate(-160,168)">
+      <rect width="120" height="64" rx="16" fill="url(#glass)" stroke="rgba(255,255,255,.8)"/>
+      <rect x="18" y="18" width="28" height="28" rx="6" fill="#111"/>
+      <text x="56" y="39" font-family="Geist, sans-serif" font-size="13" fill="#5A4A70">TikTok</text>
+    </g>
+  </g>
+
+  <!-- soft floor glow -->
+  <ellipse cx="780" cy="600" rx="360" ry="120" fill="#8F07E7" opacity=".16" filter="url(#soft)"/>
+</svg>

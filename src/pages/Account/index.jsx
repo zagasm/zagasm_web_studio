@@ -1,137 +1,123 @@
-import React, { useState } from 'react';
-import SideBarNav from '../pageAssets/SideBarNav';
-import AccountHeading from './AccountHeading';
-import rocket from '../../assets/navbar_icons/rocket.png';
-import Users_icon from '../../assets/navbar_icons/Users_icon.png';
-import Bell from '../../assets/navbar_icons/Bell.png';
-import login from '../../assets/navbar_icons/Login.png';
-import { Link } from 'react-router-dom';
-import './accountStyling.css';
-import { useAuth } from '../auth/AuthContext';
-import default_profilePicture from '../../assets/avater_pix.avif';
+import React, { useState, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
+import { clearActiveAuthStorage } from "../../lib/authStorage";
+
+// Components
+import AccountCenter from "../../component/account/AccountCenter";
+import DeactivateAccountModal from "../../component/account/DeactivateAccountModal";
+
+// CSS
+import "./accountStyling.css";
+
 function Account() {
-    const { user, logout } = useAuth();
-    const Default_user_image = user?.profileUrl ? user.profileUrl : default_profilePicture;
-    return (
-        <div className="container-flui m-0 p-0">
-            <SideBarNav />
-            <div className="page_wrapper overflow-hidden">
-                <div className="row p-0 ">
-                    <div className="col account_section ">
-                        <div className="row">
-                            <div className="col-xl-3 col-lg-4 col-md-5 col-sm-12 col-12 p-0 m-0">
-                                <AccountHeading />
-                            </div>
-                            <div className="col-xl-9 col-lg-8 col-md-7 col-sm-12 col-12 p-0 m-0">
-                                <div className="account_nav_section">
-                                    <div>
-                                        <div className="row">
-                                            <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 Preference_section">
-                                                <div className=" internal_container">
-                                                    <h6>Preference</h6>
-                                                    <ul>
-                                                        <li>
-                                                            <Link to={"/account/interest"} className=' account_link'>
-                                                                <div>
-                                                                    <img src={rocket} alt="" />
-                                                                    <span>Interest</span>
-                                                                </div>
-                                                                <div>
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-                                                                    <i className="fa fa-angle-right "></i>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
-                                                        <li>
-                                                            <Link to={"/organizers"} className=' account_link'>
-                                                                <div>
-                                                                    <img src={Users_icon} alt="" />
-                                                                    <span>Organizers you follow</span>
-                                                                </div>
-                                                                <div>
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
 
-                                                                    <i className="fa fa-angle-right "></i>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
-                                                        <li className='p-0 m-0' style={{ margin: '0px' }}>
-                                                            <Link to={"/account/manage-notification"} className=' account_link'>
-                                                                <div>
-                                                                    <img src={Bell} alt="" />
-                                                                    <span>Manage notification</span>
-                                                                </div>
-                                                                <div>
+  const handleOpenConfirm = () => {
+    setIsConfirmOpen(true);
+  };
 
-                                                                    <i className="fa fa-angle-right "></i>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
+  const handleForceLogout = () => {
+    try {
+      clearActiveAuthStorage();
+    } catch (e) {
+      console.error("Failed to clear localStorage", e);
+    }
+    if (logout) logout();
+    navigate("/auth/signin", { replace: true });
+  };
 
-                                                    </ul>
-                                                </div>
-                                            </div>
+  const handleDeactivateSuccess = () => {
+    // called from DeactivateAccountModal once API returns 200
+    setIsSuccessOpen(true);
+  };
 
-                                        </div>
-                                        {/* <div className="row mt-5">
-                                            <div className="col">
-                                                <div className="internal_container">
-                                                    <h6>Legal</h6>
-                                                    <ul>
-                                                        <li>
-                                                            <Link to={""} className=' account_link'>
-                                                                <div>
-                                                                    <img src={Document} alt="" />
-                                                                    <span>Tearm of service</span>
-                                                                </div>
-                                                                <div>
-                                                                    <i className="fa fa-angle-right "></i>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
-                                                        <li>
-                                                            <Link to={""} className=' account_link'>
-                                                                <div>
-                                                                    <img src={Laptop} alt="" />
-                                                                    <span>Accessibility</span>
-                                                                </div>
-                                                                <div>
-                                                                    
-                                                                    <i className="fa fa-angle-right "></i>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
-                                                        <li>
-                                                            <Link to={""} className=' account_link'>
-                                                                <div>
-                                                                    <img src={key} alt="" />
-                                                                    <span>Privacy</span>
-                                                                </div>
-                                                                <div>
-                                                                    
-                                                                    <i className="fa fa-angle-right "></i>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div> */}
-                                        <div className="d-flex justify-content-between mt-3 footer_section p-2 mb-3">
-                                            <span>Version</span>
-                                            <span>120.0382j2.465</span>
-                                        </div>
-                                        <Link onClick={() => logout()} className='logout_section p-2 d-inline'>
-                                            <img src={login} alt="" />  <span>Logout </span>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  return (
+    <Fragment>
+      <div className="tw:min-h-screen tw:w-full tw:bg-[#F6F7FB] tw:px-3 tw:pb-24 tw:pt-24 tw:font-sans tw:md:px-6 tw:lg:px-8">
+        <div className="tw:mx-auto tw:w-full tw:max-w-6xl">
+          <AccountCenter
+            user={user}
+            onLogout={handleForceLogout}
+            onDeactivate={handleOpenConfirm}
+          />
         </div>
-    );
+      </div>
+
+      {/* Deactivate modal (reason + password) */}
+      <DeactivateAccountModal
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onSuccess={handleDeactivateSuccess}
+      />
+
+      {/* Success Modal */}
+      <Transition appear show={isSuccessOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="tw:relative tw:z-50"
+          onClose={handleForceLogout}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="tw:ease-out tw:duration-200"
+            enterFrom="tw:opacity-0"
+            enterTo="tw:opacity-100"
+            leave="tw:ease-in tw:duration-150"
+            leaveFrom="tw:opacity-100"
+            leaveTo="tw:opacity-0"
+          >
+            <div className="tw:fixed tw:inset-0 tw:bg-black/40" />
+          </Transition.Child>
+
+          <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
+            <div className="tw:flex tw:min-h-full tw:items-center tw:justify-center tw:p-4">
+              <Transition.Child
+                as={Fragment}
+                enter="tw:ease-out tw:duration-200"
+                enterFrom="tw:opacity-0 tw:scale-95"
+                enterTo="tw:opacity-100 tw:scale-100"
+                leave="tw:ease-in tw:duration-150"
+                leaveFrom="tw:opacity-100 tw:scale-100"
+                leaveTo="tw:opacity-0 tw:scale-95"
+              >
+                <Dialog.Panel className="tw:w-full tw:max-w-md tw:rounded-2xl tw:bg-white tw:p-6 tw:shadow-xl">
+                  <Dialog.Title
+                    as="span"
+                    className="tw:block tw:text-lg tw:font-semibold tw:text-gray-900"
+                  >
+                    Account deactivated
+                  </Dialog.Title>
+                  <Dialog.Description
+                    as="span"
+                    className="tw:mt-2 tw:block tw:text-sm tw:text-gray-600"
+                  >
+                    Your account has been successfully deactivated. You’ll now
+                    be signed out.
+                  </Dialog.Description>
+
+                  <div className="tw:mt-6 tw:flex tw:justify-end tw:gap-3">
+                    <button
+                      type="button"
+                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-purple-600 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-purple-700"
+                      onClick={handleForceLogout}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </Fragment>
+  );
 }
 
 export default Account;

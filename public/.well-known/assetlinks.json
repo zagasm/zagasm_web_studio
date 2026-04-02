@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.zagasmstudio.app",
+      "sha256_cert_fingerprints": [
+        "A7:09:1B:ED:13:4B:DF:3A:AF:48:22:56:5C:34:FF:48:9D:92:63:3E:10:7F:C6:87:E9:00:9E:FB:F2:F5:30:91"
+      ]
+    }
+  }
+]

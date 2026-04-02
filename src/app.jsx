@@ -1,16 +1,13 @@
-import { Fragment, useState, useEffect } from "react";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Enables dropdown and other JS features
+import { Fragment, useState, useEffect, useMemo } from "react";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { Routes, Route, useLocation } from "react-router-dom";
 import AuthLayout from "./pages/auth/layout";
-import { SignUp } from "./pages/auth/signup";
-import { Signin } from "./pages/auth/signin";
+import { SignUp } from "./pages/auth/signup/SignupPage.jsx";
+import { Signin } from "./pages/auth/signin/SigninPage.jsx";
 import { CodeVerification } from "./pages/auth/CodeVerification";
 import { ForgetPassword } from "./pages/auth/Forgetpassword";
 import { Error404 } from "./pages/errors/pagenotfound";
-// import { Onboarding } from "./pages/onboarding";
-
-// import Header from "./component/assets/Header";
 import Sidebar from "./component/assets/sidebar/sidebar";
 import { Outlet } from "react-router-dom";
 
@@ -43,6 +40,44 @@ import AllNotification from "./pages/Notification/AllNotification/index.jsx";
 import Notification from "./pages/Notification/index.jsx";
 import EventType from "./pages/event/CreateEvent/event_types.jsx";
 import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
+import Landing from "./pages/LandingPage/index.jsx";
+import { ToastHost } from "./component/ui/toast.jsx";
+import Support from "./pages/support/index.jsx";
+import Marketing from "./pages/marketing/index.jsx";
+import StreamingPage from "./pages/Streaming/index.jsx";
+import DataProtectionPage from "./pages/DataProtection/index.jsx";
+import ZagasmLanding from "./pages/LandingPage/index.jsx";
+import TicketsPage from "./pages/tickets/TicketsPage.jsx";
+import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
+import SearchPage from "./pages/Search/index.jsx";
+import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
+import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
+import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
+import SubscriptionsPage from "./pages/subscription/index.jsx";
+import PrivacyPolicyPage from "./pages/privacy/index.jsx";
+import CommunityGuidelinesPage from "./pages/communityGuideline/index.jsx";
+import TermsOfServicePage from "./pages/terms/index.jsx";
+import TaggedMentionsPage from "./pages/mentions/index.jsx";
+import LandingLayout from "./layouts/LandingLayout.jsx";
+import AboutPage from "./pages/LandingPage/about.jsx";
+import ContactPage from "./pages/LandingPage/contact.jsx";
+import AdsPage from "./pages/LandingPage/ads.jsx";
+import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
+import CryptoWalletsPage from "./pages/crypto/index.jsx";
+import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
+import EventEditPage from "./pages/event/EventEditPage.jsx";
+// import DisableRightClick from "./component/DisableRightClick.jsx";
+import ScrollToTop from "./component/ScrollToTop.jsx";
+import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
+import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
+import WalletHub from "./pages/Account/WalletHub.jsx";
+import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
+
+import SEO from "./component/SEO/index.jsx";
+import DownloadAppModal from "./component/DownloadAppModal.jsx";
+import SignalDeck from "./pages/SignalDeck/index.jsx";
+import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
+import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
 
 const MainLayout = () => (
   <>
@@ -51,6 +86,7 @@ const MainLayout = () => (
     <Outlet />
   </>
 );
+
 export function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation(); // Detects route changes
@@ -65,13 +101,179 @@ export function App() {
     return () => clearTimeout(timer);
   }, [location.pathname]); // Runs on every route change
   const background = location.state?.background;
+  const canonicalUrl = `${window?.location?.origin || ""}${location.pathname}`;
+
+  const pageMetadata = useMemo(() => {
+    const routes = [
+      {
+        matcher: /^\/(feed)?$/,
+        meta: {
+          title: "Discover Live Events & Tickets",
+          description:
+            "Browse trending concerts, workshops, and immersive experiences on Zagasm Studios. Reserve tickets, follow organizers, and share moments.",
+          keywords:
+            "events, live performances, concerts, festivals, workshops, tickets, organizers, Zagasm Studios",
+          image: "/images/hero-event.jpg",
+        },
+      },
+      {
+        matcher: /^\/event\/view\/.+$/,
+        meta: {
+          title: "Event Details & Tickets",
+          description:
+            "See the latest event information, host profile, and secure your spot with fast checkout on Zagasm Studios.",
+          keywords:
+            "event details, buy tickets, event host, live stream, Zagasm Studios",
+          image: "/images/event-tile.jpg",
+          type: "article",
+        },
+      },
+      {
+        matcher: /^\/event\/create-event\/.+$/,
+        meta: {
+          title: "Create an Event on Zagasm Studios",
+          description:
+            "Launch your own concert, workshop, or meetup with Zagasm Studios' intuitive event builder and ticketing tools.",
+          keywords:
+            "create event, ticketing, event hosting, Zagasm Studios, organizer tools",
+        },
+      },
+      {
+        matcher: /^\/organizers/,
+        meta: {
+          title: "Meet Top Organizers",
+          description:
+            "Discover verified organizers, follow their upcoming experiences, and collaborate with the Zagasm community.",
+          keywords: "organizers, follow, streaming, community, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/account/,
+        meta: {
+          title: "Your Profile & Wallet",
+          description:
+            "Manage your profile, wallets, subscriptions, and saved events securely from your Zagasm account panel.",
+          keywords:
+            "profile, account, wallet, settings, subscriptions, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/tickets/,
+        meta: {
+          title: "Tickets & Passes",
+          description:
+            "Access all your purchased tickets and upcoming experiences at a glance.",
+          keywords: "tickets, passes, QR code, events, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/support/,
+        meta: {
+          title: "Zagasm Support Center",
+          description:
+            "Get help with tickets, organizers, and account questions from the Zagasm support team.",
+          keywords: "support, help, ticket assistance, Zagasm Studios",
+        },
+      },
+      {
+        matcher: /^\/landing/,
+        meta: {
+          title: "Zagasm Studios",
+          description:
+            "Plan, promote, and experience unforgettable events with Zagasm Studios's all-in-one platform.",
+          keywords: "landing, Zagasm Studios, events platform, social tickets",
+        },
+      },
+      {
+        matcher: /^\/signal-deck/,
+        meta: {
+          title: "Zagasm Signal Deck",
+          description:
+            "Download Zagasm Studios and follow every official channel from the Signal Deck.",
+          keywords:
+            "Zagasm Studios, Signal Deck, app download, social links, community",
+          image: "/img/logo.png",
+        },
+      },
+    ];
+
+    const match = routes.find((route) => route.matcher.test(location.pathname));
+    return match?.meta || {};
+  }, [location.pathname]);
+
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+  const APP_STORE_URL =
+    "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
+
+  const PLAY_STORE_URL =
+    "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const modalFlag = "zagasm-download-modal-shown";
+    const hasSeenModal = Boolean(localStorage.getItem(modalFlag));
+
+    if (!hasSeenModal) {
+      setShowDownloadModal(true);
+      localStorage.setItem(modalFlag, "true");
+    }
+
+    // Previously the modal forced open on every full reload:
+    // setShowDownloadModal(true);
+  }, []);
+
+  const closeDownloadModal = () => {
+    setShowDownloadModal(false);
+  };
+
+  const handleAppStoreDownload = () => {
+    if (APP_STORE_URL) {
+      window.open(APP_STORE_URL, "_blank", "noopener,noreferrer");
+    }
+    closeDownloadModal();
+  };
+
+  const handleApkDownload = () => {
+    if (PLAY_STORE_URL) {
+      window.open(PLAY_STORE_URL, "_blank", "noopener,noreferrer");
+    }
+
+    closeDownloadModal();
+  };
+
+  const handleSkip = () => {
+    closeDownloadModal();
+  };
+
   return (
     <Fragment>
       {loading && <FullpagePreloader loading={loading} />}
 
+      <ToastHost />
       <ToastContainer />
       <NetworkStatus />
+      <ScrollToTop />
+      <SEO {...pageMetadata} url={canonicalUrl} />
+      {/* <DisableRightClick /> */}
       <Routes>
+        <Route path="/signal-deck" element={<SignalDeck />} />
+        <Route element={<LandingLayout />}>
+          <Route path="/" element={<ZagasmLanding />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/ads" element={<AdsPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route
+            path="/community-guidelines"
+            element={<CommunityGuidelinesPage />}
+          />
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/marketing" element={<Marketing />} />
+          <Route path="/data-protection" element={<DataProtectionPage />} />
+        </Route>
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -80,37 +282,70 @@ export function App() {
           <Route path="forget-password" element={<ForgetPassword />} />
           <Route path="code-verification" element={<CodeVerification />} />
           <Route path="change-password" element={<ChangePassword />} />
-          <Route path="change-password-success" element={<ChangePasswordSuccesffully />} />
+          <Route
+            path="change-password-success"
+            element={<ChangePasswordSuccesffully />}
+          />
           {/*
           {/* <Route path="onboarding" element={<Onboarding />} /> */}
         </Route>
         {/* location={state?.backgroundLocation || location} */}
-        <Route element={<Sessionpage />} >
+        <Route element={<Sessionpage />}>
           <Route element={<MainLayout />}>
-            <Route index exact path="/" element={<Home />} />
+            <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
-            <Route path="/profile" element={<Profile />} >
-              <Route index exact   path=":profileId" element={<ViewProfile />} />
+            <Route path="/become-an-organiser" element={<BecomeOrganiser />} />
+            <Route path="/profile" element={<Profile />}>
+              <Route index exact path=":profileId" element={<ViewProfile />} />
               <Route path="edit-profile" element={<EditProfile />} />
               <Route path="edit-password" element={<EditPassword />} />
             </Route>
-            <Route path="/event" element={<Event />} >
+            <Route path="/tickets" element={<TicketsPage />} />
+            <Route path="/payment/callback" element={<PaymentCallback />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/mentions" element={<TaggedMentionsPage />} />
+
+            <Route path="/event" element={<Event />}>
+              <Route path="view/share/:slug" element={<EventShareRedirect />} />
               <Route path="view/:eventId" element={<ViewEvent />} />
+              <Route path="stream/:eventId" element={<EventStreamControlPage />} />
+              <Route path="edit/:eventId" element={<EventEditPage />} />
               <Route path="select-event-type" element={<EventType />} />
-              <Route path="create-event/:eventType" element={<CreateEvent />} />
+              <Route
+                path="create-event/:eventTypeId"
+                element={<CreateEvent />}
+              />
               {/* CreateEvent */}
               <Route path="saved-events" element={<SaveEvents />} />
             </Route>
-            <Route path="/account" element={<AccountOutlet />} >
+            <Route path="/creator/channel/new" element={<StreamingPage />} />
+            <Route path="/subscription" element={<SubscriptionsPage />} />
+            <Route path="/account" element={<AccountOutlet />}>
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
-              <Route path="manage-notification" element={<AccountNotification />} />
+              <Route path="blocked" element={<BlockedUsersPage />} />
+              <Route path="wallet" element={<WalletHub />} />
+              <Route path="bank-accounts" element={<BankAccountsPage />} />
+              <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
+              <Route path="fund-wallet" element={<FundWalletPage />} />
+              <Route path="payouts" element={<AccountPayouts />} />
+              <Route
+                path="payouts/history"
+                element={<AccountPayoutHistory />}
+              />
+              <Route
+                path="manage-notification"
+                element={<AccountNotification />}
+              />
             </Route>
-            <Route path="/notification" element={<Notification />} >
+            <Route path="/notifications" element={<Notification />}>
               <Route index exact element={<AllNotification />} />
             </Route>
+            <Route path="/me/organisers" element={<Notification />}>
+              <Route index exact element={<OrganisersIFollow />} />
+              <Route path="followers" element={<OrganiserFollowers />} />
+            </Route>
           </Route>
-
         </Route>
 
         <Route path="/page-not-found" element={<Error404 />} />
@@ -120,16 +355,19 @@ export function App() {
       {state?.backgroundLocation && (
         <Routes>
           <Route
-            // path="/posts/:postId" 
-            element={
-              <PostViewModal
-                show={true}
-                onHide={() => navigate(-1)}
-              />
-            }
+            // path="/posts/:postId"
+            element={<PostViewModal show={true} onHide={() => navigate(-1)} />}
           />
         </Routes>
       )}
+
+      <DownloadAppModal
+        open={showDownloadModal}
+        onClose={closeDownloadModal}
+        onSkip={handleSkip}
+        onAppStoreDownload={handleAppStoreDownload}
+        onApkDownload={handleApkDownload}
+      />
     </Fragment>
   );
 }

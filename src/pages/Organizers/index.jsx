@@ -1,130 +1,238 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import SingleOrganizers from "../../component/Organizers/singleOrganizers";
-import RightBarComponent from "../../component/RightBarComponent";
-import SideBarNav from "../pageAssets/SideBarNav";
-import '../../component/Organizers/organizerStyling.css';
-import SuggestedOrganizer from "../../component/Suggested_organizer/suggestedOrganizer";
-import SuggestedEvent from "../../component/Suggested_event/suggestedEvent";
-import Spinner from 'react-bootstrap/Spinner';
-import { useAuth } from '../auth/AuthContext';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import SEO from "../../component/SEO";
+import { useAuth } from "../auth/AuthContext";
+import { useInView } from "react-intersection-observer";
+import { showSuccess, showError } from "../../component/ui/toast";
+import {
+  PodiumShimmer,
+  RowShimmer,
+} from "../../component/Organizers/OrganisersShimmer";
+import PodiumSection from "../../component/Organizers/PodiumSection";
+import OrganizerRowCard from "../../component/Organizers/OrganiserRowCard";
+import { api, authHeaders } from "../../lib/apiClient";
 
-function AllOrganizers() {
-    const { token } = useAuth();
-    const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [error, setError] = useState(null);
-    const [hasMore, setHasMore] = useState(true);
-    const [nextPageUrl, setNextPageUrl] = useState(null);
+export default function AllOrganizers() {
+  const { token } = useAuth();
+  const perPage = 20;
 
-    // Fetch events from the public API endpoint
-    const fetchEvents = useCallback(async (url = null, isLoadMore = false) => {
-        try {
-            if (isLoadMore) {
-                setLoadingMore(true);
-            } else {
-                setLoading(true);
-            }
+  const [organizers, setOrganizers] = useState([]);
+  const [loadingList, setLoadingList] = useState(true);
+  const [initialError, setInitialError] = useState(null);
 
-            // Use the provided URL or the default endpoint
-            const fetchUrl = url || `${import.meta.env.VITE_API_URL}/api/v1/events`;
+  const [nextPage, setNextPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-            const res = await fetch(fetchUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+  const { ref: loadMoreRef, inView } = useInView({
+    rootMargin: "500px 0px",
+    triggerOnce: false,
+  });
 
-            if (!res.ok) {
-                throw new Error('Failed to fetch events');
-            }
+  const fetchOrganisers = useCallback(
+    async (pageToLoad = 1, isMore = false) => {
+      try {
+        isMore ? setLoadingMore(true) : setLoadingList(true);
+        const { data } = await api.get("/api/v1/top-organisers", {
+          params: {
+            per_page: perPage,
+            page: pageToLoad,
+          },
+          ...authHeaders(token),
+        });
+        const list = Array.isArray(data?.data) ? data.data : [];
 
-            const data = await res.json();
+        const normalized = list.map((o) => {
+          const isFollowing =
+            typeof o.isFollowing === "boolean"
+              ? o.isFollowing
+              : !!o.following;
+          const isFollowedBy =
+            typeof o.isFollowedBy === "boolean" ? o.isFollowedBy : false;
 
-            if (data.data) {
-                if (isLoadMore) {
-                    // Append new events to existing ones
-                    setEvents(prevEvents => [...prevEvents, ...data.data]);
-                } else {
-                    // Replace events for initial load
-                    setEvents(data.data);
-                }
+          return {
+            ...o,
+            isFollowing,
+            isFollowedBy,
+            following: isFollowing, // keep both in sync so old components don't break
+          };
+        });
 
-                // Set the next page URL for infinite scroll
-                setNextPageUrl(data.links?.next || null);
-                setHasMore(!!data.links?.next);
-            }
-        } catch (err) {
-            setError(err.message);
-            console.error('Error fetching events:', err);
-        } finally {
-            setLoading(false);
-            setLoadingMore(false);
+        setOrganizers((prev) =>
+          isMore ? [...prev, ...normalized] : normalized
+        );
+
+        const meta = data?.meta || {};
+        const currentPage = meta.current_page ?? pageToLoad;
+        const lastPage = meta.last_page ?? currentPage;
+        const moreAvailable = currentPage < lastPage;
+
+        setNextPage(moreAvailable ? currentPage + 1 : null);
+        setHasMore(moreAvailable);
+
+        if (!isMore) setInitialError(null);
+      } catch (e) {
+        if (isMore) {
+          setHasMore(false);
+          setNextPage(null);
+        } else {
+          setInitialError("We couldn't load organizers right now.");
+          setOrganizers([]);
+          setHasMore(false);
+          setNextPage(null);
         }
-    }, [token]);
+      } finally {
+        setLoadingList(false);
+        setLoadingMore(false);
+      }
+    },
+    [token, perPage]
+  );
 
-    // Load more events when scrolling
-    const loadMoreEvents = useCallback(() => {
-        if (nextPageUrl && !loadingMore && hasMore) {
-            fetchEvents(nextPageUrl, true);
-        }
-    }, [nextPageUrl, loadingMore, hasMore, fetchEvents]);
+  useEffect(() => {
+    fetchOrganisers(1, false);
+  }, [fetchOrganisers]);
 
-    // Set up scroll event listener
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop
-                !== document.documentElement.offsetHeight) {
-                return;
-            }
+  useEffect(() => {
+    if (inView && hasMore && !loadingMore && nextPage) {
+      fetchOrganisers(nextPage, true);
+    }
+  }, [inView, hasMore, loadingMore, nextPage, fetchOrganisers]);
 
-            loadMoreEvents();
-        };
+  const top3 = useMemo(() => organizers.slice(0, 3), [organizers]);
+  const rest = useMemo(() => organizers.slice(3), [organizers]);
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [loadMoreEvents]);
+  const [followLoading, setFollowLoading] = useState({});
 
-    // Initial load
-    useEffect(() => {
-        fetchEvents();
-    }, [fetchEvents]);
+  const toggleFollow = async (organizerUserId) => {
+    if (!organizerUserId) return;
 
+    setFollowLoading((p) => ({ ...p, [organizerUserId]: true }));
+    try {
+      const { data: result } = await api.post(
+        `/api/v1/follow/${organizerUserId}`,
+        {},
+        authHeaders(token)
+      );
+      const isNowFollowing =
+        typeof result.following === "boolean"
+          ? result.following
+          : !!result?.data?.following;
 
+      setOrganizers((prev) =>
+        prev.map((o) =>
+          o.userId === organizerUserId
+            ? { ...o, isFollowing: isNowFollowing, following: isNowFollowing }
+            : o
+        )
+      );
 
-    return (
-        <div className="container-fluid m-0 p-0">
-            <SideBarNav />
-            <div className="page_wrapper overflow-hidden">
-                <div className="row p-0 pb-5 mb-5 ">
-                    {loading && events.length === 0 ? <div className="col text-center p-5">
-                        <Spinner animation="border" variant="primary" />
-                        <p className="mt-2">Loading Organizers...</p>
-                    </div> : <div className="col ">
-                        <h4 className="organizer_heading">Organizer You May Know</h4>
-                        <div className="row">
-                            <SingleOrganizers />
-                        </div>
-                    </div>}
-                    <RightBarComponent>
-                        <div className="m-3 mt-4">
-                            <SuggestedEvent
-                                myEvent={false}
-                                events={events}
-                                loading={loading}
-                                loadingMore={loadingMore}
-                                error={error}
-                                hasMore={hasMore}
-                                onLoadMore={loadMoreEvents}
-                            />
-                        </div>
-                    </RightBarComponent>
-                </div>
+      showSuccess(
+        result?.message ||
+          (isNowFollowing
+            ? "User followed successfully"
+            : "User unfollowed successfully")
+      );
+    } catch (e) {
+      showError("Something went wrong. Try again.");
+    } finally {
+      setFollowLoading((p) => ({ ...p, [organizerUserId]: false }));
+    }
+  };
+
+  return (
+    <>
+      <SEO
+        title="Top Organizers"
+        description="See best rated organizers globally."
+        keywords="zagasm studios, organizers, ranking"
+      />
+
+      <div className="tw:font-sans tw:bg-white tw:min-h-screen tw:pt-20 tw:md:pt-28 tw:px-2 tw:md:px-6">
+        <div className="tw:max-w-3xl tw:mx-auto">
+          {/* header (spans only) */}
+          <div className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:mt-5 tw:md:mt-0">
+            <div className="tw:flex tw:flex-col">
+              <span className="tw:text-2xl tw:font-semibold tw:leading-none tw:text-gray-900 tw:sm:text-[28px] tw:md:text-3xl">
+                Top Organizers
+              </span>
+              <span className="tw:mt-1 tw:text-[11px] tw:leading-5 tw:text-gray-600 tw:md:text-sm">
+                See best rated organizers globally
+              </span>
             </div>
-        </div>
-    );
-}
+          </div>
 
-export default AllOrganizers;
+          {/* main card */}
+          <div className="tw:mt-6 tw:bg-white tw:md:border tw:md:border-gray-100 tw:rounded-3xl tw:md:p-6 tw:md:shadow-sm tw:relative tw:pb-10">
+            {/* initial loading */}
+            {loadingList && organizers.length === 0 ? (
+              <div className="tw:space-y-5 tw:py-2">
+                <PodiumShimmer />
+                <div className="tw:space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <RowShimmer key={i} />
+                  ))}
+                </div>
+              </div>
+            ) : initialError && organizers.length === 0 ? (
+              <div className="tw:text-center tw:py-10">
+                <span className="tw:text-sm tw:text-red-600">
+                  {initialError}
+                </span>
+              </div>
+            ) : organizers.length === 0 ? (
+              <div className="tw:text-center tw:py-10">
+                <span className="tw:text-sm tw:text-gray-600">
+                  No organisers to display yet.
+                </span>
+              </div>
+            ) : (
+              <>
+                <PodiumSection
+                  top3={top3}
+                  onToggleFollow={toggleFollow}
+                  followLoading={followLoading}
+                />
+
+                <div className="tw:mt-6 tw:space-y-3">
+                  {rest.map((org) => (
+                    <OrganizerRowCard
+                      key={org.id}
+                      org={org}
+                      onToggleFollow={toggleFollow}
+                      loading={!!followLoading[org.userId]}
+                    />
+                  ))}
+                </div>
+
+                {/* infinite scroll trigger */}
+                <div
+                  ref={hasMore ? loadMoreRef : null}
+                  className="tw:flex tw:justify-center tw:py-6"
+                >
+                  {hasMore ? (
+                    loadingMore ? (
+                      <div className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-600">
+                        <div className="tw:h-4 tw:w-4 tw:rounded-full tw:border-2 tw:border-gray-300 tw:border-t-gray-700 tw:animate-spin" />
+                        <span className="tw:text-sm">Loading more...</span>
+                      </div>
+                    ) : (
+                      <span className="tw:text-xs tw:text-gray-500">
+                        Scroll to load more
+                      </span>
+                    )
+                  ) : (
+                    <span className="tw:text-xs tw:text-gray-500">
+                      No more organizers
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="tw:h-10" />
+        </div>
+      </div>
+    </>
+  );
+}

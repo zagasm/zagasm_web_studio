@@ -187,6 +187,7 @@ export const ChangePasswordTemplate = ({ onClose }) => {
             onClose(); // Close the modal on success
             if (formData.logout_status == '1') {
               logout();
+              window.location.replace("/auth/signin");
             }
           } else {
             setMessage({
@@ -382,7 +383,7 @@ export const DeleteAccounttemplate = ({ onClose }) => {
               // Clear user data and redirect after delay
               // setTimeout(() => {
               //   localStorage.clear();
-              //   window.location.href = "/";
+              //   window.location.href = "/feed";
               // }, 2000);
             } else {
               setMessage({

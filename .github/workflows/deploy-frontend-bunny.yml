@@ -1,0 +1,94 @@
+name: Deploy frontend to Bunny Storage
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-frontend-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      # Set BUILD_DIR to "build" if you're using Create React App
+      BUILD_DIR: dist
+
+      BUNNY_STORAGE_ZONE: ${{ secrets.BUNNY_STORAGE_ZONE }}
+      BUNNY_STORAGE_PASSWORD: ${{ secrets.BUNNY_STORAGE_PASSWORD }}
+      BUNNY_STORAGE_REGION: ${{ secrets.BUNNY_STORAGE_REGION }}
+      BUNNY_PULL_ZONE_ID: ${{ secrets.BUNNY_PULL_ZONE_ID }}
+      BUNNY_API_KEY: ${{ secrets.BUNNY_API_KEY }}
+
+      # Example envs for Vite. Remove if not needed.
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+      # Example envs for CRA. Remove if not needed.
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_URL }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Verify build output exists
+        run: |
+          if [ ! -d "$BUILD_DIR" ]; then
+            echo "Build directory '$BUILD_DIR' not found."
+            exit 1
+          fi
+
+      - name: Upload build files to Bunny Storage
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${BUNNY_STORAGE_REGION:-}" ]; then
+            echo "BUNNY_STORAGE_REGION is not set"
+            exit 1
+          fi
+
+          STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
+
+          echo "Uploading files from $BUILD_DIR to https://$STORAGE_HOST/$BUNNY_STORAGE_ZONE/"
+
+          # Upload every file under the build directory, preserving folder structure.
+          find "$BUILD_DIR" -type f | while read -r file; do
+            rel_path="${file#"$BUILD_DIR"/}"
+
+            content_type="$(file --brief --mime-type "$file")"
+
+            echo "Uploading: $rel_path"
+            curl --fail --silent --show-error \
+              --request PUT \
+              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${rel_path}" \
+              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
+              --header "Content-Type: ${content_type}" \
+              --upload-file "$file"
+          done
+
+      - name: Purge Bunny CDN cache
+        run: |
+          curl --fail --silent --show-error \
+            --request POST \
+            --url "https://api.bunny.net/pullzone/${BUNNY_PULL_ZONE_ID}/purgeCache" \
+            --header "AccessKey: ${BUNNY_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data '{}'
+
+      - name: Done
+        run: echo "Deployment complete."

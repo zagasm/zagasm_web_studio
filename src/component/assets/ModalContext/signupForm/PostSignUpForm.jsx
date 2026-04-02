@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   FaCalendarAlt,
   FaChevronDown,
@@ -11,39 +11,43 @@ import PostSignupFormModal from "./ModalContainer";
 import SignUpCodecomponent from "./SignUpCodecomponent";
 import "./postSignupStyle.css";
 import { useAuth } from "../../../../pages/auth/AuthContext";
-import axios from "axios";
-import qs from 'qs';
 import { showToast } from "../../../ToastAlert";
+import { showError, showSuccess } from "../../../ui/toast";
+import { api } from "../../../../lib/apiClient";
+import { clearActiveAuthStorage } from "../../../../lib/authStorage";
+import { useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
-  // Conditionally render the page only if required
-  if (user.gender != null || user.dob != null) return null;
+  const navigate = useNavigate();
 
-  if (!user) {
-    return null;
-  }
-  const [dob, setDob] = useState("");
+  // ✅ hooks must always run, every render
+  const [dob, setDob] = useState(null);
   const [gender, setGender] = useState("");
-  const [tosendUserdata, settosendUserdata] = useState();
+  const [tosendUserdata, settosendUserdata] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const dateInputRef = useRef(null);
+  const fifteenYearsAgo = useMemo(() => {
+    const boundary = new Date();
+    boundary.setFullYear(boundary.getFullYear() - 15);
+    boundary.setHours(0, 0, 0, 0);
+    return boundary;
+  }, []);
 
-  const handleWrapperClick = () => {
-    dateInputRef.current?.showPicker?.() || dateInputRef.current?.focus();
-  };
+  const fiveYearsBefore = useMemo(() => {
+    const earliest = new Date(fifteenYearsAgo);
+    earliest.setFullYear(earliest.getFullYear() - 80);
+    return earliest;
+  }, [fifteenYearsAgo]);
+
   const isFormValid = dob && gender;
-  const isAtLeast15 = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age >= 15;
+
+  const isAtLeast15 = (date) => {
+    if (!date) return false;
+    return date.getTime() <= fifteenYearsAgo.getTime();
   };
 
   const handleSubmit = async (e) => {
@@ -62,50 +66,86 @@ const PostSignupForm = () => {
 
     setIsLoading(true);
     try {
-      // Verify endpoint exists
-      const endpoint = `${import.meta.env.VITE_API_URL}/api/v1/gender/dob`;
-      console.log("Attempting to reach:", endpoint);
-      const response = await axios.post(  // Changed from PATCH to POST
-        endpoint,
-        {
-          gender: gender,
-          dob: dob,
+      const endpoint = `/api/v1/gender/dob`;
+
+      const formData = new FormData();
+      formData.append("gender", gender);
+      const formattedDob = dob ? dob.toISOString().split("T")[0] : "";
+      formData.append("dob", formattedDob);
+
+      const response = await api.post(endpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${token}`,
-          },
-          validateStatus: (status) => status < 500 // Accept 4xx as responses
-        }
-      );
-      console.log('update data:', response);
+        validateStatus: (status) => status < 500,
+      });
+
+      if (response.status === 401) {
+        clearActiveAuthStorage();
+        navigate("/auth/signin");
+        return;
+      }
+
       if (response.status === 200 || response.status === 201) {
-        showToast.success(response.data.message || "Date of Birth and Gender updated successfully!");
-        // conso
+        showSuccess(
+          response.data.message ||
+            "Date of Birth and Gender updated successfully!"
+        );
         settosendUserdata(response.data.user);
         setFormSubmitted(true);
-      } else if (response.status === 422) {
-        const token = token;
-        const user = user;
-        login({ token, user });
-      } else {
-        throw new Error(response.data?.message || "Update failed");
+        return;
       }
+
+      if (response.status === 422) {
+        const message = response.data?.message || "";
+
+        if (message.toLowerCase().includes("already")) {
+          showToast.info(message);
+
+          // ✅ don’t reload the page; just update auth state
+          const updatedUser = {
+            ...user,
+            gender: user?.gender ?? gender,
+            dob: user?.dob ?? dob,
+          };
+          login({ token, user: updatedUser });
+
+          return;
+        }
+
+        const errorMsg = message || response.data?.error || "Validation failed";
+        setError(errorMsg);
+        showError(errorMsg);
+        return;
+      }
+
+      throw new Error(response.data?.message || "Update failed");
     } catch (err) {
-      console.error("API Error:", err);
       setError(
         err.response?.data?.message ||
-        err.message ||
-        "Failed to update profile. Please try again."
+          err.message ||
+          "Failed to update profile. Please try again."
       );
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ✅ now it’s safe to return early, after hooks
+  if (!user) return null;
+
+  const profileComplete = user.gender != null && user.dob != null;
+  if (profileComplete) return null;
+
   if (formSubmitted) {
-    return <SignUpCodecomponent token={token} userupdate={tosendUserdata} type="phone" />;
+    return (
+      <SignUpCodecomponent
+        token={token}
+        userupdate={tosendUserdata}
+        type="phone"
+      />
+    );
   }
 
   return (
@@ -116,46 +156,46 @@ const PostSignupForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <motion.h2
+        <motion.span
+          className="tw:lg tw:md:text-xl tw:lg:text-2xl tw:font-bold"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
           Complete your Profile
-        </motion.h2>
+        </motion.span>
+
         <p>Just a few more details to complete your profile</p>
 
-        {error && (
-          <div className="alert alert-danger mb-3">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert alert-danger mb-3">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          {/* Date of Birth Field */}
+        <form onSubmit={handleSubmit} className="tw:space-y-5">
           <div className="form-group">
             <label>Date of Birth</label>
             <motion.div
               className="dob-wrapper"
-              onClick={handleWrapperClick}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <FaCalendarAlt className="left-icon" />
-              <input
-                type="date"
-                ref={dateInputRef}
-                value={dob}
-                max={new Date().toISOString().split("T")[0]}
-                onChange={(e) => setDob(e.target.value)}
+              <DatePicker
+                selected={dob}
+                onChange={(date) => setDob(date)}
+                maxDate={fifteenYearsAgo}
+                minDate={fiveYearsBefore}
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                placeholderText="Select your date of birth"
                 className="dob-input border-0"
-                required
+                wrapperClassName="tw:w-full"
+                autoComplete="off"
+                dateFormat="yyyy-MM-dd"
               />
               <FaChevronDown className="right-icon" />
             </motion.div>
           </div>
 
-          {/* Gender Selection */}
           <div className="form-group">
             <label>Gender</label>
             <div className="gender-buttons">
@@ -167,9 +207,13 @@ const PostSignupForm = () => {
                   className={`gender-btn ${gender === g ? "selected" : ""}`}
                   onClick={() => setGender(g)}
                 >
-                  {g === "male" ? <FaMars size={20} /> :
-                    g === "female" ? <FaVenus size={20} /> :
-                      <FaGenderless size={20} />}
+                  {g === "male" ? (
+                    <FaMars size={20} />
+                  ) : g === "female" ? (
+                    <FaVenus size={20} />
+                  ) : (
+                    <FaGenderless size={20} />
+                  )}
                   {g.charAt(0).toUpperCase() + g.slice(1)}
                 </motion.button>
               ))}

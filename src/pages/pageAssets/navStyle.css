@@ -348,14 +348,14 @@
 }
 
 .mobile_navbar_container .nav-link.float-up {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
 }
 
 .mobile_navbar_container .nav-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.1s ease;
 }
 
 .mobile_navbar_container .nav-icon {
@@ -389,7 +389,7 @@
 }
 
 .mobile_navbar_container .nav-link.float-up .nav-content {
-    padding: 9px 12px;
+    padding: 4.5px 6px;
     border-radius: 50%;
     background: linear-gradient(131.28deg, #8F07E7 22.4%, #490481 66.23%);
     box-shadow: -1px 1px 5px rgba(72, 10, 123, 0.4);

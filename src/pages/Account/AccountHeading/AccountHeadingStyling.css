@@ -26,7 +26,7 @@
 .account_heading_section .details_display .profile_info {}
 .account_heading_section .details_display .profile_info .follow_section {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
 }
 .account_heading_section .details_display .profile_info .follow_section span{
     color: rgba(143, 7, 231, 1);
@@ -55,7 +55,7 @@
 
 @media (max-width: 600px) {
     .account_heading_section {
-        padding: 0px 30px
+        padding: 0px 30px;
     }
 /* 
     .account_heading_section .View_Profile_button {

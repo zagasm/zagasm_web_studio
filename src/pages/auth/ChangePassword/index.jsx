@@ -4,6 +4,8 @@ import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { showSuccess, showError } from "../../../component/ui/toast";
+import { useAuth } from "../AuthContext";
 
 export function ChangePassword({ ResetPasswordVerificationData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +17,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Extract data from props
   const { input, reset_token } = ResetPasswordVerificationData || {};
@@ -45,17 +48,17 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
 
     // Validation checks
     if (!password || !confirmPassword) {
-      showToast.error("All fields are required.");
+      showError("All fields are required.");
       return;
     }
 
     if (password.length < 8) {
-      showToast.error("Password must be at least 8 characters.");
+      showError("Password must be at least 8 characters.");
       return;
     }
 
     if (password !== confirmPassword) {
-      showToast.error("Passwords do not match.");
+      showError("Passwords do not match.");
       return;
     }
 
@@ -79,22 +82,23 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
       );
 
       const data = response.data;
-      
-      if (data.message && data.token && data.user) {
-        // Success case
-        showToast.success(data.message);
-         login({
-          user: data.user,
-          token: data.token
+      const nextUser = data?.user || data?.data?.user || null;
+      const nextToken = data?.token || data?.data?.token || null;
+
+      if (data.message && nextUser && nextToken) {
+        showSuccess(data.message);
+        login({
+          user: nextUser,
+          token: nextToken,
         });
-        // Redirect to dashboard or appropriate page
         setTimeout(() => {
-          navigate("/"); // Update this to your desired post-login route
-        }, 1000);
+          navigate("/feed", { replace: true });
+        }, 500);
       } else {
-        // Unexpected response format
-        showToast.error("Password reset successful but unexpected response format.");
-        navigate("/auth/signin");
+        showError(
+          "Password reset succeeded, but automatic sign-in is unavailable. Please sign in manually."
+        );
+        navigate("/auth/signin", { replace: true });
       }
     } catch (err) {
       let errorMessage = "An error occurred. Please try again.";
@@ -110,7 +114,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
         errorMessage = "Network error. Please check your internet connection.";
       }
       
-      showToast.error(errorMessage);
+      showError(errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -155,11 +159,11 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              className="form-control input"
+              className=" input tw:w-full"
               placeholder="Enter New Password"
               value={formData.password}
               onChange={handleChange}
-              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px" }}
+              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px", marginBottom: 0 }}
             />
             <i
               className={`position-absolute input-password-icon ${showPassword ? "feather-eye" : "feather-eye-off"}`}
@@ -183,11 +187,11 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
             <input
               type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
-              className="form-control input"
+              className="input tw:w-full"
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px" }}
+              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px", marginBottom: 0 }}
             />
             <i
               className={`position-absolute input-password-icon ${showConfirmPassword ? "feather-eye" : "feather-eye-off"}`}

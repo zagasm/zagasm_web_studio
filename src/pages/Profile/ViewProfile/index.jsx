@@ -1,158 +1,457 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import './viewProfileSTyling.css';
-import { useAuth } from '../../auth/AuthContext';
-import default_profilePicture from '../../../assets/avater_pix.avif';
-import SideBarNav from '../../pageAssets/SideBarNav';
-import Group from '../../../assets/navbar_icons/Group.svg';
-import SuggestedEvent from '../../../component/Suggested_event/suggestedEvent';
+import React, { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import useProfile from "../../../hooks/useProfile";
+import ProfileHeader from "../../../component/Profile/ProfileHeader";
+import AboutPanel from "../../../component/Profile/AboutPanel";
+import ProfileTabs from "../../../component/Profile/ProfileTab";
+import "./profile.css";
+import { ChevronLeft } from "lucide-react";
 
-function ViewProfile() {
-    const { user, logout, token } = useAuth();
-    const [activeTab, setActiveTab] = useState('myEvents');
-    const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+import { useAuth } from "../../auth/AuthContext";
+import { api, authHeaders } from "../../../lib/apiClient";
+import { showError, showSuccess } from "../../../component/ui/toast";
 
-    const Default_user_image = user?.profileUrl ? user.profileUrl : default_profilePicture;
+const pickIsFollowing = (data) => {
+  if (!data) return false;
+  if (typeof data.isFollowing === "boolean") return data.isFollowing;
+  if (typeof data.is_following === "boolean") return data.is_following;
+  if (typeof data.following === "boolean") return data.following;
+  if (typeof data.is_following_organizer === "boolean") {
+    return data.is_following_organizer;
+  }
+  return false;
+};
 
-    // Fetch events data
-    useEffect(() => {
-        const fetchEvents = async () => {
-            if (!token) return;
-            
-            try {
-                setLoading(true);
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/events`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+const normalizeViewedOrganiserProfile = (response) => {
+  const payload = response?.data?.data ?? null;
+  const organiserData =
+    payload?.organiser ??
+    response?.data?.data ??
+    response?.data?.user ??
+    response?.data ??
+    null;
+  const eventsBuckets = payload?.events ?? null;
 
-                if (!res.ok) {
-                    throw new Error('Failed to fetch events');
-                }
+  if (!organiserData) return null;
 
-                const data = await res.json();
-                if (data.status) {
-                    setEvents(data.message || []);
-                }
-            } catch (err) {
-                setError(err.message);
-                console.error('Error fetching events:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
+  return {
+    ...organiserData,
+    events: eventsBuckets || organiserData?.events || null,
+    allEvents:
+      eventsBuckets?.all ??
+      organiserData?.allEvents ??
+      organiserData?.events?.all ??
+      [],
+    upcomingEvents:
+      eventsBuckets?.upcoming ??
+      organiserData?.upcomingEvents ??
+      organiserData?.events?.upcoming ??
+      [],
+  };
+};
 
-        if (activeTab === 'myEvents') {
-            fetchEvents();
-        }
-    }, [token, activeTab]);
-
-    return (
-        <div className="container-fluid m-0 p-0">
-            <SideBarNav />
-            <div className="page_wrapper overflow-hidden">
-                <div className="row p-0">
-                    <div className="col account_section">
-                        <div className="row">
-                            <div className="col-xl-3 col-lg-5 col-md-5 col-sm-12 col-12 p-0 m-0">
-                                <div className="heading_section bg-dange shadow-l pt-3 pb-3">
-                                    <div className="details_display">
-                                        <div className='profle_img'>
-                                            <img
-                                                className=""
-                                                src={Default_user_image}
-                                                loading="lazy"
-                                            />
-                                        </div>
-                                        <div className='profile_info '>
-                                            <div>
-                                                <small><b>Username</b></small> <br />
-                                                <small>Artist</small>
-                                                <div className='follower_following_section'>
-                                                    <p className='follow_section'><small> <span>12</span> following</small> <small> <span>302</span> followers</small></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="viewers_section">
-                                            <div className="NoEvent">
-                                                <h6 className='m-0 p-0'> {events.length} events</h6>
-                                            </div>
-                                            <div className="organizers_views border-rounded">
-                                                <div className="d-flex align-items-center  job-item-body">
-                                                    <div className="overlap-rounded-circle">
-                                                        <img
-                                                            className="rounded-circle shadow-sm user_template_im"
-                                                            src={Default_user_image}
-                                                        /> <img
-                                                            className="rounded-circle shadow-sm user_template_im"
-                                                            src={Default_user_image}
-                                                        /> <img
-                                                            className="rounded-circle shadow-sm user_template_im"
-                                                            src={Default_user_image}
-                                                        />
-                                                    </div>
-                                                    <span className="font-weight-lighter">200k viewers</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className='create_event_btn'>
-                                            <Link to={'/event/select-event-type'}><img src={Group} /> Create Event</Link>
-                                        </div>
-                                        <div className='eventAttendedSection'>
-                                            <p className='NoEventAttended'><span>0</span> <small>Event attended</small></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-xl-9 col-lg-7 col-md-7 col-sm-12 col-12 p-0 m-0">
-                                <div className="tab_section_container">
-                                    <div className="tab_section_internal_container ">
-                                        <div className="tabs_navigation d-flex">
-                                            <button
-                                                className={`tab_button ${activeTab === 'myEvents' ? 'active' : ''}`}
-                                                onClick={() => setActiveTab('myEvents')}
-                                            >
-                                                My Events
-                                            </button>
-                                            <button
-                                                className={`tab_button ${activeTab === 'aboutMe' ? 'active' : ''}`}
-                                                onClick={() => setActiveTab('aboutMe')}
-                                            >
-                                                About Me
-                                            </button>
-                                        </div>
-
-                                        <div className="myprofile_tab_content">
-                                            {activeTab === 'myEvents' && (
-                                                <div className="tab-my-event">
-                                                    <SuggestedEvent 
-                                                        myEvent={true} 
-                                                        events={events}
-                                                        loading={loading}
-                                                        error={error}
-                                                    />
-                                                </div>
-                                            )}
-                                            {activeTab === 'aboutMe' && (
-                                                <div className="tab-aboutme">
-                                                    <p>Lorem ipsum dolor sit amet consectetur...</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+const ProfileSkeleton = () => (
+  <div className="tw:animate-pulse tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
+    <div className="tw:w-full tw:lg:w-[35%] tw:space-y-4">
+      <div className="tw:bg-white tw:rounded-3xl tw:p-6 tw:border tw:border-gray-100 tw:space-y-4 tw:shadow-sm">
+        <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
+          <div className="tw:h-24 tw:w-24 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:h-6 tw:w-1/2 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:h-4 tw:w-1/3 tw:rounded-full tw:bg-gray-200" />
+          <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2">
+            <span className="tw:h-4 tw:w-20 tw:rounded-full tw:bg-gray-100" />
+            <span className="tw:h-4 tw:w-24 tw:rounded-full tw:bg-gray-100" />
+          </div>
         </div>
-    );
-}
 
-export default ViewProfile;
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="tw:space-y-2">
+              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-100" />
+              <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm">
+        <div className="tw:h-5 tw:w-40 tw:rounded-full tw:bg-gray-100" />
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:mt-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="tw:space-y-2">
+              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-100" />
+              <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div className="tw:flex-1 tw:space-y-4">
+      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm tw:space-y-4">
+        <div className="tw:flex tw:gap-3">
+          {["tab-1", "tab-2", "tab-3"].map((tab) => (
+            <span
+              key={tab}
+              className="tw:h-10 tw:w-24 tw:rounded-full tw:bg-gray-100"
+            />
+          ))}
+        </div>
+        <div className="tw:h-52 tw:rounded-2xl tw:bg-gray-100" />
+      </div>
+      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm">
+        <div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:md:grid-cols-3">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="tw:h-52 tw:rounded-2xl tw:bg-gray-100" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export default function ViewProfile() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { profileId: routeUserId } = useParams();
+
+  // logged-in user (you)
+  const { user: me, token, organiser } = useAuth() || {};
+
+  // existing hook for "my profile"
+  const {
+    user: myProfile,
+    organiser: myOrganiser,
+    loading: myProfileLoading,
+    error: myProfileError,
+  } = useProfile();
+
+  // follow state (only meaningful when viewing another organiser)
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+
+  // are we viewing our own profile or another user's?
+  const isOwnProfile =
+    !routeUserId || (me?.id && routeUserId && routeUserId === me.id);
+
+  const mergedOwnProfile = useMemo(() => {
+    if (!isOwnProfile) return null;
+    if (!myProfile && !myOrganiser) return null;
+
+    return {
+      ...(myProfile || {}),
+      organiser: myOrganiser || myProfile?.organiser || null,
+    };
+  }, [isOwnProfile, myProfile, myOrganiser]);
+
+  const viewedOrganiserProfileQuery = useQuery({
+    queryKey: ["profile", "organiser", routeUserId, token ?? "guest"],
+    enabled: !isOwnProfile && !!routeUserId && !!token,
+    staleTime: 1000 * 60 * 2,
+    queryFn: async () => {
+      const res = await api.get(
+        `/api/v1/organiser/${routeUserId}`,
+        authHeaders(token)
+      );
+
+      return normalizeViewedOrganiserProfile(res);
+    },
+  });
+
+  const finalProfileUser = isOwnProfile
+    ? mergedOwnProfile
+    : viewedOrganiserProfileQuery.data ?? null;
+
+  useEffect(() => {
+    if (isOwnProfile) return;
+    setIsFollowing(pickIsFollowing(finalProfileUser));
+  }, [finalProfileUser, isOwnProfile]);
+
+  const isLoading = isOwnProfile
+    ? myProfileLoading && !mergedOwnProfile && !myProfileError
+    : viewedOrganiserProfileQuery.isLoading;
+  const profileError = isOwnProfile
+    ? myProfileError
+    : viewedOrganiserProfileQuery.error?.message || null;
+
+  /* ------------------ organiser / KYC logic (only for own profile) ------------------ */
+  const isOrganiser =
+    isOwnProfile &&
+    (finalProfileUser?.is_organiser_verified ||
+      finalProfileUser?.roles?.includes("organiser") ||
+      finalProfileUser?.roles?.includes("organizer") ||
+      finalProfileUser?.organiser?.is_organiser_verified || // optional
+      finalProfileUser?.organiser?.roles?.includes?.("organiser")); // optional
+
+  const kycStatus = isOwnProfile ? finalProfileUser?.kyc?.status || null : null;
+  const isKycVerified = kycStatus === "verified";
+
+  const shouldShowBecomeOrganiser =
+    isOwnProfile && !isOrganiser && !isKycVerified;
+
+  /* ------------------ follow / unfollow organiser ------------------ */
+  const handleToggleFollow = async () => {
+    if (isOwnProfile) return;
+    if (!finalProfileUser?.id) return;
+
+    if (!token) {
+      showError("Please log in to follow organizers.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setFollowLoading(true);
+
+      // endpoint: /api/v1/follow/{organizerId}
+      const res = await api.post(
+        `/api/v1/follow/${finalProfileUser.userId}`,
+        null,
+        authHeaders(token)
+      );
+
+      const pickFollowFromToggle = (r) => {
+        if (typeof r?.data?.following === "boolean") return r.data.following;
+        if (typeof r?.following === "boolean") return r.following;
+        if (typeof r?.data?.is_following === "boolean")
+          return r.data.is_following;
+        if (typeof r?.is_following === "boolean") return r.is_following;
+        if (typeof r?.data?.isFollowing === "boolean")
+          return r.data.isFollowing;
+        if (typeof r?.isFollowing === "boolean") return r.isFollowing;
+        return null;
+      };
+
+      const next = pickFollowFromToggle(res?.data);
+      const isNowFollowing = typeof next === "boolean" ? next : !isFollowing;
+
+      setIsFollowing(isNowFollowing);
+
+      queryClient.setQueryData(
+        ["profile", "organiser", routeUserId, token ?? "guest"],
+        (current) =>
+          current
+            ? {
+                ...current,
+                isFollowing: isNowFollowing,
+                following: isNowFollowing,
+              }
+            : current
+      );
+
+      if (isNowFollowing) {
+        showSuccess("You’re now following this organizer.");
+      } else {
+        showSuccess("You’ve unfollowed this organizer.");
+      }
+    } catch (e) {
+      console.error(e);
+      showError("Unable to update follow status. Please try again.");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  return (
+    <div className="tw:font-sans tw:bg-[#f5f5f7] tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
+      {/* top bar */}
+      <div className="tw:bg-white tw:w-full tw:pt-20 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
+        <div className="tw:max-w-2xl tw:mx-auto tw:flex tw:items-center tw:justify-between tw:px-4">
+          <button
+            style={{ borderRadius: 20 }}
+            type="button"
+            className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50 tw:transition"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
+          </button>
+          <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
+            {isOwnProfile ? "Profile" : "Organizer Profile"}
+          </span>
+          <div className="tw:size-10" />
+        </div>
+      </div>
+
+      {/* content */}
+      <div className="tw:mt-4 tw:px-2 tw:md:px-6 tw:h-auto tw:lg:h-[calc(100vh-140px)]">
+        {isLoading ? (
+          <ProfileSkeleton />
+        ) : profileError ? (
+          <p className="tw:text-red-600 tw:mt-10">
+            Failed to load profile: {profileError}
+          </p>
+        ) : !finalProfileUser ? (
+          <p className="tw:text-gray-600 tw:mt-10">No profile data found.</p>
+        ) : isOwnProfile && shouldShowBecomeOrganiser ? (
+          // 1) Your own profile + NOT organiser + KYC not verified → "Become an Organiser"
+          <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:px-4 tw:lg:px-4">
+            <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+              <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
+                <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
+                  <img
+                    src={
+                      finalProfileUser?.profileUrl || "/images/avater_pix.avif"
+                    }
+                    alt=""
+                    className="tw:w-full tw:h-full tw:object-cover"
+                  />
+                </div>
+                <div className="tw:mt-1 tw:text-center">
+                  <span className="tw:block tw:font-semibold tw:text-[16px]">
+                    {finalProfileUser?.name}
+                  </span>
+                  <span className="tw:block tw:text-xs">
+                    {finalProfileUser?.email}
+                  </span>
+                </div>
+                <div className="tw:bg-[#f5f5f5] tw:relative tw:px-4 tw:py-3 tw:rounded-2xl tw:mt-6 tw:w-full">
+                  <div>
+                    <span className="tw:block tw:text-xs">Following</span>
+                    <span className="tw:block tw:font-semibold tw:text-[20px]">
+                      {finalProfileUser?.followings_count ?? 0}
+                    </span>
+                  </div>
+                  <img
+                    className="tw:size-3 tw:absolute tw:top-4 tw:right-4"
+                    src="/images/arrowrightbend.png"
+                    alt=""
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-2 tw:rounded-2xl tw:px-4 tw:py-3">
+              <span className="tw:block tw:font-semibold">About Me</span>
+              <span className="tw:block tw:text-xs">
+                {finalProfileUser?.about}
+              </span>
+            </div>
+
+            <div className="tw:bg-linear-to-r tw:from-[#8F07E7] tw:via-[#9105B4] tw:to-[#500481] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
+              <span className="tw:block tw:font-semibold tw:uppercase tw:text-xl">
+                Do you have an event?
+              </span>
+              <span className="tw:block tw:text-xs">
+                You can be an organizer and drive more audience to your event.
+                People all over the world can’t wait to attend!!
+              </span>
+
+              <Link
+                to="/become-an-organiser"
+                className="tw:p-3 tw:block tw:bg-white tw:text-black tw:mt-5 tw:rounded-lg tw:text-center"
+              >
+                <span className="tw:block tw:font-semibold">
+                  Become an Organizer
+                </span>
+              </Link>
+            </div>
+          </div>
+        ) : isOwnProfile && isOrganiser && !isKycVerified ? (
+          // 2) Your own profile + organiser but KYC not verified → notice block
+          <div className="tw:h-full tw:flex tw:items-start tw:lg:items-center tw:justify-center tw:py-6">
+            <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:space-y-6">
+              {/* Top: icon + badge */}
+              <div className="tw:flex tw:items-center tw:flex-col tw:gap-4">
+                <div className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/5">
+                  <div className="tw:h-6 tw:w-6 tw:rounded-full tw:border-[3px] tw:border-primary tw:border-t-transparent tw:animate-spin" />
+                </div>
+
+                <div className="tw:flex-1 tw:text-center">
+                  <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1">
+                    <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500 tw:animate-pulse" />
+                    <span className="tw:text-[11px] tw:font-semibold tw:tracking-[0.16em] tw:uppercase tw:text-emerald-700">
+                      KYC in progress
+                    </span>
+                  </div>
+
+                  <span className="tw:block tw:mt-3 tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                    Your organiser account is under review
+                  </span>
+
+                  <p className="tw:mt-2 tw:text-sm tw:text-slate-600">
+                    We&apos;re currently verifying the details you submitted.
+                    Once your KYC is approved, you&apos;ll unlock organiser
+                    tools like event creation, payouts and more.
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress bar + copy */}
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:space-y-3">
+                <div className="tw:flex tw:items-center tw:justify-between">
+                  <span className="tw:text-xs tw:font-medium tw:text-slate-700">
+                    Verification status
+                  </span>
+                  <span className="tw:text-[11px] tw:font-semibold tw:text-slate-500 tw:uppercase tw:tracking-[0.16em]">
+                    Under review
+                  </span>
+                </div>
+
+                <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-slate-200">
+                  <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-primary tw:transition-all tw:duration-500" />
+                </div>
+
+                <ul className="tw:mt-1 tw:space-y-1.5 tw:text-[12px] tw:text-slate-600">
+                  <li className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
+                    ID & bank details submitted
+                  </li>
+                  <li className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
+                    Our compliance team is reviewing your information
+                  </li>
+                  <li className="tw:flex tw:items-center tw:gap-2">
+                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-slate-300" />
+                    You&apos;ll be notified once a decision is made
+                  </li>
+                </ul>
+              </div>
+
+              {/* Info + actions */}
+              <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
+                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                  <button
+                    style={{ borderRadius: 12 }}
+                    type="button"
+                    className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 tw:transition"
+                    onClick={() => navigate("/")}
+                  >
+                    Go to home
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // 3) Normal profile layout
+          // (own profile with KYC verified OR viewing another organiser)
+          <div className="tw:flex tw:flex-col tw:lg:flex-row tw:lg:gap-6 tw:lg:h-full">
+            {/* LEFT: profile card + about */}
+            <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:lg:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
+              <div className="tw:space-y-4 tw:lg:pb-6">
+                <ProfileHeader
+                  user={finalProfileUser}
+                  organiser={organiser}
+                  isOwnProfile={isOwnProfile}
+                  isFollowing={isFollowing}
+                  followLoading={followLoading}
+                  onToggleFollow={handleToggleFollow}
+                />
+                <AboutPanel user={finalProfileUser} />
+              </div>
+            </div>
+
+            {/* RIGHT: events */}
+            <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:pb-20 tw:pr-1 tw:lg:overflow-y-auto">
+              <ProfileTabs
+                user={finalProfileUser}
+                isOwnProfile={isOwnProfile}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

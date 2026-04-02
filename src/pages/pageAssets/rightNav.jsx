@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from '../../assets/zagasm_logo.png'; // Adjust path based on actual file location
+import logo from '../../assets/zagasm_studio_logo.png'; // Adjust path based on actual file location
 import { Link } from 'react-router-dom';
 function RightBarComponent({ children }) {
     return (

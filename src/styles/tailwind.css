@@ -1,0 +1,88 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Just+Another+Hand&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss" prefix(tw);
+
+@layer theme, base, components, utilities;
+/* Bring in Tailwind theme & utilities ONLY — skip preflight */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  --color-primary: #8f07e7;
+  --color-lightPurple: #f4e6fd;
+  --color-primarySecond: #c115b5;
+  --font-sans: "Montserrat", sans-serif;
+  --font-dela: "Dela Gothic One", sans-serif;
+  --font-cursive: "Just Another Hand", cursive;
+}
+:root {
+  font-family: var(--font-sans);
+}
+
+html{
+  font-family: var(--font-sans);
+}
+
+.tw-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.tw-no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* Scoped, safe reset */
+[data-tw-reset] {
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+[data-tw-reset] ul,
+[data-tw-reset] ol,
+[data-tw-reset] nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-tw-reset] a {
+  text-decoration: none;
+  color: inherit;
+}
+[data-tw-reset] button {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+[data-tw-reset] img,
+[data-tw-reset] svg {
+  display: block;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes signal-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes signal-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(20px);
+  }
+}
