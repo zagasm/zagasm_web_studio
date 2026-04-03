@@ -121,29 +121,27 @@ jobs:
 
           STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
 
-          echo "Listing existing root objects in Bunny Storage..."
-
-          EXISTING_ITEMS="$(curl --fail --silent --show-error \
-            --request GET \
-            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/" \
-            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}")"
-
           echo "$EXISTING_ITEMS" | jq -c '.[]' | while read -r item; do
-            OBJECT_NAME="$(echo "$item" | jq -r '.ObjectName')"
+          OBJECT_NAME="$(echo "$item" | jq -r '.ObjectName')"
+          IS_DIR="$(echo "$item" | jq -r '.IsDirectory')"
 
-            if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
-              continue
-            fi
+          if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
+            continue
+          fi
 
-            echo "Deleting old object: $OBJECT_NAME"
+          # Skip directories (fixes your error)
+          if [ "$IS_DIR" = "true" ]; then
+            echo "Skipping directory: $OBJECT_NAME"
+            continue
+          fi
 
-            curl --fail --silent --show-error \
-              --request DELETE \
-              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
-              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}"
+          echo "Deleting file: $OBJECT_NAME"
+
+          curl --fail --silent --show-error \
+            --request DELETE \
+            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
+            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}"
           done
-
-          echo "Old root objects removed."
 
       - name: Upload files to Bunny Storage
         shell: bash
