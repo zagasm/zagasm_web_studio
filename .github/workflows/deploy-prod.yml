@@ -1,20 +1,25 @@
-name: Deploy frontend to Bunny Storage
+name: Deploy production frontend to Bunny on release
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
+  workflow_dispatch:
 
 concurrency:
-  group: deploy-frontend-main
+  group: deploy-production-release
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    environment:
+      name: production
+
     env:
-      # Set BUILD_DIR to "build" if you're using Create React App
       BUILD_DIR: dist
 
       BUNNY_STORAGE_ZONE: ${{ secrets.BUNNY_STORAGE_ZONE }}
@@ -22,16 +27,21 @@ jobs:
       BUNNY_STORAGE_REGION: ${{ secrets.BUNNY_STORAGE_REGION }}
       BUNNY_PULL_ZONE_ID: ${{ secrets.BUNNY_PULL_ZONE_ID }}
       BUNNY_API_KEY: ${{ secrets.BUNNY_API_KEY }}
+      BUNNY_SPA_FALLBACK_PATH: ${{ secrets.BUNNY_SPA_FALLBACK_PATH }}
 
-      # Example envs for Vite. Remove if not needed.
       VITE_API_URL: ${{ secrets.VITE_API_URL }}
-
-      # Example envs for CRA. Remove if not needed.
       VITE_API_BASE_URL: ${{ secrets.VITE_API_URL }}
 
     steps:
-      - name: Checkout source
+      - name: Checkout released tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref_name }}
+
+      - name: Show release info
+        run: |
+          echo "Tag: ${{ github.event.release.tag_name || github.ref_name }}"
+          echo "Event: ${{ github.event_name }}"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -52,24 +62,105 @@ jobs:
             exit 1
           fi
 
+          if [ ! -f "$BUILD_DIR/index.html" ]; then
+            echo "index.html not found inside '$BUILD_DIR'."
+            exit 1
+          fi
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Resolve Bunny storage zone ID
+        id: zone
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZONE_ID="$(
+            curl --fail --silent --show-error \
+              --request GET \
+              --url "https://api.bunny.net/storagezone" \
+              --header "AccessKey: ${BUNNY_API_KEY}" \
+            | jq -r --arg ZONE_NAME "$BUNNY_STORAGE_ZONE" '
+                if type == "array" then
+                  (.[] | select(.Name == $ZONE_NAME) | .Id) // empty
+                else
+                  (.Items[] | select(.Name == $ZONE_NAME) | .Id) // empty
+                end
+              ' \
+            | head -n 1
+          )"
+
+          if [ -z "${ZONE_ID:-}" ] || [ "$ZONE_ID" = "null" ]; then
+            echo "Could not resolve Bunny storage zone ID for zone: $BUNNY_STORAGE_ZONE"
+            exit 1
+          fi
+
+          echo "Resolved storage zone ID: $ZONE_ID"
+          echo "zone_id=$ZONE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Bunny SPA fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl --fail --silent --show-error \
+            --request POST \
+            --url "https://api.bunny.net/storagezone/${{ steps.zone.outputs.zone_id }}" \
+            --header "AccessKey: ${BUNNY_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data @- <<EOF
+          {
+            "Custom404FilePath": "${BUNNY_SPA_FALLBACK_PATH}",
+            "Rewrite404To200": true
+          }
+          EOF
+
+          echo "Bunny SPA fallback configured."
+
+      - name: Remove old files from Bunny Storage root
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
+          LIST_URL="https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/"
+
+          echo "Listing existing root objects in Bunny Storage..."
+
+          EXISTING_ITEMS="$(curl --fail --silent --show-error \
+            --request GET \
+            --url "$LIST_URL" \
+            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}")"
+
+          echo "$EXISTING_ITEMS" | jq -c '.[]' | while read -r item; do
+            OBJECT_NAME="$(echo "$item" | jq -r '.ObjectName')"
+
+            if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
+              continue
+            fi
+
+            echo "Deleting old object: $OBJECT_NAME"
+
+            curl --fail --silent --show-error \
+              --request DELETE \
+              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
+              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}"
+          done
+
+          echo "Old root objects removed."
+
       - name: Upload build files to Bunny Storage
         shell: bash
         run: |
           set -euo pipefail
 
-          if [ -z "${BUNNY_STORAGE_REGION:-}" ]; then
-            echo "BUNNY_STORAGE_REGION is not set"
-            exit 1
-          fi
-
           STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
 
           echo "Uploading files from $BUILD_DIR to https://$STORAGE_HOST/$BUNNY_STORAGE_ZONE/"
 
-          # Upload every file under the build directory, preserving folder structure.
           find "$BUILD_DIR" -type f | while read -r file; do
             rel_path="${file#"$BUILD_DIR"/}"
-
             content_type="$(file --brief --mime-type "$file")"
 
             echo "Uploading: $rel_path"
@@ -82,7 +173,10 @@ jobs:
           done
 
       - name: Purge Bunny CDN cache
+        shell: bash
         run: |
+          set -euo pipefail
+
           curl --fail --silent --show-error \
             --request POST \
             --url "https://api.bunny.net/pullzone/${BUNNY_PULL_ZONE_ID}/purgeCache" \
@@ -90,5 +184,7 @@ jobs:
             --header "Content-Type: application/json" \
             --data '{}'
 
-      - name: Done
-        run: echo "Deployment complete."
+          echo "Bunny CDN cache purged."
+
+      - name: Deployment complete
+        run: echo "Production deployment complete."
