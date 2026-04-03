@@ -4,17 +4,24 @@ on:
   push:
     branches:
       - dev
+  workflow_dispatch:
+
 
 concurrency:
   group: deploy-staging-frontend
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
 
+    environment:
+      name: staging
+
     env:
-      # Change to "build" if this project is Create React App
       BUILD_DIR: dist
 
       BUNNY_STORAGE_ZONE: ${{ secrets.BUNNY_STORAGE_ZONE_STAGING }}
@@ -22,9 +29,9 @@ jobs:
       BUNNY_STORAGE_REGION: ${{ secrets.BUNNY_STORAGE_REGION_STAGING }}
       BUNNY_PULL_ZONE_ID: ${{ secrets.BUNNY_PULL_ZONE_ID_STAGING }}
       BUNNY_API_KEY: ${{ secrets.BUNNY_API_KEY }}
+      BUNNY_SPA_FALLBACK_PATH: ${{ secrets.BUNNY_SPA_FALLBACK_PATH }}
 
-      # Staging frontend env vars
-      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_STAGING }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_URL }}
 
     steps:
       - name: Checkout source
@@ -57,15 +64,92 @@ jobs:
             exit 1
           fi
 
-      - name: Upload files to Bunny Storage
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Resolve Bunny storage zone ID
+        id: zone
         shell: bash
         run: |
           set -euo pipefail
 
-          if [ -z "${BUNNY_STORAGE_REGION:-}" ]; then
-            echo "BUNNY_STORAGE_REGION is not set"
+          ZONE_ID="$(
+            curl --fail --silent --show-error \
+              --request GET \
+              --url "https://api.bunny.net/storagezone" \
+              --header "AccessKey: ${BUNNY_API_KEY}" \
+            | jq -r --arg ZONE_NAME "$BUNNY_STORAGE_ZONE" '
+                if type == "array" then
+                  (.[] | select(.Name == $ZONE_NAME) | .Id) // empty
+                else
+                  (.Items[] | select(.Name == $ZONE_NAME) | .Id) // empty
+                end
+              ' \
+            | head -n 1
+          )"
+
+          if [ -z "${ZONE_ID:-}" ] || [ "$ZONE_ID" = "null" ]; then
+            echo "Could not resolve Bunny storage zone ID for zone: $BUNNY_STORAGE_ZONE"
             exit 1
           fi
+
+          echo "Resolved storage zone ID: $ZONE_ID"
+          echo "zone_id=$ZONE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Bunny SPA fallback for staging
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl --fail --silent --show-error \
+            --request POST \
+            --url "https://api.bunny.net/storagezone/${{ steps.zone.outputs.zone_id }}" \
+            --header "AccessKey: ${BUNNY_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data @- <<EOF
+          {
+            "Custom404FilePath": "${BUNNY_SPA_FALLBACK_PATH}",
+            "Rewrite404To200": true
+          }
+          EOF
+
+          echo "Bunny SPA fallback configured for staging."
+
+      - name: Remove old files from Bunny Storage root
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
+
+          echo "Listing existing root objects in Bunny Storage..."
+
+          EXISTING_ITEMS="$(curl --fail --silent --show-error \
+            --request GET \
+            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/" \
+            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}")"
+
+          echo "$EXISTING_ITEMS" | jq -c '.[]' | while read -r item; do
+            OBJECT_NAME="$(echo "$item" | jq -r '.ObjectName')"
+
+            if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
+              continue
+            fi
+
+            echo "Deleting old object: $OBJECT_NAME"
+
+            curl --fail --silent --show-error \
+              --request DELETE \
+              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
+              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}"
+          done
+
+          echo "Old root objects removed."
+
+      - name: Upload files to Bunny Storage
+        shell: bash
+        run: |
+          set -euo pipefail
 
           STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
 
@@ -95,6 +179,8 @@ jobs:
             --header "AccessKey: ${BUNNY_API_KEY}" \
             --header "Content-Type: application/json" \
             --data '{}'
+
+          echo "Bunny staging cache purged."
 
       - name: Deployment complete
         run: echo "Staging deployment completed successfully."
