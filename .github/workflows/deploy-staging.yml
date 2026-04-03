@@ -6,6 +6,7 @@ on:
       - dev
   workflow_dispatch:
 
+
 concurrency:
   group: deploy-staging-frontend
   cancel-in-progress: true
