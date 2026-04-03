@@ -121,27 +121,44 @@ jobs:
 
           STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
 
-          echo "$EXISTING_ITEMS" | jq -c '.[]' | while read -r item; do
-          OBJECT_NAME="$(echo "$item" | jq -r '.ObjectName')"
-          IS_DIR="$(echo "$item" | jq -r '.IsDirectory')"
+          echo "Listing existing root objects in Bunny Storage..."
 
-          if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
-            continue
+          EXISTING_ITEMS=$(curl --silent --show-error \
+            --request GET \
+            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/" \
+            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
+            || echo "[]")
+
+          # Fallback if empty or invalid
+          if [ -z "$EXISTING_ITEMS" ] || [ "$EXISTING_ITEMS" = "null" ]; then
+            echo "No existing items found or failed to fetch. Skipping cleanup."
+            exit 0
           fi
 
-          # Skip directories (fixes your error)
-          if [ "$IS_DIR" = "true" ]; then
-            echo "Skipping directory: $OBJECT_NAME"
-            continue
-          fi
+          echo "$EXISTING_ITEMS" | jq -c '.[]?' | while read -r item; do
+            OBJECT_NAME=$(echo "$item" | jq -r '.ObjectName')
+            IS_DIR=$(echo "$item" | jq -r '.IsDirectory')
 
-          echo "Deleting file: $OBJECT_NAME"
+            if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
+              continue
+            fi
 
-          curl --fail --silent --show-error \
-            --request DELETE \
-            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
-            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}"
+            # Skip directories (important fix)
+            if [ "$IS_DIR" = "true" ]; then
+              echo "Skipping directory: $OBJECT_NAME"
+              continue
+            fi
+
+            echo "Deleting file: $OBJECT_NAME"
+
+            curl --silent --show-error \
+              --request DELETE \
+              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
+              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
+              || echo "Failed to delete $OBJECT_NAME (skipping)"
           done
+
+          echo "Cleanup complete."
 
       - name: Upload files to Bunny Storage
         shell: bash
