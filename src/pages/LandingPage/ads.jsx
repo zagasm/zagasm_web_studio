@@ -89,7 +89,7 @@ export default function Ads() {
         {/* HERO */}
         <div className="tw:relative tw:overflow-hidden tw:rounded-4xl tw:border tw:border-white/70 tw:bg-white/85 tw:p-8 tw:text-center tw:shadow-[0_30px_80px_rgba(15,23,42,0.10)]">
           <div className="tw:pointer-events-none tw:absolute tw:-top-24 tw:left-1/2 tw:h-64 tw:w-64 tw:-translate-x-1/2 tw:rounded-full tw:bg-primary/10 tw:blur-3xl" />
-          <div className="tw:pointer-events-none tw:absolute tw:-bottom-24 tw:right-0 tw:h-64 tw:w-64 tw:rounded-full tw:bg-purple-200/40 tw:blur-3xl" />
+          <div className="tw:pointer-events-none tw:absolute tw:-bottom-24 tw:right-0 tw:h-64 tw:w-64 tw:rounded-full tw:bg-primary/10 tw:blur-3xl" />
 
           <Typography
             variant="span"

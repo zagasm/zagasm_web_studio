@@ -44,7 +44,7 @@ export default function Home() {
           <button
             onClick={() => handleTabChange("all")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "all"
-                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+                ? "tw:bg-lightPurple tw:text-primary"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
@@ -53,7 +53,7 @@ export default function Home() {
           <button
             onClick={() => handleTabChange("upcoming")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "upcoming"
-                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+                ? "tw:bg-lightPurple tw:text-primary"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
@@ -62,7 +62,7 @@ export default function Home() {
           <button
             onClick={() => handleTabChange("live")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "live"
-                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+                ? "tw:bg-lightPurple tw:text-primary"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >

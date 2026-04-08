@@ -108,7 +108,7 @@ export default function LivePipelineSection() {
             className="tw:font-dela tw:block tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-semibold tw:text-white tw:tracking-tight"
           >
             From
-            <strong className="tw:font-semibold tw:text-primary">
+            <strong className="tw:font-semibold tw:text-red-600">
               {" "}
               “Go Live”
             </strong>{" "}
@@ -134,7 +134,7 @@ export default function LivePipelineSection() {
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.1, ease: "easeOut" }}
-            className="tw:origin-left tw:h-px tw:w-full tw:bg-linear-to-r tw:from-primary/10 tw:via-primary tw:to-primary/10 tw:shadow-[0_0_25px_rgba(143,7,231,0.8)]"
+            className="tw:origin-left tw:h-px tw:w-full tw:bg-linear-to-r tw:from-primary/10 tw:via-primary tw:to-primary/10 tw:shadow-[0_0_25px_rgba(0,0,0,0.35)]"
           />
 
           {/* shimmering band running along the line */}
@@ -164,7 +164,7 @@ export default function LivePipelineSection() {
               repeatType: "loop",
               ease: "easeInOut",
             }}
-            className="tw:absolute tw:-top-1 tw:h-3 tw:w-3 tw:rounded-full tw:bg-primary tw:shadow-[0_0_18px_rgba(143,7,231,0.9)]"
+            className="tw:absolute tw:-top-1 tw:h-3 tw:w-3 tw:rounded-full tw:bg-primary tw:shadow-[0_0_18px_rgba(0,0,0,0.4)]"
           />
         </div>
 
@@ -212,7 +212,7 @@ export default function LivePipelineSection() {
               >
                 <div className="tw:flex tw:items-center tw:justify-between">
                   <div className="tw:inline-flex tw:items-center tw:gap-2">
-                    <div className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/20 tw:text-[11px] tw:font-semibold tw:text-primary">
+                    <div className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/20 tw:text-[11px] tw:font-semibold tw:text-white">
                       {step.id}
                     </div>
                     <span className="tw:text-[11px] tw:uppercase tw:tracking-wide tw:text-white">

@@ -337,7 +337,7 @@ export default function FundWalletModal({
                     />
 
                     {previewLoading && currentInputPreviewKey ? (
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ece8ff] tw:bg-[linear-gradient(135deg,#fbf8ff,#ffffff)] tw:p-4">
+                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#f7f2eb,#ffffff)] tw:p-4">
                         <div className="tw:space-y-3 tw:animate-pulse">
                           <div className="tw:h-4 tw:w-40 tw:rounded-full tw:bg-[#e9ddff]" />
                           <div className="tw:flex tw:items-center tw:justify-between">
@@ -357,7 +357,7 @@ export default function FundWalletModal({
                     ) : null}
 
                     {reviewData ? (
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ece8ff] tw:bg-[linear-gradient(135deg,#fbf8ff,#ffffff)] tw:p-4">
+                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#f7f2eb,#ffffff)] tw:p-4">
                         <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
                           Review funding charge
                         </div>

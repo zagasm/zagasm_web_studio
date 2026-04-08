@@ -99,7 +99,7 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
               }}
               type="button"
               onClick={onViewReceipt}
-              className="tw:w-full tw:h-12 tw:rounded-xl tw:bg-[#F5E9FF] tw:text-[14px] tw:font-bold tw:text-purple-700 tw:hover:bg-[#EAD7FF] tw:transition-colors"
+              className="tw:w-full tw:h-12 tw:rounded-xl tw:bg-lightPurple tw:text-[14px] tw:font-bold tw:text-primary tw:hover:bg-[#e1d7cc] tw:transition-colors"
             >
               View Receipt
             </button>

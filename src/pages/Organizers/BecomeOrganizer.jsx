@@ -501,7 +501,7 @@ const BecomeOrganiser = () => {
   }, [destroyVerification]);
 
   return (
-    <div className="tw:min-h-screen tw:bg-linear-to-b tw:from-lightPurple/60 tw:via-[#F8F5FF] tw:to-white tw:pt-24 tw:md:pt-28 tw:px-4">
+    <div className="tw:min-h-screen tw:bg-linear-to-b tw:from-lightPurple/60 tw:via-[#f7f2eb] tw:to-white tw:pt-24 tw:md:pt-28 tw:px-4">
       <div className="tw:max-w-6xl tw:mx-auto tw:pb-10">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:mb-4">
           <div>

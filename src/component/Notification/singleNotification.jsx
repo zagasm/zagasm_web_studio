@@ -76,7 +76,7 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
     <article
       className={`tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-sm tw:transition tw:duration-200 tw:cursor-pointer tw:border ${
         isUnread
-          ? "tw:border-l-4 tw:border-purple-600 tw:shadow-[0_12px_30px_rgba(15,23,42,0.15)]"
+          ? "tw:border-l-4 tw:border-primary tw:shadow-[0_12px_30px_rgba(15,23,42,0.15)]"
           : "tw:border-transparent hover:tw:shadow-md"
       }`}
       onClick={onClick}
@@ -85,7 +85,7 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
       <div className="tw:flex tw:gap-4 tw:items-start">
         <span
           className={`tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-full ${
-            isUnread ? "tw:bg-purple-600" : "tw:bg-slate-300"
+            isUnread ? "tw:bg-primary" : "tw:bg-slate-300"
           }`}
         />
         <div className="tw:flex-1 tw:space-y-3">
@@ -94,7 +94,7 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
               {title}
             </strong>
             {isUnread && (
-              <span className="tw:rounded-full tw:bg-purple-100 tw:px-3 tw:py-0.5 tw:text-xs tw:font-semibold tw:text-purple-700">
+              <span className="tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-0.5 tw:text-xs tw:font-semibold tw:text-primary">
                 New
               </span>
             )}
@@ -106,7 +106,7 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
               <button
                 type="button"
                 onClick={toggleExpand}
-                className="tw:ml-2 tw:text-xs tw:font-semibold tw:text-purple-600 tw:underline-offset-4 hover:tw:underline"
+                className="tw:ml-2 tw:text-xs tw:font-semibold tw:text-primary tw:underline-offset-4 hover:tw:underline"
               >
                 {isExpanded ? "Read less" : "Read more"}
               </button>

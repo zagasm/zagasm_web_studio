@@ -111,7 +111,7 @@ export default function DeactivateAccountModal({ open, onClose, onSuccess }) {
                       <span className="tw:text-red-500">*</span>
                     </span>
                     <textarea
-                      className="tw:w-full tw:min-h-[100px] tw:rounded-xl tw:border tw:border-gray-200 tw:p-3 tw:text-sm tw:outline-none focus:tw:border-purple-600 focus:tw:ring-1 focus:tw:ring-purple-600"
+                      className="tw:w-full tw:min-h-[100px] tw:rounded-xl tw:border tw:border-gray-200 tw:p-3 tw:text-sm tw:outline-none focus:tw:border-primary focus:tw:ring-1 focus:tw:ring-primary"
                       placeholder="Tell us why you’re leaving…"
                       value={reason}
                       onChange={(e) => {
@@ -130,7 +130,7 @@ export default function DeactivateAccountModal({ open, onClose, onSuccess }) {
                     </span>
                     <input
                       type="password"
-                      className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:p-3 tw:text-sm tw:outline-none focus:tw:border-purple-600 focus:tw:ring-1 focus:tw:ring-purple-600"
+                      className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:p-3 tw:text-sm tw:outline-none focus:tw:border-primary focus:tw:ring-1 focus:tw:ring-primary"
                       placeholder="Enter your account password"
                       value={password}
                       onChange={(e) => {

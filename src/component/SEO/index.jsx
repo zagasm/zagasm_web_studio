@@ -69,7 +69,7 @@ const SEO = ({
         <meta name="revisit-after" content="3 days" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#8f07e7" />
+        <meta name="theme-color" content="#111111" />
         <link rel="apple-touch-icon" href="/images/hero-event.jpg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

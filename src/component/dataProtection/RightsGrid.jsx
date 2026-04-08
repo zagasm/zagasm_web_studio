@@ -9,7 +9,7 @@ const cards = [
   {
     title: "Right to Rectification",
     desc: "Update inaccurate or incomplete information in your profile or account settings.",
-    tone: "tw:bg-purple-50",
+    tone: "tw:bg-lightPurple/60",
   },
   {
     title: "Right to Deletion",

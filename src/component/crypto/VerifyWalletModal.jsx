@@ -99,15 +99,15 @@ export default function VerifyWalletModal({
               leaveFrom="tw:opacity-100 tw:scale-100 tw:translate-y-0"
               leaveTo="tw:opacity-0 tw:scale-95 tw:translate-y-2"
             >
-              <Dialog.Panel className="tw:w-full tw:max-w-md tw:rounded-3xl tw:bg-white tw:border tw:border-[#E1D5FF] tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:p-6 tw:sm:p-7">
+              <Dialog.Panel className="tw:w-full tw:max-w-md tw:rounded-3xl tw:bg-white tw:border tw:border-[#ded6cd] tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:p-6 tw:sm:p-7">
                 <div className="tw:flex tw:items-start tw:justify-between tw:gap-4">
                   <div className="tw:space-y-1.5">
-                    <span className="tw:block tw:text-base tw:sm:text-lg tw:md:text-xl tw:font-semibold tw:text-[#140022]">
+                    <span className="tw:block tw:text-base tw:sm:text-lg tw:md:text-xl tw:font-semibold tw:text-[#111111]">
                       Verify this wallet
                     </span>
-                    <span className="tw:block tw:text-xs tw:sm:text-sm tw:text-[#6D5B9C]">
+                    <span className="tw:block tw:text-xs tw:sm:text-sm tw:text-[#5f5a55]">
                       Enter the 5-digit code we just emailed to{" "}
-                      <span className="tw:font-medium tw:text-[#41127A]">
+                      <span className="tw:font-medium tw:text-primary">
                         {emailHint || "your account email"}
                       </span>{" "}
                       to confirm you own this address.
@@ -117,7 +117,7 @@ export default function VerifyWalletModal({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="tw:shrink-0 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F5F0FF] tw:text-[#5B3EAF] tw:hover:bg-[#ECE1FF] tw:transition"
+                    className="tw:shrink-0 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce] tw:transition"
                   >
                     <span className="tw:text-lg tw:leading-none">×</span>
                   </button>
@@ -128,7 +128,7 @@ export default function VerifyWalletModal({
                   className="tw:mt-6 tw:space-y-5 tw:sm:space-y-6"
                 >
                   <div className="tw:space-y-2">
-                    <span className="tw:block tw:text-xs tw:font-medium tw:tracking-wide tw:text-[#56409E]">
+                    <span className="tw:block tw:text-xs tw:font-medium tw:tracking-wide tw:text-[#4e4942]">
                       Verification code
                     </span>
                     <div className="tw:flex tw:flex-col tw:gap-2">
@@ -140,10 +140,10 @@ export default function VerifyWalletModal({
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={5}
-                        className="tw:block tw:w-full tw:text-center tw:tracking-[0.6em] tw:rounded-2xl tw:border tw:border-[#E1D5FF] tw:bg-[#F9F6FF] tw:px-4 tw:py-3 tw:text-lg tw:font-semibold tw:text-[#140022] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-[#8F07E7]/70 focus:tw:border-transparent tw:placeholder:tracking-normal placeholder:tw:text-[#A59ACB]"
+                        className="tw:block tw:w-full tw:text-center tw:tracking-[0.6em] tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-lg tw:font-semibold tw:text-[#111111] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:placeholder:tracking-normal placeholder:tw:text-[#a89f95]"
                         placeholder="0 0 0 0 0"
                       />
-                      <span className="tw:text-[10px] tw:text-[#8B7BB5]">
+                      <span className="tw:text-[10px] tw:text-[#7a736c]">
                         Code expires after a short time. If it stops working,
                         request a new one from your wallet settings.
                       </span>
@@ -169,7 +169,7 @@ export default function VerifyWalletModal({
                       style={{
                         borderRadius: 16,
                       }}
-                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[radial-gradient(circle_at_0%_0%,#C115B5,transparent_55%),radial-gradient(circle_at_100%_0%,#8F07E7,transparent_55%),linear-gradient(135deg,#8F07E7,#C115B5)] tw:shadow-[0_12px_35px_rgba(143,7,231,0.35)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:justify-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
+                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#111111,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:justify-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
                     >
                       {submitting && (
                         <span className="tw:inline-block tw:h-3 tw:w-3 tw:rounded-full tw:border tw:border-white/40 tw:border-t-transparent tw:animate-spin" />

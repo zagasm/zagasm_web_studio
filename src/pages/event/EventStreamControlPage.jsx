@@ -144,10 +144,10 @@ function DetailCard({
   children,
 }) {
   return (
-    <div className="tw:rounded-3xl tw:border tw:border-[#ece8ff] tw:bg-white tw:p-4 tw:shadow-sm">
+    <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4 tw:shadow-sm">
       <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
         <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-gray-700">
-          <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[#f6f1ff] tw:text-primary">
+          <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-lightPurple tw:text-primary">
             <Icon className="tw:h-4 tw:w-4" />
           </span>
           <span>{label}</span>
@@ -158,7 +158,7 @@ function DetailCard({
             style={{ borderRadius: 20, fontSize: 12 }}
             type="button"
             onClick={() => onCopy?.(value, label)}
-            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
+            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
             aria-label={`Copy ${label}`}
           >
             <Copy className="tw:h-4 tw:w-4" />
@@ -613,7 +613,7 @@ export default function EventStreamControlPage() {
             </div>
 
             {isEnded ? (
-              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ece7ff] tw:bg-[linear-gradient(135deg,#ffffff_0%,#faf7ff_52%,#f4efff_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
+              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#f7f2eb_52%,#efe7de_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
                 <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[1.15fr_0.85fr]">
                   <div>
                     <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/90 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:shadow-sm">
@@ -723,7 +723,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpServer, "RTMP Server")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
                                 aria-label="Copy RTMP Server"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -746,7 +746,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpKey, "Stream Key")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ece8ff] tw:px-3 tw:text-primary hover:tw:bg-[#faf7ff]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
                                 aria-label="Copy Stream Key"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -808,7 +808,7 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleTogglePause}
                           loading={pendingAction === "pause"}
-                          className="tw:bg-[#f7f3ff] tw:text-primary hover:tw:bg-[#efe6ff]"
+                          className="tw:bg-lightPurple tw:text-primary hover:tw:bg-[#e2d9ce]"
                           icon={PauseCircle}
                         >
                           {isPaused ? "Resume stream" : "Pause stream"}
@@ -837,7 +837,7 @@ export default function EventStreamControlPage() {
                       ) : null}
                     </div>
 
-                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#faf7ff] tw:p-4">
+                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
                       <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
                         <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
                         What to do next
@@ -856,7 +856,7 @@ export default function EventStreamControlPage() {
                   </aside>
                 </div>
 
-                <section className="tw:rounded-4xl tw:border tw:border-[#ede7ff] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+                <section className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
                   <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                     <div>
                       <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
@@ -868,10 +868,10 @@ export default function EventStreamControlPage() {
                     </div>
 
                     <div className="tw:flex tw:flex-wrap tw:gap-2">
-                      <span className="tw:rounded-full tw:border tw:border-[#ece8ff] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
+                      <span className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
                         OBS Studio
                       </span>
-                      <span className="tw:rounded-full tw:border tw:border-[#ece8ff] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
+                      <span className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
                         Recommended: OBS Studio 28+
                       </span>
                     </div>

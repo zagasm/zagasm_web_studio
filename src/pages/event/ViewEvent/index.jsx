@@ -766,7 +766,7 @@ export default function ViewEvent() {
 
                   <div className="tw:mt-4 tw:rounded-[24px] tw:bg-white/70 tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-white/80 tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.12)]">
                     <div className="tw:flex tw:items-start tw:gap-4">
-                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-[#ece8ff]">
+                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple">
                         {hostHasImage ? (
                           <img
                             src={event.hostImage}

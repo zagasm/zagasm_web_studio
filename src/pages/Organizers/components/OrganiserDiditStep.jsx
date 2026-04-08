@@ -69,7 +69,7 @@ export default function OrganiserDiditStep({
         )} */}
       </div>
 
-      <div className="tw:rounded-2xl tw:border tw:border-[#E7D9FF] tw:bg-[#FBF8FF] tw:px-4 tw:py-4 tw:space-y-2">
+      <div className="tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-[#f7f2eb] tw:px-4 tw:py-4 tw:space-y-2">
         <span className="tw:block tw:text-sm tw:font-semibold tw:text-slate-900">
           Before you continue
         </span>

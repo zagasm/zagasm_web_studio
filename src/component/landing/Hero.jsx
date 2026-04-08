@@ -80,7 +80,7 @@ function FlowHeadline({
               <span
                 className={
                   highlightWord && w === highlightWord
-                    ? "tw:text-purple-600"
+                    ? "tw:text-primary"
                     : ""
                 }
               >
@@ -316,10 +316,10 @@ export default function Hero() {
                     ease: "easeInOut",
                     delay: idx * 0.4,
                   }}
-                  className="tw:relative tw:w-12 tw:h-12 tw:lg:w-16 tw:lg:h-16 tw:rounded-2xl tw:bg-linear-to-br tw:from-purple-500/20 tw:to-pink-500/20 tw:backdrop-blur-sm tw:border tw:border-purple-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
+                  className="tw:relative tw:w-12 tw:h-12 tw:lg:w-16 tw:lg:h-16 tw:rounded-2xl tw:bg-linear-to-br tw:from-primary/15 tw:to-primarySecond/15 tw:backdrop-blur-sm tw:border tw:border-primary/15 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
                 >
                   <Icon
-                    className="tw:w-6 tw:h-6 tw:lg:w-8 tw:lg:h-8 tw:text-purple-600"
+                    className="tw:w-6 tw:h-6 tw:lg:w-8 tw:lg:h-8 tw:text-primary"
                     strokeWidth={2}
                   />
 
@@ -335,7 +335,7 @@ export default function Hero() {
                       ease: "easeInOut",
                       delay: idx * 0.3,
                     }}
-                    className="tw:absolute tw:inset-0 tw:rounded-2xl tw:bg-purple-400/30 tw:blur-lg tw:-z-10"
+                    className="tw:absolute tw:inset-0 tw:rounded-2xl tw:bg-primary/20 tw:blur-lg tw:-z-10"
                   />
 
                   {/* Sparkle effect */}
@@ -414,10 +414,10 @@ export default function Hero() {
                     ease: "easeInOut",
                     delay: idx * 0.5,
                   }}
-                  className="tw:relative tw:w-14 tw:h-14 tw:rounded-2xl tw:bg-linear-to-br tw:from-pink-500/20 tw:to-purple-500/20 tw:backdrop-blur-sm tw:border tw:border-pink-300/40 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
+                  className="tw:relative tw:w-14 tw:h-14 tw:rounded-2xl tw:bg-linear-to-br tw:from-primarySecond/15 tw:to-primary/20 tw:backdrop-blur-sm tw:border tw:border-primarySecond/15 tw:shadow-xl tw:flex tw:items-center tw:justify-center"
                 >
                   <Icon
-                    className="tw:w-7 tw:h-7 tw:text-pink-600"
+                    className="tw:w-7 tw:h-7 tw:text-primarySecond"
                     strokeWidth={2}
                   />
 
@@ -433,7 +433,7 @@ export default function Hero() {
                       ease: "easeInOut",
                       delay: idx * 0.4,
                     }}
-                    className="tw:absolute tw:inset-0 tw:rounded-2xl tw:bg-pink-400/30 tw:blur-lg tw:-z-10"
+                    className="tw:absolute tw:inset-0 tw:rounded-2xl tw:bg-primarySecond/20 tw:blur-lg tw:-z-10"
                   />
                 </motion.div>
               </motion.div>
@@ -525,7 +525,7 @@ export default function Hero() {
                     layoutId="hero-slider-dot"
                     className="tw:absolute tw:inset-0 tw:rounded-full"
                     style={{
-                      background: "linear-gradient(90deg,#8F07E7,#C115B5)",
+                      background: "linear-gradient(90deg,#111111,#2b2b2b)",
                     }}
                   />
                 )}

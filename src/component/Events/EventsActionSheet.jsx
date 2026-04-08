@@ -467,7 +467,7 @@ export default function EventActionsSheet({
                             key={r}
                             className={`tw:flex tw:items-center tw:gap-3 tw:p-2 tw:border tw:rounded-xl ${
                               selectedReason === r
-                                ? "tw:border-primary tw:bg-[#F4E6FD]/40"
+                                ? "tw:border-primary tw:bg-lightPurple/50"
                                 : "tw:border-gray-100"
                             }`}
                           >

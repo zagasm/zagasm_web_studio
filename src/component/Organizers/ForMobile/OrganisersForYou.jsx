@@ -207,7 +207,7 @@ export default function MobileSingleOrganizers() {
                   className="tw:h-full tw:bg-white tw:border tw:border-gray-100 tw:rounded-2xl tw:p-3 tw:flex tw:flex-col tw:items-stretch tw:gap-2 tw:cursor-pointer"
                 >
                   <div className="tw:flex tw:flex-col tw:items-center tw:text-center tw:gap-3">
-                    <div className="tw:w-14 tw:h-14 tw:rounded-full tw:ring-2 tw:ring-white tw:shadow-sm tw:flex tw:items-center tw:justify-center tw:bg-[#F4E6FD] tw:font-semibold tw:text-[#500481] tw:overflow-hidden">
+                    <div className="tw:w-14 tw:h-14 tw:rounded-full tw:ring-2 tw:ring-white tw:shadow-sm tw:flex tw:items-center tw:justify-center tw:bg-lightPurple tw:font-semibold tw:text-primary tw:overflow-hidden">
                       {showImage ? (
                         <img
                           src={organizer.profileImage}
@@ -253,7 +253,7 @@ export default function MobileSingleOrganizers() {
                       ${
                         isFollowing
                           ? "tw:bg-primary tw:text-white tw:ring-primary"
-                          : "tw:bg-[#F4E6FD] tw:text-black tw:ring-transparent tw:hover:bg-primary/10"
+                          : "tw:bg-lightPurple tw:text-black tw:ring-transparent tw:hover:bg-primary/10"
                       } ${isBusy ? "tw:opacity-70 tw:cursor-not-allowed" : ""}`}
                   >
                     {isBusy ? (

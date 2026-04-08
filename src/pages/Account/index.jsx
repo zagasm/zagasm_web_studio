@@ -104,7 +104,7 @@ function Account() {
                   <div className="tw:mt-6 tw:flex tw:justify-end tw:gap-3">
                     <button
                       type="button"
-                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-purple-600 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-purple-700"
+                      className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-primarySecond"
                       onClick={handleForceLogout}
                     >
                       OK

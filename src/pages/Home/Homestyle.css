@@ -1,5 +1,5 @@
 /* ===== General ===== */
-div a { color: #8000ff; }
+div a { color: #111111; }
 
 .tw-no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -100,14 +100,14 @@ img:hover { transform: scale(1.01); }
 .tab:hover { transform: translateY(-1px); }
 
 .tab.active {
-  border-color: var(--color-primary, #8f07e7);
+  border-color: var(--color-primary, #111111);
   box-shadow: 0 6px 18px rgba(143, 7, 231, 0.12);
 }
 
 /* Keep underline cue if you like it */
 .heading_tab_container .active {
   font-weight: bold;
-  border-bottom: 1px solid #8000ff;
+  border-bottom: 1px solid #111111;
   padding-bottom: 10px;
 }
 

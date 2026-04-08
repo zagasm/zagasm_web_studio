@@ -228,8 +228,8 @@ export function ForgetPassword() {
           justify-content: center;
         }
         .tab.active {
-          color: #8f07e7;
-          border-bottom: 2px solid #8f07e7;
+          color: #111111;
+          border-bottom: 2px solid #111111;
         }
         .tab:hover:not(.active) {
           color: #333;

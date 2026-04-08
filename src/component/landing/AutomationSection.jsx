@@ -36,8 +36,8 @@ export default function AutomationSection({
         aria-hidden
         className="tw:pointer-events-none tw:absolute tw:inset-0"
       >
-        <div className="tw:absolute tw:-left-40 tw:top-10 tw:h-[420px] tw:w-[420px] tw:rounded-full tw:blur-[90px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(143,7,231,0.22),rgba(193,21,181,0.10)_55%,transparent_70%)]" />
-        <div className="tw:absolute tw:-right-28 tw:bottom-0 tw:h-[520px] tw:w-[520px] tw:rounded-full tw:blur-[110px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(193,21,181,0.18),rgba(143,7,231,0.10)_55%,transparent_70%)]" />
+        <div className="tw:absolute tw:-left-40 tw:top-10 tw:h-[420px] tw:w-[420px] tw:rounded-full tw:blur-[90px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(17,17,17,0.16),rgba(43,43,43,0.08)_55%,transparent_70%)]" />
+        <div className="tw:absolute tw:-right-28 tw:bottom-0 tw:h-[520px] tw:w-[520px] tw:rounded-full tw:blur-[110px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(43,43,43,0.14),rgba(17,17,17,0.08)_55%,transparent_70%)]" />
       </div>
 
       <div className="tw:relative tw:z-10 tw:mx-auto tw:max-w-6xl tw:px-5">
@@ -54,7 +54,7 @@ export default function AutomationSection({
             viewport={{ once: true, amount: 0.3 }}
           >
             {/* <motion.div
-              className="tw:mb-4 tw:inline-flex tw:items-center tw:gap-2 tw:text-[#8F07E7] tw:text-[12px] tw:tracking-widest tw:uppercase"
+              className="tw:mb-4 tw:inline-flex tw:items-center tw:gap-2 tw:text-primary tw:text-[12px] tw:tracking-widest tw:uppercase"
               variants={textVariants}
               custom={0}
             >
@@ -92,10 +92,10 @@ export default function AutomationSection({
             >
               <Link
                 to={ctaTo}
-                className="tw:group tw:inline-flex tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:py-3 tw:border tw:border-[#8F07E7]/30 tw:text-[#8F07E7] tw:font-semibold tw:shadow-lg tw:hover:shadow-xl tw:transition"
+                className="tw:group tw:inline-flex tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:py-3 tw:border tw:border-primary/20 tw:text-primary tw:font-semibold tw:shadow-lg tw:hover:shadow-xl tw:transition"
               >
                 {ctaLabel}
-                <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[linear-gradient(135deg,#8F07E7,#C115B5)] tw:text-white">
+                <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[linear-gradient(135deg,#111111,#2b2b2b)] tw:text-white">
                   <ArrowRight size={18} />
                 </span>
               </Link>
@@ -113,7 +113,7 @@ export default function AutomationSection({
             {/* floating glow card */}
             <motion.div
               aria-hidden
-              className="tw:absolute -tw:inset-3 tw:rounded-3xl tw:bg-linear-to-br tw:from-[#8F07E7]/20 tw:to-[#C115B5]/10 tw:blur-2xl"
+              className="tw:absolute -tw:inset-3 tw:rounded-3xl tw:bg-linear-to-br tw:from-primary/15 tw:to-primarySecond/10 tw:blur-2xl"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}

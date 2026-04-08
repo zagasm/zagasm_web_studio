@@ -55,7 +55,7 @@ export default function ThreeStepSection({
         aria-hidden
         className="tw:pointer-events-none tw:absolute tw:inset-0"
       >
-        <div className="tw:absolute tw:left-[-12%] tw:top-6 tw:h-[420px] tw:w-[420px] tw:rounded-full tw:blur-[100px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(143,7,231,0.20),transparent_70%)]" />
+        <div className="tw:absolute tw:left-[-12%] tw:top-6 tw:h-[420px] tw:w-[420px] tw:rounded-full tw:blur-[100px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(17,17,17,0.16),transparent_70%)]" />
         <div className="tw:absolute tw:right-[-10%] tw:bottom-0 tw:h-[520px] tw:w-[520px] tw:rounded-full tw:blur-[120px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(193,21,181,0.16),transparent_70%)]" />
       </div>
 
@@ -83,7 +83,7 @@ export default function ThreeStepSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="tw:text-sm tw:tracking-widest tw:uppercase tw:text-[#8F07E7]"
+            className="tw:text-sm tw:tracking-widest tw:uppercase tw:text-primary"
           >
             Three steps to go live
           </motion.h3>
@@ -125,7 +125,7 @@ export default function ThreeStepSection({
                           duration: isActive ? stepDuration : 0.2,
                           ease: "easeInOut",
                         }}
-                        className="tw:h-full tw:bg-[#8F07E7]"
+                        className="tw:h-full tw:bg-primary"
                       />
                     </div>
                   </div>

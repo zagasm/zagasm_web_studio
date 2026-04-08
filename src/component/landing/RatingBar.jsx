@@ -26,7 +26,7 @@ export default function RatingBar() {
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.4 }}
     >
-      <div className="tw:flex tw:items-center tw:gap-1 tw:text-[#8F07E7]">
+      <div className="tw:flex tw:items-center tw:gap-1 tw:text-primary">
         {[...Array(5)].map((_, i) => (
           <motion.span
             key={i}

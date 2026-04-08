@@ -119,7 +119,7 @@ export default function Nav() {
               ) : (
                 <Link
                   to="/auth/signin"
-                  className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-3xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(143,7,231,0.45)] tw:hover:opacity-95 tw:transition"
+                  className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-3xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(0,0,0,0.3)] tw:hover:opacity-95 tw:transition"
                 >
                   Sign in
                 </Link>
@@ -214,7 +214,7 @@ export default function Nav() {
                 <Link
                   to="/auth/signin"
                   onClick={closeMenu}
-                  className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(143,7,231,0.45)]"
+                  className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(0,0,0,0.3)]"
                 >
                   Sign in
                 </Link>

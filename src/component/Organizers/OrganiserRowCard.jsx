@@ -23,7 +23,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
       onClick={() => navigate(`/profile/${org.id}`)}
       className="tw:flex tw:w-full tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-3 tw:shadow-sm tw:sm:gap-4 tw:sm:p-4"
     >
-      <div className="tw:relative tw:size-20 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-[#F4E6FD] tw:sm:h-[110px] tw:sm:w-[110px]">
+      <div className="tw:relative tw:size-20 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-lightPurple tw:sm:h-[110px] tw:sm:w-[110px]">
         {showImage ? (
           <img
             src={org.profileImage}
@@ -33,7 +33,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
           />
         ) : (
           <div className="tw:flex tw:h-full tw:w-full tw:items-center tw:justify-center">
-            <span className="tw:text-xl tw:font-semibold tw:text-[#500481] tw:sm:text-2xl">
+            <span className="tw:text-xl tw:font-semibold tw:text-primary tw:sm:text-2xl">
               {initials}
             </span>
           </div>
