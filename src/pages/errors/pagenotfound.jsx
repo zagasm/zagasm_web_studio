@@ -14,7 +14,7 @@ export function Error404() {
             //   style={}
             />
             <h1
-              style={{ color: "#8000FF" }}
+              style={{ color: "#111111" }}
               className=" display-3 font-weight-light"
             >
               Page not <span className="font-weight-bold">found</span>
@@ -28,7 +28,7 @@ export function Error404() {
             </p>
             <button
               onClick={() => navigate(-1)}
-              style={{ backgroundColor: "#8000FF", color: "white" }}
+              style={{ backgroundColor: "#111111", color: "white" }}
               className="btn  btn-lg"
             >
               Go Back

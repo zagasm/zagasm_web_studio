@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { Edit } from "react-feather";
 import { useAuth } from "../../auth/AuthContext";
 import "./eventTypeStyling.css";
 
@@ -74,7 +75,7 @@ function EventType() {
               >
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:flex tw:items-center tw:gap-3 tw:flex-1">
-                    <div className="tw:h-10 tw:w-10 tw:rounded-full tw:bg-[#F4E6FD]" />
+                    <div className="tw:h-10 tw:w-10 tw:rounded-full tw:bg-lightPurple" />
                     <div className="tw:flex-1">
                       <div className="tw:h-4 tw:w-24 tw:rounded-full tw:bg-gray-200" />
                       <div className="tw:mt-2 tw:h-3 tw:w-full tw:max-w-[150px] tw:rounded-full tw:bg-gray-100" />
@@ -102,7 +103,15 @@ function EventType() {
   if (shouldShowBecomeOrganiser) {
     return (
       <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:md:pt-24 tw:px-4 tw:lg:px-4">
-        <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+        <div className="tw:relative tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+          <button
+            type="button"
+            onClick={() => navigate("/profile/edit-profile")}
+            aria-label="Edit profile"
+            className="tw:absolute tw:right-4 tw:top-4 tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-md tw:hover:bg-slate-50 tw:transition"
+          >
+            <Edit size={18} />
+          </button>
           <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
             <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
               <img
@@ -138,7 +147,7 @@ function EventType() {
           <span className="tw:block tw:text-xs">{user?.about}</span>
         </div>
 
-        <div className="tw:bg-linear-to-r tw:from-[#8F07E7] tw:via-[#9105B4] tw:to-[#500481] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
+        <div className="tw:bg-linear-to-r tw:from-[#111111] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
           <span className="tw:block tw:font-semibold tw:uppercase tw:text-xl">
             Do you have an event?
           </span>
@@ -280,11 +289,11 @@ function EventType() {
                 key={event.id}
                 type="button"
                 onClick={() => navigate(`/event/create-event/${event.id}`)}
-                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-[#8F07E7] tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3"
+                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-primary tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3"
               >
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:flex tw:items-center tw:gap-3">
-                    <div className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F4E6FD] tw:text-[#ffffff] tw:text-sm tw:font-semibold">
+                    <div className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-primary tw:text-sm tw:font-semibold">
                       {/* {event.name?.[0]?.toUpperCase()} */}
                       <img src={event.icon_url} alt="" />
                     </div>
@@ -298,7 +307,7 @@ function EventType() {
                     </div>
                   </div>
 
-                  <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F5F5F7] tw:text-xs tw:text-gray-500 group-tw:hover:bg-[#8F07E7] group-tw:hover:text-white tw:transition tw:duration-200">
+                  <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F5F5F7] tw:text-xs tw:text-gray-500 group-tw:hover:bg-primary group-tw:hover:text-white tw:transition tw:duration-200">
                     →
                   </span>
                 </div>

@@ -19,7 +19,7 @@ const walletItems = [
   {
     icon: PlusCircle,
     label: "Fund Wallet",
-    description: "Add funds to your Zagasm wallet.",
+    description: "Add funds to your Xilolo wallet.",
     to: "/account/fund-wallet",
   },
   {

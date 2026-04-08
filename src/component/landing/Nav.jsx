@@ -22,11 +22,11 @@ export default function Nav() {
   const initials =
     displayName && typeof displayName === "string"
       ? displayName
-          .split(" ")
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((n) => n[0]?.toUpperCase())
-          .join("")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0]?.toUpperCase())
+        .join("")
       : "U";
 
   const navLinks = [
@@ -61,7 +61,7 @@ export default function Nav() {
           >
             <motion.img
               src="/images/logo.png"
-              alt="Zagasm Studios"
+              alt="Xilolo"
               className="tw:w-16 tw:md:w-28 tw:rounded-sm"
               initial={{ rotate: -6, scale: 0.9, opacity: 0 }}
               animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -119,7 +119,7 @@ export default function Nav() {
               ) : (
                 <Link
                   to="/auth/signin"
-                  className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-3xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(143,7,231,0.45)] tw:hover:opacity-95 tw:transition"
+                  className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-3xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(0,0,0,0.3)] tw:hover:opacity-95 tw:transition"
                 >
                   Sign in
                 </Link>
@@ -170,10 +170,9 @@ export default function Nav() {
                   to={item.to}
                   onClick={closeMenu}
                   className={({ isActive }) =>
-                    `tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:px-3 tw:py-2 ${
-                      isActive
-                        ? "tw:bg-primary/10 tw:text-primary"
-                        : "tw:text-slate-800 tw:hover:bg-slate-100/70"
+                    `tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:px-3 tw:py-2 ${isActive
+                      ? "tw:bg-primary/10 tw:text-primary"
+                      : "tw:text-slate-800 tw:hover:bg-slate-100/70"
                     }`
                   }
                 >
@@ -215,7 +214,7 @@ export default function Nav() {
                 <Link
                   to="/auth/signin"
                   onClick={closeMenu}
-                  className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(143,7,231,0.45)]"
+                  className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium text-white tw:shadow-[0_14px_40px_rgba(0,0,0,0.3)]"
                 >
                   Sign in
                 </Link>

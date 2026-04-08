@@ -133,7 +133,7 @@
 }
 
 .event_view_container .event_detail_footer {
-    background: rgba(244, 230, 253, 1);
+    background: rgba(236, 228, 218, 1);
     display: flex;
     justify-content: space-between;
     border-radius: 10px;
@@ -178,7 +178,7 @@
 
 .spinner {
   border: 4px solid rgba(0,0,0,0.1);
-  border-top: 4px solid #8f07e7;
+  border-top: 4px solid #111111;
   border-radius: 50%;
   width: 32px;
   height: 32px;

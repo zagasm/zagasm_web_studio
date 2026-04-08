@@ -22,7 +22,7 @@ export default function AboutHeroSection() {
         variants={fadeUp}
       >
         <span className="tw:block tw:text-[10px] tw:md:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-primary tw:mb-3">
-          About Zagasm Studios
+          About Xilolo
         </span>
 
         <span className="tw:font-dela tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-4">
@@ -34,7 +34,7 @@ export default function AboutHeroSection() {
         </span>
 
         <span className="tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-xl">
-          Zagasm Studios is a home for live events that feel premium. Host
+          Xilolo is a home for live events that feel premium. Host
           shows, sell tickets, and build a real audience that keeps coming back.
         </span>
       </motion.div>

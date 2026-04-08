@@ -31,12 +31,12 @@ export default function RequestFormCard() {
   };
 
   return (
-    <div className="tw:border tw:border-gray-200 tw:rounded-2xl tw:p-5 tw:mb-12 tw:bg-[#F4E6FD]/30">
+    <div className="tw:border tw:border-gray-200 tw:rounded-2xl tw:p-5 tw:mb-12 tw:bg-lightPurple/35">
       <span className="tw:text-lg tw:sm:text-2xl tw:font-semibold">
         Submit Your Data Request
       </span>
       <p className="tw:text-gray-600 tw:mt-2">
-        Enter your email and we’ll compile an export from all Zagasm modules
+        Enter your email and we’ll compile an export from all Xilolo modules
         (Live, Events, Creators, Wallet, chat) and send a secure download link.
       </p>
 

@@ -23,7 +23,7 @@ function Marketing() {
       {/* Hero Section */}
       <section className="hero fade-in">
         <div className="hero-content">
-          <h1>Zagasm Studios — Go Live. Sell Out. Grow.</h1>
+          <h1>Xilolo — Go Live. Sell Out. Grow.</h1>
           <p className="subheadline text-light">
             Host stunning live streams and ticketed events. Build your audience.
             Monetize your craft.
@@ -40,7 +40,7 @@ function Marketing() {
 
       {/* Section 1 */}
       <section className="section slide-up">
-        <h2>Why Creators Choose Zagasm Studios</h2>
+        <h2>Why Creators Choose Xilolo</h2>
         <ul>
           <li>
             All-in-One Platform: Go live, sell tickets, and engage fans — from a
@@ -84,7 +84,7 @@ function Marketing() {
         <h2>Built for Live Moments That Matter</h2>
         <p>
           Whether it’s a concert, masterclass, podcast, watch party, or worship
-          night, Zagasm Studios gives you broadcast-grade tools without the
+          night, Xilolo gives you broadcast-grade tools without the
           broadcast-grade headache.
         </p>
         <p>
@@ -122,7 +122,7 @@ function Marketing() {
 
       {/* Section 5 */}
       <section className="section slide-up">
-        <h2>What Makes Zagasm Studios Different?</h2>
+        <h2>What Makes Xilolo Different?</h2>
         <ul>
           <li>
             Creator-First Monetization: Paid tickets, tips, memberships, and
@@ -158,7 +158,7 @@ function Marketing() {
           unbelievably smooth.” – @StageCraft
         </blockquote>
         <p>
-          From indie artists to churches and brands, creators use Zagasm Studios
+          From indie artists to churches and brands, creators use Xilolo
           to host, monetize, and grow.
         </p>
         <p>

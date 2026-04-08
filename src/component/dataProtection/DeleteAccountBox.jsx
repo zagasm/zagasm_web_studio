@@ -13,7 +13,7 @@ export default function DeleteAccountBox() {
       </p>
       <p className="tw:mt-2 tw:text-amber-900/90">
         To proceed, visit your account settings or email{" "}
-        <span className="tw:font-medium">privacy@studios.zagasm.com</span>.
+        <span className="tw:font-medium">privacy@xilolo.com</span>.
       </p>
     </div>
   );

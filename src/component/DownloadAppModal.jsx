@@ -7,10 +7,10 @@ import { Download, X } from "lucide-react";
  */
 const DownloadAppModal = ({
   open,
-  onClose = () => {},
-  onAppStoreDownload = () => {},
-  onApkDownload = () => {},
-  onSkip = () => {},
+  onClose = () => { },
+  onAppStoreDownload = () => { },
+  onApkDownload = () => { },
+  onSkip = () => { },
   apkCtaText = "Get it on Google Play",
 }) => {
   return (
@@ -39,17 +39,17 @@ const DownloadAppModal = ({
               leaveFrom="tw:opacity-100 tw:scale-100 tw:translate-y-0"
               leaveTo="tw:opacity-0 tw:scale-95 tw:translate-y-2"
             >
-              <Dialog.Panel className="tw:relative tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-3xl tw:bg-white/90 tw:shadow-2xl tw:ring-1 tw:ring-purple-100 tw:backdrop-blur">
-                <div className="tw:absolute tw:inset-0 tw:z-0 tw:opacity-80 tw:bg-[radial-gradient(circle_at_15%_20%,#f4e8ff_0,transparent_32%),radial-gradient(circle_at_85%_15%,#ffe3f3_0,transparent_28%),radial-gradient(circle_at_50%_100%,#e2d7ff_0,transparent_38%)]" />
+              <Dialog.Panel className="tw:relative tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-3xl tw:bg-white/90 tw:shadow-2xl tw:ring-1 tw:ring-[#ddd4ca] tw:backdrop-blur">
+                <div className="tw:absolute tw:inset-0 tw:z-0 tw:opacity-80 tw:bg-[radial-gradient(circle_at_15%_20%,#f1ebe4_0,transparent_32%),radial-gradient(circle_at_85%_15%,#f7f2eb_0,transparent_28%),radial-gradient(circle_at_50%_100%,#e5ddd3_0,transparent_38%)]" />
                 <div className="tw:relative tw:z-10 tw:p-6">
                   <div className="tw:flex tw:items-start tw:justify-between">
                     <span className="tw:text-xl tw:md:text-2xl tw:font-bold tw:text-gray-900">
-                      Get the Zagasm Studios app
+                      Get the Xilolo app
                     </span>
                     <button
                       type="button"
                       onClick={onClose}
-                      className="tw:rounded-full tw:p-2 tw:text-gray-500 tw:transition tw:hover:bg-gray-100 tw:hover:text-gray-800 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-purple-200"
+                      className="tw:rounded-full tw:p-2 tw:text-gray-500 tw:transition tw:hover:bg-gray-100 tw:hover:text-gray-800 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
                     >
                       <X className="tw:size-5" />
                     </button>
@@ -65,7 +65,7 @@ const DownloadAppModal = ({
                       }}
                       type="button"
                       onClick={onAppStoreDownload}
-                      className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:bg-linear-to-r tw:from-[#bf07e5] tw:via-[#7c05ac] tw:to-[#490481] tw:px-5 tw:py-4 tw:text-white tw:shadow-xl tw:transition tw:hover:shadow-purple-200 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-purple-300"
+                      className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:via-primarySecond tw:to-[#3a3a3a] tw:px-5 tw:py-4 tw:text-white tw:shadow-xl tw:transition tw:hover:shadow-black/20 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#cfc4b8]"
                     >
                       <span className="tw:flex tw:items-center tw:gap-3">
                         <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-white/15 tw:ring-1 tw:ring-white/30">
@@ -93,10 +93,10 @@ const DownloadAppModal = ({
                       }}
                       type="button"
                       onClick={onApkDownload}
-                      className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-purple-100 tw:bg-white tw:px-5 tw:py-4 tw:text-gray-800 tw:shadow-lg tw:transition tw:hover:border-purple-200 tw:hover:shadow-purple-100 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-purple-200"
+                      className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-white tw:px-5 tw:py-4 tw:text-gray-800 tw:shadow-lg tw:transition tw:hover:border-[#cfc4b8] tw:hover:shadow-black/5 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
                     >
                       <span className="tw:flex tw:items-center tw:gap-3">
-                        <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-purple-50 tw:text-purple-600">
+                        <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-lightPurple tw:text-primary">
                           <img
                             src="/images/icons/ps.png"
                             alt="Google Play"
@@ -104,7 +104,7 @@ const DownloadAppModal = ({
                           />
                         </span>
                         <span className="tw:text-left">
-                          <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:text-purple-500">
+                          <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:text-[#5f5a55]">
                             Google Play
                           </span>
                           <span className="tw:block tw:text-sm tw:font-semibold">
@@ -120,7 +120,7 @@ const DownloadAppModal = ({
                     <button
                       type="button"
                       onClick={onSkip}
-                      className="tw:text-xs tw:font-semibold tw:text-purple-600 tw:underline tw:underline-offset-4 hover:tw:text-purple-700"
+                      className="tw:text-xs tw:font-semibold tw:text-primary tw:underline tw:underline-offset-4 hover:tw:text-primarySecond"
                     >
                       Skip, download later
                     </button>

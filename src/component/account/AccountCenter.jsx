@@ -195,7 +195,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                 <div className="tw:relative tw:flex tw:w-full tw:flex-col tw:gap-3">
                   <div>
                     <span className="tw:block tw:text-xs tw:font-semibold tw:md:text-sm">
-                      Zagasm Studios Verification Badge
+                      Xilolo Verification Badge
                     </span>
                     <span className="tw:mt-1 tw:block tw:text-xs tw:text-white/90 tw:md:text-sm">
                       Get the blue checkmark and unlock premium features.
@@ -237,17 +237,22 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
           ) : null}
         </section>
 
-          <section className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-3 tw:md:gap-4">
+        <section className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-3 tw:md:gap-4">
           <QuickActionCard
             iconComponent={PiBookmarkDuotone}
             label="View Saved Events"
             to="/event/saved-events"
           />
+          <QuickActionCard
+            iconComponent={PiWallet}
+            label="Wallet"
+            to="/account/wallet"
+          />
           {isOrganizer ? (
             <QuickActionCard
               iconComponent={PiMoney}
-              label="Payout"
-              to="/account/wallet"
+              label="Payouts"
+              to="/account/payouts"
             />
           ) : null}
           {securityItems.map((item) => (

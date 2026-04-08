@@ -8,16 +8,16 @@ export default function PrivacyPolicyPage() {
         <div className="tw:mb-6">
           <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-1 tw:text-[12px] tw:font-medium tw:text-primary">
             <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-primary" />
-            <span>Zagasm Studio App · Privacy</span>
+            <span>Xilolo App · Privacy</span>
           </div>
 
           <span className="tw:block tw:mt-4 tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900">
-            Privacy Policy for Zagasm Studio App
+            Privacy Policy for Xilolo App
           </span>
 
           <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:md:text-base tw:text-slate-600">
-            This Privacy Policy explains how Zagasm Inc. collects, uses, shares,
-            and protects your information when you use the Zagasm Studio App.
+            This Privacy Policy explains how Xilolo Inc. collects, uses, shares,
+            and protects your information when you use the Xilolo App.
           </p>
 
           <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:md:text-sm tw:text-slate-600">
@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
               Effective: <strong className="tw:ml-1">November 6, 2025</strong>
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
-              Company: <strong className="tw:ml-1">Zagasm Inc.</strong>
+              Company: <strong className="tw:ml-1">Xilolo Inc.</strong>
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
               Jurisdiction:
@@ -37,10 +37,10 @@ export default function PrivacyPolicyPage() {
           <div className="tw:mt-2 tw:text-xs tw:md:text-sm tw:text-slate-500">
             Contact:{" "}
             <a
-              href="mailto:support@studios.zagasm.com"
+              href="mailto:support@xilolo.com"
               className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
             >
-              support@studios.zagasm.com
+              support@xilolo.com
             </a>{" "}
             · Address:{" "}
             <span className="tw:font-medium">
@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
             <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:md:p-8 tw:border tw:border-slate-200 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
               <section className="tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700">
                 <p>
-                  Welcome to Zagasm Inc.&apos;s comprehensive Privacy Policy for
+                  Welcome to Xilolo Inc.&apos;s comprehensive Privacy Policy for
                   the Studio App. As a provider of creative tools designed to
                   empower content creators, filmmakers, and collaborative teams
                   worldwide, we are committed to upholding high standards of
@@ -68,11 +68,11 @@ export default function PrivacyPolicyPage() {
                 </p>
 
                 <p>
-                  This Privacy Policy applies exclusively to the Zagasm Studio
+                  This Privacy Policy applies exclusively to the Xilolo
                   App (&quot;Service&quot; or &quot;App&quot;), covering all
                   interactions including user registration, content creation,
                   collaboration features, monetization tools, and support
-                  services. Zagasm Inc., incorporated under the laws of the
+                  services. Xilolo Inc., incorporated under the laws of the
                   Federal Republic of Nigeria, operates from Asaba and adheres
                   to the Nigeria Data Protection Regulation (NDPR) 2019, as well
                   as international standards such as the General Data Protection
@@ -89,10 +89,10 @@ export default function PrivacyPolicyPage() {
                   For any inquiries, concerns, or to exercise your privacy
                   rights, you can contact our Data Protection Officer (DPO) at{" "}
                   <a
-                    href="mailto:support@studios.zagasm.com"
+                    href="mailto:support@xilolo.com"
                     className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
-                    support@studios.zagasm.com
+                    support@xilolo.com
                   </a>
                   . We aim to respond to valid requests within one month,
                   extendable in limited cases as permitted by law. This policy
@@ -111,7 +111,7 @@ export default function PrivacyPolicyPage() {
                   1. Information We Collect: A Detailed Overview
                 </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
-                  At Zagasm, data collection is purposeful and limited. We
+                  At Xilolo, data collection is purposeful and limited. We
                   collect information necessary to deliver core functionalities
                   such as video editing, live streaming, collaborative project
                   management, and secure monetization, while minimizing
@@ -689,10 +689,10 @@ export default function PrivacyPolicyPage() {
                 <p className="tw:mt-3 tw:text-xs tw:md:text-sm tw:text-slate-500">
                   To exercise your rights, contact us at{" "}
                   <a
-                    href="mailto:support@studios.zagasm.com"
+                    href="mailto:support@xilolo.com"
                     className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                   >
-                    support@studios.zagasm.com
+                    support@xilolo.com
                   </a>{" "}
                   or use the in-app privacy request tools. We may need to verify
                   your identity before acting on your request.
@@ -793,7 +793,7 @@ export default function PrivacyPolicyPage() {
                           Session / 1 year
                         </td>
                         <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
-                          Zagasm
+                          Xilolo
                         </td>
                       </tr>
                       <tr>
@@ -827,7 +827,7 @@ export default function PrivacyPolicyPage() {
                           1 year
                         </td>
                         <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
-                          Zagasm
+                          Xilolo
                         </td>
                       </tr>
                       <tr>
@@ -899,10 +899,10 @@ export default function PrivacyPolicyPage() {
                   <li>
                     <strong>Email:</strong>{" "}
                     <a
-                      href="mailto:support@studios.zagasm.com"
+                      href="mailto:support@xilolo.com"
                       className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
-                      support@studios.zagasm.com
+                      support@xilolo.com
                     </a>
                   </li>
                   <li>
@@ -1000,7 +1000,7 @@ export default function PrivacyPolicyPage() {
                 </span>
                 <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-50 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-slate-600 tw:border tw:border-slate-200">
                   <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
-                  Zagasm Studio · Privacy
+                  Xilolo · Privacy
                 </span>
               </div>
             </div>

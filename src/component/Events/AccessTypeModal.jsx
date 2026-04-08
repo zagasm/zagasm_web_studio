@@ -154,8 +154,7 @@ export default function AccessTypeModal({ open, onClose, event, onConfirm }) {
 
                 <div className="tw:flex tw:items-center tw:justify-between tw:pt-2 tw:border-t tw:border-gray-100">
                   <div className="tw:text-[11px] tw:text-gray-500">
-                    You’ll be redirected to a secure checkout page to complete
-                    your payment.
+                    Your ticket will be purchased directly from your user wallet balance.
                   </div>
                 </div>
 
@@ -178,7 +177,7 @@ export default function AccessTypeModal({ open, onClose, event, onConfirm }) {
                         : "tw:bg-primary tw:hover:bg-primarySecond"
                     }`}
                   >
-                    {submitting ? "Processing…" : "Continue to payment"}
+                    {submitting ? "Processing…" : "Continue"}
                   </button>
                 </div>
               </Dialog.Panel>

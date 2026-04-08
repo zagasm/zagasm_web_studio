@@ -168,17 +168,17 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
     { icon: UserPen, label: "Edit profile", to: "/profile/edit-profile" },
   ];
   const wallet = [
+    { icon: Landmark, label: "Wallet", to: "/account/wallet" },
     { icon: Coins, label: "Crypto Wallet", to: "/account/crypto-wallet" },
-    {
-      icon: PlusCircle,
-      label: "Fund Wallet",
-      to: "/account/fund-wallet",
-    },
-    {
-      icon: Landmark,
-      label: "Payouts",
-      to: "/account/payouts",
-    },
+    ...(isOrganizer
+      ? [
+          {
+            icon: PlusCircle,
+            label: "Payouts",
+            to: "/account/payouts",
+          },
+        ]
+      : []),
   ];
 
   const support = [
@@ -264,13 +264,11 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
           <ItemCard key={index} {...item} />
         ))}
       </MenuSection>
-      {isOrganizer && (
-        <MenuSection title="Wallet">
-          {wallet.map((item, index) => (
-            <ItemCard key={index} {...item} />
-          ))}
-        </MenuSection>
-      )}
+      <MenuSection title="Wallet">
+        {wallet.map((item, index) => (
+          <ItemCard key={index} {...item} />
+        ))}
+      </MenuSection>
       <MenuSection title="Events">
         {events.map((item, index) => (
           <ItemCard key={index} {...item} />

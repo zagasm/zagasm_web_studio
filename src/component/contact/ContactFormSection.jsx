@@ -149,7 +149,7 @@ export default function ContactFormSection() {
                 style={{ borderRadius: 16 }}
                 type="submit"
                 disabled={submitting}
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white tw:shadow-[0_16px_50px_rgba(143,7,231,0.45)] tw:hover:opacity-95 tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white tw:shadow-[0_16px_50px_rgba(0,0,0,0.28)] tw:hover:opacity-95 tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
                 whileHover={{
                   scale: submitting ? 1 : 1.02,
                   y: submitting ? 0 : -1,
@@ -178,7 +178,7 @@ export default function ContactFormSection() {
           transition={{ duration: 0.55, ease: "easeOut", delay: 0.08 }}
         >
           <div className="tw:rounded-3xl tw:bg-slate-900 tw:text-white tw:p-5 tw:md:p-6 tw:shadow-[0_24px_60px_rgba(15,23,42,0.9)] tw:relative tw:overflow-hidden">
-            <div className="tw:absolute tw:inset-0 tw:bg-[radial-gradient(circle_at_top,rgba(193,21,181,0.5),transparent_55%),radial-gradient(circle_at_bottom,rgba(143,7,231,0.6),transparent_55%)] tw:opacity-80" />
+            <div className="tw:absolute tw:inset-0 tw:bg-[radial-gradient(circle_at_top,rgba(43,43,43,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(17,17,17,0.28),transparent_55%)] tw:opacity-80" />
             <div className="tw:relative">
               <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.2em] tw:text-white/70">
                 Studio contact
@@ -194,7 +194,7 @@ export default function ContactFormSection() {
                   <div>
                     <span className="tw:block tw:text-white/60">Email</span>
                     <span className="tw:block tw:text-white tw:font-medium">
-                      support@studios.zagasm.com
+                      support@xilolo.com
                     </span>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ export default function ContactFormSection() {
           {/* Small note card */}
           <div className="tw:rounded-3xl tw:bg-white tw:border tw:border-slate-200/80 tw:p-4 tw:text-[12px] tw:text-slate-600 tw:shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
             <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-slate-500 tw:mb-1">
-              Already using Zagasm Studios?
+              Already using Xilolo?
             </span>
             <span className="tw:block">
               For billing or show-day issues, use the in-app help section. This

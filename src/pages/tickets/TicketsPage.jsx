@@ -7,7 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { TicketIcon } from "lucide-react";
 import { normalizeTicketStatus } from "../../utils/ticketHelpers";
 
-const CACHE_KEY = "zagasm_tickets_cache_v1";
+const CACHE_KEY = "Xilolo_tickets_cache_v1";
 
 const TABS = [
   { key: "all", label: "All" },
@@ -36,7 +36,7 @@ function TicketsPage() {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed)) setTickets(parsed);
-      } catch (_) {}
+      } catch (_) { }
     }
     fetchTickets();
     // eslint-disable-next-line react-hooks/exhaustive-deps

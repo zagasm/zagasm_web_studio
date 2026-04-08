@@ -73,7 +73,7 @@ function mapEventForCard(rawEvent) {
       rawEvent?.organizer?.name ||
       rawEvent?.organiser?.name ||
       rawEvent?.user?.name ||
-      "Zagasm Studios",
+      "Xilolo",
     price_display:
       rawEvent?.price_display ||
       formatMoney(
@@ -102,9 +102,9 @@ function extractEventsPayload(payload) {
       hasMore: Boolean(pagination?.has_more),
       lastPage: Number(
         pagination?.last_page ??
-          (pagination?.has_more
-            ? Number(pagination?.current_page ?? 1) + 1
-            : 1),
+        (pagination?.has_more
+          ? Number(pagination?.current_page ?? 1) + 1
+          : 1),
       ),
     },
   };

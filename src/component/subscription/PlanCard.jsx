@@ -104,7 +104,7 @@ export default function PlanCard({
     level,
   ]);
 
-  const planAccent = color || "#8F07E7";
+  const planAccent = color || "#111111";
 
   return (
     <div className="tw:relative tw:group tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:flex tw:flex-col tw:gap-4 tw:shadow-[0_18px_45px_rgba(15,23,42,0.06)] tw:hover:border-primary/70 tw:hover:shadow-[0_20px_55px_rgba(15,23,42,0.12)] tw:transition-all tw:duration-300">
@@ -185,7 +185,7 @@ export default function PlanCard({
           type="button"
           onClick={onSubscribe}
           disabled={selecting}
-          className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-sm tw:font-medium tw:text-white tw:flex tw:items-center tw:justify-center tw:gap-2 tw:shadow-[0_16px_40px_rgba(143,7,231,0.35)] tw:hover:brightness-110 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
+          className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-sm tw:font-medium tw:text-white tw:flex tw:items-center tw:justify-center tw:gap-2 tw:shadow-[0_16px_40px_rgba(0,0,0,0.24)] tw:hover:brightness-110 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
         >
           {selecting ? (
             <>

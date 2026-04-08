@@ -151,7 +151,7 @@ export default function EventCard({
               e.stopPropagation();
               navigate(`/event/edit/${event.id}`);
             }}
-            className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-gray-500 tw:shadow-md hover:tw:bg-[#F4E6FD] hover:tw:text-primary tw:transition"
+            className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-gray-500 tw:shadow-md hover:tw:bg-lightPurple hover:tw:text-primary tw:transition"
             aria-label="Edit event"
             title="Edit"
           >

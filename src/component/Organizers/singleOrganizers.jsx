@@ -201,7 +201,7 @@ export default function SingleOrganizers() {
                                             <span className='mr-1' style={{ color: 'rgba(143, 7, 231, 1)' }}>@</span>
                                             {organizer.totalEventsCreated || 0} events
                                         </div>
-                                        <div className="organizers_views border-rounded" style={{ background: 'rgba(244, 230, 253, 1)', borderRadius: '8px' }}>
+                                        <div className="organizers_views border-rounded" style={{ background: 'rgba(236, 228, 218, 1)', borderRadius: '8px' }}>
                                             <div className="d-flex align-items-center mb-3 job-item-body">
                                                 <div className="overlap-rounded-circle">
                                                     {[1, 2, 3, 4, 5].map((_, index) => (

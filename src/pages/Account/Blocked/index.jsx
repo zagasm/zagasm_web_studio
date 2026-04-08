@@ -7,7 +7,7 @@ import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { useAuth } from "../../auth/AuthContext";
 
-const CACHE_KEY = "zagasm_blocked_users";
+const CACHE_KEY = "Xilolo_blocked_users";
 
 function BlockedUsersPage() {
   const navigate = useNavigate();
@@ -243,12 +243,12 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
 
   const initials = name
     ? name
-        .split(" ")
-        .filter(Boolean)
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "?";
 
   const followersLabel = formatFollowers(followers_count);

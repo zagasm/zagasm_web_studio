@@ -226,7 +226,7 @@ const PostSignupForm = () => {
             whileHover={isFormValid ? { scale: 1.02 } : {}}
             className="submit-btn"
             style={{
-              backgroundColor: isFormValid ? "#8f07e7" : "#e6e6e6",
+              backgroundColor: isFormValid ? "#111111" : "#e6e6e6",
               color: isFormValid ? "#fff" : "#999",
               cursor: isFormValid ? "pointer" : "not-allowed",
               marginTop: "20px",

@@ -8,7 +8,7 @@ export default function HeroBanner() {
           Your Data, Your Rights
         </h1>
         <span className="tw:mt-3 tw:max-w-3xl tw:text-white/90">
-          At <span className="tw:font-medium">Zagasm Studios</span>, we power
+          At <span className="tw:font-medium">Xilolo</span>, we power
           creator-first experiences — LIVE streams, events, chat and payouts —
           while keeping your personal data protected. You can access, download,
           move or delete your information whenever you need.

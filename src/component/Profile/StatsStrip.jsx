@@ -12,7 +12,7 @@ export default function StatsStrip({ user }) {
           key={t.label}
           className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:p-4 tw:text-center"
         >
-          <div className="tw:text-purple-600 tw:text-2xl">{t.icon}</div>
+          <div className="tw:text-primary tw:text-2xl">{t.icon}</div>
           <div className="tw:mt-1 tw:text-2xl tw:font-semibold">{t.value}</div>
           <div className="tw:text-sm tw:text-gray-600">{t.label}</div>
         </div>

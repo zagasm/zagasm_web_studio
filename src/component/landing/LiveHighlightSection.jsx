@@ -20,7 +20,7 @@ const features = [
     title: "Sell tickets, get paid",
     badge: "Built-in ticketing",
     description:
-      "Create paid events, set your price, and earn from your audience directly on Zagasm.",
+      "Create paid events, set your price, and earn from your audience directly on Xilolo.",
   },
   {
     title: "Interactive by design",
@@ -69,11 +69,11 @@ export default function LiveHighlightsSection() {
             Live streaming, reimagined
           </span>
           <span className="tw:font-dela tw:block tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-semibold text-white tw:tracking-tight">
-            Make every LIVE moment
-            <span className="tw:text-primary"> unforgettable.</span>
+            Make every <span className="tw:text-red-600">LIVE </span> moment
+            unforgettable
           </span>
           <span className="tw:max-w-2xl tw:mx-auto tw:text-sm tw:md:text-base text-white">
-            Zagasm Studios gives creators and brands everything they need to
+            Xilolo gives creators and brands everything they need to
             host cinematic live shows, connect with fans, and grow real-time
             communities.
           </span>

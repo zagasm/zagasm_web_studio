@@ -6,7 +6,7 @@ export default function StartStreamAppDownloadModal({
   open,
   onClose,
   title = "Start Event Stream on mobile",
-  description = "To start streaming this event on mobile, download the Zagasm Studios app from your preferred app store.",
+  description = "To start streaming this event on mobile, download the Xilolo app from your preferred app store.",
   dismissLabel = "I’ll do this later",
 }) {
   return (

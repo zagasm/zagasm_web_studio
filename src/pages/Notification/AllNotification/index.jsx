@@ -151,16 +151,16 @@ function AllNotification() {
   return (
     <div className="tw:font-sans tw:mt-20 tw:bg-slate-50 tw:min-h-screen tw:px-4 tw:py-10 tw:sm:px-6 tw:md:px-8">
       <div className="tw:mx-auto tw:flex tw:max-w-6xl tw:flex-col tw:gap-8">
-        <section className="tw:rounded-[28px] tw:bg-linear-to-br tw:from-white tw:to-purple-50 tw:p-6 tw:shadow-[0_25px_45px_rgba(15,23,42,0.15)] tw:space-y-4">
+        <section className="tw:rounded-[28px] tw:bg-linear-to-br tw:from-white tw:to-[#f3ede6] tw:p-6 tw:shadow-[0_25px_45px_rgba(15,23,42,0.15)] tw:space-y-4">
           <div className="tw:text-slate-700">
-            <span className="tw:text-xs tw:font-bold tw:uppercase tw:tracking-[0.4em] tw:text-purple-700">
+            <span className="tw:text-xs tw:font-bold tw:uppercase tw:tracking-[0.4em] tw:text-primary">
               Activity center
             </span>
             <h1 className="tw:mt-3 tw:text-3xl tw:font-semibold tw:text-slate-900">
               Notifications
             </h1>
             <span className="tw:mt-1 tw:max-w-3xl tw:text-sm tw:text-slate-600">
-              Keep up with everything happening on Zagasm Studios—reads,
+              Keep up with everything happening on Xilolo—reads,
               follows, and community updates live in one place.
             </span>
           </div>
@@ -203,8 +203,8 @@ function AllNotification() {
               type="button"
               onClick={() => setFilter("all")}
               className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${filter === "all"
-                  ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
-                  : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
+                ? "tw:border-transparent tw:bg-primary tw:text-white"
+                : "tw:border-[#ddd4ca] tw:bg-white tw:text-primary"
                 }`}
             >
               All updates
@@ -216,13 +216,13 @@ function AllNotification() {
               type="button"
               onClick={() => setFilter("unread")}
               className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${filter === "unread"
-                  ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
-                  : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
+                ? "tw:border-transparent tw:bg-primary tw:text-white"
+                : "tw:border-[#ddd4ca] tw:bg-white tw:text-primary"
                 }`}
             >
               Unread only
               {unreadCount > 0 && (
-                <span className="tw:ml-3 tw:inline-flex tw:h-2 tw:w-2 tw:rounded-full tw:bg-purple-500" />
+                <span className="tw:ml-3 tw:inline-flex tw:h-2 tw:w-2 tw:rounded-full tw:bg-primary" />
               )}
             </button>
           </div>

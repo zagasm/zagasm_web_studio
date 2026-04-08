@@ -237,7 +237,7 @@ export function Signin() {
   return (
     <AuthContainer
       title="Login account"
-      description="Continue to explore Zagasm Studio"
+      description="Continue to explore Xilolo"
       footer={true}
       header={true}
       privacy={true}
@@ -419,7 +419,7 @@ export function Signin() {
               </div>
               <button
                 style={{
-                  color: 'purple'
+                  color: '#111111'
                 }}
                 type="button"
                 className="btn btn-link p-0 text-decoration-none text-primary"

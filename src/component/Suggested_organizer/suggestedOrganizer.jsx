@@ -163,7 +163,7 @@ function SingleOrganizers() {
               <span className="ml-auto">
                 <button
                   type="button"
-                  style={{ background: organizer.following ? '#8F07E7' : '#EEDAFB', color: organizer.following ? 'white' : 'black' }}
+                  style={{ background: organizer.following ? '#111111' : '#ece4da', color: organizer.following ? 'white' : '#111111' }}
                   className="btn btn-sm d-flex align-items-center border-0"
                   onClick={() => toggleFollow(organizer.id)}
                   disabled={followLoading[organizer.id]}

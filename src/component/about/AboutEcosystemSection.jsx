@@ -30,7 +30,7 @@ export default function AboutEcosystemSection() {
         </span>
 
         <span className="tw:mt-2 tw:block tw:text-sm tw:md:text-[15px] tw:text-slate-600 tw:max-w-2xl">
-          Zagasm Studios is a platform for recurring
+          Xilolo is a platform for recurring
           events and serious creators. We built it for the way live shows
           actually run, with real audiences and real revenue.
         </span>
@@ -48,7 +48,7 @@ export default function AboutEcosystemSection() {
           custom={0.1}
         >
           <span className="tw:block">
-            Zagasm Studios is built for organisers who run shows regularly. Plan your
+            Xilolo is built for organisers who run shows regularly. Plan your
             calendar, manage performers, sell tickets, and pay out smoothly.
           </span>
 
@@ -97,7 +97,7 @@ export default function AboutEcosystemSection() {
               Built for creators everywhere.
             </span>
             <span className="tw:block tw:text-[11px] tw:text-white/80 tw:max-w-sm">
-              From small rooms to big stages, Zagasm Studios grows with your audience.
+              From small rooms to big stages, Xilolo grows with your audience.
             </span>
           </div>
         </motion.div>

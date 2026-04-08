@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
 import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
 
-const CACHE_KEY = "zagasm_followers_organisers";
+const CACHE_KEY = "xilolo_followers_organisers";
 
 function OrganiserFollowers() {
   const navigate = useNavigate();
@@ -55,8 +55,8 @@ function OrganiserFollowers() {
           typeof res?.data?.following === "boolean"
             ? res.data.following
             : typeof res?.data?.data?.following === "boolean"
-            ? res.data.data.following
-            : !org.isFollowing;
+              ? res.data.data.following
+              : !org.isFollowing;
 
         setOrganisers((prev) => {
           const updated = prev.map((item) =>
@@ -166,7 +166,7 @@ function OrganiserFollowers() {
         <div>
           <div className="tw:mb-4 tw:px-4">
             <span className="tw:text-center tw:block tw:mt-3 tw:px-5 tw:py-2 tw:rounded-full tw:bg-[#f0f0f0] tw:text-xs tw:text-gray-500 tw:shadow-sm">
-              These are organisers who follow your profile on Zagasm.
+              These are organisers who follow your profile on Xilolo.
             </span>
           </div>
 
@@ -191,7 +191,7 @@ function OrganiserCard({
   organiser,
   onToggleFollow,
   isToggling = false,
-  onCardClick = () => {},
+  onCardClick = () => { },
 }) {
   const {
     organiser: name,
@@ -216,7 +216,7 @@ function OrganiserCard({
       className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)] tw:cursor-pointer"
     >
       {/* Image / initials */}
-      <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-[#F4E6FD] tw:flex tw:items-center tw:justify-center">
+      <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center">
         {showImage ? (
           <img
             src={profileImage}
@@ -225,7 +225,7 @@ function OrganiserCard({
             loading="lazy"
           />
         ) : (
-          <span className="tw:text-[#500481] tw:text-2xl tw:font-semibold">
+          <span className="tw:text-primary tw:text-2xl tw:font-semibold">
             {initials}
           </span>
         )}

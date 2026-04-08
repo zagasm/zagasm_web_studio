@@ -96,9 +96,7 @@ export default function TicketPromptModal({
                     className="tw:w-full tw:rounded-[20px] tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 hover:brightness-90 tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
                     style={{ fontSize: 12, borderRadius: 16 }}
                   >
-                    {buying
-                      ? "Opening checkout…"
-                      : `Buy Ticket (${priceLabel})`}
+                    {buying ? "Buying ticket…" : `Buy Ticket (${priceLabel})`}
                   </button>
 
                   <button

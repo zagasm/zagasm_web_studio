@@ -22,8 +22,8 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
 
   const ring =
     position === 1
-      ? "tw:ring-4 tw:ring-purple-500"
-      : "tw:ring-4 tw:ring-purple-400";
+      ? "tw:ring-4 tw:ring-primary"
+      : "tw:ring-4 tw:ring-primary/60";
 
   const size =
     position === 1
@@ -53,7 +53,7 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
         )}
 
         <div
-          className={`${size} tw:flex tw:items-center tw:justify-center tw:rounded-full tw:overflow-hidden tw:bg-[#F4E6FD] ${ring}`}
+          className={`${size} tw:flex tw:items-center tw:justify-center tw:rounded-full tw:overflow-hidden tw:bg-lightPurple ${ring}`}
         >
           {showImage ? (
             <img
@@ -63,13 +63,13 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
               loading="lazy"
             />
           ) : (
-            <span className="tw:text-lg tw:font-semibold tw:text-[#500481] tw:sm:text-xl">
+            <span className="tw:text-lg tw:font-semibold tw:text-primary tw:sm:text-xl">
               {initials}
             </span>
           )}
         </div>
 
-        <div className="tw:absolute tw:-bottom-3 tw:left-1/2 tw:-translate-x-1/2 tw:rounded-full tw:bg-purple-600 tw:px-3 tw:py-1 tw:text-[10px] tw:font-semibold tw:text-white tw:sm:text-sm">
+        <div className="tw:absolute tw:-bottom-3 tw:left-1/2 tw:-translate-x-1/2 tw:rounded-full tw:bg-primary tw:px-3 tw:py-1 tw:text-[10px] tw:font-semibold tw:text-white tw:sm:text-sm">
           #{position}
         </div>
       </div>

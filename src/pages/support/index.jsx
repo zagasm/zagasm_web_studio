@@ -15,7 +15,7 @@ function Support() {
         "Make sure your internet connection is stable.",
         "Update the app to the latest version from your app store.",
         "If you use social login, confirm the correct account is selected.",
-        "If the problem persists, contact us at support@studios.zagasm.com.",
+        "If the problem persists, contact us at support@xilolo.com.",
       ],
     },
     {
@@ -89,7 +89,7 @@ function Support() {
       answer: [
         "Make sure you’re logged into the same account used for purchase.",
         "From the event page, tap Access Ticket to link your purchase.",
-        "If you still can’t join, contact support@studios.zagasm.com with your payment reference.",
+        "If you still can’t join, contact support@xilolo.com with your payment reference.",
       ],
     },
     {
@@ -113,9 +113,9 @@ function Support() {
   return (
     <div className="support-container">
       <div className="support-header">
-        <h1>Zagasm Studios Support</h1>
+        <h1>Xilolo Support</h1>
         <p>
-          🎉 Welcome to the Zagasm Studios Support Center 🎉 <br />
+          🎉 Welcome to the Xilolo Support Center 🎉 <br />
           We’re here to make sure your laughter never stops!
         </p>
       </div>
@@ -151,16 +151,16 @@ function Support() {
         <p>Still need help? We’d love to hear from you 💌</p>
         <ul>
           <li>
-            📧 Email: <a href="mailto:support@studios.zagasm.com">support@studios.zagasm.com</a>
+            📧 Email: <a href="mailto:support@xilolo.com">support@xilolo.com</a>
           </li>
           <li>
             🌐 Website:{" "}
             <a
-              href="https://www.studios.zagasm.com"
+              href="https://www.xilolo.com"
               target="_blank"
               rel="noreferrer"
             >
-              www.studios.zagasm.com
+              www.xilolo.com
             </a>
           </li>
           <li>
@@ -171,7 +171,7 @@ function Support() {
 
       <section className="guidelines-section">
         <h2>Community Guidelines</h2>
-        <p>To keep Zagasm fun for everyone, please avoid:</p>
+        <p>To keep Xilolo fun for everyone, please avoid:</p>
         <ul>
           <li>Posting hateful or harmful content.</li>
           <li>Sharing copyrighted memes without permission.</li>

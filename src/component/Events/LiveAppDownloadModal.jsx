@@ -51,7 +51,7 @@ export default function LiveAppDownloadModal({ open, onClose }) {
                   </span>
 
                   <Dialog.Description className="tw:text-sm tw:text-gray-600 tw:max-w-sm">
-                    To join this event LIVE right now, download the Zagasm
+                    To join this event LIVE right now, download the Xilolo
                     Studios app from your preferred app store.
                   </Dialog.Description>
 

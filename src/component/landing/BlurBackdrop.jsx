@@ -64,7 +64,7 @@ export default function BlurBackdrop() {
           x: glowX,
           y: glowY,
           background:
-            "radial-gradient(1200px 600px at 60% -10%, rgba(143,7,231,0.12), transparent 60%)",
+            "radial-gradient(1200px 600px at 60% -10%, rgba(17,17,17,0.1), transparent 60%)",
         }}
       />
     </div>

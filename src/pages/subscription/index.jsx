@@ -11,7 +11,7 @@ import PlansSkeleton from "../../component/subscription/PlansSkeleton";
 import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function SubscriptionsPage({}) {
+export default function SubscriptionsPage({ }) {
   const { token: authToken, user, refreshUser } = useAuth();
   const navigate = useNavigate();
 
@@ -142,7 +142,7 @@ export default function SubscriptionsPage({}) {
           <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary/5 tw:px-4 tw:py-1 tw:border tw:border-primary/15">
             <Sparkles className="tw:w-4 tw:h-4 tw:text-primary" />
             <span className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-primary">
-              Zagasm Studios • Subscriptions
+              Xilolo • Subscriptions
             </span>
           </div>
 

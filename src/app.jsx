@@ -53,6 +53,7 @@ import SearchPage from "./pages/Search/index.jsx";
 import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
 import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
 import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
+import DiditCallback from "./pages/Organizers/DiditCallback.jsx";
 import SubscriptionsPage from "./pages/subscription/index.jsx";
 import PrivacyPolicyPage from "./pages/privacy/index.jsx";
 import CommunityGuidelinesPage from "./pages/communityGuideline/index.jsx";
@@ -70,8 +71,11 @@ import EventEditPage from "./pages/event/EventEditPage.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
-import WalletHub from "./pages/Account/WalletHub.jsx";
 import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
+import WalletPage from "./features/wallet/pages/WalletPage.jsx";
+import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCallbackPage.jsx";
+import WalletFundingCancelPage from "./features/wallet/pages/WalletFundingCancelPage.jsx";
+import SharedEventPage from "./pages/event/SharedEventPage.jsx";
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
@@ -110,9 +114,9 @@ export function App() {
         meta: {
           title: "Discover Live Events & Tickets",
           description:
-            "Browse trending concerts, workshops, and immersive experiences on Zagasm Studios. Reserve tickets, follow organizers, and share moments.",
+            "Browse trending concerts, workshops, and immersive experiences on Xilolo. Reserve tickets, follow organizers, and share moments.",
           keywords:
-            "events, live performances, concerts, festivals, workshops, tickets, organizers, Zagasm Studios",
+            "events, live performances, concerts, festivals, workshops, tickets, organizers, Xilolo",
           image: "/images/hero-event.jpg",
         },
       },
@@ -121,9 +125,9 @@ export function App() {
         meta: {
           title: "Event Details & Tickets",
           description:
-            "See the latest event information, host profile, and secure your spot with fast checkout on Zagasm Studios.",
+            "See the latest event information, host profile, and secure your spot with fast checkout on Xilolo.",
           keywords:
-            "event details, buy tickets, event host, live stream, Zagasm Studios",
+            "event details, buy tickets, event host, live stream, Xilolo",
           image: "/images/event-tile.jpg",
           type: "article",
         },
@@ -131,11 +135,11 @@ export function App() {
       {
         matcher: /^\/event\/create-event\/.+$/,
         meta: {
-          title: "Create an Event on Zagasm Studios",
+          title: "Create an Event on Xilolo",
           description:
-            "Launch your own concert, workshop, or meetup with Zagasm Studios' intuitive event builder and ticketing tools.",
+            "Launch your own concert, workshop, or meetup with Xilolo' intuitive event builder and ticketing tools.",
           keywords:
-            "create event, ticketing, event hosting, Zagasm Studios, organizer tools",
+            "create event, ticketing, event hosting, Xilolo, organizer tools",
         },
       },
       {
@@ -143,8 +147,8 @@ export function App() {
         meta: {
           title: "Meet Top Organizers",
           description:
-            "Discover verified organizers, follow their upcoming experiences, and collaborate with the Zagasm community.",
-          keywords: "organizers, follow, streaming, community, Zagasm Studios",
+            "Discover verified organizers, follow their upcoming experiences, and collaborate with the Xilolo community.",
+          keywords: "organizers, follow, streaming, community, Xilolo",
         },
       },
       {
@@ -152,9 +156,9 @@ export function App() {
         meta: {
           title: "Your Profile & Wallet",
           description:
-            "Manage your profile, wallets, subscriptions, and saved events securely from your Zagasm account panel.",
+            "Manage your profile, wallets, subscriptions, and saved events securely from your Xilolo account panel.",
           keywords:
-            "profile, account, wallet, settings, subscriptions, Zagasm Studios",
+            "profile, account, wallet, settings, subscriptions, Xilolo",
         },
       },
       {
@@ -163,35 +167,35 @@ export function App() {
           title: "Tickets & Passes",
           description:
             "Access all your purchased tickets and upcoming experiences at a glance.",
-          keywords: "tickets, passes, QR code, events, Zagasm Studios",
+          keywords: "tickets, passes, QR code, events, Xilolo",
         },
       },
       {
         matcher: /^\/support/,
         meta: {
-          title: "Zagasm Support Center",
+          title: "Xilolo Support Center",
           description:
-            "Get help with tickets, organizers, and account questions from the Zagasm support team.",
-          keywords: "support, help, ticket assistance, Zagasm Studios",
+            "Get help with tickets, organizers, and account questions from the Xilolo support team.",
+          keywords: "support, help, ticket assistance, Xilolo",
         },
       },
       {
         matcher: /^\/landing/,
         meta: {
-          title: "Zagasm Studios",
+          title: "Xilolo",
           description:
-            "Plan, promote, and experience unforgettable events with Zagasm Studios's all-in-one platform.",
-          keywords: "landing, Zagasm Studios, events platform, social tickets",
+            "Plan, promote, and experience unforgettable events with Xilolo's all-in-one platform.",
+          keywords: "landing, Xilolo, events platform, social tickets",
         },
       },
       {
         matcher: /^\/signal-deck/,
         meta: {
-          title: "Zagasm Signal Deck",
+          title: "Xilolo Signal Deck",
           description:
-            "Download Zagasm Studios and follow every official channel from the Signal Deck.",
+            "Download Xilolo and follow every official channel from the Signal Deck.",
           keywords:
-            "Zagasm Studios, Signal Deck, app download, social links, community",
+            "Xilolo, Signal Deck, app download, social links, community",
           image: "/img/logo.png",
         },
       },
@@ -274,6 +278,10 @@ export function App() {
           <Route path="/marketing" element={<Marketing />} />
           <Route path="/data-protection" element={<DataProtectionPage />} />
         </Route>
+        <Route element={<MainLayout />}>
+          <Route path="/event/view/share/:slug" element={<EventShareRedirect />} />
+          <Route path="/events/:shareKey" element={<SharedEventPage />} />
+        </Route>
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -295,6 +303,7 @@ export function App() {
             <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
             <Route path="/become-an-organiser" element={<BecomeOrganiser />} />
+            <Route path="/kyc/didit/callback" element={<DiditCallback />} />
             <Route path="/profile" element={<Profile />}>
               <Route index exact path=":profileId" element={<ViewProfile />} />
               <Route path="edit-profile" element={<EditProfile />} />
@@ -302,11 +311,18 @@ export function App() {
             </Route>
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/payment/callback" element={<PaymentCallback />} />
+            <Route
+              path="/wallet/funding/callback"
+              element={<WalletFundingCallbackPage />}
+            />
+            <Route
+              path="/wallet/funding/cancel"
+              element={<WalletFundingCancelPage />}
+            />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/mentions" element={<TaggedMentionsPage />} />
 
             <Route path="/event" element={<Event />}>
-              <Route path="view/share/:slug" element={<EventShareRedirect />} />
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="stream/:eventId" element={<EventStreamControlPage />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
@@ -324,7 +340,7 @@ export function App() {
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
               <Route path="blocked" element={<BlockedUsersPage />} />
-              <Route path="wallet" element={<WalletHub />} />
+              <Route path="wallet" element={<WalletPage />} />
               <Route path="bank-accounts" element={<BankAccountsPage />} />
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
               <Route path="fund-wallet" element={<FundWalletPage />} />

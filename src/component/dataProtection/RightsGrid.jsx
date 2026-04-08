@@ -9,7 +9,7 @@ const cards = [
   {
     title: "Right to Rectification",
     desc: "Update inaccurate or incomplete information in your profile or account settings.",
-    tone: "tw:bg-purple-50",
+    tone: "tw:bg-lightPurple/60",
   },
   {
     title: "Right to Deletion",
@@ -38,7 +38,7 @@ const cards = [
   },
   {
     title: "Right to Lodge a Complaint",
-    desc: "Raise a complaint with Zagasm Studios and/or the relevant data protection authority if you believe your rights are infringed.",
+    desc: "Raise a complaint with Xilolo and/or the relevant data protection authority if you believe your rights are infringed.",
     tone: "tw:bg-indigo-50",
   },
 ];

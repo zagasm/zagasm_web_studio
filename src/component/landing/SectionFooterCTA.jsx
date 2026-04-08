@@ -42,7 +42,7 @@ export default function Footer() {
             <Link to="/" className="tw:inline-flex tw:items-center tw:gap-3">
               <img
                 src="/images/logo.png"
-                alt="Zagasm Studios"
+                alt="Xilolo"
                 className="tw:w-28 tw:rounded-sm"
               />
             </Link>
@@ -51,12 +51,12 @@ export default function Footer() {
             <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:gap-6">
               <div className="tw:space-y-1 tw:text-sm">
                 <div className="tw:flex tw:items-center tw:gap-2 text-dark">
-                  <Phone size={16} className="tw:text-[#8F07E7]" />
+                  <Phone size={16} className="tw:text-primary" />
                   <span>+234 802 379 7265</span>
                 </div>
                 <div className="tw:flex tw:items-center tw:gap-2 text-dark">
-                  <Mail size={16} className="tw:text-[#8F07E7]" />
-                  <span>support@studios.zagasm.com</span>
+                  <Mail size={16} className="tw:text-primary" />
+                  <span>support@xilolo.com</span>
                 </div>
                 <address className="tw:not-italic tw:text-gray-500 tw:mt-2">
                   16192 Coastal Highway Lewes,{" "}
@@ -90,7 +90,7 @@ export default function Footer() {
                     href={href}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.96 }}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:ring-1 tw:ring-gray-200 tw:hover:ring-[#8F07E7]/40 tw:transition"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:ring-1 tw:ring-gray-200 tw:hover:ring-primary/30 tw:transition"
                     aria-label="social link"
                   >
                     <Icon size={18} className="text-dark" />
@@ -115,7 +115,7 @@ export default function Footer() {
                   <li key={it.url}>
                     <a
                       href={it.url}
-                      className="tw:text-sm text-dark tw:hover:text-[#8F07E7] tw:transition"
+                      className="tw:text-sm text-dark tw:hover:text-primary tw:transition"
                     >
                       {it.label}
                     </a>
@@ -130,7 +130,7 @@ export default function Footer() {
             <div className="tw:h-px tw:flex-1 tw:bg-gray-200" />
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="tw:ml-4 tw:text-xs tw:font-medium text-dark tw:hover:text-[#8F07E7] tw:transition"
+              className="tw:ml-4 tw:text-xs tw:font-medium text-dark tw:hover:text-primary tw:transition"
             >
               Back to the top ↑
             </button>
@@ -159,7 +159,7 @@ function BottomCTA() {
           {/* Rounded top bar with gradient */}
           <Link
             to="/auth/signup"
-            className="tw:block tw:w-full tw:rounded-t-[28px] tw:bg-linear-to-r tw:from-[#8F07E7] tw:to-[#C115B5] tw:px-6 tw:py-6 tw:sm:py-7 tw:md:py-8 tw:text-center"
+            className="tw:block tw:w-full tw:rounded-t-[28px] tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-6 tw:py-6 tw:sm:py-7 tw:md:py-8 tw:text-center"
           >
             <div className="tw:relative tw:mx-auto tw:max-w-7xl tw:px-5">
               <motion.span

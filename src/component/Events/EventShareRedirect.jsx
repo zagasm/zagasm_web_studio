@@ -8,9 +8,7 @@ export default function EventShareRedirect() {
   useEffect(() => {
     if (!slug) return;
 
-    // Redirect to your main event details route
-    // ViewEvent will detect it's a slug and call the slug endpoint
-    navigate(`/event/view/${slug}`, { replace: true });
+    navigate(`/events/${slug}`, { replace: true });
   }, [slug, navigate]);
 
   return (

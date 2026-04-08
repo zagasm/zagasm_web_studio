@@ -229,7 +229,7 @@ function Header() {
 
         <div className="topbar stick">
           <div className="logo">
-            <img src={Pokilogo_light} style={{ width: "75%" }} alt="Zagasm Studios Logo" />
+            <img src={Pokilogo_light} style={{ width: "75%" }} alt="Xilolo Logo" />
           </div>
           <div className="top-area">
             <div className="main-menu">
@@ -261,7 +261,7 @@ function Header() {
               </form>
             </div>
             <div className="page-name">
-              <span>{ "people of knowledge and innovation"}</span>
+              <span>{"people of knowledge and innovation"}</span>
             </div>
             <ul className="setting-area float-left">
               <li>

@@ -70,7 +70,7 @@ function AccountNotification() {
                     Manage notifications
                   </span>
                   <span className="tw:block tw:text-sm tw:md:text-base tw:text-gray-500">
-                    Choose how you’d like Zagasm to reach you. Open each
+                    Choose how you’d like Xilolo to reach you. Open each
                     preference to fine-tune what you receive.
                   </span>
                 </div>
@@ -111,9 +111,8 @@ function AccountNotification() {
 
                         {/* Chevron */}
                         <svg
-                          className={`tw:w-4 tw:h-4 tw:text-gray-500 tw:transition-transform ${
-                            open.push ? "tw:rotate-180" : ""
-                          }`}
+                          className={`tw:w-4 tw:h-4 tw:text-gray-500 tw:transition-transform ${open.push ? "tw:rotate-180" : ""
+                            }`}
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -303,9 +302,8 @@ function AccountNotification() {
                           </label>
                         </div>
                         <svg
-                          className={`tw:w-4 tw:h-4 tw:text-gray-500 tw:transition-transform ${
-                            open.sms ? "tw:rotate-180" : ""
-                          }`}
+                          className={`tw:w-4 tw:h-4 tw:text-gray-500 tw:transition-transform ${open.sms ? "tw:rotate-180" : ""
+                            }`}
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -383,9 +381,8 @@ function AccountNotification() {
                           </label>
                         </div>
                         <svg
-                          className={`tw:w-4 tw:h-4 tw:text-gray-500 tw:transition-transform ${
-                            open.email ? "tw:rotate-180" : ""
-                          }`}
+                          className={`tw:w-4 tw:h-4 tw:text-gray-500 tw:transition-transform ${open.email ? "tw:rotate-180" : ""
+                            }`}
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -408,7 +405,7 @@ function AccountNotification() {
                             <span className="account_link tw:w-full">
                               <div className="tw:flex tw:flex-col">
                                 <span className="tw:text-sm tw:text-gray-900">
-                                  Zagasm newsletter
+                                  Xilolo newsletter
                                 </span>
                                 <span className="tw:text-[12px] tw:text-gray-400 tw:mt-0.5">
                                   Product updates, tips, and creator stories.

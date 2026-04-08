@@ -240,11 +240,7 @@ export function EventCard({
     (variant === "all" && event.status === "upcoming");
 
   const isEnded =
-    event?.status === "ended" ||
-    (startDate &&
-      startDate.getTime() < Date.now() &&
-      event?.status !== "live" &&
-      event?.status !== "paused");
+    event?.status === "ended" ;
 
   const ticketLabel = `Buy Ticket ${!hidePrice ? `(${priceText(event)})` : ''} `;
 

@@ -36,38 +36,35 @@ export default function Home() {
 
   return (
     <>
-      <SEO title="Discover Events - Zagasm Studios" />
+      <SEO title="Discover Events - Xilolo" />
 
       <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-24 tw:md:pt-24 tw:lg:px-4 tw:font-sans">
         {/* TABS */}
         <div className="tw:flex tw:gap-3 tw:mb-6 tw:ml-2">
           <button
             onClick={() => handleTabChange("all")}
-            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
-              activeTab === "all"
-                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "all"
+                ? "tw:bg-lightPurple tw:text-primary"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
-            }`}
+              }`}
           >
             All
           </button>
           <button
             onClick={() => handleTabChange("upcoming")}
-            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
-              activeTab === "upcoming"
-                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "upcoming"
+                ? "tw:bg-lightPurple tw:text-primary"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
-            }`}
+              }`}
           >
             Trending
           </button>
           <button
             onClick={() => handleTabChange("live")}
-            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${
-              activeTab === "live"
-                ? "tw:bg-[#EDE6FF] tw:text-[#8F07E7]"
+            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "live"
+                ? "tw:bg-lightPurple tw:text-primary"
                 : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
-            }`}
+              }`}
           >
             Live
           </button>
@@ -84,8 +81,8 @@ export default function Home() {
               activeTab === "live"
                 ? "/api/v1/events/view/live"
                 : activeTab === "all"
-                ? "/api/v1/events/all/get"
-                : "/api/v1/events"
+                  ? "/api/v1/events/all/get"
+                  : "/api/v1/events"
             }
             live={activeTab === "live"}
             upcoming={activeTab === "upcoming"}

@@ -14,11 +14,12 @@ import { useAuth } from "../auth/AuthContext";
 import MobileNav from "./MobileNav";
 import logo from "../../assets/zagasm_studio_logo.png";
 import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
+import WalletBalanceChip from "../../features/wallet/components/WalletBalanceChip";
 
 // src/component/Events/SingleEvent.jsx (Updated Navbar function)
 export default function Navbar() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const profileImage = user?.profileUrl;
   const hasImage = hasProfileImage(profileImage);
@@ -49,7 +50,7 @@ export default function Navbar() {
           {/* Logo */}
           <img
             src={"/images/logo.png"}
-            alt="Zagasm Logo"
+            alt="Xilolo Logo"
             className="tw:w-20 tw:md:w-24 tw:lg:w-28 tw:-ml-2 tw:md:-ml-3 tw:object-contain"
           />
         </Link>
@@ -67,17 +68,15 @@ export default function Navbar() {
                 className="tw:flex tw:flex-col tw:items-center tw:gap-0.5"
               >
                 <Icon
-                  className={`tw:size-5 ${
-                    active ? "tw:text-black" : "tw:text-gray-500"
-                  }`}
+                  className={`tw:size-5 ${active ? "tw:text-black" : "tw:text-gray-500"
+                    }`}
                   fill={active ? "black" : "none"}
                 />
                 <span
-                  className={`tw:text-[11px] ${
-                    active
+                  className={`tw:text-[11px] ${active
                       ? "tw:text-black tw:font-semibold"
                       : "tw:text-gray-500"
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </span>
@@ -92,6 +91,8 @@ export default function Navbar() {
           <Link to='/search'>
             <Search className="tw:size-5 tw:text-gray-700 tw:cursor-pointer" />
           </Link>
+
+          {isAuthenticated ? <WalletBalanceChip /> : null}
 
           {/* Bell + dot */}
           <Link to={"/notifications"} className="tw:relative tw:cursor-pointer">

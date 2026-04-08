@@ -10,7 +10,7 @@ import { showError } from "../../component/ui/toast";
 // Re-use your existing card + shimmer
 import { EventCard, EventShimmer } from "../../component/Events/SingleEvent";
 
-const RECENTS_KEY = "zagasm_search_recent_people";
+const RECENTS_KEY = "Xilolo_search_recent_people";
 
 function normalizeSearchResponse(raw) {
   if (!raw) return { people: [], events: [] };
@@ -379,7 +379,7 @@ export default function SearchPage() {
                   key={event.id}
                   event={event}
                   variant="all"
-                  onMore={() => {}}
+                  onMore={() => { }}
                 />
               ))}
             </div>
@@ -408,7 +408,7 @@ export default function SearchPage() {
                   key={event.id}
                   event={event}
                   variant="all"
-                  onMore={() => {}}
+                  onMore={() => { }}
                 />
               ))}
             </div>

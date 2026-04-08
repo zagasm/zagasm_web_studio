@@ -9,19 +9,26 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
-  --color-primary: #8f07e7;
-  --color-lightPurple: #f4e6fd;
-  --color-primarySecond: #c115b5;
+  --color-white: #f7f2eb;
+  --color-primary: #111111;
+  --color-lightPurple: #ece4da;
+  --color-primarySecond: #2b2b2b;
   --font-sans: "Montserrat", sans-serif;
   --font-dela: "Dela Gothic One", sans-serif;
-  --font-cursive: "Just Another Hand", cursive;
+  --font-cursive: "Just Another Hand", cursive; 
 }
 :root {
   font-family: var(--font-sans);
+  background-color: var(--color-white);
 }
 
 html{
   font-family: var(--font-sans);
+  background-color: var(--color-white);
+}
+
+body {
+  background-color: var(--color-white);
 }
 
 .tw-no-scrollbar::-webkit-scrollbar {

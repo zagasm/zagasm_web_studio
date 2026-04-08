@@ -52,9 +52,8 @@ const AccountLeft = ({ user }) => {
         >
           <div className="tw:flex tw:items-center tw:gap-4">
             <div
-              className={`tw:h-12 tw:w-12 tw:rounded-full tw:overflow-hidden tw:flex tw:items-center tw:justify-center ${
-                showProfileImage ? "" : "tw:bg-lightPurple"
-              }`}
+              className={`tw:h-12 tw:w-12 tw:rounded-full tw:overflow-hidden tw:flex tw:items-center tw:justify-center ${showProfileImage ? "" : "tw:bg-lightPurple"
+                }`}
             >
               {showProfileImage ? (
                 <img
@@ -92,9 +91,8 @@ const AccountLeft = ({ user }) => {
         </Link>
         {!user.subscription?.isActive && (
           <div
-            className={`${
-              user.subscription?.isActive ? "tw:bg-blue-600" : "tw:bg-blue-700"
-            } tw:border tw:border-blue-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4`}
+            className={`${user.subscription?.isActive ? "tw:bg-blue-600" : "tw:bg-blue-700"
+              } tw:border tw:border-blue-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4`}
           >
             <div className="tw:flex tw:items-center tw:gap-3">
               <div className="tw:shrink-0">
@@ -134,7 +132,7 @@ const AccountLeft = ({ user }) => {
                 ) : (
                   <div>
                     <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">
-                      Zagasm Studios Verification Badge
+                      Xilolo Verification Badge
                     </span>
                     <br />
                     <span className="tw:text-[12px] tw:font-medium tw:text-white tw:leading-tight">

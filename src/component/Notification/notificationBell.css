@@ -37,7 +37,7 @@
 .notification-dropdown__mark-all {
   border: none;
   background: transparent;
-  color: #8f07e7;
+  color: #111111;
   font-weight: 600;
   cursor: pointer;
 }
@@ -90,7 +90,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #8f07e7;
+  background: #111111;
 }
 
 .notification-dropdown__item-body {
@@ -107,6 +107,6 @@
 }
 
 .notification-dropdown__footer a {
-  color: #8f07e7;
+  color: #111111;
   font-weight: 600;
 }

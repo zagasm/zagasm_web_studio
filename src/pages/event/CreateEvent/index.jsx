@@ -8,16 +8,16 @@ function CreateEvent() {
     const { eventTypeId } = useParams();
     return (
         <>
-            <SEO 
+            <SEO
                 title="Create Event - Host Your Next Amazing Event"
-                description="Create and manage your events with Zagasm Studios. Set up concerts, parties, festivals, conferences, and more with our easy-to-use event creation platform. Sell tickets and manage attendees."
-                keywords="zagasm studios, create event, host event, event management, sell tickets, event hosting, organize concert, plan party, festival management, event ticketing platform"
+                description="Create and manage your events with Xilolo. Set up concerts, parties, festivals, conferences, and more with our easy-to-use event creation platform. Sell tickets and manage attendees."
+                keywords="Xilolo, create event, host event, event management, sell tickets, event hosting, organize concert, plan party, festival management, event ticketing platform"
             />
             <div className="">
                 <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:md:pt-28 tw:lg:px-4">
                     <div className="">
                         <div className="col ">
-                             <EventCreationWizard eventTypeId={eventTypeId} />
+                            <EventCreationWizard eventTypeId={eventTypeId} />
                         </div>
                     </div>
                 </div>
