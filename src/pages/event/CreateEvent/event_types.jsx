@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { Edit } from "react-feather";
 import { useAuth } from "../../auth/AuthContext";
 import "./eventTypeStyling.css";
 
@@ -102,7 +103,15 @@ function EventType() {
   if (shouldShowBecomeOrganiser) {
     return (
       <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-20 tw:md:pt-24 tw:px-4 tw:lg:px-4">
-        <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+        <div className="tw:relative tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+          <button
+            type="button"
+            onClick={() => navigate("/profile/edit-profile")}
+            aria-label="Edit profile"
+            className="tw:absolute tw:right-4 tw:top-4 tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-md tw:hover:bg-slate-50 tw:transition"
+          >
+            <Edit size={18} />
+          </button>
           <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
             <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
               <img

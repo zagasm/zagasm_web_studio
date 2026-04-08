@@ -14,11 +14,12 @@ import { useAuth } from "../auth/AuthContext";
 import MobileNav from "./MobileNav";
 import logo from "../../assets/zagasm_studio_logo.png";
 import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
+import WalletBalanceChip from "../../features/wallet/components/WalletBalanceChip";
 
 // src/component/Events/SingleEvent.jsx (Updated Navbar function)
 export default function Navbar() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const profileImage = user?.profileUrl;
   const hasImage = hasProfileImage(profileImage);
@@ -92,6 +93,8 @@ export default function Navbar() {
           <Link to='/search'>
             <Search className="tw:size-5 tw:text-gray-700 tw:cursor-pointer" />
           </Link>
+
+          {isAuthenticated ? <WalletBalanceChip /> : null}
 
           {/* Bell + dot */}
           <Link to={"/notifications"} className="tw:relative tw:cursor-pointer">

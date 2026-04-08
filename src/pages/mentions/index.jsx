@@ -12,7 +12,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 const STATUS_TABS = [
   { id: "pending", label: "Pending" },
-  { id: "approved", label: "Accepted" }, // backend status = approved
+  { id: "approved", label: "Accepted" },
   { id: "rejected", label: "Rejected" },
 ];
 

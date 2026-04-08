@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import ReportModal from "../../../component/Events/ReportModal";
-import AccessTypeModal from "../../../component/Events/AccessTypeModal";
 import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
 import { formatEventDateTime } from "../../../utils/ui";
 import { useAuth } from "../../auth/AuthContext";
@@ -27,6 +27,22 @@ import {
 import EventShareModal from "../../../component/Events/EvenetShareModal";
 import TicketPromptModal from "../../../component/Events/TicketPromptModal";
 import Countdown from "react-countdown";
+import FundWalletModal from "../../../features/wallet/components/FundWalletModal";
+import TicketPurchaseSuccessModal from "../../../features/wallet/components/TicketPurchaseSuccessModal";
+import WalletFundingRequiredModal from "../../../features/wallet/components/WalletFundingRequiredModal";
+import { useEventShareFlow } from "../../../features/eventShare/hooks/useEventShareFlow";
+import { normalizeEventRecord } from "../../../features/eventShare/shareUtils";
+import { usePurchaseTicketWithWallet } from "../../../features/wallet/hooks/usePurchaseTicketWithWallet";
+import {
+  clearPendingPurchaseIntent,
+  setPendingPurchaseIntent,
+} from "../../../features/wallet/store/walletFlowSlice";
+import {
+  formatWalletMoney,
+  getApiErrorCode,
+  getApiErrorMessage,
+  getFundingRequiredDetails,
+} from "../../../features/wallet/walletUtils";
 
 export function CountdownPill({ target }) {
   if (!target) return null;
@@ -57,58 +73,6 @@ function isUuid(value = "") {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     String(value)
   );
-}
-
-function normalizeViewEvent(rawEvent) {
-  if (!rawEvent) return null;
-
-  const poster =
-    Array.isArray(rawEvent.poster) && rawEvent.poster.length > 0
-      ? rawEvent.poster
-      : rawEvent.icon_url
-        ? [{ type: "image", url: rawEvent.icon_url }]
-        : [];
-
-  return {
-    ...rawEvent,
-    poster,
-    status: String(rawEvent.status || "upcoming").toLowerCase(),
-    hostName:
-      rawEvent.hostName ||
-      rawEvent.userName ||
-      rawEvent.organizer_name ||
-      "Event Organizer",
-    organiserId:
-      rawEvent.organiserId ||
-      rawEvent.organizerId ||
-      rawEvent.hostId ||
-      rawEvent.user_id,
-    hostId:
-      rawEvent.hostId ||
-      rawEvent.organiserId ||
-      rawEvent.organizerId ||
-      rawEvent.user_id,
-    hostImage:
-      rawEvent.hostImage ||
-      rawEvent.host_image ||
-      rawEvent.organizer_image ||
-      rawEvent.user?.profileUrl ||
-      rawEvent.user?.profile_image_id ||
-      "",
-    eventType:
-      rawEvent.eventType ||
-      rawEvent.eventTypeFullDetails?.name ||
-      rawEvent.event_type ||
-      "Event",
-    hostHasActiveSubscription:
-      rawEvent.hostHasActiveSubscription ||
-      rawEvent.hostSubscription?.isActive ||
-      false,
-    is_saved: !!rawEvent.is_saved,
-    is_following_organizer: !!(
-      rawEvent.is_following_organizer || rawEvent.is_following
-    ),
-  };
 }
 
 function getTicketPromptStorageKey(eventIdentifier) {
@@ -159,22 +123,44 @@ function EventDetailShimmer() {
 
 export default function ViewEvent() {
   const { eventId } = useParams();
+  const location = useLocation();
+  const dispatch = useDispatch();
   const [event, setEvent] = useState(null);
   const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [shareOpen, setShareOpen] = useState(false);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [purchaseModalOpen, setPurchaseModalOpen] = useState(false);
+  const [purchaseSuccessOpen, setPurchaseSuccessOpen] = useState(false);
+  const [fundingRequiredOpen, setFundingRequiredOpen] = useState(false);
+  const [fundWalletOpen, setFundWalletOpen] = useState(false);
+  const [fundingRequiredDetails, setFundingRequiredDetails] = useState(null);
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
-  const [initiatingPayment, setInitiatingPayment] = useState(false);
   const navigate = useNavigate();
   const { token } = useAuth();
+  const shareFlow = useEventShareFlow();
   const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
-  const [accessModalOpen, setAccessModalOpen] = useState(false);
+
+  const purchaseTicketMutation = usePurchaseTicketWithWallet({
+    onSuccess: () => {
+      setEvent((previous) =>
+        previous
+          ? {
+              ...previous,
+              hasPaid: true,
+            }
+          : previous
+      );
+      setPurchaseSuccessOpen(true);
+      setPurchaseModalOpen(false);
+      setFundingRequiredOpen(false);
+      dispatch(clearPendingPurchaseIntent());
+      showSuccess("Ticket purchased successfully.");
+    },
+  });
 
   function initialsFromName(name = "") {
     const parts = String(name).trim().split(/\s+/).filter(Boolean);
@@ -218,7 +204,7 @@ export default function ViewEvent() {
           data?.data?.recommendations ||
           [];
 
-        setEvent(normalizeViewEvent(ev));
+        setEvent(normalizeEventRecord(ev));
         setRecs(recommendations);
         setIsSaved(!!ev?.is_saved);
         setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
@@ -266,45 +252,67 @@ export default function ViewEvent() {
 
   const posterUrl = useMemo(() => event?.poster?.[0]?.url, [event]);
 
-  const handleGetTicket = async (accessType = "main") => {
-    if (event?.is_sold_out) return;
+  const handleGetTicket = async () => {
+    if (event?.is_sold_out || purchaseTicketMutation.isPending) return;
 
     if (!token) {
       showError("Please log in to purchase a ticket.");
-      navigate("/login");
+      navigate("/auth/signin");
       return;
     }
 
     try {
-      setInitiatingPayment(true);
-      const res = await api.post(
-        `/api/v1/payments/${event.id}/initiate`,
-        { access_type: accessType },
-        authHeaders(token)
+      await purchaseTicketMutation.mutateAsync({
+        event_id: event.id,
+        quantity: 1,
+      });
+    } catch (paymentError) {
+      const errorCode = getApiErrorCode(paymentError);
+      const errorMessage = getApiErrorMessage(
+        paymentError,
+        "Failed to purchase ticket."
       );
 
-      const payload = res?.data || {};
-
-      if (payload.status === false && payload.message) {
-        showError(payload.message);
+      if (errorCode === "WALLET_FUNDING_REQUIRED") {
+        const details = getFundingRequiredDetails(paymentError);
+        setFundingRequiredDetails(details);
+        setFundingRequiredOpen(true);
+        setPurchaseModalOpen(false);
+        dispatch(
+          setPendingPurchaseIntent({
+            eventId: event.id,
+            eventTitle: event.title,
+            quantity: 1,
+            sourcePage: "event_detail",
+            eventPath: location.pathname,
+            deficitAmount: details?.deficit_amount || 0,
+            requiredAmount: details?.required_amount || 0,
+            walletBalance: details?.wallet_balance || 0,
+          })
+        );
         return;
       }
 
-      if (payload.url) {
-        showSuccess(`Preparing ticket for "${event?.title || "Event"}"...`);
-        window.location.href = payload.url;
-      } else {
-        showError("Payment initiation failed: no redirect URL received.");
+      if (errorCode === "EVENT_NOT_PURCHASABLE") {
+        showError(errorMessage || "This event is not available for purchase.");
+        return;
       }
-    } catch (paymentError) {
-      const errorMessage =
-        paymentError?.response?.data?.message ||
-        paymentError?.message ||
-        "Failed to initiate payment.";
+
+      if (errorCode === "TICKET_SOLD_OUT") {
+        setEvent((previous) =>
+          previous
+            ? {
+                ...previous,
+                is_sold_out: true,
+              }
+            : previous
+        );
+        showError(errorMessage || "This event is sold out.");
+        return;
+      }
+
       showError(errorMessage);
-      console.error("Payment initiation error:", paymentError);
-    } finally {
-      setInitiatingPayment(false);
+      console.error("Wallet purchase error:", paymentError);
     }
   };
 
@@ -358,11 +366,16 @@ export default function ViewEvent() {
     primaryCtaLabel = "Ticket Purchased";
   } else if (isSoldOut) {
     primaryCtaLabel = "Sold Out";
+  } else if (purchaseTicketMutation.isPending) {
+    primaryCtaLabel = "Processing...";
   } else {
     primaryCtaLabel = "Buy Ticket";
   }
 
-  const ctaDisabled = (!hasPaid && isSoldOut) || (hasPaid && !isLiveNow);
+  const ctaDisabled =
+    (!hasPaid && isSoldOut) ||
+    (hasPaid && !isLiveNow) ||
+    purchaseTicketMutation.isPending;
 
   const handleEnterLive = () => {
     if (hasPaid && isLiveNow) {
@@ -378,11 +391,7 @@ export default function ViewEvent() {
       return;
     }
 
-    if (isLiveNow && !event.hasBackstage && !event.combined_price) {
-      handleGetTicket("main");
-    } else {
-      setAccessModalOpen(true);
-    }
+    handleGetTicket();
   };
 
   if (loading) {
@@ -413,6 +422,10 @@ export default function ViewEvent() {
     (event.eventType?.toLowerCase() === "virtual"
       ? "Online event"
       : "Location to be announced");
+
+  const handleShareEvent = async () => {
+    await shareFlow.startShare({ eventId: event?.id });
+  };
 
   return (
     <>
@@ -502,7 +515,7 @@ export default function ViewEvent() {
 
             <button
               type="button"
-              onClick={() => setShareOpen(true)}
+              onClick={handleShareEvent}
               className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white tw:md:size-11"
               aria-label="Share event"
               style={{ borderRadius: "9999px" }}
@@ -886,27 +899,45 @@ export default function ViewEvent() {
         }}
       />
       <EventShareModal
-        open={shareOpen}
-        onClose={() => setShareOpen(false)}
-        eventId={event?.id}
-        token={token}
+        open={shareFlow.shareModalOpen}
+        onClose={shareFlow.closeShareModal}
+        payload={shareFlow.sharePayload}
+        loading={shareFlow.sharePayloadLoading}
+        error={shareFlow.sharePayloadError}
+        onRetry={shareFlow.retryShare}
+        onCopyLink={shareFlow.handleCopyLink}
+        onChannelClick={shareFlow.handleChannelShare}
         title="Share this event"
-      />
-      <AccessTypeModal
-        open={accessModalOpen}
-        onClose={() => setAccessModalOpen(false)}
-        event={event}
-        onConfirm={async (accessType) => {
-          await handleGetTicket(accessType);
-          setAccessModalOpen(false);
-        }}
       />
       <TicketPromptModal
         open={purchaseModalOpen}
         onClose={closePurchaseModal}
         event={event}
-        onBuy={() => handleGetTicket("main")}
-        buying={initiatingPayment}
+        onBuy={() => handleGetTicket()}
+        buying={purchaseTicketMutation.isPending}
+      />
+      <WalletFundingRequiredModal
+        open={fundingRequiredOpen}
+        onClose={() => setFundingRequiredOpen(false)}
+        details={fundingRequiredDetails}
+        formatAmount={(amount) =>
+          formatWalletMoney(amount, event?.currency?.code || "NGN")
+        }
+        onFundWallet={() => {
+          setFundingRequiredOpen(false);
+          setFundWalletOpen(true);
+        }}
+      />
+      <FundWalletModal
+        open={fundWalletOpen}
+        onClose={() => setFundWalletOpen(false)}
+        prefilledAmount={fundingRequiredDetails?.deficit_amount || ""}
+        source="ticket_purchase"
+      />
+      <TicketPurchaseSuccessModal
+        open={purchaseSuccessOpen}
+        onClose={() => setPurchaseSuccessOpen(false)}
+        eventTitle={event?.title}
       />
       <LiveAppDownloadModal
         open={downloadModalOpen}

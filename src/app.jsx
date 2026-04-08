@@ -53,6 +53,7 @@ import SearchPage from "./pages/Search/index.jsx";
 import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
 import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
 import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
+import DiditCallback from "./pages/Organizers/DiditCallback.jsx";
 import SubscriptionsPage from "./pages/subscription/index.jsx";
 import PrivacyPolicyPage from "./pages/privacy/index.jsx";
 import CommunityGuidelinesPage from "./pages/communityGuideline/index.jsx";
@@ -70,8 +71,11 @@ import EventEditPage from "./pages/event/EventEditPage.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
-import WalletHub from "./pages/Account/WalletHub.jsx";
 import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
+import WalletPage from "./features/wallet/pages/WalletPage.jsx";
+import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCallbackPage.jsx";
+import WalletFundingCancelPage from "./features/wallet/pages/WalletFundingCancelPage.jsx";
+import SharedEventPage from "./pages/event/SharedEventPage.jsx";
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
@@ -274,6 +278,10 @@ export function App() {
           <Route path="/marketing" element={<Marketing />} />
           <Route path="/data-protection" element={<DataProtectionPage />} />
         </Route>
+        <Route element={<MainLayout />}>
+          <Route path="/event/view/share/:slug" element={<EventShareRedirect />} />
+          <Route path="/events/:shareKey" element={<SharedEventPage />} />
+        </Route>
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -295,6 +303,7 @@ export function App() {
             <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
             <Route path="/become-an-organiser" element={<BecomeOrganiser />} />
+            <Route path="/kyc/didit/callback" element={<DiditCallback />} />
             <Route path="/profile" element={<Profile />}>
               <Route index exact path=":profileId" element={<ViewProfile />} />
               <Route path="edit-profile" element={<EditProfile />} />
@@ -302,11 +311,18 @@ export function App() {
             </Route>
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/payment/callback" element={<PaymentCallback />} />
+            <Route
+              path="/wallet/funding/callback"
+              element={<WalletFundingCallbackPage />}
+            />
+            <Route
+              path="/wallet/funding/cancel"
+              element={<WalletFundingCancelPage />}
+            />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/mentions" element={<TaggedMentionsPage />} />
 
             <Route path="/event" element={<Event />}>
-              <Route path="view/share/:slug" element={<EventShareRedirect />} />
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="stream/:eventId" element={<EventStreamControlPage />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
@@ -324,7 +340,7 @@ export function App() {
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
               <Route path="blocked" element={<BlockedUsersPage />} />
-              <Route path="wallet" element={<WalletHub />} />
+              <Route path="wallet" element={<WalletPage />} />
               <Route path="bank-accounts" element={<BankAccountsPage />} />
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
               <Route path="fund-wallet" element={<FundWalletPage />} />

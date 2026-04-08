@@ -243,11 +243,16 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
             label="View Saved Events"
             to="/event/saved-events"
           />
+          <QuickActionCard
+            iconComponent={PiWallet}
+            label="Wallet"
+            to="/account/wallet"
+          />
           {isOrganizer ? (
             <QuickActionCard
               iconComponent={PiMoney}
-              label="Payout"
-              to="/account/wallet"
+              label="Payouts"
+              to="/account/payouts"
             />
           ) : null}
           {securityItems.map((item) => (
