@@ -30,7 +30,7 @@ const socialLinks = [
   },
   {
     label: "YouTube",
-    handle: "Zagasm Studios",
+    handle: "Xilolo",
     url: "https://youtube.com/@zagasm_studios?si=zX-zad1XPLtF1tO4",
     icon: "fa-youtube",
   },
@@ -42,7 +42,7 @@ const socialLinks = [
   },
   {
     label: "Facebook",
-    handle: "Zagasm Studios",
+    handle: "Xilolo",
     url: "https://www.facebook.com/share/1AU5fGrEDw/?mibextid=wwXIfr",
     icon: "fa-facebook-f",
   },
@@ -86,11 +86,11 @@ export default function SignalDeck() {
           <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4">
             <img
               src="/img/log.png"
-              alt="Zagasm Studios logo"
+              alt="Xilolo logo"
               className="tw:h-14"
             />
             <span className="tw:text-sm tw:font-semibold tw:uppercase tw:tracking-[0.3em]">
-              Zagasm Studios
+              Xilolo
             </span>
           </div>
           <span className="tw:text-2xl tw:font-dela tw:text-[clamp(2.6rem,4vw,4rem)] tw:font-bold tw:text-[#3b165f]">

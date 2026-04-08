@@ -1,4 +1,4 @@
-export const BANKS_CACHE_KEY = "zagasm_banks_cache_v1";
+export const BANKS_CACHE_KEY = "Xilolo_banks_cache_v1";
 export const BANKS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 export const COUNTRIES_API_URL =
   "https://restcountries.com/v3.1/all?fields=name,cca2,flags";

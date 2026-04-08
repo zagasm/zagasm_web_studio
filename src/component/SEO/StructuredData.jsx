@@ -37,8 +37,8 @@ export const EventStructuredData = ({ event }) => {
     },
     "organizer": {
       "@type": "Organization",
-      "name": event.hostName || event.organizer || "Zagasm Studios",
-      "url": "https://studios.zagasm.com"
+      "name": event.hostName || event.organizer || "Xilolo",
+      "url": "https://xilolo.com"
     },
     "performer": event.performer ? {
       "@type": "PerformingGroup",
@@ -60,10 +60,10 @@ export const OrganizationStructuredData = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Zagasm Studios",
-    "url": "https://studios.zagasm.com",
-    "logo": "https://studios.zagasm.com/zagasm_studio_logo.png",
-    "description": "Zagasm Studios is the premier platform for discovering exciting events, connecting with top organizers, and creating unforgettable experiences.",
+    "name": "Xilolo",
+    "url": "https://xilolo.com",
+    "logo": "https://xilolo.com/zagasm_studio_logo.png",
+    "description": "Xilolo is the premier platform for discovering exciting events, connecting with top organizers, and creating unforgettable experiences.",
     "sameAs": [
       // Add your social media URLs here
       // "https://www.facebook.com/zagasmstudios",
@@ -74,7 +74,7 @@ export const OrganizationStructuredData = () => {
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "Customer Service",
-      "email": "support@studios.zagasm.com"
+      "email": "support@xilolo.com"
     }
   };
 
@@ -140,12 +140,12 @@ export const WebsiteSearchBoxStructuredData = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "url": "https://studios.zagasm.com",
+    "url": "https://xilolo.com",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://studios.zagasm.com/search?q={search_term_string}"
+        "urlTemplate": "https://xilolo.com/search?q={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }

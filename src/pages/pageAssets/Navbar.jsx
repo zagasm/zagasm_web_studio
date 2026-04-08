@@ -50,7 +50,7 @@ export default function Navbar() {
           {/* Logo */}
           <img
             src={"/images/logo.png"}
-            alt="Zagasm Logo"
+            alt="Xilolo Logo"
             className="tw:w-20 tw:md:w-24 tw:lg:w-28 tw:-ml-2 tw:md:-ml-3 tw:object-contain"
           />
         </Link>
@@ -68,17 +68,15 @@ export default function Navbar() {
                 className="tw:flex tw:flex-col tw:items-center tw:gap-0.5"
               >
                 <Icon
-                  className={`tw:size-5 ${
-                    active ? "tw:text-black" : "tw:text-gray-500"
-                  }`}
+                  className={`tw:size-5 ${active ? "tw:text-black" : "tw:text-gray-500"
+                    }`}
                   fill={active ? "black" : "none"}
                 />
                 <span
-                  className={`tw:text-[11px] ${
-                    active
+                  className={`tw:text-[11px] ${active
                       ? "tw:text-black tw:font-semibold"
                       : "tw:text-gray-500"
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </span>

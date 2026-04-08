@@ -22,7 +22,7 @@ export default function ContactMetaSection() {
             </span>
             <span className="tw:block tw:mt-1.5 tw:text-[12px] tw:md:text-[13px] tw:text-slate-600">
               We keep it simple. We will understand your event, suggest the
-              right setup, and help you decide how to run it on Zagasm, free or
+              right setup, and help you decide how to run it on Xilolo, free or
               ticketed.
             </span>
           </div>

@@ -506,7 +506,7 @@ const BecomeOrganiser = () => {
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:mb-4">
           <div>
             <span className="tw:block tw:text-[11px] tw:uppercase tw:font-medium tw:text-primary tw:tracking-[0.16em]">
-              Zagasm Studios · Organisers
+              Xilolo · Organisers
             </span>
           </div>
           <div className="tw:hidden tw:md:flex tw:flex-col tw:items-end tw:text-right">

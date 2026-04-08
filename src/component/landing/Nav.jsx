@@ -22,11 +22,11 @@ export default function Nav() {
   const initials =
     displayName && typeof displayName === "string"
       ? displayName
-          .split(" ")
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((n) => n[0]?.toUpperCase())
-          .join("")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0]?.toUpperCase())
+        .join("")
       : "U";
 
   const navLinks = [
@@ -61,7 +61,7 @@ export default function Nav() {
           >
             <motion.img
               src="/images/logo.png"
-              alt="Zagasm Studios"
+              alt="Xilolo"
               className="tw:w-16 tw:md:w-28 tw:rounded-sm"
               initial={{ rotate: -6, scale: 0.9, opacity: 0 }}
               animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -170,10 +170,9 @@ export default function Nav() {
                   to={item.to}
                   onClick={closeMenu}
                   className={({ isActive }) =>
-                    `tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:px-3 tw:py-2 ${
-                      isActive
-                        ? "tw:bg-primary/10 tw:text-primary"
-                        : "tw:text-slate-800 tw:hover:bg-slate-100/70"
+                    `tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:px-3 tw:py-2 ${isActive
+                      ? "tw:bg-primary/10 tw:text-primary"
+                      : "tw:text-slate-800 tw:hover:bg-slate-100/70"
                     }`
                   }
                 >

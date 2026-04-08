@@ -142,7 +142,7 @@ const slideVariants = {
 const slides = [
   {
     id: 0,
-    line1: ["Welcome", "to", "Zagasm", "Studios"],
+    line1: ["Welcome", "to", "Xilolo"],
     line2: ["Go", "live.", "Look", "premium.", "Reach", "everywhere."],
     highlightWord: "live.",
     subText:

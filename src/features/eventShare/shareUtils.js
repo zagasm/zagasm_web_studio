@@ -181,7 +181,7 @@ export function getEventDescription(event = {}) {
   ).trim();
 
   if (!description) {
-    return "Discover event details, timing, and updates on Zagasm Studios.";
+    return "Discover event details, timing, and updates on Xilolo.";
   }
 
   return description.length > 160

@@ -101,7 +101,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           )}
                         </p>
                         <p className="tw:text-xs tw:text-gray-500">
-                          {event.venue || "Online • Zagasm Studios"}
+                          {event.venue || "Online • Xilolo"}
                         </p>
                       </div>
 
@@ -152,7 +152,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                     <p>
                       Need help? Contact{" "}
                       <span className="tw:text-primary tw:font-medium">
-                        support@studios.zagasm.com
+                        support@xilolo.com
                       </span>
                     </p>
                     <button

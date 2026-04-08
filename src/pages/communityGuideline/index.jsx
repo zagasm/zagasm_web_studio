@@ -8,16 +8,16 @@ export default function CommunityGuidelinesPage() {
         <div className="tw:mb-6">
           <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-1 tw:text-[12px] tw:font-medium tw:text-primary">
             <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-primary" />
-            <span>Zagasm Studio App · Community</span>
+            <span>Xilolo App · Community</span>
           </div>
 
           <div className="tw:mt-4 tw:flex tw:flex-col tw:gap-2">
             <span className="tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900 tw:block">
-              Community Guidelines for Zagasm Studio App
+              Community Guidelines for Xilolo App
             </span>
 
             <span className="tw:text-sm tw:md:text-base tw:text-slate-600 tw:block tw:max-w-2xl">
-              These Community Guidelines explain how we keep the Zagasm Studio
+              These Community Guidelines explain how we keep the Xilolo
               App safe, fair, and respectful for creators, collaborators, and
               viewers across the platform.
             </span>
@@ -32,7 +32,7 @@ export default function CommunityGuidelinesPage() {
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
               <span>Company:</span>
-              <strong>Zagasm Inc.</strong>
+              <strong>Xilolo Inc.</strong>
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
               <span>Jurisdiction:</span>
@@ -44,10 +44,10 @@ export default function CommunityGuidelinesPage() {
             <span className="tw:block">
               Contact:{" "}
               <a
-                href="mailto:support@studios.zagasm.com"
+                href="mailto:support@xilolo.com"
                 className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
               >
-                support@studios.zagasm.com
+                support@xilolo.com
               </a>
             </span>
             <span className="tw:block">
@@ -71,7 +71,7 @@ export default function CommunityGuidelinesPage() {
                 className="tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700"
               >
                 <span className="tw:block">
-                  Welcome to the Community Guidelines for the Zagasm Studio App.
+                  Welcome to the Community Guidelines for the Xilolo App.
                   The Studio App is a hub for creators, filmmakers, educators,
                   brands, and teams to produce videos, host live sessions,
                   manage projects, and monetize their work. These Guidelines set
@@ -118,7 +118,7 @@ export default function CommunityGuidelinesPage() {
 
                 <span className="tw:block">
                   Our community is built around four core principles that should
-                  guide every interaction on the Zagasm Studio App:
+                  guide every interaction on the Xilolo App:
                 </span>
 
                 <ul className="tw:list-disc tw:pl-5 tw:space-y-2">
@@ -665,10 +665,10 @@ export default function CommunityGuidelinesPage() {
                         <strong>Appeals:</strong> You can contest moderation
                         decisions by emailing{" "}
                         <a
-                          href="mailto:support@studios.zagasm.com"
+                          href="mailto:support@xilolo.com"
                           className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                         >
-                          support@studios.zagasm.com
+                          support@xilolo.com
                         </a>{" "}
                         with context and evidence.
                       </span>
@@ -690,10 +690,10 @@ export default function CommunityGuidelinesPage() {
                     If you see content or behavior that breaks these Guidelines,
                     please report it. Use the in-app report controls or email{" "}
                     <a
-                      href="mailto:abuse@studios.zagasm.com"
+                      href="mailto:abuse@xilolo.com"
                       className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                     >
-                      abuse@studios.zagasm.com
+                      abuse@xilolo.com
                     </a>{" "}
                     with links, timestamps, and any supporting evidence you can
                     safely share.
@@ -868,7 +868,7 @@ export default function CommunityGuidelinesPage() {
                 </span>
 
                 <span className="tw:block">
-                  By using the Zagasm Studio App, you help shape the culture of
+                  By using the Xilolo App, you help shape the culture of
                   the platform. Following these Guidelines keeps the community
                   safe, productive, and inspiring for everyone.
                 </span>
@@ -881,7 +881,7 @@ export default function CommunityGuidelinesPage() {
                 </span>
                 <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-50 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-slate-600 tw:border tw:border-slate-200">
                   <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
-                  <span>Zagasm Studio · Community Guidelines</span>
+                  <span>Xilolo · Community Guidelines</span>
                 </span>
               </div>
             </div>

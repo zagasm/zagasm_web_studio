@@ -17,7 +17,7 @@ const fadeUp = {
 
 const faqs = [
   {
-    q: "Who is Zagasm Studios for?",
+    q: "Who is Xilolo for?",
     a: "For organisers, studios, and creators who want to run proper live events. If you care about quality, consistency, and selling tickets, you will feel at home here.",
   },
   {
@@ -29,7 +29,7 @@ const faqs = [
     a: "Yes. You can create ticketed events, set your price, and earn directly from your audience.",
   },
   {
-    q: "Where is Zagasm Studios based?",
+    q: "Where is Xilolo based?",
     a: "16192 Coastal Highway Lewes, Delaware 19958 Sussex County United States",
   },
 ];

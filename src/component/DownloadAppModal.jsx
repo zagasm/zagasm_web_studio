@@ -7,10 +7,10 @@ import { Download, X } from "lucide-react";
  */
 const DownloadAppModal = ({
   open,
-  onClose = () => {},
-  onAppStoreDownload = () => {},
-  onApkDownload = () => {},
-  onSkip = () => {},
+  onClose = () => { },
+  onAppStoreDownload = () => { },
+  onApkDownload = () => { },
+  onSkip = () => { },
   apkCtaText = "Get it on Google Play",
 }) => {
   return (
@@ -44,7 +44,7 @@ const DownloadAppModal = ({
                 <div className="tw:relative tw:z-10 tw:p-6">
                   <div className="tw:flex tw:items-start tw:justify-between">
                     <span className="tw:text-xl tw:md:text-2xl tw:font-bold tw:text-gray-900">
-                      Get the Zagasm Studios app
+                      Get the Xilolo app
                     </span>
                     <button
                       type="button"

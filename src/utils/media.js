@@ -1,4 +1,4 @@
-const CDN_STORAGE_BASE_URL = "https://zagasm-studios.b-cdn.net/";
+const CDN_STORAGE_BASE_URL = "https://xilolo.b-cdn.net/";
 
 export function resolveMediaUrl(url, baseUrl = CDN_STORAGE_BASE_URL) {
   if (!url) return "";

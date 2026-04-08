@@ -36,7 +36,7 @@ export default function RequestFormCard() {
         Submit Your Data Request
       </span>
       <p className="tw:text-gray-600 tw:mt-2">
-        Enter your email and we’ll compile an export from all Zagasm modules
+        Enter your email and we’ll compile an export from all Xilolo modules
         (Live, Events, Creators, Wallet, chat) and send a secure download link.
       </p>
 

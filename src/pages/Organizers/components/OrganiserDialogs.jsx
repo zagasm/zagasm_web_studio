@@ -124,7 +124,7 @@ export function OrganiserNameMismatchDialog({
                   Account name mismatch
                 </span>
                 <span className="tw:block tw:mt-2 tw:text-sm tw:text-gray-600">
-                  Your Zagasm account name must match the name on your bank
+                  Your Xilolo account name must match the name on your bank
                   account. Please update your bank details or edit your profile
                   to continue.
                 </span>

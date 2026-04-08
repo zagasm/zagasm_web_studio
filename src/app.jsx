@@ -114,9 +114,9 @@ export function App() {
         meta: {
           title: "Discover Live Events & Tickets",
           description:
-            "Browse trending concerts, workshops, and immersive experiences on Zagasm Studios. Reserve tickets, follow organizers, and share moments.",
+            "Browse trending concerts, workshops, and immersive experiences on Xilolo. Reserve tickets, follow organizers, and share moments.",
           keywords:
-            "events, live performances, concerts, festivals, workshops, tickets, organizers, Zagasm Studios",
+            "events, live performances, concerts, festivals, workshops, tickets, organizers, Xilolo",
           image: "/images/hero-event.jpg",
         },
       },
@@ -125,9 +125,9 @@ export function App() {
         meta: {
           title: "Event Details & Tickets",
           description:
-            "See the latest event information, host profile, and secure your spot with fast checkout on Zagasm Studios.",
+            "See the latest event information, host profile, and secure your spot with fast checkout on Xilolo.",
           keywords:
-            "event details, buy tickets, event host, live stream, Zagasm Studios",
+            "event details, buy tickets, event host, live stream, Xilolo",
           image: "/images/event-tile.jpg",
           type: "article",
         },
@@ -135,11 +135,11 @@ export function App() {
       {
         matcher: /^\/event\/create-event\/.+$/,
         meta: {
-          title: "Create an Event on Zagasm Studios",
+          title: "Create an Event on Xilolo",
           description:
-            "Launch your own concert, workshop, or meetup with Zagasm Studios' intuitive event builder and ticketing tools.",
+            "Launch your own concert, workshop, or meetup with Xilolo' intuitive event builder and ticketing tools.",
           keywords:
-            "create event, ticketing, event hosting, Zagasm Studios, organizer tools",
+            "create event, ticketing, event hosting, Xilolo, organizer tools",
         },
       },
       {
@@ -147,8 +147,8 @@ export function App() {
         meta: {
           title: "Meet Top Organizers",
           description:
-            "Discover verified organizers, follow their upcoming experiences, and collaborate with the Zagasm community.",
-          keywords: "organizers, follow, streaming, community, Zagasm Studios",
+            "Discover verified organizers, follow their upcoming experiences, and collaborate with the Xilolo community.",
+          keywords: "organizers, follow, streaming, community, Xilolo",
         },
       },
       {
@@ -156,9 +156,9 @@ export function App() {
         meta: {
           title: "Your Profile & Wallet",
           description:
-            "Manage your profile, wallets, subscriptions, and saved events securely from your Zagasm account panel.",
+            "Manage your profile, wallets, subscriptions, and saved events securely from your Xilolo account panel.",
           keywords:
-            "profile, account, wallet, settings, subscriptions, Zagasm Studios",
+            "profile, account, wallet, settings, subscriptions, Xilolo",
         },
       },
       {
@@ -167,35 +167,35 @@ export function App() {
           title: "Tickets & Passes",
           description:
             "Access all your purchased tickets and upcoming experiences at a glance.",
-          keywords: "tickets, passes, QR code, events, Zagasm Studios",
+          keywords: "tickets, passes, QR code, events, Xilolo",
         },
       },
       {
         matcher: /^\/support/,
         meta: {
-          title: "Zagasm Support Center",
+          title: "Xilolo Support Center",
           description:
-            "Get help with tickets, organizers, and account questions from the Zagasm support team.",
-          keywords: "support, help, ticket assistance, Zagasm Studios",
+            "Get help with tickets, organizers, and account questions from the Xilolo support team.",
+          keywords: "support, help, ticket assistance, Xilolo",
         },
       },
       {
         matcher: /^\/landing/,
         meta: {
-          title: "Zagasm Studios",
+          title: "Xilolo",
           description:
-            "Plan, promote, and experience unforgettable events with Zagasm Studios's all-in-one platform.",
-          keywords: "landing, Zagasm Studios, events platform, social tickets",
+            "Plan, promote, and experience unforgettable events with Xilolo's all-in-one platform.",
+          keywords: "landing, Xilolo, events platform, social tickets",
         },
       },
       {
         matcher: /^\/signal-deck/,
         meta: {
-          title: "Zagasm Signal Deck",
+          title: "Xilolo Signal Deck",
           description:
-            "Download Zagasm Studios and follow every official channel from the Signal Deck.",
+            "Download Xilolo and follow every official channel from the Signal Deck.",
           keywords:
-            "Zagasm Studios, Signal Deck, app download, social links, community",
+            "Xilolo, Signal Deck, app download, social links, community",
           image: "/img/logo.png",
         },
       },

@@ -466,15 +466,15 @@ export default function EventStreamControlPage() {
     setStageOverride("live");
     try {
       await runAction({
-      key: "go-live",
-      request: () =>
-        api.post(
-          `/api/v1/events/${eventId}/streams/go-live`,
-          {},
-          authHeaders(token),
-        ),
-      loadingText: "Taking event live…",
-      successText: "Event is now live.",
+        key: "go-live",
+        request: () =>
+          api.post(
+            `/api/v1/events/${eventId}/streams/go-live`,
+            {},
+            authHeaders(token),
+          ),
+        loadingText: "Taking event live…",
+        successText: "Event is now live.",
       });
     } catch (error) {
       setStageOverride("started");
@@ -627,10 +627,10 @@ export default function EventStreamControlPage() {
                     <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:leading-7 tw:text-gray-600 tw:md:text-base">
                       OBS connection details, stream controls, and setup instructions are hidden because this event is no longer active. If you need help reviewing what happened or have feedback about the streaming experience, contact{" "}
                       <a
-                        href="mailto:support@studios.zagasm.com"
+                        href="mailto:support@xilolo.com"
                         className="tw:font-semibold tw:text-primary hover:tw:underline"
                       >
-                        support@studios.zagasm.com
+                        support@xilolo.com
                       </a>
                       .
                     </p>
@@ -678,10 +678,10 @@ export default function EventStreamControlPage() {
                       <p>
                         Email{" "}
                         <a
-                          href="mailto:support@studios.zagasm.com"
+                          href="mailto:support@xilolo.com"
                           className="tw:font-semibold tw:text-primary hover:tw:underline"
                         >
-                          support@studios.zagasm.com
+                          support@xilolo.com
                         </a>
                         {" "}if you need help.
                       </p>
@@ -863,7 +863,7 @@ export default function EventStreamControlPage() {
                         How to stream this event using OBS Studio
                       </span>
                       <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                        Use these steps to connect OBS to Zagasm Studios before you press Go Live.
+                        Use these steps to connect OBS to Xilolo before you press Go Live.
                       </p>
                     </div>
 
@@ -898,7 +898,7 @@ export default function EventStreamControlPage() {
         open={watchModalOpen}
         onClose={() => setWatchModalOpen(false)}
         title="Watch this event live on mobile"
-        description="Watching live is currently available in the Zagasm Studios mobile app. Download the app to continue."
+        description="Watching live is currently available in the Xilolo mobile app. Download the app to continue."
         dismissLabel="Maybe later"
       />
     </>

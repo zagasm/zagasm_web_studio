@@ -7,7 +7,7 @@ import { getInitials, hasProfileImage } from "../../component/Organizers/organis
 import { useAuth } from "../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
 
-const CACHE_KEY = "zagasm_following_organisers";
+const CACHE_KEY = "Xilolo_following_organisers";
 
 function OrganisersIFollow() {
   const navigate = useNavigate();

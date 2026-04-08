@@ -43,7 +43,7 @@ export default function ContactHero() {
           >
             <Sparkles className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
             <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.22em] tw:text-primary">
-              Contact Zagasm Studios
+              Contact Xilolo
             </span>
           </motion.div>
 
@@ -107,7 +107,7 @@ export default function ContactHero() {
 
               <span className="tw:block tw:text-sm tw:md:text-base tw:font-medium tw:mb-4 tw:text-white/95">
                 Share your event date and what you want to host. We will reply
-                with next steps and the best way to set it up on Zagasm.
+                with next steps and the best way to set it up on Xilolo.
               </span>
 
               <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:mb-4">
@@ -140,7 +140,7 @@ export default function ContactHero() {
                 <span className="tw:block">
                   Prefer email?{" "}
                   <span className="tw:font-medium tw:text-white">
-                    support@studios.zagasm.com
+                    support@xilolo.com
                   </span>
                 </span>
                 <span className="tw:block">

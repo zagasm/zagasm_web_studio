@@ -101,7 +101,7 @@ export default function Ads() {
 
           <Typography className="tw:relative tw:mt-3 tw:text-base tw:text-slate-600 tw:md:text-lg">
             Pick a plan, upload your creative, set your schedule, and we’ll
-            deliver it across the Zagasm community.
+            deliver it across the Xilolo community.
           </Typography>
 
           <div className="tw:relative tw:mx-auto tw:mt-6 tw:grid tw:max-w-3xl tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-3">

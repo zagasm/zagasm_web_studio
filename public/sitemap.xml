@@ -8,7 +8,7 @@
 
     <!-- Homepage -->
     <url>
-        <loc>https://studios.zagasm.com/</loc>
+        <loc>https://xilolo.com/</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
@@ -16,7 +16,7 @@
 
     <!-- Organizers Page -->
     <url>
-        <loc>https://studios.zagasm.com/organizers</loc>
+        <loc>https://xilolo.com/organizers</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -24,7 +24,7 @@
 
     <!-- Create Event Page -->
     <url>
-        <loc>https://studios.zagasm.com/event/select-event-type</loc>
+        <loc>https://xilolo.com/event/select-event-type</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
@@ -32,7 +32,7 @@
 
     <!-- Saved Events Page -->
     <url>
-        <loc>https://studios.zagasm.com/event/saved-events</loc>
+        <loc>https://xilolo.com/event/saved-events</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -40,7 +40,7 @@
 
     <!-- Profile Page -->
     <url>
-        <loc>https://studios.zagasm.com/profile</loc>
+        <loc>https://xilolo.com/profile</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
@@ -48,7 +48,7 @@
 
     <!-- Notification Page -->
     <url>
-        <loc>https://studios.zagasm.com/notification</loc>
+        <loc>https://xilolo.com/notification</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.4</priority>
@@ -56,7 +56,7 @@
 
     <!-- Account Settings -->
     <url>
-        <loc>https://studios.zagasm.com/account</loc>
+        <loc>https://xilolo.com/account</loc>
         <lastmod>2025-10-07</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
@@ -64,8 +64,8 @@
 
     <!-- 
     Note: Individual event pages and user profiles should be added dynamically
-    Example event URL: https://studios.zagasm.com/event/view/{eventId}
-    Example profile URL: https://studios.zagasm.com/profile/{userId}
+    Example event URL: https://xilolo.com/event/view/{eventId}
+    Example profile URL: https://xilolo.com/profile/{userId}
     
     Consider creating a dynamic sitemap generator that fetches:
     - All public events

@@ -3,14 +3,14 @@ import { ExternalLink } from "lucide-react";
 
 // TODO: replace these with your real store URLs
 const PLAYSTORE_URL =
-  "https://play.google.com/store/apps/details?id=com.zagasm.studios";
+  "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
 const APPSTORE_URL = "https://apps.apple.com/app/id1234567890";
 
 export default function LiveAppDownloadBanner() {
   return (
     <div className="tw:w-full tw:rounded-2xl tw:bg-[#F3F4FF] tw:px-3.5 tw:py-3 tw:text-[11px] tw:text-gray-700">
       <p className="tw:text-xs tw:font-semibold tw:text-gray-900">
-        Join LIVE from the Zagasm Studios app
+        Join LIVE from the Xilolo app
       </p>
       <p className="tw:mt-1 tw:text-[11px] tw:text-gray-600">
         For the smoothest low-latency experience, join this LIVE event from our

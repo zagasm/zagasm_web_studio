@@ -100,7 +100,7 @@ export default function DeactivateAccountModal({ open, onClose, onSuccess }) {
                   as="span"
                   className="tw:mt-2 tw:block tw:text-sm tw:text-gray-600"
                 >
-                  This will deactivate your Zagasm Studios account.
+                  This will deactivate your Xilolo account.
                 </Dialog.Description>
 
                 <div className="tw:mt-4 tw:space-y-4">

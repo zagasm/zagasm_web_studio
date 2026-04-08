@@ -8,7 +8,7 @@ export default function ProcessSteps() {
     },
     {
       title: "Data Compilation",
-      body: "We collect your information from Zagasm modules (streams, events, wallet, chat, analytics) into a single archive.",
+      body: "We collect your information from Xilolo modules (streams, events, wallet, chat, analytics) into a single archive.",
     },
     {
       title: "Secure Delivery",

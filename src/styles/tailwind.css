@@ -14,7 +14,7 @@
   --color-primarySecond: #c115b5;
   --font-sans: "Montserrat", sans-serif;
   --font-dela: "Dela Gothic One", sans-serif;
-  --font-cursive: "Just Another Hand", cursive;
+  --font-cursive: "Just Another Hand", cursive; 
 }
 :root {
   font-family: var(--font-sans);

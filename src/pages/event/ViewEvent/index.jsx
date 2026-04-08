@@ -76,7 +76,7 @@ function isUuid(value = "") {
 }
 
 function getTicketPromptStorageKey(eventIdentifier) {
-  return `zagasm:event-ticket-prompt-seen:${eventIdentifier}`;
+  return `xilolo:event-ticket-prompt-seen:${eventIdentifier}`;
 }
 
 function EventDetailShimmer() {
@@ -149,9 +149,9 @@ export default function ViewEvent() {
       setEvent((previous) =>
         previous
           ? {
-              ...previous,
-              hasPaid: true,
-            }
+            ...previous,
+            hasPaid: true,
+          }
           : previous
       );
       setPurchaseSuccessOpen(true);
@@ -302,9 +302,9 @@ export default function ViewEvent() {
         setEvent((previous) =>
           previous
             ? {
-                ...previous,
-                is_sold_out: true,
-              }
+              ...previous,
+              is_sold_out: true,
+            }
             : previous
         );
         showError(errorMessage || "This event is sold out.");
@@ -438,9 +438,9 @@ export default function ViewEvent() {
         description={
           event?.description
             ? event.description.slice(0, 155)
-            : "Discover event details, get tickets, and connect with attendees at Zagasm Studios. Join the experience!"
+            : "Discover event details, get tickets, and connect with attendees at Xilolo. Join the experience!"
         }
-        keywords={`zagasm studios, ${event?.title || "event"}, ${event?.eventType || "event"
+        keywords={`Xilolo, ${event?.title || "event"}, ${event?.eventType || "event"
           }, event tickets, ${event?.hostName || "event organizer"
           }, live events, entertainment`}
         image={posterUrl}
@@ -481,7 +481,7 @@ export default function ViewEvent() {
             },
             organizer: {
               "@type": "Organization",
-              name: event.hostName || "Zagasm Studios",
+              name: event.hostName || "Xilolo",
             },
             performer: {
               "@type": "PerformingGroup",
@@ -545,7 +545,7 @@ export default function ViewEvent() {
                     <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(15,23,42,0.02)_0%,rgba(15,23,42,0.08)_42%,rgba(15,23,42,0.62)_100%)] tw:md:bg-[linear-gradient(180deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.18)_35%,rgba(15,23,42,0.75)_100%)]" />
 
                     <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:flex-wrap tw:gap-2">
-                      
+
                       <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-white/20 tw:bg-white/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:backdrop-blur-xl">
                         <Ticket className="tw:h-3 tw:w-3" />
                         {event.eventType}
@@ -749,7 +749,7 @@ export default function ViewEvent() {
                     >
                       {primaryCtaLabel}
                       {!ctaDisabled && !hasPaid && (
-                          <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
+                        <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
                           ({priceText(event)})
                         </span>
                       )}
@@ -850,7 +850,7 @@ export default function ViewEvent() {
             </div>
           </section>
 
-        <div className="tw:mt-8">
+          <div className="tw:mt-8">
             <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
           </div>
         </div>
@@ -873,11 +873,10 @@ export default function ViewEvent() {
               type="button"
               disabled={ctaDisabled}
               onClick={handlePrimaryAction}
-              className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${
-                ctaDisabled
-                  ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                  : "tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
-              }`}
+              className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
+                ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
+                : "tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+                }`}
             >
               {primaryCtaLabel}
             </button>

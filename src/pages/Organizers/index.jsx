@@ -128,9 +128,9 @@ export default function AllOrganizers() {
 
       showSuccess(
         result?.message ||
-          (isNowFollowing
-            ? "User followed successfully"
-            : "User unfollowed successfully")
+        (isNowFollowing
+          ? "User followed successfully"
+          : "User unfollowed successfully")
       );
     } catch (e) {
       showError("Something went wrong. Try again.");
@@ -144,7 +144,7 @@ export default function AllOrganizers() {
       <SEO
         title="Top Organizers"
         description="See best rated organizers globally."
-        keywords="zagasm studios, organizers, ranking"
+        keywords="Xilolo, organizers, ranking"
       />
 
       <div className="tw:font-sans tw:bg-white tw:min-h-screen tw:pt-20 tw:md:pt-28 tw:px-2 tw:md:px-6">

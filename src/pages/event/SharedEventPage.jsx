@@ -91,13 +91,13 @@ export default function SharedEventPage() {
           event?.eventType?.toLowerCase() === "virtual"
             ? { "@type": "VirtualLocation", url: sharePayload?.url || "" }
             : {
-                "@type": "Place",
-                name: event?.location || "Event location",
-                address: event?.address || "",
-              },
+              "@type": "Place",
+              name: event?.location || "Event location",
+              address: event?.address || "",
+            },
         organizer: {
           "@type": "Organization",
-          name: event?.hostName || "Zagasm Studios",
+          name: event?.hostName || "Xilolo",
         },
       },
     ];
@@ -271,7 +271,7 @@ export default function SharedEventPage() {
                     {event?.hostName || "Event Organizer"}
                   </div>
                   <p className="tw:mt-3 tw:text-sm tw:leading-6 tw:text-slate-600">
-                    Open this event in Zagasm Studios to follow the organizer, buy access, and keep up with live updates.
+                    Open this event in Xilolo to follow the organizer, buy access, and keep up with live updates.
                   </p>
                   <button
                     type="button"

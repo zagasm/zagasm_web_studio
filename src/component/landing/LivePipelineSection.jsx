@@ -12,7 +12,7 @@ const steps = [
   },
   {
     id: 2,
-    label: "Zagasm Studios",
+    label: "Xilolo",
     title: "We keep it smooth",
     description:
       "Your stream stays clear and stable so your audience enjoys the show, not the struggle.",

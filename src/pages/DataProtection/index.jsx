@@ -15,14 +15,14 @@ export default function DataProtectionPage() {
   return (
     <main className="tw:min-h-screen tw:bg-white tw:text-gray-900 tw:font-sans">
       <Helmet>
-        <title>Data Protection & Privacy Rights — Zagasm Studios</title>
+        <title>Data Protection & Privacy Rights — Xilolo</title>
       </Helmet>
 
       <div className="tw:relative tw:z-10 tw:max-w-7xl tw:mx-auto tw:px-4 tw:md:px-6 tw:lg:px-8 tw:py-5 tw:flex tw:items-center tw:justify-between">
         <Link to="/" className="tw:inline-flex tw:items-center tw:gap-3">
           <img
             src="/images/logo.png"
-            alt="Zagasm Studio"
+            alt="Xilolo"
             className="tw:w-[100px] tw:md:w-[150px]"
           />
         </Link>
@@ -54,7 +54,7 @@ export default function DataProtectionPage() {
           <span className=" tw:block tw:mt-2 tw:text-gray-600">
             In line with global and African data protection standards (e.g.,
             GDPR/CCPA/local regulations), you can request a copy of the personal
-            data we process while you use Zagasm Studios across{" "}
+            data we process while you use Xilolo across{" "}
             <span className="tw:font-medium">Live</span>,{" "}
             <span className="tw:font-medium">Events</span>,{" "}
             <span className="tw:font-medium">Creators</span>,{" "}chat and other

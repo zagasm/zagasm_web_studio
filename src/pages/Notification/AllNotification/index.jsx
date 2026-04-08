@@ -160,7 +160,7 @@ function AllNotification() {
               Notifications
             </h1>
             <span className="tw:mt-1 tw:max-w-3xl tw:text-sm tw:text-slate-600">
-              Keep up with everything happening on Zagasm Studios—reads,
+              Keep up with everything happening on Xilolo—reads,
               follows, and community updates live in one place.
             </span>
           </div>
@@ -203,8 +203,8 @@ function AllNotification() {
               type="button"
               onClick={() => setFilter("all")}
               className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${filter === "all"
-                  ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
-                  : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
+                ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
+                : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
                 }`}
             >
               All updates
@@ -216,8 +216,8 @@ function AllNotification() {
               type="button"
               onClick={() => setFilter("unread")}
               className={`tw:rounded-full tw:border tw:px-5 tw:py-2 tw:text-sm tw:font-semibold ${filter === "unread"
-                  ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
-                  : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
+                ? "tw:border-transparent tw:bg-purple-600 tw:text-white"
+                : "tw:border-purple-200 tw:bg-white tw:text-purple-700"
                 }`}
             >
               Unread only

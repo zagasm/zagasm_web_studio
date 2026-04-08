@@ -1,5 +1,5 @@
-const PENDING_PURCHASE_KEY = "zagasm:user-wallet:pending-purchase";
-const LAST_FUNDING_KEY = "zagasm:user-wallet:last-funding";
+const PENDING_PURCHASE_KEY = "xilolo:user-wallet:pending-purchase";
+const LAST_FUNDING_KEY = "xilolo:user-wallet:last-funding";
 
 function safeRead(key) {
   if (typeof window === "undefined") return null;

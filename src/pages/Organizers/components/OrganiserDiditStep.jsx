@@ -74,13 +74,13 @@ export default function OrganiserDiditStep({
           Before you continue
         </span>
         <span className="tw:block tw:text-xs tw:text-slate-600">
-          DIDIT is Zagasm&apos;s identity verification provider for
+          DIDIT is Xilolo&apos;s identity verification provider for
           government-issued documents. By continuing, you consent to share your
           verification data with DIDIT for identity checks and fraud prevention.
         </span>
         <span className="tw:block tw:text-xs tw:text-slate-600">
           Make sure you have your ID ready, allow camera access, and review
-          Zagasm&apos;s privacy notice before starting.
+          Xilolo&apos;s privacy notice before starting.
         </span>
       </div>
 

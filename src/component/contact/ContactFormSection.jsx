@@ -194,7 +194,7 @@ export default function ContactFormSection() {
                   <div>
                     <span className="tw:block tw:text-white/60">Email</span>
                     <span className="tw:block tw:text-white tw:font-medium">
-                      support@studios.zagasm.com
+                      support@xilolo.com
                     </span>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ export default function ContactFormSection() {
           {/* Small note card */}
           <div className="tw:rounded-3xl tw:bg-white tw:border tw:border-slate-200/80 tw:p-4 tw:text-[12px] tw:text-slate-600 tw:shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
             <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-slate-500 tw:mb-1">
-              Already using Zagasm Studios?
+              Already using Xilolo?
             </span>
             <span className="tw:block">
               For billing or show-day issues, use the in-app help section. This

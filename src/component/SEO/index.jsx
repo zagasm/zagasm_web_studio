@@ -3,13 +3,13 @@ import { Helmet } from 'react-helmet-async';
 import StructuredData from './StructuredData';
 
 const SEO = ({
-  title = 'Zagasm Studios',
-  description = 'Discover and create amazing events with Zagasm Studios - your destination for live experiences, creators, and social commerce.',
-  keywords = 'zagasm studios, events, event management, tickets, organizers, concerts, parties, entertainment, social events',
+  title = 'Xilolo',
+  description = 'Discover and create amazing events with Xilolo - your destination for live experiences, creators, and social commerce.',
+  keywords = 'Xilolo, events, event management, tickets, organizers, concerts, parties, entertainment, social events',
   image = '/images/event-dummy.jpg',
-  url = typeof window !== 'undefined' ? window.location.href : 'https://studios.zagasm.com',
+  url = typeof window !== 'undefined' ? window.location.href : 'https://xilolo.com',
   type = 'website',
-  author = 'Zagasm Studios',
+  author = 'Xilolo',
   twitterCard = 'summary_large_image',
   locale = 'en_US',
   twitterSite = '@zagasmstudios',
@@ -17,7 +17,7 @@ const SEO = ({
   modifiedTime,
   structuredData = [],
 }) => {
-  const siteName = 'Zagasm Studios';
+  const siteName = 'Xilolo';
   const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
   const updatedAt = modifiedTime || new Date().toISOString();
 

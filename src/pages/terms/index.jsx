@@ -8,17 +8,17 @@ export default function TermsOfServicePage() {
         <div className="tw:mb-6">
           <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-1 tw:text-[12px] tw:font-medium tw:text-primary">
             <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-primary" />
-            <span>Zagasm Studio App · Legal</span>
+            <span>Xilolo App · Legal</span>
           </div>
 
           <div className="tw:mt-4 tw:flex tw:flex-col tw:gap-2">
             <span className="tw:block tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900">
-              Terms of Service for Zagasm Studio App
+              Terms of Service for Xilolo App
             </span>
 
             <span className="tw:block tw:max-w-2xl tw:text-sm tw:md:text-base tw:text-slate-600">
               These Terms of Service explain your rights and responsibilities
-              when using the Zagasm Studio App as a creator, viewer, or
+              when using the Xilolo App as a creator, viewer, or
               collaborator.
             </span>
           </div>
@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
               <span>Company:</span>
-              <strong>Zagasm Inc.</strong>
+              <strong>Xilolo Inc.</strong>
             </span>
             <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
               <span>Jurisdiction:</span>
@@ -44,10 +44,10 @@ export default function TermsOfServicePage() {
             <span className="tw:block">
               Contact:{" "}
               <a
-                href="mailto:support@studios.zagasm.com"
+                href="mailto:support@xilolo.com"
                 className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
               >
-                support@studios.zagasm.com
+                support@xilolo.com
               </a>
             </span>
             <span className="tw:block">
@@ -73,8 +73,8 @@ export default function TermsOfServicePage() {
               >
                 <span className="tw:block">
                   Welcome to the Terms of Service <span>(“Terms”)</span> for
-                  Zagasm Inc.’s Studio App <span>(“Service” or “App”)</span>.
-                  Zagasm Inc., a technology company incorporated under the laws
+                  Xilolo Inc.’s Studio App <span>(“Service” or “App”)</span>.
+                  Xilolo Inc., a technology company incorporated under the laws
                   of the Federal Republic of Nigeria and headquartered in Asaba,
                   provides this platform to help creators, filmmakers,
                   educators, and teams produce, edit, stream, and monetize
@@ -86,7 +86,7 @@ export default function TermsOfServicePage() {
 
                 <span className="tw:block">
                   These Terms form a legally binding agreement between you{" "}
-                  <span>(“User,” “you,” or “your”)</span> and Zagasm Inc.{" "}
+                  <span>(“User,” “you,” or “your”)</span> and Xilolo Inc.{" "}
                   <span>(“we,” “us,” or “our”)</span>. By accessing,
                   downloading, registering for, or using the Service—whether via
                   web, mobile app, or APIs—you confirm that you have read,
@@ -692,10 +692,10 @@ export default function TermsOfServicePage() {
                       for a defined period, or permanently ban accounts,
                       depending on severity and history. Appeals can be sent to{" "}
                       <a
-                        href="mailto:support@studios.zagasm.com"
+                        href="mailto:support@xilolo.com"
                         className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
-                        support@studios.zagasm.com
+                        support@xilolo.com
                       </a>
                       .
                     </span>
@@ -758,7 +758,7 @@ export default function TermsOfServicePage() {
                     <span>
                       <strong>Protected elements:</strong> The Service itself,
                       including software, design, trademarks, and branding, is
-                      owned or licensed by Zagasm Inc. You may not copy or
+                      owned or licensed by Xilolo Inc. You may not copy or
                       exploit these except as allowed by law or by written
                       agreement.
                     </span>
@@ -794,10 +794,10 @@ export default function TermsOfServicePage() {
                       <strong>Submission process:</strong> Send rights or policy
                       complaints to{" "}
                       <a
-                        href="mailto:support@studios.zagasm.com"
+                        href="mailto:support@xilolo.com"
                         className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
                       >
-                        support@studios.zagasm.com
+                        support@xilolo.com
                       </a>{" "}
                       with relevant details, including your contact information,
                       URLs or IDs of affected content, and evidence supporting
@@ -963,7 +963,7 @@ export default function TermsOfServicePage() {
                 </span>
 
                 <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
-                  You agree to defend and indemnify Zagasm Inc. against certain
+                  You agree to defend and indemnify Xilolo Inc. against certain
                   claims arising from your use of the Service.
                 </span>
 
@@ -1149,7 +1149,7 @@ export default function TermsOfServicePage() {
                 </dl>
 
                 <span className="tw:block tw:mt-4 tw:text-slate-700">
-                  Thank you for using the Zagasm Studio App. By following these
+                  Thank you for using the Xilolo App. By following these
                   Terms, you help maintain a safe, fair, and high-quality space
                   for everyone.
                 </span>
@@ -1162,7 +1162,7 @@ export default function TermsOfServicePage() {
                 </span>
                 <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-50 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-slate-600 tw:border tw:border-slate-200">
                   <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
-                  <span>Zagasm Studio · Terms of Service</span>
+                  <span>Xilolo · Terms of Service</span>
                 </span>
               </div>
             </div>

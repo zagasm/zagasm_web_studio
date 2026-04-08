@@ -237,7 +237,7 @@ export function Signin() {
   return (
     <AuthContainer
       title="Login account"
-      description="Continue to explore Zagasm Studio"
+      description="Continue to explore Xilolo"
       footer={true}
       header={true}
       privacy={true}

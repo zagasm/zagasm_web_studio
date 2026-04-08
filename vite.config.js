@@ -21,15 +21,15 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "https://api.studios.zagasm.com",
+        target: "https://api.xilolo.com",
         changeOrigin: true,
         secure: true,
         // Optional: if the upstream checks Origin, pretend to be the allowed site
-        headers: { Origin: "https://zagasm.com" },
+        headers: { Origin: "https://xilolo.com" },
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/media": {
-        target: "https://api.studio.zagasm.com",
+        target: "https://api.xilolo.com",
         changeOrigin: true,
         secure: true,
         // rewrite your local path to the real one
