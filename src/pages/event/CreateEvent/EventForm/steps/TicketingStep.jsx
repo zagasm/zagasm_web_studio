@@ -11,8 +11,8 @@ const DISPLAY_CURRENCIES = [
   {
     value: "NGN",
     label: "Nigerian Naira",
-    subLabel: "Minimum ticket price: ₦3,000",
-    symbol: "₦",
+    subLabel: "Minimum ticket price: N3,000",
+    symbol: "N",
     minimum: 3000,
   },
   {
@@ -29,6 +29,24 @@ const VISIBILITY_OPTIONS = [
   { value: "private", label: "Private" },
 ];
 
+const MANUAL_FILE_EXTENSIONS = [
+  "pdf",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "csv",
+  "txt",
+  "ppt",
+  "pptx",
+  "rtf",
+  "odt",
+  "ods",
+];
+
+const MANUAL_FILE_ACCEPT = MANUAL_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",");
+const MANUAL_COVER_ACCEPT = "image/*";
+
 function normalizeAmountInput(rawValue) {
   const raw = String(rawValue || "");
   const stripped = raw.replace(/,/g, "").replace(/[^\d.]/g, "");
@@ -41,10 +59,7 @@ function normalizeAmountInput(rawValue) {
   }
 
   const integerPart = stripped.slice(0, firstDotIndex).replace(/^0+(?=\d)/, "");
-  const decimalPart = stripped
-    .slice(firstDotIndex + 1)
-    .replace(/\./g, "")
-    .slice(0, 2);
+  const decimalPart = stripped.slice(firstDotIndex + 1).replace(/\./g, "").slice(0, 2);
 
   return `${integerPart || "0"}.${decimalPart}`;
 }
@@ -59,9 +74,7 @@ function formatAmountDisplay(value) {
 
   const [integerPart, decimalPart] = normalized.split(".");
   const formattedInteger = Number(integerPart || 0).toLocaleString("en-NG");
-  return decimalPart !== undefined
-    ? `${formattedInteger}.${decimalPart}`
-    : formattedInteger;
+  return decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
 }
 
 function parseAmount(value) {
@@ -86,6 +99,20 @@ function findCurrencyByCode(currencies, code) {
   });
 }
 
+function getFileExtension(fileName = "") {
+  const parts = String(fileName).split(".");
+  return parts.length > 1 ? parts.pop().toLowerCase() : "";
+}
+
+function isManualFileAllowed(file) {
+  if (!file?.name) return false;
+  return MANUAL_FILE_EXTENSIONS.includes(getFileExtension(file.name));
+}
+
+function fileLabel(file) {
+  return file?.name || "";
+}
+
 const schema = z
   .object({
     priceInput: z.string().min(1, "Enter a ticket price"),
@@ -93,8 +120,10 @@ const schema = z
     ticketLimit: z.string().optional(),
     currencyCode: z.enum(["NGN", "USD"]),
     visibility: z.enum(["public", "private"]),
+    hasMaterials: z.boolean(),
     enableReplay: z.boolean(),
     matureContent: z.boolean(),
+    manualPriceInput: z.string().optional(),
   })
   .superRefine((values, ctx) => {
     const selectedCurrency = DISPLAY_CURRENCIES.find(
@@ -112,7 +141,9 @@ const schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["priceInput"],
-        message: `Minimum ticket price for ${selectedCurrency.label} is ${selectedCurrency.symbol}${selectedCurrency.minimum.toLocaleString("en-NG")}`,
+        message: `Minimum ticket price for ${selectedCurrency.label} is ${selectedCurrency.symbol}${selectedCurrency.minimum.toLocaleString(
+          "en-NG"
+        )}`,
       });
     }
 
@@ -126,11 +157,32 @@ const schema = z
         });
       }
     }
+
+    const manualPrice = parseAmount(values.manualPriceInput);
+    if (values.manualPriceInput && (manualPrice === null || manualPrice <= 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["manualPriceInput"],
+        message: "Enter a valid material price",
+      });
+    }
   });
 
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const { token } = useAuth();
   const [currencies, setCurrencies] = useState([]);
+  const [manualFile, setManualFile] = useState(null);
+  const [manualCover, setManualCover] = useState(null);
+  const [manualErrors, setManualErrors] = useState({});
+
+  const existingManual = defaultValues.existingManual || null;
+  const existingManualCover = defaultValues.existingManualCover || null;
+  const hasExistingMaterial = Boolean(
+    existingManual?.fileName ||
+      existingManual?.name ||
+      existingManualCover?.url ||
+      Number(defaultValues.manualPrice || 0) > 0
+  );
 
   const {
     control,
@@ -145,17 +197,24 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       priceInput: formatAmountDisplay(defaultValues.price ?? 0) || "0",
       maxTickets: defaultValues.maxTickets || "unlimited",
       ticketLimit:
-        defaultValues.ticketLimit !== undefined &&
-        defaultValues.ticketLimit !== null
+        defaultValues.ticketLimit !== undefined && defaultValues.ticketLimit !== null
           ? String(defaultValues.ticketLimit)
           : "",
       currencyCode: defaultValues.currencyCode === "USD" ? "USD" : "NGN",
       visibility: defaultValues.visibility || "public",
+      hasMaterials:
+        typeof defaultValues.hasMaterials === "boolean"
+          ? defaultValues.hasMaterials
+          : hasExistingMaterial,
       enableReplay:
         typeof defaultValues.enableReplay === "boolean"
           ? defaultValues.enableReplay
           : true,
       matureContent: !!defaultValues.matureContent,
+      manualPriceInput:
+        defaultValues.manualPrice !== undefined && defaultValues.manualPrice !== null
+          ? formatAmountDisplay(defaultValues.manualPrice)
+          : "",
     },
     mode: "onChange",
     reValidateMode: "onChange",
@@ -164,13 +223,26 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const selectedCurrencyCode = watch("currencyCode");
   const maxTickets = watch("maxTickets");
   const visibility = watch("visibility");
+  const hasMaterials = watch("hasMaterials");
   const selectedCurrency = useMemo(
     () =>
-      DISPLAY_CURRENCIES.find(
-        (currency) => currency.value === selectedCurrencyCode
-      ) || DISPLAY_CURRENCIES[0],
+      DISPLAY_CURRENCIES.find((currency) => currency.value === selectedCurrencyCode) ||
+      DISPLAY_CURRENCIES[0],
     [selectedCurrencyCode]
   );
+
+  const manualCoverPreview = useMemo(() => {
+    if (!manualCover) return "";
+    return URL.createObjectURL(manualCover);
+  }, [manualCover]);
+
+  useEffect(() => {
+    return () => {
+      if (manualCoverPreview) {
+        URL.revokeObjectURL(manualCoverPreview);
+      }
+    };
+  }, [manualCoverPreview]);
 
   useEffect(() => {
     let mounted = true;
@@ -207,6 +279,15 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     };
   }, [defaultValues.currency, defaultValues.currencyCode, setValue, token]);
 
+  const clearManualError = (key) => {
+    setManualErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
   const onSubmit = (values) => {
     const matchedCurrency = findCurrencyByCode(currencies, values.currencyCode);
     if (!matchedCurrency?.id) {
@@ -214,32 +295,89 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       return;
     }
 
+    if (!values.hasMaterials) {
+      setManualErrors({});
+      onNext({
+        price: parseAmount(values.priceInput) ?? 0,
+        maxTickets: values.maxTickets,
+        ticketLimit:
+          values.maxTickets === "limited" ? Number(values.ticketLimit || 0) : undefined,
+        currency: String(matchedCurrency.id),
+        currencyCode: values.currencyCode,
+        visibility: values.visibility,
+        hasMaterials: false,
+        enableReplay: values.enableReplay,
+        matureContent: values.matureContent,
+        manualPrice: 0,
+        manualFile: null,
+        manualCover: null,
+        existingManual: null,
+        existingManualCover: null,
+      });
+      return;
+    }
+
+    const nextManualErrors = {};
+    const manualPrice = parseAmount(values.manualPriceInput);
+    const hasExistingManual = Boolean(existingManual?.fileName || existingManual?.name);
+    const hasManualSource = Boolean(manualFile || hasExistingManual);
+
+    if (manualFile && !isManualFileAllowed(manualFile)) {
+      nextManualErrors.manualFile = `Unsupported material format. Use: ${MANUAL_FILE_EXTENSIONS.join(
+        ", "
+      )}.`;
+    }
+
+    if (manualCover && !String(manualCover.type || "").startsWith("image/")) {
+      nextManualErrors.manualCover = "Material cover must be an image file.";
+    }
+
+    if (manualPrice !== null && !hasManualSource) {
+      nextManualErrors.manualFile = "Upload the material file before setting a material price.";
+    }
+
+    if (manualCover && !hasManualSource) {
+      nextManualErrors.manualFile = "Upload the material file before adding a cover.";
+    }
+
+    if (manualFile && (manualPrice === null || manualPrice <= 0)) {
+      nextManualErrors.manualPrice = "Material price is required when a material file is uploaded.";
+    }
+
+    setManualErrors(nextManualErrors);
+    if (Object.keys(nextManualErrors).length > 0) {
+      return;
+    }
+
     onNext({
       price: parseAmount(values.priceInput) ?? 0,
       maxTickets: values.maxTickets,
-      ticketLimit:
-        values.maxTickets === "limited"
-          ? Number(values.ticketLimit || 0)
-          : undefined,
+      ticketLimit: values.maxTickets === "limited" ? Number(values.ticketLimit || 0) : undefined,
       currency: String(matchedCurrency.id),
       currencyCode: values.currencyCode,
       visibility: values.visibility,
+      hasMaterials: true,
       enableReplay: values.enableReplay,
       matureContent: values.matureContent,
+      manualPrice: manualPrice ?? 0,
+      manualFile,
+      manualCover,
+      existingManual,
+      existingManualCover,
     });
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
+      className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
     >
       <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
         <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:lg:text-2xl">
           Ticketing
         </span>
         <span className="tw:text-sm tw:text-slate-500">
-          Set pricing, ticket availability, and attendee visibility controls.
+          Set pricing, ticket availability, and optional material access.
         </span>
       </div>
 
@@ -247,9 +385,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
         <SelectField
           label="Currency"
           value={selectedCurrencyCode}
-          onChange={(value) =>
-            setValue("currencyCode", value, { shouldValidate: true })
-          }
+          onChange={(value) => setValue("currencyCode", value, { shouldValidate: true })}
           options={DISPLAY_CURRENCIES}
           error={errors?.currencyCode?.message}
         />
@@ -279,18 +415,14 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
             )}
           />
           {errors.priceInput && (
-            <p className="tw:mt-1 tw:text-xs tw:text-red-500">
-              {errors.priceInput.message}
-            </p>
+            <p className="tw:mt-1 tw:text-xs tw:text-red-500">{errors.priceInput.message}</p>
           )}
         </div>
 
         <SelectField
           label="Ticket availability"
           value={maxTickets}
-          onChange={(value) =>
-            setValue("maxTickets", value, { shouldValidate: true })
-          }
+          onChange={(value) => setValue("maxTickets", value, { shouldValidate: true })}
           options={[
             { value: "unlimited", label: "Unlimited tickets" },
             { value: "limited", label: "Limited tickets" },
@@ -300,9 +432,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
 
         {maxTickets === "limited" && (
           <div>
-            <label className="tw:mb-1 tw:block tw:text-[15px]">
-              Total number of tickets
-            </label>
+            <label className="tw:mb-1 tw:block tw:text-[15px]">Total number of tickets</label>
             <input
               type="number"
               min="1"
@@ -310,9 +440,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
               className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
             />
             {errors.ticketLimit && (
-              <p className="tw:mt-1 tw:text-xs tw:text-red-500">
-                {errors.ticketLimit.message}
-              </p>
+              <p className="tw:mt-1 tw:text-xs tw:text-red-500">{errors.ticketLimit.message}</p>
             )}
           </div>
         )}
@@ -320,14 +448,131 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
         <SelectField
           label="Event visibility"
           value={visibility}
-          onChange={(value) =>
-            setValue("visibility", value, { shouldValidate: true })
-          }
+          onChange={(value) => setValue("visibility", value, { shouldValidate: true })}
           options={VISIBILITY_OPTIONS}
           error={errors?.visibility?.message}
         />
 
-        <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:px-4 tw:py-3">
+        <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
+          <label className="tw:text-[15px]">This event has materials</label>
+          <input
+            type="checkbox"
+            {...register("hasMaterials")}
+            className="tw:h-4 tw:w-4 tw:accent-primary"
+          />
+        </div>
+
+        {hasMaterials && (
+          <div className=" ">
+            <div className="tw:flex tw:flex-col tw:gap-1">
+              <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
+                Event material
+              </div>
+              <div className="tw:text-sm tw:text-slate-500">
+                Attach an optional paid soft-copy material buyers can purchase with or after the
+                ticket.
+              </div>
+            </div>
+
+            <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-2">
+              <div>
+                <label className="tw:mb-1 tw:block tw:text-[15px]">Material file</label>
+                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 hover:tw:border-primary/40">
+                  <span className="tw:text-sm tw:font-medium tw:text-slate-700">
+                    {fileLabel(manualFile) || existingManual?.fileName || "Choose document"}
+                  </span>
+                  <span className="tw:block tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-500">
+                    Accepted: {MANUAL_FILE_EXTENSIONS.join(", ")}
+                  </span>
+                  <input
+                    type="file"
+                    accept={MANUAL_FILE_ACCEPT}
+                    className="tw:hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0] || null;
+                      setManualFile(file);
+                      clearManualError("manualFile");
+                    }}
+                  />
+                </label>
+                {manualErrors.manualFile && (
+                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">{manualErrors.manualFile}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="tw:mb-1 tw:block tw:text-[15px]">Material cover</label>
+                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 hover:tw:border-primary/40">
+                  <span className="tw:text-sm tw:font-medium tw:text-slate-700">
+                    {fileLabel(manualCover) || existingManualCover?.fileName || "Choose cover image"}
+                  </span>
+                  <span className="tw:block tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-500">
+                    Optional image shown before purchase and download.
+                  </span>
+                  <input
+                    type="file"
+                    accept={MANUAL_COVER_ACCEPT}
+                    className="tw:hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0] || null;
+                      setManualCover(file);
+                      clearManualError("manualCover");
+                    }}
+                  />
+                </label>
+                {manualErrors.manualCover && (
+                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">{manualErrors.manualCover}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-[minmax(0,1fr)_180px]">
+              <div>
+                <label className="tw:mb-1 tw:block tw:text-[15px]">Material price</label>
+                <Controller
+                  name="manualPriceInput"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="tw:relative">
+                      <span className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-sm tw:text-slate-500">
+                        {selectedCurrency.symbol}
+                      </span>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={field.value || ""}
+                        onChange={(event) => {
+                          const normalized = normalizeAmountInput(event.target.value);
+                          field.onChange(normalized ? formatAmountDisplay(normalized) : "");
+                          clearManualError("manualPrice");
+                        }}
+                        className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                        placeholder="Set material price"
+                      />
+                    </div>
+                  )}
+                />
+                {(manualErrors.manualPrice || errors.manualPriceInput?.message) && (
+                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">
+                    {manualErrors.manualPrice || errors.manualPriceInput?.message}
+                  </p>
+                )}
+              </div>
+
+              {(manualCoverPreview || existingManualCover?.url) && (
+                <div className="tw:overflow-hidden tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white">
+                  <img
+                    src={manualCoverPreview || existingManualCover?.url}
+                    alt="Material cover preview"
+                    className="tw:h-full tw:max-h-[160px] tw:w-full tw:object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
           <label className="tw:text-[15px]">Enable event replay</label>
           <input
             type="checkbox"
@@ -336,10 +581,8 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           />
         </div>
 
-        <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:px-4 tw:py-3">
-          <label className="tw:text-[15px]">
-            This event contains mature content
-          </label>
+        <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
+          <label className="tw:text-[15px]">This event contains mature content</label>
           <input
             type="checkbox"
             {...register("matureContent")}

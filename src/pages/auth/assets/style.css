@@ -96,7 +96,7 @@ form .inactive_submit_button {
 }
 
 .active_submit_button {
-  background: rgba(143, 7, 231, 1);
+  background: #111111;
   color: white;
   height: 50px;
   border-radius: 15px;
@@ -224,8 +224,9 @@ form .inactive_submit_button {
 
 
 .footer_text a {
-  color: #7223c2;
-  text-decoration: none;
+  color: #111111;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 form .code_container {
@@ -338,7 +339,7 @@ form .code_container .code {
 }
 
 .active_submit_button {
-  background-color: rgba(143, 7, 231, 1);
+  background-color: #111111;
   color: white;
   cursor: pointer;
   border: none;
@@ -350,7 +351,7 @@ form .code_container .code {
 }
 
 .active_submit_button:hover {
-  background-color: rgba(141, 7, 231, 0.81);
+  background-color: #1d1d1d;
 }
 
 .inactive_submit_button {

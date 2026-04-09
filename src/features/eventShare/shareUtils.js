@@ -123,6 +123,25 @@ export function normalizeEventRecord(rawEvent) {
   return {
     ...rawEvent,
     poster,
+    purchase_options: {
+      ticket_only: !!rawEvent?.purchase_options?.ticket_only,
+      ticket_and_manual: !!rawEvent?.purchase_options?.ticket_and_manual,
+      manual_only: !!rawEvent?.purchase_options?.manual_only,
+    },
+    manual: rawEvent?.manual
+      ? {
+          ...rawEvent.manual,
+          available: !!rawEvent.manual.available,
+          viewer_has_access: !!rawEvent.manual.viewer_has_access,
+          viewer_has_purchased: !!rawEvent.manual.viewer_has_purchased,
+          viewer_has_ticket: !!rawEvent.manual.viewer_has_ticket,
+        }
+      : {
+          available: false,
+          viewer_has_access: false,
+          viewer_has_purchased: false,
+          viewer_has_ticket: false,
+        },
     status: String(rawEvent.status || "upcoming").toLowerCase(),
     hostName:
       rawEvent.hostName ||

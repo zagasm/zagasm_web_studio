@@ -206,7 +206,7 @@ export default function EventInformationStep({
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="tw:rounded-4xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
+        className="tw:rounded-4xl tw:border tw:border-gray-100 tw:bg-[#FFFFFF] tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
       >
         <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
           <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:md:text-2xl">

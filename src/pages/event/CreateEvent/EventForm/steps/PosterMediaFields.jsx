@@ -320,7 +320,7 @@ export default function PosterMediaFields({
 
   return (
     <>
-      <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:p-4 tw:sm:p-5">
+      <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-4 tw:sm:p-5">
         <div className="tw:mb-4 tw:flex tw:flex-col tw:gap-1">
           <span className="tw:text-base tw:font-semibold tw:text-slate-900">
             Upload a thumbnail 
@@ -341,8 +341,8 @@ export default function PosterMediaFields({
           onClick={() => uploadInputRef.current?.click()}
           className={`tw:cursor-pointer tw:rounded-3xl tw:border tw:border-dashed tw:p-5 tw:text-center tw:transition ${
             isDraggingUpload
-              ? "tw:border-primary tw:bg-lightPurple"
-              : "tw:border-gray-300 tw:bg-white tw:hover:border-primary"
+              ? "tw:border-primary tw:bg-[#ffffff]"
+              : "tw:border-gray-300 tw:bg-[#ffffff] tw:hover:border-primary"
           }`}
         >
           <div className="tw:text-sm tw:font-medium tw:text-primary">

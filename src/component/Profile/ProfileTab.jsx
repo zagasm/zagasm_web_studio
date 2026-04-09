@@ -59,7 +59,7 @@ export default function ProfileTabs({ user, isOwnProfile }) {
 
   return (
     <div className="tw:h-full tw:flex tw:flex-col">
-      <div className="tw:lg:sticky tw:lg:top-0 tw:z-20 tw:bg-[#f5f5f7] tw:pb-3">
+      <div className="tw:lg:sticky tw:lg:top-0 tw:z-20 tw:bg-white tw:pb-3">
         <div className="tw:flex tw:items-center tw:justify-between tw:pt-3 tw:pb-2">
           <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
             {heading}

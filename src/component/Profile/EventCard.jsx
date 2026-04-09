@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Eye, Heart, Users, Pencil, Trash2 } from "lucide-react";
+import { Clock, Heart, Pencil, Trash2, Pause, CalendarDays } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
 import MediaCarousel from "./MediaCarousel";
 import DeleteConfirmModal from "../DeleteConfirmModal";
+import { CountdownPill, eventStartDate, formatMetaLine } from "../Events/SingleEvent";
 
 function collectMedia(poster = []) {
   const imgs = poster.filter((p) => p.type === "image");
@@ -34,35 +35,6 @@ function normalizeEventStatus(status) {
   return "upcoming";
 }
 
-function getStatusBadgeConfig(status) {
-  const normalized = normalizeEventStatus(status);
-
-  const badgeMap = {
-    live: {
-      label: "Live",
-      className: "tw:bg-red-50 tw:text-red-700 tw:border-red-100",
-      dotClassName: "tw:bg-red-500",
-    },
-    paused: {
-      label: "Paused",
-      className: "tw:bg-sky-50 tw:text-sky-700 tw:border-sky-100",
-      dotClassName: "tw:bg-sky-500",
-    },
-    upcoming: {
-      label: "Upcoming",
-      className: "tw:bg-amber-50 tw:text-amber-700 tw:border-amber-100",
-      dotClassName: "tw:bg-amber-500",
-    },
-    ended: {
-      label: "Ended",
-      className: "tw:bg-gray-100 tw:text-gray-700 tw:border-gray-200",
-      dotClassName: "tw:bg-gray-500",
-    },
-  };
-
-  return badgeMap[normalized];
-}
-
 export default function EventCard({
   event,
   isOwnProfile,
@@ -70,12 +42,9 @@ export default function EventCard({
   onDeleted,
 }) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
+  const startDate = useMemo(() => eventStartDate(event), [event]);
   const normalizedStatus = useMemo(
     () => normalizeEventStatus(event?.status),
-    [event?.status],
-  );
-  const statusBadge = useMemo(
-    () => getStatusBadgeConfig(event?.status),
     [event?.status],
   );
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
@@ -136,8 +105,30 @@ export default function EventCard({
     }
   };
 
+  const statusChip = normalizedStatus === "live" ? (
+    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-red-50 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-red-600">
+      <span>Live now</span>
+      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-red-500" />
+    </span>
+  ) : normalizedStatus === "paused" ? (
+    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-blue-50 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-blue-700">
+      <span>Paused</span>
+      <Pause className="tw:size-3.5" />
+    </span>
+  ) : normalizedStatus === "upcoming" ? (
+    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-emerald-800 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-white">
+      <span>Upcoming</span>
+      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-white/80" />
+    </span>
+  ) : normalizedStatus === "ended" ? (
+    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-gray-700">
+      <span>Ended</span>
+      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-gray-500" />
+    </span>
+  ) : null;
+
   return (
-    <article className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-white">
+    <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-[#ffffff]">
       {/* Top-right actions (only for owner) */}
       {event.isOwner && (
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:flex tw:gap-2">
@@ -180,19 +171,22 @@ export default function EventCard({
 
       {/* Clickable media/title section navigates to event page */}
       <div className="tw:cursor-pointer" onClick={goToEvent}>
-        <div
-          className={`tw:absolute tw:left-4 tw:top-4 tw:z-10 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-semibold tw:backdrop-blur-sm ${statusBadge.className}`}
-        >
-          <span
-            className={`tw:inline-block tw:h-2 tw:w-2 tw:rounded-full ${statusBadge.dotClassName}`}
-          />
-          <span>{statusBadge.label}</span>
-        </div>
-
         <MediaCarousel items={media} alt={event.title} />
       </div>
 
-      <div className="tw:p-5 tw:space-y-2">
+      <div className="tw:flex tw:flex-col tw:gap-4 tw:p-5">
+        <div className="tw:text-xs tw:text-zinc-600">
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            {statusChip && (
+              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                {statusChip}
+                {normalizedStatus === "upcoming" && <CountdownPill target={startDate} />}
+              </div>
+            )}
+            
+          </div>
+        </div>
+
         <div className="tw:flex tw:items-start tw:gap-2">
           <div
             onClick={goToEvent}
@@ -266,7 +260,7 @@ export default function EventCard({
               e.stopPropagation();
               goToStreamControl();
             }}
-            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
+            className="tw:mt-auto tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
             <span className="tw:mr-2">
               {normalizedStatus === "live"
@@ -303,6 +297,6 @@ export default function EventCard({
         loading={deleting}
         onConfirm={deleteEvent}
       />
-    </article>
+    </div>
   );
 }

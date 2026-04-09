@@ -2,6 +2,7 @@ export const BANKS_CACHE_KEY = "Xilolo_banks_cache_v1";
 export const BANKS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 export const COUNTRIES_API_URL =
   "https://restcountries.com/v3.1/all?fields=name,cca2,flags";
+export const COUNTRY_GEOLOOKUP_API_URL = "https://api.country.is/";
 export const DIDIT_RETRYABLE_STATUSES = ["Declined", "Abandoned", "Expired"];
 export const BANK_STEPPER_STEPS = ["Account details", "Verify identity"];
 

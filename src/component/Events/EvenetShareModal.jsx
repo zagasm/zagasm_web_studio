@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   Copy,
@@ -50,7 +50,7 @@ function ChannelButton({ channel, onClick }) {
     <button
       type="button"
       onClick={() => onClick?.(channel)}
-      className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:py-3 tw:text-left tw:transition hover:tw:border-primary/30 hover:tw:bg-primary/5"
+      className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:text-left tw:transition hover:tw:border-primary/30 hover:tw:bg-primary/5"
     >
       <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:text-slate-700">
         <Icon className="tw:h-4 tw:w-4" />
@@ -78,9 +78,39 @@ export default function EventShareModal({
   onChannelClick,
   title = "Share this event",
 }) {
+  const [copied, setCopied] = useState(false);
   const channels = Array.isArray(payload?.channels) ? payload.channels : [];
   const hasShareUrl = Boolean(payload?.url);
   const sharePreviewText = payload?.text || payload?.url || "";
+
+  useEffect(() => {
+    if (!open) {
+      setCopied(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    setCopied(false);
+  }, [payload?.url]);
+
+  useEffect(() => {
+    if (!copied) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [copied]);
+
+  const handleCopyLink = async () => {
+    try {
+      await onCopyLink?.();
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <Transition show={open} as={Fragment} appear>
@@ -115,9 +145,9 @@ export default function EventShareModal({
                       <Share2 className="tw:h-5 tw:w-5" />
                     </span>
                     <div>
-                      <Dialog.Title className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                      <span className="tw:block tw:text-xl tw:font-semibold tw:text-slate-900">
                         {title}
-                      </Dialog.Title>
+                      </span>
                       <p className="tw:text-sm tw:text-slate-500">
                         Choose how you want to share this event.
                       </p>
@@ -159,46 +189,30 @@ export default function EventShareModal({
                     </div>
                   ) : (
                     <div className="tw:space-y-5">
-                      <div className="tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-slate-200 tw:bg-white">
-                        {payload?.coverUrl ? (
-                          <img
-                            src={payload.coverUrl}
-                            alt={payload?.title || "Event cover"}
-                            className="tw:h-48 tw:w-full tw:object-cover"
-                          />
-                        ) : (
-                          <div className="tw:flex tw:h-32 tw:items-center tw:justify-center tw:bg-[radial-gradient(circle_at_top_left,#d9ebff_0%,#f8fbff_100%)] tw:text-slate-500">
-                            No event cover available
-                          </div>
-                        )}
-                        <div className="tw:space-y-2 tw:px-4 tw:py-4">
-                          <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
-                            {payload?.title || "Event"}
-                          </div>
-                          {sharePreviewText && (
-                            <p className="tw:text-sm tw:leading-6 tw:text-slate-600">
-                              {sharePreviewText}
-                            </p>
-                          )}
-                        </div>
-                      </div>
 
                       {hasShareUrl && (
                         <div className="tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4">
                           <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                             Share Link
                           </div>
-                          <div className="tw:mt-2 tw:break-all tw:text-sm tw:text-slate-700">
+                          <div className="tw:flex tw:items-center tw:justify-between">
+                            <div className="tw:mt-2 tw:break-all tw:text-sm tw:text-slate-700">
                             {payload.url}
                           </div>
                           <button
+                            style={{
+                              borderRadius: 16,
+                              marginTop: 10
+                            }}
                             type="button"
-                            onClick={onCopyLink}
+                            onClick={handleCopyLink}
                             className="tw:mt-4 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
                           >
                             <Copy className="tw:h-4 tw:w-4" />
-                            Copy link
+                            {copied ? "Copied" : "Copy link"}
                           </button>
+                          </div>
+                          
                         </div>
                       )}
 

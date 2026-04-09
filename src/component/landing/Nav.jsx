@@ -49,7 +49,7 @@ export default function Nav() {
     <div className="tw:md:fixed tw:top-0 tw:left-0 tw:right-0 tw:z-40 tw:overflow-x-hidden">
       <div className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:py-3 tw:md:py-4">
         <motion.div
-          className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-white/60 tw:bg-[rgba(250,247,255,0.65)] tw:backdrop-blur-xl tw:px-4 tw:md:px-6 tw:py-1.5 tw:md:py-2.5"
+          className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-[#efe7dd] tw:bg-[#f7f2eb] tw:backdrop-blur-xl tw:px-4 tw:md:px-6 tw:py-1.5 tw:md:py-2.5"
           initial={{ y: -12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 120, damping: 18 }}
@@ -60,7 +60,7 @@ export default function Nav() {
             className="tw:inline-flex tw:items-center tw:gap-2 tw:shrink-0"
           >
             <motion.img
-              src="/images/logo.png"
+              src="/logo.png"
               alt="Xilolo"
               className="tw:w-16 tw:md:w-28 tw:rounded-sm"
               initial={{ rotate: -6, scale: 0.9, opacity: 0 }}
@@ -150,7 +150,7 @@ export default function Nav() {
           onClick={closeMenu}
         >
           <div
-            className="tw:absolute tw:top-4 tw:left-4 tw:right-4 tw:rounded-2xl tw:border tw:border-white/60 tw:bg-[rgba(250,247,255,0.95)] tw:shadow-[0_18px_50px_rgba(15,23,42,0.28)] tw:p-4 tw:space-y-3"
+            className="tw:absolute tw:top-4 tw:left-4 tw:right-4 tw:rounded-2xl tw:border tw:border-[#efe7dd] tw:bg-[#f7f2eb] tw:shadow-[0_18px_50px_rgba(15,23,42,0.28)] tw:p-4 tw:space-y-3"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:mb-1">

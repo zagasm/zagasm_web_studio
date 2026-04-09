@@ -58,7 +58,7 @@ function EventType() {
 
   if (loading) {
     return (
-      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
+      <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-white tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
         <div className="tw:max-w-7xl tw:mx-auto">
           <div className="tw:flex tw:flex-col tw:gap-2 tw:mb-6">
             <div className="tw:h-8 tw:w-52 tw:rounded-xl tw:bg-gray-200 tw:animate-pulse" />
@@ -253,7 +253,7 @@ function EventType() {
 
   // 3) Organiser + KYC verified → modern card grid for event types
   return (
-    <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
+    <div className="tw:font-sans tw:w-full tw:min-h-screen tw:bg-white tw:py-24 tw:md:pt-28 tw:px-4 tw:lg:px-4">
       <div className="tw:max-w-7xl tw:mx-auto">
         <div className="tw:flex tw:flex-col tw:gap-2 tw:mb-6">
           <span className="tw:block tw:text-2xl tw:md:text-3xl tw:font-semibold">
@@ -289,11 +289,11 @@ function EventType() {
                 key={event.id}
                 type="button"
                 onClick={() => navigate(`/event/create-event/${event.id}`)}
-                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-primary tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3"
+                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-[#ffffff] tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-primary tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3 tw:text-primary"
               >
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:flex tw:items-center tw:gap-3">
-                    <div className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-primary tw:text-sm tw:font-semibold">
+                    <div className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:text-primary tw:text-sm tw:font-semibold">
                       {/* {event.name?.[0]?.toUpperCase()} */}
                       <img src={event.icon_url} alt="" />
                     </div>
@@ -307,15 +307,12 @@ function EventType() {
                     </div>
                   </div>
 
-                  <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#F5F5F7] tw:text-xs tw:text-gray-500 group-tw:hover:bg-primary group-tw:hover:text-white tw:transition tw:duration-200">
+                  <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#ffffff]/50 tw:text-xs tw:text-gray-500 group-tw:hover:bg-primary group-tw:hover:text-white tw:transition tw:duration-200">
                     →
                   </span>
                 </div>
 
                 <div className="tw:flex tw:items-center tw:justify-between tw:mt-2">
-                  <span className="tw:inline-flex tw:px-2 tw:py-1 tw:rounded-full tw:bg-[#F5F5F7] tw:text-[10px] tw:font-medium tw:text-gray-600">
-                    Event type
-                  </span>
                   <span className="tw:text-[10px] tw:text-gray-400">
                     Tap to continue
                   </span>

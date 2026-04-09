@@ -48,7 +48,7 @@ export function CountdownPill({ target }) {
   if (!target) return null;
 
   return (
-    <div className="tw:flex tw:items-center tw:gap-2 tw:text-base tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
+    <div className="tw:flex tw:items-center tw:gap-2 tw:text-base tw:font-medium tw:border tw:border-[#ffffff]/30 tw:backdrop-blur">
       <Clock className="tw:w-4 tw:h-4 tw:opacity-80" />
 
       <Countdown
@@ -81,25 +81,25 @@ function getTicketPromptStorageKey(eventIdentifier) {
 
 function EventDetailShimmer() {
   return (
-    <div className="tw:min-h-screen tw:w-full tw:bg-[radial-gradient(circle_at_top_left,#d9ebff_0%,#f6f9fc_34%,#eef4fb_72%,#f8fbff_100%)] tw:pb-12 tw:pt-20">
+    <div className="tw:min-h-screen tw:w-full tw:pb-12 tw:pt-20">
       <div className="tw:mx-auto tw:max-w-7xl tw:px-2 tw:md:px-6 tw:lg:px-8">
-        <div className="tw:mb-4 tw:mt-10 tw:h-[64px] tw:animate-pulse tw:md:rounded-[28px] tw:md:border tw:md:border-white/70 tw:md:bg-white/55 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl" />
+        <div className="tw:mb-4 tw:mt-10 tw:h-[64px] tw:animate-pulse tw:md:rounded-[28px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/55 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl" />
 
-        <div className="tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-white/70 tw:md:bg-white/50 tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:md:backdrop-blur-2xl">
+        <div className="tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/50 tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:md:backdrop-blur-2xl">
           <div className="tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
             <div className="tw:space-y-6">
-              <div className="tw:h-80 tw:animate-pulse tw:rounded-[28px] tw:bg-white/70 tw:md:h-[520px] tw:md:rounded-4xl" />
+              <div className="tw:h-80 tw:animate-pulse tw:rounded-[28px] tw:bg-[#ffffff]/70 tw:md:h-[520px] tw:md:rounded-4xl" />
 
               <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-4">
                 {[...Array(4)].map((_, index) => (
                   <div
                     key={index}
-                    className="tw:h-[116px] tw:animate-pulse tw:rounded-[26px] tw:bg-white/70"
+                    className="tw:h-[116px] tw:animate-pulse tw:rounded-[26px] tw:bg-[#ffffff]/70"
                   />
                 ))}
               </div>
 
-              <div className="tw:py-2 tw:md:rounded-[30px] tw:md:bg-white/70 tw:md:p-6">
+              <div className="tw:py-2 tw:md:rounded-[30px] tw:md:bg-[#ffffff]/70 tw:md:p-6">
                 <div className="tw:h-4 tw:w-28 tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
                 <div className="tw:mt-5 tw:h-8 tw:w-3/4 tw:animate-pulse tw:rounded-full tw:bg-slate-200" />
                 <div className="tw:mt-4 tw:space-y-3">
@@ -111,8 +111,8 @@ function EventDetailShimmer() {
             </div>
 
             <div className="tw:space-y-6">
-              <div className="tw:h-[360px] tw:animate-pulse tw:rounded-[28px] tw:bg-white/70 tw:md:rounded-[30px]" />
-              <div className="tw:h-[280px] tw:animate-pulse tw:rounded-[28px] tw:bg-white/70 tw:md:rounded-[30px]" />
+              <div className="tw:h-[360px] tw:animate-pulse tw:rounded-[28px] tw:bg-[#ffffff]/70 tw:md:rounded-[30px]" />
+              <div className="tw:h-[280px] tw:animate-pulse tw:rounded-[28px] tw:bg-[#ffffff]/70 tw:md:rounded-[30px]" />
             </div>
           </div>
         </div>
@@ -136,6 +136,7 @@ export default function ViewEvent() {
   const [fundWalletOpen, setFundWalletOpen] = useState(false);
   const [fundingRequiredDetails, setFundingRequiredDetails] = useState(null);
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
+  const [purchaseSummary, setPurchaseSummary] = useState(null);
   const navigate = useNavigate();
   const { token } = useAuth();
   const shareFlow = useEventShareFlow();
@@ -145,20 +146,41 @@ export default function ViewEvent() {
   const [reportOpen, setReportOpen] = useState(false);
 
   const purchaseTicketMutation = usePurchaseTicketWithWallet({
-    onSuccess: () => {
+    onSuccess: (payload) => {
+      const purchaseData = payload?.data || payload || {};
+      const purchaseType = purchaseData?.purchase_type || "ticket_only";
+      const includesManual = !!purchaseData?.includes_manual;
+
       setEvent((previous) =>
         previous
           ? {
             ...previous,
-            hasPaid: true,
+            hasPaid: purchaseType === "manual_only" ? !!previous?.hasPaid : true,
+            manual: previous?.manual
+              ? {
+                ...previous.manual,
+                viewer_has_access:
+                  includesManual || previous.manual.viewer_has_access,
+                viewer_has_purchased:
+                  includesManual || previous.manual.viewer_has_purchased,
+                viewer_has_ticket: true,
+              }
+              : previous?.manual,
           }
           : previous
       );
+      setPurchaseSummary(purchaseData);
       setPurchaseSuccessOpen(true);
       setPurchaseModalOpen(false);
       setFundingRequiredOpen(false);
       dispatch(clearPendingPurchaseIntent());
-      showSuccess("Ticket purchased successfully.");
+      showSuccess(
+        purchaseType === "manual_only"
+          ? "Manual purchased successfully."
+          : includesManual
+            ? "Ticket and manual purchased successfully."
+            : "Ticket purchased successfully."
+      );
     },
   });
 
@@ -184,6 +206,7 @@ export default function ViewEvent() {
         setError(null);
         setModalAutoTrigger(true);
         setPurchaseModalOpen(false);
+        setPurchaseSummary(null);
         const isId = isUuid(eventId);
         const res = isId
           ? await api.get(`/api/v1/events/${eventId}/view`, authHeaders(token))
@@ -228,12 +251,17 @@ export default function ViewEvent() {
 
     const priceValue = Number(event?.price ?? 0);
     const hasPrice = priceValue > 0 || Boolean(event?.price_display);
+    const hasPurchaseOptions =
+      event?.purchase_options?.ticket_only ||
+      event?.purchase_options?.ticket_and_manual ||
+      event?.purchase_options?.manual_only ||
+      hasPrice;
     const promptKey = getTicketPromptStorageKey(event?.id || eventId);
     const hasSeenPrompt =
       typeof window !== "undefined" &&
       window.localStorage.getItem(promptKey) === "1";
 
-    if (!event?.hasPaid && hasPrice && !hasSeenPrompt) {
+    if (!event?.hasPaid && hasPurchaseOptions && !hasSeenPrompt) {
       if (typeof window !== "undefined") {
         window.localStorage.setItem(promptKey, "1");
       }
@@ -251,8 +279,74 @@ export default function ViewEvent() {
     `${event?.currency?.symbol || "₦"}${event?.price || "0"}`;
 
   const posterUrl = useMemo(() => event?.poster?.[0]?.url, [event]);
+  const manual = event?.manual || {};
+  const purchaseOptions = event?.purchase_options || {};
+  const manualAvailable = !!manual?.available;
+  const manualHasAccess = !!manual?.viewer_has_access;
+  const ticketOnlyAvailable =
+    !event?.is_sold_out &&
+    (!!purchaseOptions.ticket_only || (!event?.hasPaid && Number(event?.price ?? 0) > 0));
+  const ticketAndManualAvailable =
+    manualAvailable && !!purchaseOptions.ticket_and_manual && !manualHasAccess;
+  const manualOnlyAvailable =
+    manualAvailable && !!purchaseOptions.manual_only && !manualHasAccess;
+  const purchaseChoiceCount = [
+    ticketOnlyAvailable,
+    ticketAndManualAvailable,
+    manualOnlyAvailable,
+  ].filter(Boolean).length;
+  const shouldChoosePurchaseType =
+    purchaseChoiceCount > 1 || ticketAndManualAvailable || manualOnlyAvailable;
+  const manualPriceDisplay =
+    manual?.price_display ||
+    formatWalletMoney(
+      Number(manual?.price || 0),
+      manual?.currency_code || event?.currency?.code || "NGN"
+    );
 
-  const handleGetTicket = async () => {
+  const handleDownloadManual = async () => {
+    if (!event?.id) return;
+
+    if (!token) {
+      showError("Please log in to access the event manual.");
+      navigate("/auth/signin");
+      return;
+    }
+
+    try {
+      const endpoint = manual?.download_endpoint || `/api/v1/events/${event.id}/manual/download`;
+      const response = await api.get(endpoint, authHeaders(token));
+      const payload = response?.data?.data || response?.data || {};
+      const downloadUrl = payload?.download_url;
+
+      if (!downloadUrl) {
+        showError("Manual download is not available right now.");
+        return;
+      }
+
+      window.open(downloadUrl, "_blank", "noopener,noreferrer");
+      setEvent((previous) =>
+        previous
+          ? {
+            ...previous,
+            manual: previous.manual
+              ? {
+                ...previous.manual,
+                viewer_has_access: true,
+                download_endpoint: endpoint,
+              }
+              : previous.manual,
+          }
+          : previous
+      );
+    } catch (downloadError) {
+      showError(
+        getApiErrorMessage(downloadError, "Unable to download the event manual.")
+      );
+    }
+  };
+
+  const handleGetTicket = async (purchaseType = "ticket_only") => {
     if (event?.is_sold_out || purchaseTicketMutation.isPending) return;
 
     if (!token) {
@@ -265,6 +359,7 @@ export default function ViewEvent() {
       await purchaseTicketMutation.mutateAsync({
         event_id: event.id,
         quantity: 1,
+        purchase_type: purchaseType,
       });
     } catch (paymentError) {
       const errorCode = getApiErrorCode(paymentError);
@@ -283,6 +378,7 @@ export default function ViewEvent() {
             eventId: event.id,
             eventTitle: event.title,
             quantity: 1,
+            purchaseType,
             sourcePage: "event_detail",
             eventPath: location.pathname,
             deficitAmount: details?.deficit_amount || 0,
@@ -295,6 +391,11 @@ export default function ViewEvent() {
 
       if (errorCode === "EVENT_NOT_PURCHASABLE") {
         showError(errorMessage || "This event is not available for purchase.");
+        return;
+      }
+
+      if (errorCode === "EVENT_MANUAL_NOT_AVAILABLE") {
+        showError(errorMessage || "This manual is not available for purchase.");
         return;
       }
 
@@ -358,23 +459,29 @@ export default function ViewEvent() {
   const isEnded = event?.status === "ended";
   const isSoldOut = !!event?.is_sold_out;
   const hasPaid = !!event?.hasPaid;
+  const canBuyManualOnly = hasPaid && manualOnlyAvailable;
+  const canDownloadManual = manualAvailable && manualHasAccess;
 
   let primaryCtaLabel;
   if (hasPaid && isLiveNow) {
     primaryCtaLabel = "Join Live Event";
+  } else if (canBuyManualOnly) {
+    primaryCtaLabel = "Buy Manual";
   } else if (hasPaid && !isLiveNow) {
     primaryCtaLabel = "Ticket Purchased";
   } else if (isSoldOut) {
     primaryCtaLabel = "Sold Out";
   } else if (purchaseTicketMutation.isPending) {
     primaryCtaLabel = "Processing...";
+  } else if (shouldChoosePurchaseType) {
+    primaryCtaLabel = "Choose Access";
   } else {
     primaryCtaLabel = "Buy Ticket";
   }
 
   const ctaDisabled =
-    (!hasPaid && isSoldOut) ||
-    (hasPaid && !isLiveNow) ||
+    (!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
+    (hasPaid && !isLiveNow && !canBuyManualOnly) ||
     purchaseTicketMutation.isPending;
 
   const handleEnterLive = () => {
@@ -391,7 +498,13 @@ export default function ViewEvent() {
       return;
     }
 
-    handleGetTicket();
+    if (shouldChoosePurchaseType || canBuyManualOnly) {
+      setPurchaseModalOpen(true);
+      setModalAutoTrigger(false);
+      return;
+    }
+
+    handleGetTicket(ticketAndManualAvailable ? "ticket_and_manual" : "ticket_only");
   };
 
   if (loading) {
@@ -491,14 +604,14 @@ export default function ViewEvent() {
         </script>
       </Helmet>
 
-      <div className="tw:min-h-screen tw:w-full tw:bg-[radial-gradient(circle_at_top_left,#d9ebff_0%,#f6f9fc_34%,#eef4fb_72%,#f8fbff_100%)] tw:pb-32 tw:pt-20 tw:font-sans tw:text-slate-900 tw:md:pb-12">
+      <div className="tw:min-h-screen tw:w-full tw:bg-[#ffffff] tw:pb-32 tw:pt-20 tw:font-sans tw:text-slate-900 tw:md:pb-12">
         <div className="tw:mx-auto tw:max-w-7xl tw:px-2 tw:md:px-6 tw:lg:px-8">
-          <div className="tw:mb-4 tw:mt-4 tw:sm:mt-10 tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:py-2 tw:md:mb-6 tw:md:rounded-[28px] tw:md:border tw:md:border-white/70 tw:md:bg-white/55 tw:md:px-4 tw:md:py-3 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl">
+          <div className="tw:mb-4 tw:mt-4 tw:sm:mt-10 tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:py-2 tw:md:mb-6 tw:md:rounded-[28px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:px-4 tw:md:py-3 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.10)]">
             <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white tw:md:size-11"
+                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:md:size-11"
                 style={{ borderRadius: "9999px" }}
               >
                 <ArrowLeft className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
@@ -516,7 +629,7 @@ export default function ViewEvent() {
             <button
               type="button"
               onClick={handleShareEvent}
-              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white tw:md:size-11"
+              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:md:size-11"
               aria-label="Share event"
               style={{ borderRadius: "9999px" }}
             >
@@ -524,13 +637,13 @@ export default function ViewEvent() {
             </button>
           </div>
 
-          <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-white/70 tw:md:bg-white/50 tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:md:backdrop-blur-2xl">
-            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#d7e8ff] tw:blur-3xl tw:md:block" />
-            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#f3d9ff] tw:blur-3xl tw:md:block" />
+          <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
+            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#f7f2eb] tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#f5efe6] tw:blur-3xl tw:md:block" />
 
             <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
               <div className="tw:space-y-6">
-                <div className="tw:relative tw:overflow-hidden tw:rounded-[28px] tw:bg-white/35 tw:md:rounded-4xl tw:md:border tw:md:border-white/70 tw:md:shadow-[0_20px_60px_rgba(15,23,42,0.08)] tw:md:backdrop-blur-xl">
+                <div className="tw:relative tw:overflow-hidden tw:rounded-[28px] tw:bg-[#FFFFFF] tw:md:rounded-4xl tw:md:border tw:md:border-[#f1f5f9] tw:md:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
                   <div className="tw:relative tw:h-80 tw:w-full tw:overflow-hidden tw:md:h-[520px]">
                     {posterUrl ? (
                       <img
@@ -546,12 +659,12 @@ export default function ViewEvent() {
 
                     <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:flex-wrap tw:gap-2">
 
-                      <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-white/20 tw:bg-white/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:backdrop-blur-xl">
+                      <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-[#ffffff]/20 tw:bg-[#ffffff]/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:backdrop-blur-xl">
                         <Ticket className="tw:h-3 tw:w-3" />
                         {event.eventType}
                       </span>
                       {event.genre && (
-                        <span className="tw:rounded-full tw:border tw:border-white/20 tw:bg-white/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:backdrop-blur-xl">
+                        <span className="tw:rounded-full tw:border tw:border-[#ffffff]/20 tw:bg-[#ffffff]/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:backdrop-blur-xl">
                           {event.genre}
                         </span>
                       )}
@@ -559,48 +672,48 @@ export default function ViewEvent() {
 
                     <div className="tw:absolute tw:right-4 tw:top-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
                       {isSoldOut && !hasPaid && (
-                        <span className="tw:rounded-full tw:bg-[#ef4444] tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:shadow-lg">
+                        <span className="tw:rounded-full tw:bg-[#ef4444] tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:shadow-lg">
                           Sold out
                         </span>
                       )}
                       {hasPaid && (
-                        <span className="tw:rounded-full tw:bg-emerald-500/90 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-white tw:shadow-lg">
+                        <span className="tw:rounded-full tw:bg-emerald-500/90 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:shadow-lg">
                           Ticket purchased
                         </span>
                       )}
                     </div>
 
                     <div className="tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:p-2.5 tw:md:p-6">
-                      <div className="tw:rounded-[24px] tw:border tw:border-white/12 tw:bg-white/10 tw:p-3 tw:text-white tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-white/15 tw:md:bg-white/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
+                      <div className="tw:rounded-[24px] tw:border tw:border-[#ffffff]/12 tw:bg-[#ffffff]/10 tw:p-3 tw:text-[#ffffff] tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-[#ffffff]/15 tw:md:bg-[#ffffff]/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
                         <div className="tw:flex tw:flex-col tw:gap-3 tw:md:gap-5">
                           <div className="tw:space-y-2 tw:md:space-y-3">
-                            <div className="tw:hidden tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-white/72 tw:md:block">
+                            <div className="tw:hidden tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-[#ffffff]/72 tw:md:block">
                               Featured Experience
                             </div>
-                            <span className="tw:block tw:max-w-3xl tw:text-[19px] tw:font-semibold tw:leading-tight tw:text-white tw:md:text-3xl">
+                            <span className="tw:block tw:max-w-3xl tw:text-[19px] tw:font-semibold tw:leading-tight tw:text-[#ffffff] tw:md:text-3xl">
                               {event.title}
                             </span>
-                            <span className="tw:hidden tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-white/84 tw:md:block tw:md:text-base">
+                            <span className="tw:hidden tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-[#ffffff]/84 tw:md:block tw:md:text-base">
                               {event.description ||
                                 "No description available for this event yet."}
                             </span>
                           </div>
 
                           <div className="tw:grid tw:grid-cols-2 tw:gap-2.5 tw:md:grid-cols-3 tw:md:gap-3">
-                            <div className="tw:rounded-[18px] tw:border tw:border-white/12 tw:bg-black/18 tw:p-3 tw:md:rounded-2xl tw:md:border-white/15 tw:md:p-3.5">
-                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-white/55">
+                            <div className="tw:rounded-[18px] tw:border tw:border-[#ffffff]/12 tw:bg-black/18 tw:p-3 tw:md:rounded-2xl tw:md:border-[#ffffff]/15 tw:md:p-3.5">
+                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-[#ffffff]/55">
                                 Date & Time
                               </div>
-                              <div className="tw:mt-1.5 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-white tw:md:mt-2 tw:md:text-sm">
+                              <div className="tw:mt-1.5 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[#ffffff] tw:md:mt-2 tw:md:text-sm">
                                 {formattedDateTime || formatMetaLine(event)}
                               </div>
                             </div>
 
-                            <div className="tw:rounded-[18px] tw:border tw:border-white/12 tw:bg-black/18 tw:p-3 tw:md:rounded-2xl tw:md:border-white/15 tw:md:p-3.5">
-                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-white/55">
+                            <div className="tw:rounded-[18px] tw:border tw:border-[#ffffff]/12 tw:bg-black/18 tw:p-3 tw:md:rounded-2xl tw:md:border-[#ffffff]/15 tw:md:p-3.5">
+                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-[#ffffff]/55">
                                 Ticket Price
                               </div>
-                              <div className="tw:mt-1.5 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-white tw:md:mt-2 tw:md:text-sm">
+                              <div className="tw:mt-1.5 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[#ffffff] tw:md:mt-2 tw:md:text-sm">
                                 {priceDisplay}
                               </div>
                             </div>
@@ -612,7 +725,7 @@ export default function ViewEvent() {
                 </div>
 
                 <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-4">
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-white/75 tw:md:bg-white/65 tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:md:backdrop-blur-xl">
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                     <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                       Event Schedule
                     </div>
@@ -621,7 +734,7 @@ export default function ViewEvent() {
                     </div>
                   </div>
 
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-white/75 tw:md:bg-white/65 tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:md:backdrop-blur-xl">
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                     <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                       Access Window
                     </div>
@@ -636,7 +749,7 @@ export default function ViewEvent() {
                     </div>
                   </div>
 
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-white/75 tw:md:bg-white/65 tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:md:backdrop-blur-xl">
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                     <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                       Hosted By
                     </div>
@@ -645,7 +758,7 @@ export default function ViewEvent() {
                     </div>
                   </div>
 
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-white/75 tw:md:bg-white/65 tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.12)] tw:md:backdrop-blur-xl">
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                     <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                       Countdown
                     </div>
@@ -661,7 +774,7 @@ export default function ViewEvent() {
                   </div>
                 </div>
 
-                <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-white/75 tw:md:bg-white/68 tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.12)] tw:md:backdrop-blur-2xl">
+                <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
                   <div className="tw:flex tw:flex-col tw:gap-6 tw:md:flex-row tw:md:items-start tw:md:justify-between">
                     <div className="tw:max-w-3xl">
                       <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
@@ -687,7 +800,7 @@ export default function ViewEvent() {
                         }}
                         type="button"
                         onClick={() => setReportOpen(true)}
-                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm hover:tw:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
+                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#ffffff] tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm hover:tw:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
                       >
                         Report this event
                       </button>
@@ -697,8 +810,8 @@ export default function ViewEvent() {
               </div>
 
               <aside className="tw:flex tw:flex-col tw:gap-6">
-                <div className="tw:px-1 tw:py-2 tw:md:sticky tw:md:top-28 tw:md:rounded-[30px] tw:md:border tw:md:border-white/75 tw:md:bg-white/70 tw:md:p-5 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.14)] tw:md:backdrop-blur-2xl">
-                  <div className="tw:rounded-[24px] tw:bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-white/80 tw:md:p-5">
+                <div className="tw:px-1 tw:py-2 tw:md:sticky tw:md:top-28">
+                  <div className="tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5">
                     <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
                       <div>
                         <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
@@ -717,7 +830,7 @@ export default function ViewEvent() {
                     </div>
 
                     <div className="tw:mt-5 tw:space-y-3">
-                      <div className="tw:flex tw:items-start tw:gap-3 tw:rounded-2xl tw:bg-[#f6f9ff] tw:px-4 tw:py-3">
+                      <div className="tw:flex tw:items-start tw:gap-3 tw:py-3">
                         <CalendarDays className="tw:mt-0.5 tw:h-4 tw:w-4 tw:text-primary" />
                         <div>
                           <div className="tw:text-xs tw:text-slate-500">When</div>
@@ -735,6 +848,46 @@ export default function ViewEvent() {
                       </div>
                     )}
 
+                    {manualAvailable && (
+                      <div className="tw:my-6">
+                        <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+                          <div>
+                            <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
+                              Event Manual
+                            </div>
+                            <div className="tw:mt-1 tw:text-sm tw:font-semibold tw:text-slate-900">
+                              {manual?.file_name || "Soft-copy manual"}
+                            </div>
+                            <div className="tw:my-1 tw:text-xs tw:text-slate-500">
+                              {manualHasAccess
+                                ? "You already have access to this manual."
+                                : `Available for ${manualPriceDisplay}.`}
+                            </div>
+                          </div>
+                          {manual?.cover_url && (
+                            <img
+                              src={manual.cover_url}
+                              alt="Manual cover"
+                              className="tw:h-16 tw:w-16 tw:rounded-2xl tw:object-cover"
+                            />
+                          )}
+                        </div>
+
+                        {canDownloadManual && (
+                          <button
+                            style={{
+                              borderRadius: 24, marginTop: 12
+                            }}
+                            type="button"
+                            onClick={handleDownloadManual}
+                            className=" tw:w-full tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/10"
+                          >
+                            Download manual
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     <button
                       style={{
                         borderRadius: 24
@@ -744,11 +897,11 @@ export default function ViewEvent() {
                       onClick={handlePrimaryAction}
                       className={`tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-4 tw:text-xs tw:font-semibold tw:transition tw:md:h-12 tw:md:px-5 tw:md:text-sm ${ctaDisabled
                         ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                        : "tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+                        : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
                         }`}
                     >
                       {primaryCtaLabel}
-                      {!ctaDisabled && !hasPaid && (
+                      {!ctaDisabled && !hasPaid && !shouldChoosePurchaseType && (
                         <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
                           ({priceText(event)})
                         </span>
@@ -759,14 +912,18 @@ export default function ViewEvent() {
                       {hasPaid
                         ? isLiveNow
                           ? "You already have access. Tap the button above to join the live experience."
-                          : "Your ticket is secured. We will notify you when the event starts."
-                        : "Secure checkout and fast access to your purchased ticket."}
+                          : canBuyManualOnly
+                            ? "Your ticket is secured. You can still unlock the event manual."
+                            : "Your ticket is secured. We will notify you when the event starts."
+                        : shouldChoosePurchaseType
+                          ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
+                          : "Secure checkout and fast access to your purchased ticket."}
                     </p>
                   </div>
 
-                  <div className="tw:mt-4 tw:rounded-[24px] tw:bg-white/70 tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-white/80 tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.12)]">
+                  <div className="tw:mt-4 tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
                     <div className="tw:flex tw:items-start tw:gap-4">
-                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple">
+                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-[#f7f2eb]">
                         {hostHasImage ? (
                           <img
                             src={event.hostImage}
@@ -818,7 +975,7 @@ export default function ViewEvent() {
                         onClick={handleToggleFollow}
                         disabled={followLoading || !event.hostId}
                         className={`tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:px-3 tw:text-xs tw:font-medium tw:transition tw:md:h-11 tw:md:text-sm ${isFollowing
-                          ? "tw:border-primary/25 tw:bg-white tw:text-primary"
+                          ? "tw:border-primary/25 tw:bg-[#ffffff] tw:text-primary"
                           : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 hover:tw:bg-[#ebf1f8]"
                           } ${followLoading ? "tw:cursor-not-allowed tw:opacity-70" : ""
                           }`}
@@ -832,14 +989,14 @@ export default function ViewEvent() {
 
                       <Link
                         style={{
-                          color: "white"
+                          color: "#ffffff"
                         }}
                         to={
                           event.organiserId
                             ? `/profile/${event.organiserId}`
                             : "/organizers"
                         }
-                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-white hover:tw:bg-primarySecond tw:md:h-11 tw:md:text-sm"
+                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] hover:tw:bg-primarySecond tw:md:h-11 tw:md:text-sm"
                       >
                         View Profile
                       </Link>
@@ -857,7 +1014,7 @@ export default function ViewEvent() {
       </div>
 
       <div className="tw:fixed tw:bottom-20 tw:left-0 tw:right-0 tw:z-40 tw:px-3 tw:md:hidden">
-        <div className="tw:rounded-[28px] tw:border tw:border-white/80 tw:bg-white/88 tw:p-3 tw:shadow-[0_18px_45px_rgba(15,23,42,0.18)] tw:backdrop-blur-2xl">
+        <div className="tw:rounded-[28px] tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/88 tw:p-3 tw:shadow-[0_18px_45px_rgba(15,23,42,0.18)] tw:backdrop-blur-2xl">
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
             <div className="tw:min-w-0">
               <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
@@ -875,7 +1032,7 @@ export default function ViewEvent() {
               onClick={handlePrimaryAction}
               className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
                 ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                : "tw:bg-primary tw:text-white hover:tw:bg-primarySecond"
+                : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
                 }`}
             >
               {primaryCtaLabel}
@@ -912,7 +1069,8 @@ export default function ViewEvent() {
         open={purchaseModalOpen}
         onClose={closePurchaseModal}
         event={event}
-        onBuy={() => handleGetTicket()}
+        onBuy={(purchaseType) => handleGetTicket(purchaseType)}
+        onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
       />
       <WalletFundingRequiredModal
@@ -937,6 +1095,11 @@ export default function ViewEvent() {
         open={purchaseSuccessOpen}
         onClose={() => setPurchaseSuccessOpen(false)}
         eventTitle={event?.title}
+        purchaseType={purchaseSummary?.purchase_type || "ticket_only"}
+        includesManual={!!purchaseSummary?.includes_manual}
+        onDownloadManual={
+          purchaseSummary?.includes_manual ? handleDownloadManual : undefined
+        }
       />
       <LiveAppDownloadModal
         open={downloadModalOpen}

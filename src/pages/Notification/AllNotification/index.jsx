@@ -4,6 +4,7 @@ import SingleNotificationTemplate from "../../../component/Notification/singleNo
 import { api, authHeaders } from "../../../lib/apiClient";
 import { useAuth } from "../../auth/AuthContext";
 import { showPromise } from "../../../component/ui/toast";
+import { ChevronLeftIcon } from "lucide-react";
 
 function AllNotification() {
   const { token } = useAuth();
@@ -149,23 +150,24 @@ function AllNotification() {
   };
 
   return (
-    <div className="tw:font-sans tw:mt-20 tw:bg-slate-50 tw:min-h-screen tw:px-4 tw:py-10 tw:sm:px-6 tw:md:px-8">
-      <div className="tw:mx-auto tw:flex tw:max-w-6xl tw:flex-col tw:gap-8">
-        <section className="tw:rounded-[28px] tw:bg-linear-to-br tw:from-white tw:to-[#f3ede6] tw:p-6 tw:shadow-[0_25px_45px_rgba(15,23,42,0.15)] tw:space-y-4">
+    <div className="tw:mt-16 tw:h-[calc(100vh-4rem)] tw:bg-white tw:px-4 tw:py-6 tw:font-sans tw:sm:px-6 tw:md:px-8 tw:md:py-8">
+      <div className="tw:mx-auto tw:flex tw:h-full tw:max-w-6xl tw:flex-col tw:gap-6">
+        <section className="">
           <div className="tw:text-slate-700">
-            <span className="tw:text-xs tw:font-bold tw:uppercase tw:tracking-[0.4em] tw:text-primary">
-              Activity center
-            </span>
-            <h1 className="tw:mt-3 tw:text-3xl tw:font-semibold tw:text-slate-900">
+            <button onClick={() => window.history.back()} className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-medium tw:text-primary">
+              <ChevronLeftIcon className="tw:h-5 tw:w-5 tw:mr-2" />
+              <span>Back</span>
+            </button>
+            <span className="tw:block tw:mt-3 tw:text-3xl tw:font-semibold tw:text-slate-900">
               Notifications
-            </h1>
+            </span>
             <span className="tw:mt-1 tw:max-w-3xl tw:text-sm tw:text-slate-600">
               Keep up with everything happening on Xilolo—reads,
               follows, and community updates live in one place.
             </span>
           </div>
-          <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-lg tw:md:flex-row tw:md:items-center tw:md:justify-between">
-            <div className="tw:flex tw:gap-6 tw:flex-wrap">
+          <div className="tw:my-4 tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+            <div className="tw:hidden tw:flex-wrap tw:gap-6 tw:md:flex">
               <div className="tw:flex tw:flex-col">
                 <span className="tw:text-3xl tw:font-bold tw:text-slate-900">
                   {items.length}
@@ -228,13 +230,14 @@ function AllNotification() {
           </div>
         </section>
 
-        <section className="tw:space-y-4">
+        <section className="tw:min-h-0 tw:flex-1 tw:overflow-hidden">
+          <div className="tw:h-full tw:space-y-4 tw:overflow-y-auto tw:pr-1">
           {loading ? (
-            <div className="tw:rounded-2xl tw:bg-white tw:p-8 tw:text-center tw:text-sm tw:text-slate-500 tw:shadow-sm">
+            <div className="tw:bg-white tw:p-8 tw:text-center tw:text-sm tw:text-slate-500">
               Loading notifications…
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="tw:rounded-2xl tw:bg-white tw:p-8 tw:text-center tw:text-sm tw:text-slate-500 tw:shadow-sm">
+            <div className="tw:bg-white tw:p-8 tw:text-center tw:text-sm tw:text-slate-500">
               You are all caught up. Check back later for updates.
             </div>
           ) : (
@@ -247,6 +250,7 @@ function AllNotification() {
               />
             ))
           )}
+          </div>
         </section>
       </div>
 

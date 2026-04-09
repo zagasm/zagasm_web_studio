@@ -121,8 +121,14 @@ export default function ReviewStep({
     maxTickets,
     ticketLimit,
     visibility,
+    hasMaterials,
     enableReplay,
     matureContent,
+    manualPrice,
+    manualFile,
+    manualCover,
+    existingManual,
+    existingManualCover,
   } = collected || {};
 
   const flat = useMemo(
@@ -135,6 +141,23 @@ export default function ReviewStep({
     date && time
       ? moment(`${date} ${time}`, "YYYY-MM-DD HH:mm").format("dddd, MMMM D, YYYY [at] h:mm A")
       : "Date and time not set";
+  const manualCoverUrl = useMemo(() => {
+    if (manualCover instanceof File) {
+      return URL.createObjectURL(manualCover);
+    }
+    return existingManualCover?.url || "";
+  }, [existingManualCover?.url, manualCover]);
+  const hasMaterial = Boolean(
+    hasMaterials && (manualFile || existingManual?.fileName)
+  );
+
+  React.useEffect(() => {
+    return () => {
+      if (manualCover instanceof File && manualCoverUrl) {
+        URL.revokeObjectURL(manualCoverUrl);
+      }
+    };
+  }, [manualCover, manualCoverUrl]);
 
   return (
     <div className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7">
@@ -310,6 +333,28 @@ export default function ReviewStep({
                 <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
                   {matureContent ? "Yes" : "No"}
                 </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4 tw:sm:col-span-3">
+                <div className="tw:text-xs tw:text-slate-500">Event material</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {hasMaterial
+                    ? `${currencyMark}${formatMoney(Number(manualPrice || 0))} add-on`
+                    : "No material attached"}
+                </div>
+                {hasMaterial && (
+                  <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-center">
+                    {manualCoverUrl && (
+                      <img
+                        src={manualCoverUrl}
+                        alt="Material cover"
+                        className="tw:h-24 tw:w-24 tw:rounded-2xl tw:object-cover"
+                      />
+                    )}
+                    <div className="tw:text-sm tw:text-slate-600">
+                      {manualFile?.name || existingManual?.fileName || "Material attached"}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>

@@ -49,9 +49,9 @@ export default function Navbar() {
         <Link to={'/feed'} className="tw:flex tw:items-center tw:gap-4 tw:md:gap-5">
           {/* Logo */}
           <img
-            src={"/images/logo.png"}
+            src={"/logo.png"}
             alt="Xilolo Logo"
-            className="tw:w-20 tw:md:w-24 tw:lg:w-28 tw:-ml-2 tw:md:-ml-3 tw:object-contain"
+            className="tw:w-20 tw:md:w-24 tw:lg:w-40 tw:-ml-2 tw:md:-ml-3 tw:object-contain"
           />
         </Link>
 

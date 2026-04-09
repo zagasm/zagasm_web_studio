@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Step, StepLabel, Stepper, useMediaQuery } from "@mui/material";
@@ -19,6 +19,7 @@ import {
 } from "./components/OrganiserDialogs";
 import {
   BANK_STEPPER_STEPS,
+  COUNTRY_GEOLOOKUP_API_URL,
   COUNTRIES_API_URL,
   DIDIT_RETRYABLE_STATUSES,
   loadBanksFromCache,
@@ -40,7 +41,10 @@ const BecomeOrganiser = () => {
   const [countriesLoading, setCountriesLoading] = useState(true);
   const [countriesError, setCountriesError] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [countryAutoDetected, setCountryAutoDetected] = useState(false);
   const [verificationMethod, setVerificationMethod] = useState(null);
+  const countryPrefillDismissedRef = useRef(false);
+  const countryPrefillAttemptedRef = useRef(false);
 
   const [bankStep, setBankStep] = useState(0);
   const [banks, setBanks] = useState([]);
@@ -141,6 +145,60 @@ const BecomeOrganiser = () => {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    if (
+      countriesLoading ||
+      !countries.length ||
+      selectedCountry ||
+      countryPrefillDismissedRef.current ||
+      countryPrefillAttemptedRef.current
+    ) {
+      return;
+    }
+
+    let active = true;
+    const controller = new AbortController();
+
+    const preloadCountryFromGeo = async () => {
+      countryPrefillAttemptedRef.current = true;
+
+      try {
+        const response = await fetch(COUNTRY_GEOLOOKUP_API_URL, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to detect your country right now.");
+        }
+
+        const payload = await response.json();
+        const countryCode = String(payload?.country || "")
+          .trim()
+          .toUpperCase();
+
+        if (!countryCode || !active) return;
+
+        const matchedCountry = countries.find(
+          (country) => country.code === countryCode
+        );
+
+        if (!matchedCountry) return;
+
+        setSelectedCountry(matchedCountry);
+        setCountryAutoDetected(true);
+      } catch (error) {
+        if (!active || error?.name === "AbortError") return;
+      }
+    };
+
+    preloadCountryFromGeo();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [countries, countriesLoading, selectedCountry]);
 
   useEffect(() => {
     if (verificationMethod !== "bvn") return;
@@ -289,8 +347,16 @@ const BecomeOrganiser = () => {
   };
 
   const handleCountryChange = (_, value) => {
+    countryPrefillDismissedRef.current = true;
     setSelectedCountry(value);
+    setCountryAutoDetected(false);
     resetVerificationSelection();
+  };
+
+  const handleChangeCountryRequest = () => {
+    countryPrefillDismissedRef.current = true;
+    setCountryAutoDetected(false);
+    handleCountryChange(null, null);
   };
 
   const handleSaveBankAndContinue = async () => {
@@ -552,6 +618,7 @@ const BecomeOrganiser = () => {
                   countriesLoading={countriesLoading}
                   countriesError={countriesError}
                   selectedCountry={selectedCountry}
+                  countryAutoDetected={countryAutoDetected}
                   onCountryChange={handleCountryChange}
                 />
               )}
@@ -559,6 +626,7 @@ const BecomeOrganiser = () => {
               {selectedCountry && !verificationMethod && (
                 <OrganiserMethodChoiceStep
                   selectedCountry={selectedCountry}
+                  countryAutoDetected={countryAutoDetected}
                   isNigeria={isNigeria}
                   verificationMethod={verificationMethod}
                   onSelectBvn={() => {
@@ -566,7 +634,7 @@ const BecomeOrganiser = () => {
                     setBankStep(0);
                   }}
                   onSelectDidit={() => setVerificationMethod("didit")}
-                  onChangeCountry={() => handleCountryChange(null, null)}
+                  onChangeCountry={handleChangeCountryRequest}
                 />
               )}
 

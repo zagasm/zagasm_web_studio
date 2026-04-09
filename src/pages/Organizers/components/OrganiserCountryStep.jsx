@@ -6,6 +6,7 @@ export default function OrganiserCountryStep({
   countriesLoading,
   countriesError,
   selectedCountry,
+  countryAutoDetected,
   onCountryChange,
 }) {
   return (
@@ -53,7 +54,9 @@ export default function OrganiserCountryStep({
               label="Country"
               helperText={
                 countriesError ||
-                "Search and select the country you are streaming from"
+                (countryAutoDetected
+                  ? "We prefilled this from your connection. You can change it if it looks wrong."
+                  : "Search and select the country you are streaming from")
               }
               error={Boolean(countriesError)}
             />
@@ -65,6 +68,11 @@ export default function OrganiserCountryStep({
         <div className="tw:inline-flex tw:w-fit tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-100 tw:px-3 tw:py-2 tw:text-xs tw:text-slate-700">
           <span>{selectedCountry.flagEmoji || ""}</span>
           <span>{selectedCountry.name}</span>
+          {countryAutoDetected && (
+            <span className="tw:rounded-full tw:bg-white tw:px-2 tw:py-1 tw:text-[10px] tw:font-medium tw:text-slate-600">
+              Auto-detected
+            </span>
+          )}
         </div>
       )}
     </div>

@@ -9,7 +9,7 @@ const FILTERS = [
 
 export default function EventsFilterTabs({ value, onChange }) {
   return (
-    <div className="tw:flex tw:rounded-3xl tw:bg-white tw:p-1 tw:ring-1 tw:ring-gray-200">
+    <div className="tw:flex tw:rounded-3xl tw:bg-[#ffffff] tw:p-1 tw:ring-1 tw:ring-gray-200">
       {FILTERS.map((f) => (
         <button
           key={f.key}

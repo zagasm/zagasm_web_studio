@@ -66,7 +66,7 @@ export default function ProfileHeader({
   const showFollowButton = !isOwnProfile && isOrganiserProfileData;
 
   return (
-    <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:py-6 tw:px-3 tw:shadow-sm">
+    <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:py-6 tw:px-3 tw:shadow-sm">
       <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
         {/* avatar + edit / follow */}
         <div className="tw:relative">
