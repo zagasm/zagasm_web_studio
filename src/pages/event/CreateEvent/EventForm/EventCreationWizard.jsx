@@ -29,7 +29,11 @@ function mapEventToDefaults(event) {
         ticketLimit: undefined,
         currency: "",
         currencyCode: "NGN",
+        hasMaterials: false,
         enableReplay: true,
+        manualPrice: 0,
+        existingManual: null,
+        existingManualCover: null,
       },
       streaming: {
         streamingOption: "in_app",
@@ -79,10 +83,29 @@ function mapEventToDefaults(event) {
           : undefined,
       currency: String(currentEvent.currency?.currencyId || currentEvent.currency?.id || ""),
       currencyCode: String(currentEvent.currency?.code || "NGN").toUpperCase(),
+      hasMaterials: !!(
+        currentEvent.manual?.available ||
+        currentEvent.manual?.cover_url ||
+        Number(currentEvent.manual?.price || 0) > 0
+      ),
       enableReplay:
         typeof currentEvent.enable_replay === "boolean"
           ? currentEvent.enable_replay
           : true,
+      manualPrice: Number(currentEvent.manual?.price || 0),
+      existingManual: currentEvent.manual?.available
+        ? {
+            fileName: currentEvent.manual?.file_name || "",
+            fileMimeType: currentEvent.manual?.file_mime_type || "",
+            fileSize: currentEvent.manual?.file_size || 0,
+          }
+        : null,
+      existingManualCover: currentEvent.manual?.cover_url
+        ? {
+            url: currentEvent.manual.cover_url,
+            fileName: currentEvent.manual?.file_name || "Material cover",
+          }
+        : null,
     },
     streaming: {
       streamingOption: currentEvent.streaming_option || "in_app",
@@ -228,6 +251,32 @@ export default function EventCreationWizard({
       payload.append("ticket_limit", ticketing.maxTickets || "unlimited");
       if (ticketing.maxTickets === "limited") {
         payload.append("ticket_limit_number", ticketing.ticketLimit || 0);
+      }
+
+      if (ticketing.hasMaterials) {
+        const hasExistingManual = Boolean(ticketing.existingManual?.fileName);
+        if (ticketing.manualFile instanceof File) {
+          payload.append(
+            "manual_file",
+            ticketing.manualFile,
+            ticketing.manualFile.name || "event-manual"
+          );
+        }
+
+        if (ticketing.manualCover instanceof File) {
+          payload.append(
+            "manual_cover",
+            ticketing.manualCover,
+            ticketing.manualCover.name || "event-manual-cover"
+          );
+        }
+
+        if (
+          Number(ticketing.manualPrice || 0) > 0 &&
+          (ticketing.manualFile instanceof File || hasExistingManual)
+        ) {
+          payload.append("manual_price", ticketing.manualPrice);
+        }
       }
 
       payload.append(

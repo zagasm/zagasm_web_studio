@@ -23,10 +23,11 @@ const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed 
 
   return (
     <Wrapper
+      style={{ borderRadius: 16 }}
       to={to}
       type={to ? undefined : "button"}
       onClick={onClick}
-      className="tw:relative tw:flex tw:min-h-20 tw:w-full tw:flex-col tw:items-start tw:justify-between tw:gap-3 tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-white/45 tw:bg-white/30 tw:p-3 tw:text-left tw:shadow-[0_18px_50px_rgba(148,163,184,0.18)] tw:backdrop-blur-2xl tw:transition hover:tw:-translate-y-0.5 hover:tw:border-white/60 hover:tw:bg-white/40 hover:tw:shadow-[0_22px_60px_rgba(148,163,184,0.24)] tw:md:min-h-24 tw:md:gap-4 tw:md:rounded-[28px] tw:md:p-4"
+      className="tw:relative tw:flex tw:min-h-20 tw:w-full tw:flex-col tw:items-start tw:justify-between tw:gap-3 tw:overflow-hidden tw:rounded-3xl tw:border tw:border-[#ffffff]/45 tw:bg-[#ffffff]/70 tw:p-3 tw:text-left tw:shadow-[0_18px_50px_rgba(148,163,184,0.18)] tw:backdrop-blur-2xl tw:transition hover:tw:-translate-y-0.5 hover:tw:border-white/60 hover:tw:bg-white/40 hover:tw:shadow-[0_22px_60px_rgba(148,163,184,0.24)] tw:md:min-h-24 tw:md:gap-4 tw:md:rounded-[28px] tw:md:p-4"
     >
       <span className="tw:pointer-events-none tw:absolute tw:inset-x-3 tw:top-0 tw:h-px tw:bg-white/70" />
       <span className="tw:pointer-events-none tw:absolute tw:-right-8 tw:top-3 tw:h-16 tw:w-16 tw:rounded-full tw:bg-white/25 tw:blur-2xl" />
@@ -144,7 +145,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                   navigate(profilePath);
                 }
               }}
-              className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-[24px] tw:border tw:border-white/45 tw:bg-white/24 tw:p-3 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition hover:tw:bg-white/32 tw:md:gap-4 tw:md:rounded-[30px] tw:md:p-4"
+              className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-white/45 tw:bg-white/24 tw:p-3 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition hover:tw:bg-white/32 tw:md:gap-4 tw:md:rounded-[30px] tw:md:p-4"
             >
               <div
                 className={`tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-white/55 tw:shadow-[0_8px_20px_rgba(148,163,184,0.18)] tw:md:h-16 tw:md:w-16 ${showProfileImage ? "tw:bg-white/30" : "tw:bg-white/45"
@@ -183,13 +184,13 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
             </div>
 
             {!user?.subscription?.isActive ? (
-              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-primary tw:p-4 tw:text-white tw:lg:max-w-md tw:md:rounded-[28px] tw:md:p-5">
+              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-blue-700 tw:p-4 tw:text-white tw:lg:max-w-md tw:md:rounded-[28px] tw:md:p-5">
                 <span className="tw:pointer-events-none tw:absolute tw:-right-6 tw:-top-6 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/10 tw:blur-2xl" />
                 <span className="tw:pointer-events-none tw:absolute tw:-left-5 tw:bottom-0 tw:h-20 tw:w-20 tw:rounded-full tw:bg-sky-300/10 tw:blur-2xl" />
                 <img
                   src="/images/verifiedIcon.svg"
                   alt=""
-                  className="tw:pointer-events-none tw:absolute tw:-right-4 tw:top-1/2 tw:h-28 tw:w-28 tw:-translate-y-1/2 tw:opacity-[0.14] tw:grayscale tw:brightness-[2.4] tw:contrast-125 tw:md:h-36 tw:md:w-36"
+                  className="tw:pointer-events-none tw:absolute tw:-right-4 tw:top-1/2 tw:h-28 tw:w-28 tw:-translate-y-1/2 tw:opacity-[0.40] tw:grayscale tw:brightness-[4.4] tw:contrast-125 tw:md:h-36 tw:md:w-36"
                 />
 
                 <div className="tw:relative tw:flex tw:w-full tw:flex-col tw:gap-3">

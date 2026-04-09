@@ -39,7 +39,7 @@ function Account() {
 
   return (
     <Fragment>
-      <div className="tw:min-h-screen tw:w-full tw:bg-[#F6F7FB] tw:px-3 tw:pb-24 tw:pt-24 tw:font-sans tw:md:px-6 tw:lg:px-8">
+      <div className="tw:min-h-screen tw:w-full tw:bg-white tw:px-3 tw:pb-24 tw:pt-24 tw:font-sans tw:md:px-6 tw:lg:px-8">
         <div className="tw:mx-auto tw:w-full tw:max-w-6xl">
           <AccountCenter
             user={user}

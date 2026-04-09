@@ -2,6 +2,7 @@ import React from "react";
 
 export default function OrganiserMethodChoiceStep({
   selectedCountry,
+  countryAutoDetected,
   isNigeria,
   verificationMethod,
   onSelectBvn,
@@ -20,8 +21,9 @@ export default function OrganiserMethodChoiceStep({
         </span>
         <span className="tw:block tw:mt-2 tw:text-xs tw:md:text-sm tw:text-gray-600 tw:max-w-xl">
           Selected country:{" "}
-          <span className="tw:font-semibold">{selectedCountry?.name}</span>. We
-          will only show verification methods supported for that country.
+          <span className="tw:font-semibold">{selectedCountry?.name}</span>
+          {countryAutoDetected ? " (auto-detected)." : "."} We will only show
+          verification methods supported for that country.
         </span>
       </div>
 

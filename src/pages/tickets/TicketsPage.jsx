@@ -104,13 +104,13 @@ function TicketsPage() {
 
   return (
     <div className="tw:font-sans">
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:py-20 tw:md:pt-24 tw:lg:px-4">
+      <div className="tw:w-full tw:min-h-screen tw:bg-white tw:py-20 tw:md:pt-24 tw:lg:px-4">
         <div className="account_section" style={{ padding: 0 }}>
           <div className="tw:px-4 tw:py-4 tw:md:px-8 tw:md:py-8">
             <div className="tw:flex tw:flex-col tw:gap-6">
               {/* Header */}
               <div className="tw:flex tw:flex-col tw:gap-1">
-                <span className="tw:text-2xl tw:md:text-3xl tw:font-semibold tw:text-gray-900">
+                <span className="tw:text-2xl tw:md:text-3xl tw:font-bold tw:text-gray-900">
                   Tickets
                 </span>
                 <span className="tw:block tw:text-sm tw:md:text-base tw:text-gray-500">
@@ -120,7 +120,7 @@ function TicketsPage() {
 
               {/* Tabs */}
               <div className="tw:w-full tw:mt-2 tw:mb-4 tw:overflow-x-auto">
-                <div className="tw:inline-flex tw:bg-white tw:rounded-lg tw:p-1 tw:gap-1">
+                <div className="tw:inline-flex tw:bg-[#ffffff] tw:rounded-lg tw:p-1 tw:gap-1">
                   {TABS.map((tab) => {
                     const active = activeTab === tab.key;
                     const count = counts[tab.key] ?? 0;
@@ -135,7 +135,7 @@ function TicketsPage() {
                         className={[
                           "tw:px-4 tw:py-2 tw:rounded-full tw:text-sm tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150",
                           active
-                            ? "tw:bg-lightPurple tw:text-gray-900 tw:shadow-sm"
+                            ? "tw:bg-primary tw:text-white tw:shadow-sm"
                             : "tw:text-gray-500 tw:hover:text-gray-900",
                         ].join(" ")}
                       >
@@ -164,7 +164,7 @@ function TicketsPage() {
                 <div className="row">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="col-12 col-md-12 col-lg-6 mb-4">
-                      <div className="tw:animate-pulse tw:h-40 tw:bg-gray-100 tw:rounded-3xl tw:shadow-sm tw:w-full" />
+                      <div className="tw:animate-pulse tw:h-40 tw:bg-[#ffffff] tw:rounded-3xl tw:shadow-sm tw:w-full" />
                     </div>
                   ))}
                 </div>
@@ -172,17 +172,17 @@ function TicketsPage() {
 
               {/* Empty state */}
               {showEmpty && (
-                <div className="tw:mt-6 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center tw:py-10 tw:bg-gray-50 tw:rounded-3xl">
+                <div className="tw:mt-6 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center tw:py-10 tw:bg-white tw:rounded-3xl">
                   <div className="tw:text-4xl">
                     <TicketIcon className="tw:text-primary" size={40} />
                   </div>
-                  <p className="tw:text-base tw:font-medium tw:text-gray-900">
+                  <span className="tw:text-base tw:font-medium tw:text-gray-900">
                     No tickets yet
-                  </p>
-                  <p className="tw:text-sm tw:text-gray-500 tw:max-w-md">
+                  </span>
+                  <span className="tw:text-sm tw:text-gray-500 tw:max-w-md">
                     When you buy tickets to an event, they will appear here with
                     their receipt and details.
-                  </p>
+                  </span>
                 </div>
               )}
 

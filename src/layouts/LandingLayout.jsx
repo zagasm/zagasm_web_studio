@@ -6,7 +6,7 @@ import SectionFooterCTA from "../component/landing/SectionFooterCTA";
 export default function LandingLayout() {
   return (
     <>
-      <div className="tw:min-h-screen tw:max-w-full tw:overflow-x-clip">
+      <div className="tw:min-h-screen tw:max-w-full tw:overflow-x-clip tw:bg-white">
 
         {/* Top navigation */}
         <Nav />

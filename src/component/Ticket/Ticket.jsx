@@ -61,7 +61,7 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
             {/* Header: Logo + Title + Status */}
             <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
               <div className="tw:flex tw:items-center tw:gap-3">
-                <div className="tw:h-10 tw:w-10 tw:rounded-full tw:overflow-hidden tw:bg-gray-200 tw:shrink-0">
+                <div className="tw:h-10 tw:w-10 tw:rounded-full tw:overflow-hidden tw:bg-[#ffffff] tw:shrink-0">
                   <img
                     src={event.poster}
                     alt={title}

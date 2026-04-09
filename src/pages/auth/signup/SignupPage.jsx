@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { showError, showSuccess } from "../../../component/ui/toast";
+import { api } from "../../../lib/apiClient";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +16,9 @@ export function SignUp() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [emailExistsError, setEmailExistsError] = useState("");
+  const [checkedEmail, setCheckedEmail] = useState("");
+  const emailCheckRequestId = useRef(0);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     label: "",
@@ -31,6 +38,25 @@ export function SignUp() {
       setPasswordStrength({ score: 0, label: "", class: "" });
     }
   }, [formData.password]);
+
+  useEffect(() => {
+    const trimmedEmail = formData.email.trim();
+
+    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+      emailCheckRequestId.current += 1;
+      setCheckedEmail("");
+      setEmailExistsError("");
+      return;
+    }
+
+    if (checkedEmail === trimmedEmail) return;
+
+    const timeoutId = window.setTimeout(() => {
+      checkEmailExists(trimmedEmail);
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [formData.email, checkedEmail]);
 
   const checkPasswordStrength = (password) => {
     let score = 0;
@@ -65,6 +91,44 @@ export function SignUp() {
       ...prev,
       [name]: type === "checkbox" ? checked : value
     }));
+    if (name === "email") {
+      setEmailExistsError("");
+      setCheckedEmail("");
+    }
+  };
+
+  const checkEmailExists = async (email) => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+      setEmailExistsError("");
+      setCheckedEmail("");
+      return null;
+    }
+
+    const requestId = ++emailCheckRequestId.current;
+
+    try {
+      const { data } = await api.post("/api/v1/email-exists", {
+        email: trimmedEmail,
+      });
+
+      if (requestId !== emailCheckRequestId.current) return null;
+
+      setCheckedEmail(trimmedEmail);
+      setEmailExistsError(
+        data?.exists
+          ? "This email is already in use. Please use another email."
+          : ""
+      );
+      return Boolean(data?.exists);
+    } catch (error) {
+      if (requestId !== emailCheckRequestId.current) return null;
+
+      setCheckedEmail("");
+      setEmailExistsError("");
+      return null;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -78,6 +142,30 @@ export function SignUp() {
 
     if (!formData.email) {
       showError("Please enter a valid email");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(formData.email.trim())) {
+      showError("Please enter a valid email");
+      return;
+    }
+
+    let existsResult = null;
+
+    if (checkedEmail !== formData.email.trim()) {
+      existsResult = await checkEmailExists(formData.email);
+    }
+
+    if (existsResult === true) {
+      showError("This email is already in use. Please use another email.");
+      return;
+    }
+
+    if (
+      checkedEmail === formData.email.trim() &&
+      emailExistsError
+    ) {
+      showError(emailExistsError);
       return;
     }
 
@@ -147,21 +235,30 @@ export function SignUp() {
             className="col-md-6 col-6 p-0 m-0"
           >
             <div className="form-group m-2">
-              <label htmlFor="fName">First name</label>
-              <div className="position-relative">
-                <input
-                  id="fName"
-                  type="text"
-                  name="first_name"
-                  className="tw:w-full input"
-                  style={{ paddingLeft: "50px" }}
-                  placeholder="First Name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  required
-                />
-                <i className="input-icon feather-user position-absolute"></i>
-              </div>
+              <TextField
+                fullWidth
+                id="fName"
+                type="text"
+                name="first_name"
+                label="First name"
+                placeholder="First Name"
+                value={formData.first_name}
+                onChange={handleChange}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <i className="feather-user" style={{ color: "#666" }}></i>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                }}
+              />
             </div>
           </motion.div>
 
@@ -172,21 +269,30 @@ export function SignUp() {
             className="col-md-6 col-6 p-0 m-0"
           >
             <div className="form-group m-2">
-              <label htmlFor="lName">Last name</label>
-              <div className="position-relative">
-                <input
-                  id="lName"
-                  type="text"
-                  name="last_name"
-                  className="tw:w-full input"
-                  style={{ paddingLeft: "50px" }}
-                  placeholder="Last Name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  required
-                />
-                <i className="input-icon feather-user position-absolute"></i>
-              </div>
+              <TextField
+                fullWidth
+                id="lName"
+                type="text"
+                name="last_name"
+                label="Last name"
+                placeholder="Last Name"
+                value={formData.last_name}
+                onChange={handleChange}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <i className="feather-user" style={{ color: "#666" }}></i>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                }}
+              />
             </div>
           </motion.div>
         </div>
@@ -197,21 +303,32 @@ export function SignUp() {
           transition={{ duration: 0.3 }}
           className="form-group m-2"
         >
-          <label htmlFor="email">Email Address</label>
-          <div className="position-relative">
-            <input
-              id="email"
-              type="email"
-              name="email"
-              className="tw:w-full input"
-              style={{ paddingLeft: "50px" }}
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            <i className="input-icon feather-mail position-absolute"></i>
-          </div>
+          <TextField
+            fullWidth
+            id="email"
+            type="email"
+            name="email"
+            label="Email Address"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            error={Boolean(emailExistsError)}
+            helperText={emailExistsError || " "}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <i className="feather-mail" style={{ color: "#666" }}></i>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "8px",
+                backgroundColor: "#fff",
+              },
+            }}
+          />
         </motion.div>
 
         <motion.div
@@ -220,26 +337,45 @@ export function SignUp() {
           transition={{ duration: 0.3 }}
           className="form-group m-2"
         >
-          <label>Password</label>
-          <div className="position-relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              className="tw:w-full input"
-              style={{ paddingLeft: "40px", paddingRight: "40px" }}
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength="8"
-            />
-            <i
-              className={`input-password-icon feather-eye${showPassword ? "" : "-off"
-                } position-absolute`}
-              onClick={() => setShowPassword(!showPassword)}
-            ></i>
-            <i className="input-icon feather-lock position-absolute"></i>
-          </div>
+          <TextField
+            fullWidth
+            type={showPassword ? "text" : "password"}
+            name="password"
+            label="Password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            minLength="8"
+            helperText=" "
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <i className="feather-lock" style={{ color: "#666" }}></i>
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <i
+                      className={`feather-eye${showPassword ? "" : "-off"}`}
+                      style={{ color: "#666" }}
+                    ></i>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "8px",
+                backgroundColor: "#fff",
+              },
+            }}
+          />
         </motion.div>
 
         <motion.div

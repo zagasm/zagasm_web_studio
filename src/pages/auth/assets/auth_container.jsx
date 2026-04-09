@@ -44,8 +44,8 @@ function AuthContainer({
                   >
                     <Link to="/">
                       <img
-                        src={"/images/logo.png"}
-                        className="zagasm_logo"
+                        src={"/logo.png"}
+                        className="tw:w-32 tw:md:w-40"
                         alt="Xilolo Logo"
                       />
                     </Link>

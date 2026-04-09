@@ -265,7 +265,7 @@ function EditProfile() {
   const recoveryPhoneLocked = !!user?.phoneNumber2; // lock only if it exists
 
   return (
-    <div className="tw:min-h-screen tw:bg-[#F5F5F7] tw:flex tw:flex-col tw:items-center tw:pb-24">
+    <div className="tw:min-h-screen tw:bg-white tw:flex tw:flex-col tw:items-center tw:pb-24">
       {/* Top header (back + title) */}
       <div className="tw:bg-white tw:w-full tw:px-4 tw:pt-24 tw:pb-4">
         <div className="tw:max-w-3xl tw:mx-auto tw:flex tw:items-center tw:justify-between">

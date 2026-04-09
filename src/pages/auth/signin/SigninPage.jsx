@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { SigninWithCode } from "./SignCode";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import {
@@ -11,6 +12,7 @@ import {
   removeRememberedAccount,
 } from "../../../lib/authStorage";
 import defaultAvatar from "../../../assets/avater_pix.avif";
+import { api } from "../../../lib/apiClient";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REMEMBERED_ACCOUNT_INVALID_PATTERNS = [
@@ -38,12 +40,34 @@ export function Signin() {
   const [showVerification, setShowVerification] = useState(false);
   const [rememberedAccounts, setRememberedAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [emailExistsError, setEmailExistsError] = useState("");
+  const [checkedEmail, setCheckedEmail] = useState("");
+  const emailCheckRequestId = useRef(0);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
     setRememberedAccounts(getRememberedAccounts());
   }, []);
+
+  useEffect(() => {
+    const trimmedEmail = formData.email.trim();
+
+    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+      emailCheckRequestId.current += 1;
+      setCheckedEmail("");
+      setEmailExistsError("");
+      return;
+    }
+
+    if (checkedEmail === trimmedEmail) return;
+
+    const timeoutId = window.setTimeout(() => {
+      checkEmailExists(trimmedEmail);
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [formData.email, checkedEmail]);
 
   const isCredentialFilled = useMemo(() => {
     return formData.email && EMAIL_REGEX.test(formData.email);
@@ -77,7 +101,7 @@ export function Signin() {
   const buttonVariants = {
     hover: {
       scale: 1.02,
-      boxShadow: "0 4px 12px rgba(143, 7, 231, 0.3)",
+      boxShadow: "0 4px 12px rgba(17, 17, 17, 0.3)",
     },
     tap: { scale: 0.98 },
   };
@@ -87,6 +111,44 @@ export function Signin() {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
     if (errors.server) setErrors((prev) => ({ ...prev, server: null }));
+    if (name === "email") {
+      setEmailExistsError("");
+      setCheckedEmail("");
+    }
+  };
+
+  const checkEmailExists = async (email) => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+      setEmailExistsError("");
+      setCheckedEmail("");
+      return null;
+    }
+
+    const requestId = ++emailCheckRequestId.current;
+
+    try {
+      const { data } = await api.post("/api/v1/email-exists", {
+        email: trimmedEmail,
+      });
+
+      if (requestId !== emailCheckRequestId.current) return;
+
+      setCheckedEmail(trimmedEmail);
+      setEmailExistsError(
+        data?.exists === false
+          ? "We couldn’t find an account with this email."
+          : ""
+      );
+      return Boolean(data?.exists);
+    } catch (error) {
+      if (requestId !== emailCheckRequestId.current) return;
+
+      setCheckedEmail("");
+      setEmailExistsError("");
+      return null;
+    }
   };
 
   const validateCredential = () => {
@@ -96,6 +158,11 @@ export function Signin() {
       newErrors.email = "Email is required";
     } else if (!EMAIL_REGEX.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
+    } else if (
+      checkedEmail === formData.email.trim() &&
+      emailExistsError
+    ) {
+      newErrors.email = emailExistsError;
     }
 
     setErrors(newErrors);
@@ -115,7 +182,25 @@ export function Signin() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    const trimmedEmail = formData.email.trim();
+    let existsResult = null;
+
+    if (
+      EMAIL_REGEX.test(trimmedEmail) &&
+      checkedEmail !== trimmedEmail
+    ) {
+      existsResult = await checkEmailExists(trimmedEmail);
+    }
+
+    if (existsResult === false) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "We couldn’t find an account with this email.",
+      }));
+      return;
+    }
+
     if (validateCredential()) {
       setVerificationSource(formData.email);
       setShowPasswordField(true);
@@ -245,21 +330,21 @@ export function Signin() {
     >
       <style>{`
         .continue-btn {
-          background-color: ${isCredentialFilled ? "rgba(143, 7, 231, 1)" : "rgba(230, 230, 230, 1)"};
+          background-color: ${isCredentialFilled ? "#111111" : "rgba(230, 230, 230, 1)"};
           color: white;
           cursor: ${isCredentialFilled ? "pointer" : "not-allowed"};
         }
 
         .signin-btn {
-          background-color: ${isPasswordFilled ? "rgba(143, 7, 231, 1)" : "rgba(230, 230, 230, 1)"};
+          background-color: ${isPasswordFilled ? "#111111" : "rgba(230, 230, 230, 1)"};
           color: white;
           cursor: ${isPasswordFilled ? "pointer" : "not-allowed"};
         }
 
         .verification-btn {
           background-color: transparent;
-          border: 1px solid rgba(143, 7, 231, 1);
-          color: rgba(143, 7, 231, 1);
+          border: 1px solid #111111;
+          color: #111111;
         }
       `}</style>
 
@@ -286,7 +371,7 @@ export function Signin() {
               {rememberedAccounts.map((account) => (
                 <div
                   key={account.id || account.userId || account.email}
-                  className="btn btn-light border text-start d-flex align-items-center justify-content-between py-3 px-3"
+                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3 tw:cursor-pointer hover:tw:bg-gray-50"
                   onClick={() => handleSelectAccount(account)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -349,9 +434,7 @@ export function Signin() {
         {!selectedAccount && (
           <motion.div variants={inputVariants} className="form-group mb-4">
             <div className="d-flex justify-content-between align-items-center">
-              <label htmlFor="email" className="form-label">
-                Email Address
-              </label>
+              
               {rememberedAccounts.length > 0 && showPasswordField && (
                 <button
                   type="button"
@@ -362,32 +445,49 @@ export function Signin() {
                 </button>
               )}
             </div>
-            <div className="position-relative">
-              <i
-                className="feather-mail position-absolute"
-                style={{
-                  left: "15px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#666",
-                }}
-              ></i>
-              <input
-                type="email"
+            <div className="position-relative tw:mt-4">
+              <TextField
+                fullWidth
                 id="email"
                 name="email"
-                className={`tw:w-full tw:pl-8 tw:pr-6 tw:py-4 tw:rounded-lg tw:border tw:border-gray-200 ${errors.email ? "is-invalid" : ""
-                  }`}
+                type="email"
+                label="Email Address"
                 placeholder="Enter email address"
                 value={formData.email}
                 onChange={handleChange}
                 autoComplete="username"
+                error={Boolean(errors.email)}
+                helperText={
+                  errors.email ? (
+                    errors.email
+                  ) : emailExistsError ? (
+                    <>
+                      {emailExistsError}{" "}
+                      <Link
+                        to="/auth/signup"
+                        className="text-decoration-underline"
+                      >
+                        Create an account
+                      </Link>
+                    </>
+                  ) : (
+                    " "
+                  )
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <i className="feather-mail" style={{ color: "#666" }}></i>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                }}
               />
-              {errors.email && (
-                <div className="invalid-feedback d-block mt-1">
-                  {errors.email}
-                </div>
-              )}
             </div>
           </motion.div>
         )}
@@ -440,57 +540,49 @@ export function Signin() {
               transition={{ duration: 0.3 }}
               className="form-group mb-3"
             >
-              <label htmlFor="password" className="form-label">
-                Password
-              </label>
-              <div className="position-relative">
-                <i
-                  className="feather-lock position-absolute"
-                  style={{
-                    left: "15px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#666",
-                  }}
-                ></i>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  name="password"
-                  className={`tw:w-full tw:pl-2 tw:pr-6 tw:py-4 tw:rounded-lg tw:border tw:border-gray-200 ${errors.password ? "is-invalid" : ""
-                    }`}
-                  style={{
-                    paddingLeft: "45px",
-                    paddingRight: "45px",
-                    height: "40px",
+              
+              <TextField
+                fullWidth
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                label="Password"
+                placeholder="Enter password"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+                error={Boolean(errors.password)}
+                helperText={errors.password || " "}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <i className="feather-lock" style={{ color: "#666" }}></i>
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        <i
+                          className={`feather-eye${showPassword ? "" : "-off"}`}
+                          style={{ color: "#666" }}
+                        ></i>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
                     borderRadius: "8px",
-                    border: "1px solid #ddd",
-                  }}
-                  placeholder="Enter password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  autoComplete={
-                    selectedAccount ? "current-password" : "current-password"
-                  }
-                />
-                <i
-                  className={`feather-eye${showPassword ? "" : "-off"
-                    } position-absolute`}
-                  style={{
-                    right: "15px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    cursor: "pointer",
-                    color: "#666",
-                  }}
-                  onClick={() => setShowPassword(!showPassword)}
-                />
-                {errors.password && (
-                  <div className="invalid-feedback d-block mt-1">
-                    {errors.password}
-                  </div>
-                )}
-              </div>
+                    backgroundColor: "#fff",
+                  },
+                }}
+              />
             </motion.div>
             <div className="d-flex justify-content-end mb-3">
               <Link

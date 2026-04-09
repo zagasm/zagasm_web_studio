@@ -49,7 +49,7 @@ const SkeletonBlock = ({ className }) => (
 const StatsSkeleton = ({ cards = 4 }) => (
   <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4 tw:md:gap-4">
     {Array.from({ length: cards }).map((_, index) => (
-      <div key={index} className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+      <div key={index} className="tw:rounded-3xl tw:bg-[#ffffff] tw:p-4 tw:shadow-sm">
         <SkeletonBlock className="tw:h-4 tw:w-24" />
         <SkeletonBlock className="tw:mt-3 tw:h-7 tw:w-32" />
         <SkeletonBlock className="tw:mt-3 tw:h-3 tw:w-20" />
@@ -63,7 +63,7 @@ const ListSkeleton = () => (
     {Array.from({ length: 5 }).map((_, index) => (
       <div
         key={index}
-        className="tw:flex tw:items-center tw:gap-4 tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm"
+        className="tw:flex tw:items-center tw:gap-4 tw:rounded-3xl tw:bg-[#ffffff] tw:p-4 tw:shadow-sm"
       >
         <SkeletonBlock className="tw:h-14 tw:w-14 tw:rounded-2xl" />
         <div className="tw:flex-1">
@@ -78,7 +78,7 @@ const ListSkeleton = () => (
 );
 
 const StatCard = ({ icon: Icon, label, value, hint }) => (
-  <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+  <div className="tw:rounded-3xl tw:bg-[#ffffff] tw:p-4 tw:shadow-sm">
     <div className="tw:flex tw:items-center tw:justify-between">
       <span className="tw:text-sm tw:text-gray-500">{label}</span>
       {Icon ? <Icon className="tw:h-4 tw:w-4 tw:text-gray-400" /> : null}
@@ -96,7 +96,7 @@ const EventRow = ({ event }) => {
   const posterUrl = event?.poster?.[0]?.url;
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm tw:md:flex-row tw:md:items-center">
+    <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-3xl tw:bg-[#ffffff] tw:p-4 tw:shadow-sm tw:md:flex-row tw:md:items-center">
       <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-4">
         <div className="tw:flex tw:size-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-2xl tw:bg-gray-100 tw:md:size-32">
           {posterUrl ? (
@@ -220,7 +220,7 @@ function WithdrawDialog({
               leaveFrom="tw:opacity-100 tw:sm:scale-100"
               leaveTo="tw:opacity-0 tw:translate-y-2 tw:sm:translate-y-0 tw:sm:scale-95"
             >
-              <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:sm:p-6">
+              <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-5 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:sm:p-6">
                 <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
                   Request payout
                 </span>
@@ -256,7 +256,7 @@ function WithdrawDialog({
                     value={amount}
                     min="0"
                     onChange={(event) => onAmountChange(event.target.value)}
-                    className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:text-sm tw:text-gray-900 tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
+                    className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-[#ffffff] tw:px-4 tw:text-sm tw:text-gray-900 tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
                   />
                 </div>
 
@@ -461,7 +461,7 @@ export default function AccountPayouts() {
   if (!isOrganizer) {
     return (
       <>
-        <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:shadow-sm tw:flex tw:items-start tw:gap-3">
+        <div className="tw:rounded-3xl tw:bg-[#ffffff] tw:p-5 tw:shadow-sm tw:flex tw:items-start tw:gap-3">
           <AlertTriangle className="tw:mt-0.5 tw:h-5 tw:w-5 tw:text-amber-500" />
           <div>
             <div className="tw:font-semibold tw:text-gray-900">
@@ -501,7 +501,7 @@ export default function AccountPayouts() {
           <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
             <Link
               to="/account/payouts/history"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-[#ffffff] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
             >
               <History className="tw:h-4 tw:w-4" />
               Payout history
@@ -521,7 +521,7 @@ export default function AccountPayouts() {
             <button
               type="button"
               onClick={refreshPageData}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-[#ffffff] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
             >
               <RefreshCw className="tw:h-4 tw:w-4" />
               Refresh
@@ -569,7 +569,7 @@ export default function AccountPayouts() {
           )}
         </div>
 
-        <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+        <div className="tw:rounded-3xl tw:bg-[#ffffff] tw:p-4 tw:shadow-sm">
           <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center">
             <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2">
               <Search className="tw:h-4 tw:w-4 tw:text-gray-400" />
@@ -635,7 +635,7 @@ export default function AccountPayouts() {
         {loading ? (
           <ListSkeleton />
         ) : filtered.length === 0 ? (
-          <div className="tw:mt-4 tw:rounded-3xl tw:bg-white tw:p-6 tw:shadow-sm">
+          <div className="tw:mt-4 tw:rounded-3xl tw:bg-[#ffffff] tw:p-6 tw:shadow-sm">
             <div className="tw:font-semibold tw:text-gray-900">No payouts found</div>
             <div className="tw:mt-1 tw:text-sm tw:text-gray-600">
               Try changing your filters, or check back after ticket sales.

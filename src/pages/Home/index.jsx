@@ -38,14 +38,17 @@ export default function Home() {
     <>
       <SEO title="Discover Events - Xilolo" />
 
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:pt-24 tw:md:pt-24 tw:lg:px-4 tw:font-sans">
+      <div className="tw:w-full tw:min-h-screen tw:bg-white tw:pt-24 tw:md:pt-24 tw:px-2 tw:font-sans">
+        <span className="tw:text-3xl tw:font-bold tw:block tw:mb-8">
+          Discover events
+        </span>
         {/* TABS */}
-        <div className="tw:flex tw:gap-3 tw:mb-6 tw:ml-2">
+        <div className="tw:flex tw:gap-3 tw:mb-6">
           <button
             onClick={() => handleTabChange("all")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "all"
-                ? "tw:bg-lightPurple tw:text-primary"
-                : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
+                ? "tw:bg-primary tw:text-white"
+                : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
             All
@@ -53,8 +56,8 @@ export default function Home() {
           <button
             onClick={() => handleTabChange("upcoming")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "upcoming"
-                ? "tw:bg-lightPurple tw:text-primary"
-                : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
+                ? "tw:bg-primary tw:text-white"
+                : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
             Trending
@@ -62,8 +65,8 @@ export default function Home() {
           <button
             onClick={() => handleTabChange("live")}
             className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "live"
-                ? "tw:bg-lightPurple tw:text-primary"
-                : "tw:bg-white tw:text-gray-500 tw:border tw:border-gray-200"
+                ? "tw:bg-primary tw:text-white"
+                : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
             Live
@@ -74,7 +77,7 @@ export default function Home() {
         {/* SCROLL AREA */}
         <div
           ref={eventsScrollRef}
-          className="tw:h-[calc(100vh-120px)] tw:overflow-y-auto tw-no-scrollbar tw:pr-1 tw:pb-20"
+          className="tw:-mt-6 tw:h-[calc(100vh-120px)] tw:overflow-y-auto tw-no-scrollbar tw:pr-1 tw:pb-20"
         >
           <EventTemplate
             endpoint={

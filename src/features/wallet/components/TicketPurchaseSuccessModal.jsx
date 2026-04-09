@@ -13,7 +13,28 @@ export default function TicketPurchaseSuccessModal({
   open,
   onClose,
   eventTitle,
+  purchaseType = "ticket_only",
+  includesManual = false,
+  onDownloadManual,
 }) {
+  const title =
+    purchaseType === "manual_only"
+      ? "Manual purchased"
+      : includesManual
+      ? "Ticket and manual purchased"
+      : "Ticket purchased";
+  const description = eventTitle
+    ? purchaseType === "manual_only"
+      ? `The manual for "${eventTitle}" is now unlocked.`
+      : includesManual
+      ? `Your ticket and manual for "${eventTitle}" are now ready.`
+      : `Your ticket for "${eventTitle}" is now ready in My Tickets.`
+    : purchaseType === "manual_only"
+    ? "Your manual is now unlocked."
+    : includesManual
+    ? "Your ticket and manual are now ready."
+    : "Your ticket is now ready in My Tickets.";
+
   return (
     <Transition show={open} as={Fragment} appear>
       <Dialog as="div" className="tw:relative tw:z-50" onClose={onClose}>
@@ -56,16 +77,24 @@ export default function TicketPurchaseSuccessModal({
                     <CheckCircle2 className="tw:h-8 tw:w-8" />
                   </span>
                   <span className="tw:block tw:mt-5 tw:text-2xl tw:font-semibold tw:text-gray-900">
-                    Ticket purchased
+                    {title}
                   </span>
                   <Dialog.Description className="tw:mt-2 tw:block tw:text-sm tw:text-gray-500">
-                    {eventTitle
-                      ? `Your ticket for "${eventTitle}" is now ready in My Tickets.`
-                      : "Your ticket is now ready in My Tickets."}
+                    {description}
                   </Dialog.Description>
                 </div>
 
                 <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:gap-3">
+                  {includesManual && onDownloadManual && (
+                    <button
+                      type="button"
+                      onClick={onDownloadManual}
+                      className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/15"
+                      style={{ borderRadius: 16 }}
+                    >
+                      Download manual
+                    </button>
+                  )}
                   <Link
                     to="/tickets"
                     onClick={onClose}

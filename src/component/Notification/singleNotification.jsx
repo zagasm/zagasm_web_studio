@@ -74,7 +74,7 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
 
   return (
     <article
-      className={`tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-sm tw:transition tw:duration-200 tw:cursor-pointer tw:border ${
+      className={`tw:bg-[#ffffff] tw:p-5 tw:shadow-sm tw:transition tw:duration-200 tw:cursor-pointer tw:border ${
         isUnread
           ? "tw:border-l-4 tw:border-primary tw:shadow-[0_12px_30px_rgba(15,23,42,0.15)]"
           : "tw:border-transparent hover:tw:shadow-md"
