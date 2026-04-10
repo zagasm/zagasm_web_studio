@@ -129,7 +129,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
   return (
     <>
       <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-5xl tw:flex-col tw:gap-4 tw:md:gap-6">
-        <section className="tw:relative tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-white/50 tw:bg-[linear-gradient(135deg,rgba(255,255,255,0.54)_0%,rgba(244,248,255,0.36)_46%,rgba(235,242,255,0.46)_100%)] tw:p-1.5 tw:shadow-[0_24px_80px_rgba(148,163,184,0.2)] tw:backdrop-blur-3xl tw:md:rounded-[36px] tw:md:p-7">
+        <section className="tw:relative tw:overflow-hidden tw:md:border tw:md:border-white/50 tw:md:bg-[linear-gradient(135deg,rgba(255,255,255,0.54)_0%,rgba(244,248,255,0.36)_46%,rgba(235,242,255,0.46)_100%)] tw:p-0 tw:md:shadow-[0_24px_80px_rgba(148,163,184,0.2)] tw:md:backdrop-blur-3xl tw:md:rounded-[36px] tw:md:p-7">
           <span className="tw:pointer-events-none tw:absolute tw:-left-12 tw:top-6 tw:h-28 tw:w-28 tw:rounded-full tw:bg-white/35 tw:blur-3xl" />
           <span className="tw:pointer-events-none tw:absolute tw:-right-10 tw:bottom-4 tw:h-32 tw:w-32 tw:rounded-full tw:bg-sky-100/30 tw:blur-3xl" />
           <span className="tw:pointer-events-none tw:absolute tw:inset-x-6 tw:top-0 tw:h-px tw:bg-white/80" />
@@ -184,7 +184,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
             </div>
 
             {!user?.subscription?.isActive ? (
-              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-blue-700 tw:p-4 tw:text-white tw:lg:max-w-md tw:md:rounded-[28px] tw:md:p-5">
+              <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-primary tw:p-4 tw:text-white tw:lg:max-w-md tw:md:rounded-[28px] tw:md:p-5">
                 <span className="tw:pointer-events-none tw:absolute tw:-right-6 tw:-top-6 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/10 tw:blur-2xl" />
                 <span className="tw:pointer-events-none tw:absolute tw:-left-5 tw:bottom-0 tw:h-20 tw:w-20 tw:rounded-full tw:bg-sky-300/10 tw:blur-2xl" />
                 <img
@@ -206,7 +206,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                   <Link
                     to="/subscription"
                     style={{ borderRadius: 12 }}
-                    className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition hover:tw:bg-white/90"
+                    className="tw:inline tw:w-36 tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition hover:tw:bg-white/90"
                   >
                     <span className="tw:text-primary">
                       Subscribe Now
@@ -218,10 +218,10 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
           </div>
 
           {!isVerified ? (
-            <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-3 tw:rounded-[24px] tw:border tw:border-orange-100 tw:bg-[#FFF4E5] tw:p-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+            <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-3 tw:rounded-3xl tw:border tw:border-orange-100 tw:bg-[#FFF4E5] tw:p-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
               <div className="tw:flex tw:items-center tw:gap-3">
                 <img src="/images/warning.svg" alt="Warning" />
-                <span className="tw:text-sm tw:font-medium tw:text-orange-800">
+                <span className="tw:text-xs tw:md:text-sm tw:font-medium tw:text-orange-800">
                   You have not verified your account yet.
                 </span>
               </div>
@@ -230,7 +230,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                 type="button"
                 onClick={() => setIsVerifyModalOpen(true)}
                 style={{ borderRadius: 12 }}
-                className="tw:inline-flex tw:items-center tw:justify-center tw:bg-orange-500 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition hover:tw:bg-orange-600"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:bg-orange-500 tw:px-4 tw:py-3 tw:text-xs tw:font-semibold tw:text-white tw:transition hover:tw:bg-orange-600"
               >
                 {isRefreshingProfile ? "Refreshing..." : "Verify Now"}
               </button>

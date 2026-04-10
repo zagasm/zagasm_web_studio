@@ -5,11 +5,13 @@ import MobileSingleOrganizers from "../../component/Organizers/ForMobile/Organis
 import SEO from "../../component/SEO";
 import { Link } from "react-router-dom";
 import "./Homestyle.css";
+import { useAuth } from "../auth/AuthContext";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("all");
   const [showOrganizers, setShowOrganizers] = useState(false);
   const eventsScrollRef = useRef(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const area = eventsScrollRef.current;
@@ -39,39 +41,44 @@ export default function Home() {
       <SEO title="Discover Events - Xilolo" />
 
       <div className="tw:w-full tw:min-h-screen tw:bg-white tw:pt-24 tw:md:pt-24 tw:px-2 tw:font-sans">
-        <span className="tw:text-3xl tw:font-bold tw:block tw:mb-8">
-          Discover events
+        <span className=" tw:text-2xl tw:font-semibold">
+         { new Date().getHours() < 12 ? "Good morning" : "Good afternoon" }, {user?.firstName || user?.username || "there"}!
+        </span>
+        <span className="tw:font-bold tw:block tw:mb-3 tw:md:mb-5">
+          Explore events
         </span>
         {/* TABS */}
-        <div className="tw:flex tw:gap-3 tw:mb-6">
+        <div className="tw:flex tw:gap-3 tw:pb-6">
           <button
+            style={{ borderRadius: 16 }}
             onClick={() => handleTabChange("all")}
-            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "all"
-                ? "tw:bg-primary tw:text-white"
-                : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
+            className={`tw:px-5 tw:md:px-6 tw:py-2 tw:rounded-xl tw:text-[10px] tw:md:text-sm tw:font-medium ${activeTab === "all"
+              ? "tw:bg-primary tw:text-white"
+              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
             All
           </button>
           <button
+            style={{ borderRadius: 16 }}
             onClick={() => handleTabChange("upcoming")}
-            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "upcoming"
-                ? "tw:bg-primary tw:text-white"
-                : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
+            className={`tw:px-5 tw:md:px-6 tw:py-2 tw:rounded-xl tw:text-[10px] tw:md:text-sm tw:font-medium ${activeTab === "upcoming"
+              ? "tw:bg-primary tw:text-white"
+              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
             Trending
           </button>
           <button
+            style={{ borderRadius: 16 }}
             onClick={() => handleTabChange("live")}
-            className={`tw:px-6 tw:py-2 tw:rounded-xl tw:text-sm tw:font-medium ${activeTab === "live"
-                ? "tw:bg-primary tw:text-white"
-                : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
+            className={`tw:px-5 tw:md:px-6 tw:py-2 tw:rounded-xl tw:text-[10px] tw:md:text-sm tw:font-medium ${activeTab === "live"
+              ? "tw:bg-primary tw:text-white"
+              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
             Live
           </button>
-
         </div>
 
         {/* SCROLL AREA */}

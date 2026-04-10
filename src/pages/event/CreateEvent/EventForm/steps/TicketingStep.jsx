@@ -24,6 +24,11 @@ const DISPLAY_CURRENCIES = [
   },
 ];
 
+const MANUAL_PRICE_MINIMUMS = {
+  NGN: 100,
+  USD: 1,
+};
+
 const VISIBILITY_OPTIONS = [
   { value: "public", label: "Public" },
   { value: "private", label: "Private" },
@@ -165,6 +170,19 @@ const schema = z
         path: ["manualPriceInput"],
         message: "Enter a valid material price",
       });
+    } else if (values.manualPriceInput && selectedCurrency) {
+      const minimumManualPrice =
+        MANUAL_PRICE_MINIMUMS[selectedCurrency.value] ?? 1;
+
+      if (manualPrice !== null && manualPrice < minimumManualPrice) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["manualPriceInput"],
+          message: `Minimum material price for ${selectedCurrency.label} is ${selectedCurrency.symbol}${minimumManualPrice.toLocaleString(
+            "en-NG"
+          )}`,
+        });
+      }
     }
   });
 
@@ -340,8 +358,15 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       nextManualErrors.manualFile = "Upload the material file before adding a cover.";
     }
 
+    const minimumManualPrice =
+      MANUAL_PRICE_MINIMUMS[values.currencyCode] ?? 1;
+
     if (manualFile && (manualPrice === null || manualPrice <= 0)) {
       nextManualErrors.manualPrice = "Material price is required when a material file is uploaded.";
+    } else if (manualFile && manualPrice < minimumManualPrice) {
+      nextManualErrors.manualPrice = `Minimum material price is ${selectedCurrency.symbol}${minimumManualPrice.toLocaleString(
+        "en-NG"
+      )}.`;
     }
 
     setManualErrors(nextManualErrors);
