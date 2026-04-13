@@ -47,6 +47,30 @@ function formatEventDate(dateValue) {
   });
 }
 
+function formatEventTime(timeValue) {
+  if (!timeValue) return "";
+
+  const parsedDate = new Date(timeValue);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  const normalized = String(timeValue).trim();
+  const match = normalized.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+
+  if (!match) return normalized;
+
+  let hour = Number(match[1]);
+  const minute = match[2];
+  const suffix = hour >= 12 ? "PM" : "AM";
+  hour = ((hour + 11) % 12) + 1;
+
+  return `${hour}:${minute} ${suffix}`;
+}
+
 function normalizePoster(rawEvent) {
   const source = Array.isArray(rawEvent?.poster)
     ? rawEvent.poster
@@ -67,7 +91,8 @@ function mapEventForCard(rawEvent) {
     poster: normalizePoster(rawEvent),
     eventDate: rawEvent?.eventDate || formatEventDate(rawEvent?.event_date),
     eventDateISO: rawEvent?.eventDateISO || rawEvent?.event_date || "",
-    startTime: rawEvent?.startTime || rawEvent?.start_time || "",
+    startTime: formatEventTime(rawEvent?.startTime || rawEvent?.start_time || ""),
+    endTime: formatEventTime(rawEvent?.endTime || rawEvent?.end_time || ""),
     hostName:
       rawEvent?.hostName ||
       rawEvent?.organizer?.name ||

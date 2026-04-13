@@ -7,6 +7,7 @@ import {
 } from "./organiser.utils";
 import { Ticket } from "lucide-react";
 import { useAuth } from "../../pages/auth/AuthContext";
+import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
 export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
   const { user } = useAuth();
@@ -52,11 +53,7 @@ export default function OrganizerRowCard({ org, onToggleFollow, loading }) {
             {displayName}
           </span>
           {org.has_active_subscription && (
-            <img
-              className="tw:size-3 tw:md:size-4"
-              src="/images/verifiedIcon.svg"
-              alt=""
-            />
+            <SubscriptionBadge className="tw:size-3 tw:md:size-4" />
           )}
         </div>
 

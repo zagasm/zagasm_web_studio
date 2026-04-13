@@ -11,6 +11,7 @@ export default function EventsGrid({
   error,
   isOwnProfile,
   isOrganiserProfile,
+  refreshEvents,
 }) {
   const [items, setItems] = useState(events ?? []);
   const observerRef = useRef(null);
@@ -51,6 +52,14 @@ export default function EventsGrid({
     setItems((prev) => prev.filter((e) => e.id !== id));
   };
 
+  const handleUpdated = (updatedEvent) => {
+    if (!updatedEvent?.id) return;
+
+    setItems((prev) =>
+      prev.map((item) => (item.id === updatedEvent.id ? { ...item, ...updatedEvent } : item))
+    );
+  };
+
   if (loading) {
     return (
       <div className="row tw:mt-4">
@@ -87,6 +96,8 @@ export default function EventsGrid({
             isOwnProfile={isOwnProfile}
             isOrganiserProfile={isOrganiserProfile}
             onDeleted={handleDeleted}
+            onUpdated={handleUpdated}
+            refreshEvents={refreshEvents}
           />
         ))}
       </div>

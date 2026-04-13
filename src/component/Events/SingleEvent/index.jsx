@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Countdown from "react-countdown";
 import EventActionsSheet from "../EventsActionSheet";
+import SubscriptionBadge from "../../ui/SubscriptionBadge.jsx";
 
 /* ---- Shimmer ---- */
 export const EventShimmer = () => (
@@ -111,6 +112,18 @@ export function hostName(event) {
   );
 }
 
+export function hostHasActiveSubscription(event) {
+  return !!(
+    event?.hostHasActiveSubscription ||
+    event?.has_active_subscription ||
+    event?.host?.has_active_subscription ||
+    event?.user?.has_active_subscription ||
+    event?.organiser?.has_active_subscription ||
+    event?.organizer?.has_active_subscription ||
+    event?.hostSubscription?.isActive
+  );
+}
+
 export function eventLocation(event) {
   if (event?.is_online) return "Online";
   return event?.location || "Venue TBA";
@@ -120,6 +133,14 @@ export function eventLocation(event) {
 export function getRawDate(event) {
   const raw = event?.eventDate || event?.event_date;
   if (!raw) return null;
+
+  const parsedIso = new Date(raw);
+  if (!Number.isNaN(parsedIso.getTime())) {
+    const year = parsedIso.getFullYear();
+    const month = String(parsedIso.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedIso.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
   const parts = raw.split(",");
   if (parts.length < 3) return null;
@@ -157,6 +178,13 @@ export function getRawDate(event) {
 function getRawTime(event) {
   const raw = event?.startTime || event?.start_time;
   if (!raw) return "00:00:00";
+
+  const parsedIso = new Date(raw);
+  if (!Number.isNaN(parsedIso.getTime())) {
+    return `${String(parsedIso.getHours()).padStart(2, "0")}:${String(
+      parsedIso.getMinutes()
+    ).padStart(2, "0")}:${String(parsedIso.getSeconds()).padStart(2, "0")}`;
+  }
 
   const normalizedRaw = String(raw).trim();
   const [timePart = "", ampmRaw = ""] = normalizedRaw.split(/\s+/);
@@ -374,12 +402,8 @@ export function EventCard({
                 </div>
                 <div className="tw:flex tw:items-center tw:gap-1.5 tw:text-sm tw:font-semibold tw:text-slate-900">
                   <span className="tw:truncate">{hostName(event)}</span>
-                  {event.hostHasActiveSubscription && (
-                    <img
-                      className="tw:inline-block tw:size-4"
-                      src="/images/verifiedIcon.svg"
-                      alt="Verified"
-                    />
+                  {hostHasActiveSubscription(event) && (
+                    <SubscriptionBadge className="tw:size-4" />
                   )}
                 </div>
               </div>

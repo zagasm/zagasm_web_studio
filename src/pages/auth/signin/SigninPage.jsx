@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
@@ -44,7 +44,10 @@ export function Signin() {
   const [checkedEmail, setCheckedEmail] = useState("");
   const emailCheckRequestId = useRef(0);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+  const redirectPath =
+    typeof location.state?.from === "string" ? location.state.from : "/feed";
 
   useEffect(() => {
     setRememberedAccounts(getRememberedAccounts());
@@ -288,7 +291,7 @@ export function Signin() {
           token: data.token,
         });
         showSuccess(data.message || "Login successful!");
-        navigate("/feed");
+        navigate(redirectPath, { replace: true });
       } else {
         throw new Error("Invalid response format");
       }

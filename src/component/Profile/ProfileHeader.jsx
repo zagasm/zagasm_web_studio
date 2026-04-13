@@ -4,6 +4,7 @@ import { Users, UserPlus, ArrowUpRight, Ticket } from "lucide-react";
 import { Edit } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import "./profile.css";
+import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
 export default function ProfileHeader({
   user,
@@ -48,7 +49,7 @@ export default function ProfileHeader({
   const followingCount = user?.followings_count ?? 0;
 
   const ticketsSold = user?.successfulPayments ?? user?.tickets_sold ?? 0;
-
+  console.log(user);
   const rankValue =
     user?.organiser?.rank ??
     user?.organiser?.rank_global ??
@@ -58,6 +59,12 @@ export default function ProfileHeader({
 
   const rankingLabel = isOwnProfile ? "My Ranking" : "Organizer Ranking";
   const followersLabel = isOwnProfile ? "Followers" : "Followers";
+  const hasActiveSubscription = !!(
+    user?.subscription?.isActive ||
+    user?.has_active_subscription ||
+    user?.organiser?.has_active_subscription ||
+    organiser?.has_active_subscription
+  );
 
   const handleEditClick = () => {
     navigate("/profile/edit-profile");
@@ -101,12 +108,8 @@ export default function ProfileHeader({
         <div className="tw:text-center tw:w-full">
           <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900 tw:flex tw:items-center tw:gap-0.5 tw:justify-center">
             <span>{displayName}</span>
-            {user.subscription?.isActive && (
-              <img
-                className="tw:inline-block tw:size-5"
-                src="/images/verifiedIcon.svg"
-                alt="Verified"
-              />
+            {hasActiveSubscription && (
+              <SubscriptionBadge className="tw:size-5" />
             )}
           </span>
 

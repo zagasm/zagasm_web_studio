@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
+  formatPaymentMethodLabel,
   formatTicketDate,
   formatTicketPrice,
   formatTicketStatusLabel,
@@ -22,9 +23,12 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
   const timeLabel = formatTicketTime(event.start_time);
   const priceLabel = formatTicketPrice(
     payment.amount ?? event.price ?? event.fullPrice ?? "",
-    currency.symbol || event.currency || ""
+    payment.currency || event.currency || ""
   );
   const statusLabel = formatTicketStatusLabel(event.status);
+  const paymentMethodLabel = formatPaymentMethodLabel(
+    payment.payment_method || ticket?.payment_method
+  );
 
   return (
     <Transition show={open} as={Fragment} appear>
@@ -124,7 +128,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                       </div>
 
                       {/* Payment & status */}
-                      <div className="tw:grid tw:grid-cols-3 tw:gap-3 tw:text-xs tw:pt-2 tw:border-t tw:border-dashed tw:border-gray-200">
+                      <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:border-t tw:border-dashed tw:border-gray-200 tw:pt-2 tw:text-xs tw:sm:grid-cols-3">
                         <div>
                           <p className="tw:text-[11px] tw:text-gray-500 tw:uppercase tw:tracking-[0.16em] tw:mb-0.5">
                             Price
@@ -141,7 +145,14 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                             {currency.code || ""} {payment.amount || ""}
                           </p>
                         </div>
-
+                        <div>
+                          <p className="tw:text-[11px] tw:text-gray-500 tw:uppercase tw:tracking-[0.16em] tw:mb-0.5">
+                            Method
+                          </p>
+                          <p className="tw:text-xs tw:text-gray-900 tw:font-medium">
+                            {paymentMethodLabel}
+                          </p>
+                        </div>
                       </div>
                     </div>
 

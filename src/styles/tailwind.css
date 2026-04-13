@@ -20,6 +20,7 @@
 :root {
   font-family: var(--font-sans);
   background-color: var(--color-white);
+  --desktop-app-scale: 0.75;
 }
 
 html{
@@ -30,6 +31,19 @@ html{
 body {
   background-color: var(--color-white);
 }
+
+/* Web pages cannot force the browser's native zoom level, so this scales the
+   app itself on tablet/desktop to mimic a 75% zoomed-out layout. */
+/* @media (min-width: 768px) {
+  html {
+    zoom: var(--desktop-app-scale);
+  }
+
+  body {
+    width: calc(100% / var(--desktop-app-scale));
+    min-height: calc(100vh / var(--desktop-app-scale));
+  }
+} */
 
 .tw-no-scrollbar::-webkit-scrollbar {
   display: none;

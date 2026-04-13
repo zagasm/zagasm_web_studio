@@ -6,6 +6,7 @@ import { getInitials, hasProfileImage } from "../Organizers/organiser.utils";
 import VerificationModal from "./VerificationModal";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
+import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
 const AccountLeft = ({ user }) => {
   const { token, setAuth, refreshUser } = useAuth();
@@ -27,6 +28,9 @@ const AccountLeft = ({ user }) => {
     : user?.username || user?.email || "User";
   const initials = getInitials(fullName);
   const isVerified = user?.email_verified || user?.phone_verified;
+  const hasActiveSubscription = !!(
+    user?.subscription?.isActive || user?.has_active_subscription
+  );
 
   const handleVerificationSuccess = async () => {
     setIsLoading(true);
@@ -74,12 +78,8 @@ const AccountLeft = ({ user }) => {
                     ? `${user.firstName} ${user.lastName}`
                     : "User"}
                 </span>
-                {user.subscription?.isActive && (
-                  <img
-                    className="tw:size-5"
-                    src="/images/verifiedIcon.svg"
-                    alt=""
-                  />
+                {hasActiveSubscription && (
+                  <SubscriptionBadge className="tw:size-5" />
                 )}
               </div>
               <span className="tw:text-[10px] tw:md:text-sm tw:text-gray-500">
@@ -89,7 +89,7 @@ const AccountLeft = ({ user }) => {
           </div>
           <ChevronRight className="tw:w-5 tw:h-5 tw:text-gray-400" />
         </Link>
-        {!user.subscription?.isActive && (
+        {!hasActiveSubscription && (
           <div
             className={`${user.subscription?.isActive ? "tw:bg-blue-600" : "tw:bg-blue-700"
               } tw:border tw:border-blue-100 tw:rounded-3xl tw:px-3 tw:py-6 tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-4`}

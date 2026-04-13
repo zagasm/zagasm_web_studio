@@ -8,6 +8,7 @@ import { useAuth } from "../../../pages/auth/AuthContext";
 import { truncate } from "../../../utils/helpers";
 import { showError, showSuccess } from "../../ui/toast";
 import { api, authHeaders } from "../../../lib/apiClient";
+import SubscriptionBadge from "../../ui/SubscriptionBadge.jsx";
 
 export default function MobileSingleOrganizers() {
   const navigate = useNavigate();
@@ -225,12 +226,8 @@ export default function MobileSingleOrganizers() {
                         <span className="tw:block tw:text-xs tw:font-medium tw:truncate">
                           {truncate(name, 14)}
                         </span>
-                        {organizer.plan && (
-                          <img
-                            className="tw:size-4"
-                            src="/images/verifiedIcon.svg"
-                            alt=""
-                          />
+                        {(organizer.has_active_subscription || organizer.plan) && (
+                          <SubscriptionBadge className="tw:size-4" />
                         )}
                       </div>
 

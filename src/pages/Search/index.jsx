@@ -6,6 +6,7 @@ import { ArrowLeft, Search, X } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showError } from "../../component/ui/toast";
+import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 
 // Re-use your existing card + shimmer
 import { EventCard, EventShimmer } from "../../component/Events/SingleEvent";
@@ -134,7 +135,7 @@ function PersonRow({ item, onClick }) {
             {name}
           </span>
           {item.data.has_active_subscription && (
-            <img width={15} src="/images/verifiedIcon.svg" alt="" />
+            <SubscriptionBadge className="tw:size-[15px]" />
           )}
         </div>
         <span className="tw:text-sm tw:text-zinc-500 tw:truncate">

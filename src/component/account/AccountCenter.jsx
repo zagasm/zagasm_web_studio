@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   PiBookmarkDuotone,
-  PiBookmarkSimple,
   PiBookOpenText,
   PiHeadset,
   PiLockKey,
@@ -17,6 +16,15 @@ import { getInitials, hasProfileImage } from "../Organizers/organiser.utils";
 import VerificationModal from "./VerificationModal";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
+import BlueBadgeSubscriptionModal from "./BlueBadgeSubscriptionModal";
+import WalletFundingRequiredModal from "../../features/wallet/components/WalletFundingRequiredModal";
+import FundWalletModal from "../../features/wallet/components/FundWalletModal";
+import {
+  formatWalletMoney,
+  getApiErrorCode,
+  getApiErrorMessage,
+} from "../../features/wallet/walletUtils";
+import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
 const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed }) => {
   const Wrapper = to ? Link : "button";
@@ -60,15 +68,64 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
   const { token, setAuth, refreshUser } = useAuth();
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isRefreshingProfile, setIsRefreshingProfile] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [isSubscribingToBadge, setIsSubscribingToBadge] = useState(false);
+  const [fundingRequiredOpen, setFundingRequiredOpen] = useState(false);
+  const [fundingRequiredDetails, setFundingRequiredDetails] = useState(null);
+  const [fundWalletOpen, setFundWalletOpen] = useState(false);
+
+  const loadSubscriptionStatus = useCallback(async () => {
+    if (!token) {
+      setSubscriptionStatus(null);
+      return null;
+    }
+
+    try {
+      const res = await api.get("/api/v1/user/subscription", authHeaders(token));
+      const payload = res?.data?.data || res?.data || null;
+      setSubscriptionStatus(payload);
+      return payload;
+    } catch (error) {
+      console.error("Failed to load subscription status", error);
+      return null;
+    }
+  }, [token]);
+
+  const syncNotifications = useCallback(async () => {
+    if (!token || typeof window === "undefined") return;
+
+    try {
+      const res = await api.get("/api/v1/notifications", authHeaders(token));
+      const nextNotifications = Array.isArray(res?.data?.notifications)
+        ? res.data.notifications
+        : [];
+
+      window.dispatchEvent(
+        new CustomEvent("notifications:sync", {
+          detail: nextNotifications,
+        })
+      );
+    } catch (error) {
+      console.error("Failed to refresh notifications", error);
+    }
+  }, [token]);
 
   useEffect(() => {
     const onFocus = () => {
-      if (token) refreshUser();
+      if (!token) return;
+
+      refreshUser();
+      loadSubscriptionStatus();
     };
 
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [token, refreshUser]);
+  }, [loadSubscriptionStatus, refreshUser, token]);
+
+  useEffect(() => {
+    loadSubscriptionStatus();
+  }, [loadSubscriptionStatus]);
 
   const profileImage = user?.profileUrl;
   const showProfileImage = hasProfileImage(profileImage);
@@ -79,6 +136,17 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
   const isVerified = user?.email_verified || user?.phone_verified;
   const isOrganizer = user?.is_organiser_verified;
   const profilePath = `/profile/${user.id}`;
+  const hasActiveSubscription =
+    subscriptionStatus?.has_active_subscription ??
+    user?.has_active_subscription ??
+    user?.subscription?.isActive ??
+    false;
+  const subscriptionPrice = Number(subscriptionStatus?.price) || 2500;
+  const subscriptionCurrency = subscriptionStatus?.currency || "NGN";
+  const formattedSubscriptionPrice = formatWalletMoney(
+    subscriptionPrice,
+    subscriptionCurrency
+  );
 
   const handleVerificationSuccess = async () => {
     setIsRefreshingProfile(true);
@@ -91,6 +159,95 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
       showError(error?.response?.data?.message || "Failed to refresh profile.");
     } finally {
       setIsRefreshingProfile(false);
+    }
+  };
+
+  const markLocalSubscriptionAsActive = useCallback(
+    (nextStatus = null) => {
+      if (!user) return;
+
+      setAuth({
+        user: {
+          ...user,
+          has_active_subscription: true,
+          subscription: {
+            ...user?.subscription,
+            ...(nextStatus?.subscription || {}),
+            isActive: true,
+            current_period_end:
+              nextStatus?.subscription?.current_period_end ||
+              user?.subscription?.current_period_end,
+          },
+        },
+        token,
+      });
+    },
+    [setAuth, token, user]
+  );
+
+  const handleSubscribeToBadge = async () => {
+    if (!token || isSubscribingToBadge) return;
+
+    setIsSubscribingToBadge(true);
+
+    try {
+      const res = await api.post(
+        "/api/v1/user/subscription/subscribe-wallet",
+        null,
+        authHeaders(token)
+      );
+
+      const payload = res?.data?.data || {};
+      const message =
+        res?.data?.message || "Blue badge subscription activated successfully.";
+
+      setSubscriptionStatus((previous) => ({
+        ...(previous || {}),
+        ...payload,
+        has_active_subscription: true,
+        subscription: {
+          ...(previous?.subscription || {}),
+          ...(payload?.subscription || {}),
+        },
+      }));
+      markLocalSubscriptionAsActive(payload);
+      setIsSubscriptionModalOpen(false);
+      showSuccess(message);
+
+      await Promise.all([
+        refreshUser?.(),
+        loadSubscriptionStatus(),
+        syncNotifications(),
+      ]);
+    } catch (error) {
+      const status = error?.response?.status;
+      const code = getApiErrorCode(error);
+      const message = getApiErrorMessage(
+        error,
+        "Unable to subscribe to blue badge right now."
+      );
+      const details = error?.response?.data?.data || {};
+
+      if (
+        status === 422 &&
+        (code === "INSUFFICIENT_BALANCE" ||
+          message === "Insufficient balance. Please fund your wallet.")
+      ) {
+        setIsSubscriptionModalOpen(false);
+        setFundingRequiredDetails({
+          wallet_balance: details?.wallet_balance || 0,
+          required_amount: details?.required_amount || subscriptionPrice,
+          deficit_amount: details?.deficit_amount || 0,
+        });
+        setFundingRequiredOpen(true);
+        showError("Insufficient balance. Please fund your wallet.");
+        return;
+      }
+
+      showError(message);
+      console.error("Blue badge subscription error:", error);
+    } finally {
+      setIsSubscribingToBadge(false);
     }
   };
 
@@ -169,12 +326,8 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                   <span className="tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900 tw:md:text-xl">
                     {fullName}
                   </span>
-                  {user?.subscription?.isActive ? (
-                    <img
-                      className="tw:h-5 tw:w-5"
-                      src="/images/verifiedIcon.svg"
-                      alt=""
-                    />
+                  {hasActiveSubscription ? (
+                    <SubscriptionBadge className="tw:size-5" />
                   ) : null}
                 </div>
                 <span className="tw:mt-1 tw:block tw:text-xs tw:font-medium tw:text-gray-500 tw:md:text-sm">
@@ -183,15 +336,11 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
               </div>
             </div>
 
-            {!user?.subscription?.isActive ? (
+            {!hasActiveSubscription ? (
               <div className="tw:relative tw:flex tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-primary tw:p-4 tw:text-white tw:lg:max-w-md tw:md:rounded-[28px] tw:md:p-5">
                 <span className="tw:pointer-events-none tw:absolute tw:-right-6 tw:-top-6 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/10 tw:blur-2xl" />
                 <span className="tw:pointer-events-none tw:absolute tw:-left-5 tw:bottom-0 tw:h-20 tw:w-20 tw:rounded-full tw:bg-sky-300/10 tw:blur-2xl" />
-                <img
-                  src="/images/verifiedIcon.svg"
-                  alt=""
-                  className="tw:pointer-events-none tw:absolute tw:-right-4 tw:top-1/2 tw:h-28 tw:w-28 tw:-translate-y-1/2 tw:opacity-[0.40] tw:grayscale tw:brightness-[4.4] tw:contrast-125 tw:md:h-36 tw:md:w-36"
-                />
+                <SubscriptionBadge className="tw:pointer-events-none tw:absolute tw:-right-4 tw:top-1/2 tw:h-28 tw:w-28 tw:-translate-y-1/2 tw:opacity-[0.12] tw:text-black tw:md:h-36 tw:md:w-36" />
 
                 <div className="tw:relative tw:flex tw:w-full tw:flex-col tw:gap-3">
                   <div>
@@ -199,19 +348,20 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                       Xilolo Verification Badge
                     </span>
                     <span className="tw:mt-1 tw:block tw:text-xs tw:text-white/90 tw:md:text-sm">
-                      Get the blue checkmark and unlock premium features.
+                      Get the blue checkmark for {formattedSubscriptionPrice} monthly from your wallet.
                     </span>
                   </div>
 
-                  <Link
-                    to="/subscription"
+                  <button
+                    type="button"
+                    onClick={() => setIsSubscriptionModalOpen(true)}
                     style={{ borderRadius: 12 }}
                     className="tw:inline tw:w-36 tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition hover:tw:bg-white/90"
                   >
                     <span className="tw:text-primary">
                       Subscribe Now
                     </span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             ) : null}
@@ -292,6 +442,34 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
         showError={showError}
         showSuccess={showSuccess}
         onSuccess={handleVerificationSuccess}
+      />
+      <BlueBadgeSubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+        onConfirm={handleSubscribeToBadge}
+        loading={isSubscribingToBadge}
+        formattedPrice={formattedSubscriptionPrice}
+      />
+      <WalletFundingRequiredModal
+        open={fundingRequiredOpen}
+        onClose={() => setFundingRequiredOpen(false)}
+        details={fundingRequiredDetails}
+        formatAmount={(amount) =>
+          formatWalletMoney(amount, subscriptionCurrency)
+        }
+        title="Wallet funding required"
+        description="Your wallet balance is not enough to subscribe to the Xilolo badge right now."
+        requiredAmountLabel="Subscription amount"
+        onFundWallet={() => {
+          setFundingRequiredOpen(false);
+          setFundWalletOpen(true);
+        }}
+      />
+      <FundWalletModal
+        open={fundWalletOpen}
+        onClose={() => setFundWalletOpen(false)}
+        prefilledAmount={fundingRequiredDetails?.deficit_amount || ""}
+        source="blue_badge_subscription"
       />
     </>
   );

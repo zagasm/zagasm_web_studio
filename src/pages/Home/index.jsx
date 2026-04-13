@@ -42,9 +42,9 @@ export default function Home() {
 
       <div className="tw:w-full tw:min-h-screen tw:bg-white tw:pt-24 tw:md:pt-24 tw:px-2 tw:font-sans">
         <span className=" tw:text-2xl tw:font-semibold">
-         { new Date().getHours() < 12 ? "Good morning" : "Good afternoon" }, {user?.firstName || user?.username || "there"}!
+         { new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 18 ? "Good afternoon" : "Good Evening"  }, {user?.firstName || user?.username || "there"}!
         </span>
-        <span className="tw:font-bold tw:block tw:mb-3 tw:md:mb-5">
+        <span className="tw:font-bold tw:md:text-xl tw:block tw:mb-3 tw:md:mb-5">
           Explore events
         </span>
         {/* TABS */}
