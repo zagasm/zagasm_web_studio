@@ -6,8 +6,10 @@ import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
+import EventReviewsSection from "../../../component/Events/EventReviewsSection.jsx";
 import ReportModal from "../../../component/Events/ReportModal";
 import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
+import SubscriptionBadge from "../../../component/ui/SubscriptionBadge.jsx";
 import { formatEventDateTime } from "../../../utils/ui";
 import { useAuth } from "../../auth/AuthContext";
 import {
@@ -23,6 +25,7 @@ import {
   Ticket,
   MapPin,
   Clock,
+  Star,
 } from "lucide-react";
 import EventShareModal from "../../../component/Events/EvenetShareModal";
 import TicketPromptModal from "../../../component/Events/TicketPromptModal";
@@ -77,6 +80,44 @@ function isUuid(value = "") {
 
 function getTicketPromptStorageKey(eventIdentifier) {
   return `xilolo:event-ticket-prompt-seen:${eventIdentifier}`;
+}
+
+function resolveManualDownloadUrl(manual = {}) {
+  const directCandidates = [
+    manual?.cdn_url,
+    manual?.cdn_link,
+    manual?.document_url,
+    manual?.document_link,
+    manual?.file_url,
+    manual?.file_link,
+    manual?.download_url,
+    manual?.url,
+    manual?.link,
+    manual?.path,
+    manual?.document?.cdn_url,
+    manual?.document?.cdn_link,
+    manual?.document?.url,
+    manual?.document?.link,
+    manual?.document?.file_url,
+    manual?.file?.cdn_url,
+    manual?.file?.cdn_link,
+    manual?.file?.url,
+    manual?.file?.link,
+    manual?.file?.file_url,
+    manual?.manual_document?.cdn_url,
+    manual?.manual_document?.cdn_link,
+    manual?.manual_document?.url,
+    manual?.manual_document?.link,
+    manual?.asset?.url,
+    manual?.asset?.cdn_url,
+    manual?.asset?.cdn_link,
+  ];
+
+  return (
+    directCandidates.find(
+      (value) => typeof value === "string" && /^https?:\/\//i.test(value.trim())
+    ) || ""
+  );
 }
 
 function EventDetailShimmer() {
@@ -138,7 +179,7 @@ export default function ViewEvent() {
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
   const [purchaseSummary, setPurchaseSummary] = useState(null);
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const shareFlow = useEventShareFlow();
   const [isSaved, setIsSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -174,6 +215,7 @@ export default function ViewEvent() {
       setPurchaseModalOpen(false);
       setFundingRequiredOpen(false);
       dispatch(clearPendingPurchaseIntent());
+      refreshEventDetailSilently();
       showSuccess(
         purchaseType === "manual_only"
           ? "Manual purchased successfully."
@@ -195,6 +237,45 @@ export default function ViewEvent() {
   const hostInitials = initialsFromName(hostName);
   const hostHasImage = !!event?.hostImage;
 
+  function syncEventPayload(data = {}) {
+    const ev =
+      data?.currentEvent || data?.event || data?.data?.event || null;
+    const recommendations =
+      data?.recommendations ||
+      data?.recommended?.data ||
+      data?.recs ||
+      data?.data?.recommendations ||
+      [];
+
+    setEvent(normalizeEventRecord(ev));
+    setRecs(recommendations);
+    setIsSaved(!!ev?.is_saved);
+    setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
+  }
+
+  async function fetchEventPayload() {
+    const isId = isUuid(eventId);
+    const res = isId
+      ? await api.get(`/api/v1/events/${eventId}/view`, authHeaders(token))
+      : await api.get(
+        `/api/v1/event/recommended/${eventId}`,
+        authHeaders(token)
+      );
+
+    return res?.data?.data || res?.data || {};
+  }
+
+  async function refreshEventDetailSilently() {
+    if (!eventId) return;
+
+    try {
+      const data = await fetchEventPayload();
+      syncEventPayload(data);
+    } catch (refreshError) {
+      console.error("Failed to refresh event detail", refreshError);
+    }
+  }
+
   useEffect(() => {
     if (!eventId) return;
 
@@ -207,30 +288,10 @@ export default function ViewEvent() {
         setModalAutoTrigger(true);
         setPurchaseModalOpen(false);
         setPurchaseSummary(null);
-        const isId = isUuid(eventId);
-        const res = isId
-          ? await api.get(`/api/v1/events/${eventId}/view`, authHeaders(token))
-          : await api.get(
-            `/api/v1/event/recommended/${eventId}`,
-            authHeaders(token)
-          );
+        const data = await fetchEventPayload();
 
         if (!mounted) return;
-
-        const data = res?.data?.data || res?.data || {};
-        const ev =
-          data?.currentEvent || data?.event || data?.data?.event || null;
-        const recommendations =
-          data?.recommendations ||
-          data?.recommended?.data ||
-          data?.recs ||
-          data?.data?.recommendations ||
-          [];
-
-        setEvent(normalizeEventRecord(ev));
-        setRecs(recommendations);
-        setIsSaved(!!ev?.is_saved);
-        setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
+        syncEventPayload(data);
       } catch (e) {
         setError(
           e?.response?.data?.message || e?.message || "Failed to fetch event"
@@ -269,6 +330,11 @@ export default function ViewEvent() {
     }
   }, [event, eventId, modalAutoTrigger]);
 
+  useEffect(() => {
+    if (!event?.id) return;
+    shareFlow.prefetchShare({ eventId: event.id });
+  }, [event?.id, shareFlow.prefetchShare]);
+
   const closePurchaseModal = () => {
     setPurchaseModalOpen(false);
     setModalAutoTrigger(false);
@@ -303,47 +369,21 @@ export default function ViewEvent() {
       Number(manual?.price || 0),
       manual?.currency_code || event?.currency?.code || "NGN"
     );
+  const manualDownloadUrl = resolveManualDownloadUrl(manual);
 
-  const handleDownloadManual = async () => {
-    if (!event?.id) return;
-
+  const handleDownloadManual = () => {
     if (!token) {
       showError("Please log in to access the event manual.");
       navigate("/auth/signin");
       return;
     }
 
-    try {
-      const endpoint = manual?.download_endpoint || `/api/v1/events/${event.id}/manual/download`;
-      const response = await api.get(endpoint, authHeaders(token));
-      const payload = response?.data?.data || response?.data || {};
-      const downloadUrl = payload?.download_url;
-
-      if (!downloadUrl) {
-        showError("Manual download is not available right now.");
-        return;
-      }
-
-      window.open(downloadUrl, "_blank", "noopener,noreferrer");
-      setEvent((previous) =>
-        previous
-          ? {
-            ...previous,
-            manual: previous.manual
-              ? {
-                ...previous.manual,
-                viewer_has_access: true,
-                download_endpoint: endpoint,
-              }
-              : previous.manual,
-          }
-          : previous
-      );
-    } catch (downloadError) {
-      showError(
-        getApiErrorMessage(downloadError, "Unable to download the event manual.")
-      );
+    if (!manualDownloadUrl) {
+      showError("Manual CDN file link is missing from the event response.");
+      return;
     }
+
+    window.open(manualDownloadUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleGetTicket = async (purchaseType = "ticket_only") => {
@@ -474,7 +514,7 @@ export default function ViewEvent() {
   } else if (purchaseTicketMutation.isPending) {
     primaryCtaLabel = "Processing...";
   } else if (shouldChoosePurchaseType) {
-    primaryCtaLabel = "Choose Access";
+    primaryCtaLabel = "Buy Ticket";
   } else {
     primaryCtaLabel = "Buy Ticket";
   }
@@ -527,6 +567,9 @@ export default function ViewEvent() {
     event.eventDate,
     event.startTime
   );
+  const reviewStats = event?.reviews || {};
+  const reviewCount = Number(reviewStats?.count ?? 0) || 0;
+  const reviewAverage = Number(reviewStats?.average_rating ?? 0) || 0;
 
   const startDate = eventStartDate(event);
   const formattedLocation =
@@ -629,11 +672,16 @@ export default function ViewEvent() {
             <button
               type="button"
               onClick={handleShareEvent}
-              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:md:size-11"
+              disabled={shareFlow.shareInProgress}
+              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:disabled:cursor-not-allowed tw:disabled:opacity-75 tw:md:size-11"
               aria-label="Share event"
               style={{ borderRadius: "9999px" }}
             >
-              <Share2 className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
+              {shareFlow.shareInProgress ? (
+                <span className="tw:h-3.5 tw:w-3.5 tw:animate-spin tw:rounded-full tw:border-2 tw:border-slate-500/70 tw:border-t-transparent tw:md:h-4 tw:md:w-4" />
+              ) : (
+                <Share2 className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
+              )}
             </button>
           </div>
 
@@ -724,7 +772,7 @@ export default function ViewEvent() {
                   </div>
                 </div>
 
-                <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-4">
+                <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-5">
                   <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                     <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                       Event Schedule
@@ -770,6 +818,23 @@ export default function ViewEvent() {
                           Closed
                         </span>
                       )}
+                    </div>
+                  </div>
+
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
+                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                      Reviews
+                    </div>
+                    <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-slate-900">
+                      <Star className="tw:h-4 tw:w-4 tw:fill-amber-400 tw:text-amber-400" />
+                      {reviewCount > 0
+                        ? `${reviewAverage.toFixed(1)} / 5`
+                        : "No reviews yet"}
+                    </div>
+                    <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
+                      {reviewCount > 0
+                        ? `${reviewCount} attendee review${reviewCount === 1 ? "" : "s"}`
+                        : "Be the first attendee to share feedback."}
                     </div>
                   </div>
                 </div>
@@ -946,11 +1011,7 @@ export default function ViewEvent() {
                             {event.hostName || "Organizer"}
                           </span>
                           {event.hostHasActiveSubscription && (
-                            <img
-                              className="tw:h-4 tw:w-4"
-                              src="/images/verifiedIcon.svg"
-                              alt="Verified"
-                            />
+                            <SubscriptionBadge className="tw:size-4" />
                           )}
                         </div>
 
@@ -1006,6 +1067,14 @@ export default function ViewEvent() {
               </aside>
             </div>
           </section>
+
+          <EventReviewsSection
+            eventId={event?.id}
+            eventSummary={event?.reviews}
+            token={token}
+            currentUser={user}
+            onReviewMutationSuccess={refreshEventDetailSilently}
+          />
 
           <div className="tw:mt-8">
             <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />

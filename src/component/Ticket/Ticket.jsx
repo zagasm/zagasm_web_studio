@@ -1,11 +1,18 @@
 import React from "react";
 import "./ticket.css";
 import {
+  formatPaymentMethodLabel,
   formatTicketDate,
   formatTicketPrice,
   formatTicketTime,
   normalizeTicketStatus,
 } from "../../utils/ticketHelpers";
+import {
+  CalendarDays,
+  Receipt,
+  Ticket as TicketIcon,
+  Wallet,
+} from "lucide-react";
 
 const phaseStyles = {
   live: {
@@ -13,7 +20,7 @@ const phaseStyles = {
     classes: "tw:bg-red-100 tw:text-red-600",
     icon: (
       <svg
-        className="tw:w-3 tw:h-3 tw:mr-1"
+        className="tw:mr-1 tw:h-3 tw:w-3"
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -23,7 +30,7 @@ const phaseStyles = {
   },
   upcoming: {
     label: "Upcoming",
-    classes: "tw:bg-orange-100 tw:text-orange-600",
+    classes: "tw:bg-emerald-100 tw:text-emerald-600",
   },
   ended: {
     label: "Ended",
@@ -34,91 +41,113 @@ const phaseStyles = {
 function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
   const event = ticket.event || {};
   const payment = ticket.payment || {};
-  const currency = payment.currency || {};
   const title = event.title || "Event";
 
   const dateLabel = formatTicketDate(event.event_date);
   const timeLabel = formatTicketTime(event.start_time);
+  const paymentMethodLabel = formatPaymentMethodLabel(
+    payment.payment_method || ticket.payment_method
+  );
 
   const phase = phaseProp || normalizeTicketStatus(event.status);
   const phaseDef = phaseStyles[phase] || phaseStyles.upcoming;
 
   const priceLabel = formatTicketPrice(
     payment.amount ?? event.price ?? event.fullPrice ?? "",
-    currency.symbol || event.currency || ""
+    payment.currency || event.currency || ""
   );
 
   return (
     <div className="ticket-wrapper">
-      {/* 1. The Background Image sits at the back */}
-      <img src="/images/ticketbg.png" alt="" className="ticket-bg-image" />
+      <div className="ticket-shell">
+        <div className="ticket-hero">
+          <img
+            src={event.poster}
+            alt={title}
+            className="ticket-hero-image"
+            
+          />
+          <div className="ticket-hero-overlay" />
 
-      {/* 2. The Content sits on top */}
-      <div className="ticket-content">
-        {/* LEFT SIDE: Main Info */}
-        <div className="ticket-main">
-          <div className="tw:flex tw:flex-col tw:gap-4 tw:h-full tw:justify-between">
-            {/* Header: Logo + Title + Status */}
-            <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
-              <div className="tw:flex tw:items-center tw:gap-3">
-                <div className="tw:h-10 tw:w-10 tw:rounded-full tw:overflow-hidden tw:bg-[#ffffff] tw:shrink-0">
-                  <img
-                    src={event.poster}
-                    alt={title}
-                    className="tw:w-full tw:h-full tw:object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                </div>
-                <span className="tw:text-sm tw:md:text-[16px] tw:font-semibold tw:text-gray-900 tw:leading-tight tw:line-clamp-2">
+          <div className="ticket-hero-content">
+            <span
+              className={`tw:inline-flex tw:w-fit tw:items-center tw:rounded-full tw:px-3 tw:py-1 tw:text-[10px] tw:font-bold tw:uppercase ${phaseDef.classes}`}
+            >
+              {phaseDef.icon}
+              {phaseDef.label}
+            </span>
+
+            <div className="tw:flex tw:items-end tw:justify-between tw:gap-4">
+              <div className="tw:min-w-0">
+                <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.18em] tw:text-white/75">
+                  Event Ticket
+                </span>
+                <span className="tw:mt-2 tw:block tw:line-clamp-2 tw:text-lg tw:font-semibold tw:leading-tight tw:text-white">
                   {title}
                 </span>
               </div>
 
-              <span
-                className={`tw:inline-flex tw:items-center tw:px-2.5 tw:py-0.5 tw:rounded-full tw:text-[8px] tw:font-bold tw:uppercase ${phaseDef.classes}`}
-              >
-                {phaseDef.label}
-              </span>
+              <div className="tw:hidden tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/12 tw:px-3 tw:py-2 tw:text-white/90 tw:backdrop-blur-sm tw:sm:inline-flex">
+                <TicketIcon className="tw:h-4 tw:w-4" />
+                <span className="tw:text-xs tw:font-medium">
+                  #{ticket?.code?.slice(-6) || "—"}
+                </span>
+              </div>
             </div>
-
-            {/* Info Pill */}
-            <div className="tw:inline-flex tw:items-center tw:px-4 tw:py-2 tw:bg-gray-100 tw:rounded-full tw:text-[9px] tw:md:text-[11px] tw:text-gray-700 tw:font-medium tw:w-fit">
-              <span>{dateLabel}</span>
-              <span className="tw:mx-2 tw:text-gray-300">•</span>
-              <span>{timeLabel}</span>
-              <span className="tw:mx-2 tw:text-gray-300">•</span>
-              <span>Online</span>
-            </div>
-
-            {/* Button */}
-            <button
-              style={{
-                borderRadius: 8,
-              }}
-              type="button"
-              onClick={onViewReceipt}
-              className="tw:w-full tw:h-12 tw:rounded-xl tw:bg-lightPurple tw:text-[14px] tw:font-bold tw:text-primary tw:hover:bg-[#e1d7cc] tw:transition-colors"
-            >
-              View Receipt
-            </button>
           </div>
         </div>
 
-        {/* RIGHT SIDE: Price Stub */}
-        <div className="ticket-stub">
-          <div className="tw:flex tw:flex-col tw:items-start tw:justify-end tw:h-full">
-            <span style={{ fontSize: 8 }} className="tw:text-[10px] tw:uppercase tw:tracking-widest tw:text-gray-400 tw:font-semibold tw:mb-1">
-              Price
-            </span>
-            <span
-              style={{ fontSize: 12 }}
-              className="tw:text-[8px] tw:md:text-[20px] tw:font-semibold tw:text-gray-900"
-            >
-              {priceLabel}
+        <div className="ticket-body">
+          <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-[minmax(0,1.2fr)_minmax(190px,0.8fr)]">
+            <div className="tw:space-y-3">
+              <div className="tw:flex tw:items-start tw:gap-2 tw:text-sm tw:text-slate-700">
+                <CalendarDays className="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:text-primary" />
+                <div className="tw:min-w-0">
+                  <span className="tw:block tw:font-medium tw:text-slate-900">
+                    {dateLabel}
+                    {timeLabel ? ` • ${timeLabel}` : ""}
+                  </span>
+                </div>
+              </div>
+
+              <div className="tw:flex tw:items-start tw:gap-2 tw:text-sm tw:text-slate-700">
+                <Wallet className="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:text-primary" />
+                <div className="tw:min-w-0">
+                  <span className="tw:block tw:font-medium tw:text-slate-900">
+                    Payment Method: {paymentMethodLabel}
+                  </span>
+                  <span className="tw:block tw:break-all tw:text-xs tw:text-slate-500">
+                    {ticket?.code || "Ticket code unavailable"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="ticket-price-block">
+              <span className="ticket-price-label">Amount Paid</span>
+              <span className="ticket-price-value">{priceLabel}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="ticket-divider" aria-hidden="true" />
+
+        <div className="ticket-footer">
+          <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2 tw:text-xs tw:text-slate-500">
+            <Receipt className="tw:h-4 tw:w-4 tw:shrink-0 tw:text-slate-400" />
+            <span className="tw:truncate">
+              Open your receipt for full payment and ticket details.
             </span>
           </div>
+
+          <button
+            style={{ borderRadius: 12 }}
+            type="button"
+            onClick={onViewReceipt}
+            className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-xl tw:bg-slate-950 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:transition-colors hover:tw:bg-slate-800"
+          >
+            View Receipt
+          </button>
         </div>
       </div>
     </div>

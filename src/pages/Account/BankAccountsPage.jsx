@@ -315,17 +315,17 @@ export default function BankAccountsPage() {
           <section className="tw:p-0 tw:md:rounded-[32px] tw:md:border tw:md:border-white/70 tw:md:bg-white tw:md:p-7 tw:md:shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
             <div className="tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-start tw:md:justify-between">
               <div>
-                <Link to="/account/wallet" className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 hover:tw:text-gray-900">
+                <Link to="/account/payouts" className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 hover:tw:text-gray-900">
                   <ArrowLeft className="tw:h-4 tw:w-4" />
-                  <span>Back to wallet</span>
+                  <span>Back to payouts</span>
                 </Link>
                 <div className="tw:mt-4 tw:flex tw:items-center tw:gap-3">
                   <span className="tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-[20px] tw:bg-[#f4efff] tw:text-primary">
                     <Landmark className="tw:h-6 tw:w-6" />
                   </span>
                   <div>
-                    <div className="tw:text-xl tw:font-semibold tw:text-gray-900 tw:md:text-3xl">Bank Accounts</div>
-                    <div className="tw:mt-1 tw:text-xs tw:text-gray-500 tw:md:text-sm">Add, remove, and manage your payout bank accounts.</div>
+                    <div className="tw:text-xl tw:font-semibold tw:text-gray-900 tw:md:text-3xl">My Bank Accounts</div>
+                    <div className="tw:mt-1 tw:text-xs tw:text-gray-500 tw:md:text-sm">Add, remove, and manage the bank accounts used for organiser payouts.</div>
                   </div>
                 </div>
               </div>

@@ -1,14 +1,21 @@
 // src/pages/search/SearchPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, X } from "lucide-react";
+import { ArrowLeft, CalendarDays, Clock3, Search, X } from "lucide-react";
 
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showError } from "../../component/ui/toast";
+import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 
 // Re-use your existing card + shimmer
-import { EventCard, EventShimmer } from "../../component/Events/SingleEvent";
+import {
+  EventShimmer,
+  eventStartDate,
+  hostHasActiveSubscription,
+  hostName,
+  priceText,
+} from "../../component/Events/SingleEvent";
 
 const RECENTS_KEY = "Xilolo_search_recent_people";
 
@@ -94,6 +101,77 @@ function getAvatarUrl(item) {
   return data.profileUrl || data.profileImage || null;
 }
 
+function getCompactEventMeta(event) {
+  const startDate = eventStartDate(event);
+  const dateLabel = startDate
+    ? startDate.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : event?.eventDate || "Date TBA";
+  const timeLabel = event?.startTime || "Time TBA";
+
+  return { dateLabel, timeLabel };
+}
+
+function CompactEventRow({ event, index = null, onClick }) {
+  const poster = event?.poster?.find?.((item) => item?.type === "image" && item?.url)?.url;
+  const { dateLabel, timeLabel } = getCompactEventMeta(event);
+  const organiser = hostName(event);
+  const hasActiveSubscription = !!(
+    event?.has_active_subscription || hostHasActiveSubscription(event)
+  );
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tw:flex tw:w-full tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:transition hover:tw:border-slate-300 hover:tw:bg-slate-50"
+    >
+      
+
+      <div className="tw:min-w-0 tw:flex-1">
+        
+        <div className="tw:mt-1 tw:flex tw:items-center tw:gap-1.5 tw:text-base tw:font-semibold tw:text-slate-900">
+          <span>{event?.title || "Untitled event"}</span>
+          
+        </div>
+        <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+          Organised by {organiser}
+          {hasActiveSubscription ? (
+            <SubscriptionBadge className="tw:size-4 tw:ml-1" />
+          ) : null}
+        </div>
+
+        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:text-xs tw:text-slate-500">
+          <span className="tw:inline-flex tw:items-center tw:gap-1.5">
+            <CalendarDays className="tw:h-3.5 tw:w-3.5" />
+            {dateLabel}
+          </span>
+          <span className="tw:inline-flex tw:items-center tw:gap-1.5">
+            <Clock3 className="tw:h-3.5 tw:w-3.5" />
+            {timeLabel}
+          </span>
+          <span className="tw:rounded-full tw:bg-slate-100 tw:px-2.5 tw:py-1 tw:font-medium tw:text-slate-700">
+            {priceText(event)}
+          </span>
+        </div>
+      </div>
+
+      <div className="tw:h-16 tw:w-16 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-slate-100">
+        {poster ? (
+          <img
+            src={poster}
+            alt={event?.title || "Event poster"}
+            className="tw:h-full tw:w-full tw:object-cover"
+          />
+        ) : null}
+      </div>
+    </button>
+  );
+}
+
 function PersonRow({ item, onClick }) {
   const isOrganiser = item.type === "organiser";
 
@@ -134,7 +212,7 @@ function PersonRow({ item, onClick }) {
             {name}
           </span>
           {item.data.has_active_subscription && (
-            <img width={15} src="/images/verifiedIcon.svg" alt="" />
+            <SubscriptionBadge className="tw:size-[15px]" />
           )}
         </div>
         <span className="tw:text-sm tw:text-zinc-500 tw:truncate">
@@ -301,7 +379,7 @@ export default function SearchPage() {
 
   return (
     <div className="tw:min-h-screen tw:bg-white tw:flex tw:justify-center tw:py-16 tw:md:py-20 tw:px-3 tw:sm:px-4">
-      <div className="tw:w-full tw:max-w-6xl tw:pb-10 tw:pt-8">
+      <div className="tw:w-full tw:max-w-4xl tw:pb-10 tw:pt-8">
         {/* Top search bar */}
         <div className="tw:flex tw:items-center tw:gap-3 tw:mb-6 tw:sm:mb-8">
           <button
@@ -316,7 +394,7 @@ export default function SearchPage() {
             onSubmit={handleSubmit}
             className="tw:flex-1 tw:relative tw:flex tw:items-center"
           >
-            <div className="tw:flex tw:items-center tw:bg-white tw:border tw:border-[#F5F5F5] tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-4 tw:w-full">
+            <div className="tw:flex tw:items-center tw:bg-[#f5f7fa] tw:border tw:border-slate-200 tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-4 tw:w-full">
               <Search className="tw:w-5 tw:h-5 tw:text-zinc-500 tw:mr-2" />
               <input
                 type="text"
@@ -346,9 +424,9 @@ export default function SearchPage() {
         {/* People / recent searches */}
         {showPeopleSection && (
           <section className="tw:mb-8">
-            <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
+            <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
               Recent Searches
-            </span>
+            </div>
 
             <div className="tw:flex tw:flex-col tw:gap-1">
               {peopleToShow.map((item) => (
@@ -369,17 +447,20 @@ export default function SearchPage() {
         {/* Trending events (initial load / when not searching) */}
         {!hasSearched && trendingEvents.length > 0 && (
           <section className="tw:mb-6">
-            <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-6">
+            <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
               Trending Searches
-            </span>
+            </div>
+            <div className="tw:mb-4 tw:text-sm tw:text-slate-500">
+              Popular events people are checking out right now.
+            </div>
 
-            <div className="row tw:mx-0 tw:mt-3">
-              {trendingEvents.map((event) => (
-                <EventCard
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              {trendingEvents.map((event, index) => (
+                <CompactEventRow
                   key={event.id}
                   event={event}
-                  variant="all"
-                  onMore={() => { }}
+                  index={index}
+                  onClick={() => navigate(`/event/view/${event.id}`)}
                 />
               ))}
             </div>
@@ -398,17 +479,16 @@ export default function SearchPage() {
         {/* Events */}
         {events.length > 0 && (
           <section className="tw:mb-6">
-            <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black tw:mb-3">
+            <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
               Events
-            </span>
+            </div>
 
-            <div className="row tw:mx-0 tw:mt-3">
+            <div className="tw:flex tw:flex-col tw:gap-3">
               {events.map((event) => (
-                <EventCard
+                <CompactEventRow
                   key={event.id}
                   event={event}
-                  variant="all"
-                  onMore={() => { }}
+                  onClick={() => navigate(`/event/view/${event.id}`)}
                 />
               ))}
             </div>

@@ -1,172 +1,257 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { formatEventDateTime } from "../../utils/ui";
-import { CountdownPill, eventStartDate, firstImageFromPoster, formatMetaLine, hostName, priceText } from "./SingleEvent";
-import camera_icon from "../../assets/navbar_icons/camera_icon.png";
-import { CalendarDays } from "lucide-react";
+import "keen-slider/keen-slider.min.css";
+import { useKeenSlider } from "keen-slider/react";
+import { ArrowLeft, ArrowRight, CalendarDays, Clock, Radio } from "lucide-react";
+import {
+  CountdownPill,
+  eventStartDate,
+  firstImageFromPoster,
+  formatMetaLine,
+  hostHasActiveSubscription,
+  hostName,
+  priceText,
+} from "./SingleEvent";
+import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
+function resolvePoster(event, posterFallback) {
+  const posterUrl = firstImageFromPoster(event?.poster);
+  return posterUrl || posterFallback || "/images/event-dummy.jpg";
+}
 
-export default function YouMayAlsoLike({ recs = [], posterFallback }) {
-  if (!recs.length) return null;
+function getStatusLabel(event) {
+  const status = String(event?.status || "upcoming").toLowerCase();
+  if (status === "live") return "Live";
+  if (status === "paused") return "Paused";
+  if (status === "ended") return "Ended";
+  return "Upcoming";
+}
+
+function RecommendationCard({ event, posterFallback }) {
+  const status = String(event?.status || "upcoming").toLowerCase();
+  const isLive = status === "live";
+  const isPaid = !!event?.hasPaid;
+  const startDate = eventStartDate(event);
+  const host = hostName(event);
+  const statusLabel = getStatusLabel(event);
+  const imageUrl = resolvePoster(event, posterFallback);
 
   return (
-    <div className="tw:lg:sticky tw:lg:top-6">
-      <h4 className="tw:text-base tw:font-semibold tw:mb-3">
-        You may also like
-      </h4>
-      <div className="tw:space-y-3 row">
-        {recs.slice(0, 2).map((event) => {
-          const startDate = eventStartDate(event);
-          const variant = "upcoming";
-          const isLive = variant === "live";
-          const isUpcoming = variant === "upcoming";
+    <article className="tw:h-full tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-[#eef2f7] tw:bg-white tw:shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+      <Link
+        to={`/event/view/${event.id}`}
+        className="tw:block tw:text-inherit tw:no-underline"
+      >
+        <div className="tw:relative tw:h-52 tw:w-full tw:overflow-hidden tw:bg-slate-100">
+          <img
+            className="tw:h-full tw:w-full tw:object-cover"
+            src={imageUrl}
+            alt={event?.title || "Event"}
+            loading="lazy"
+          />
 
-          const ticketLabel = `Buy Ticket (${priceText(event)})`;
-          return (
-            <div key={event.id} className="col col-12 col-md-6 col-lg-4 mb-4">
-              <div className="tw:bg-white tw:rounded-xl tw:shadow-md tw:overflow-hidden tw:flex tw:flex-col tw:h-full blog-card border-0 tw:relative tw:pb-2">
-                {/* Image & badges */}
-                <Link
-                  to={`/event/view/${event.id}`}
-                  className="text-decoration-none"
-                >
-                  <div className="tw:relative tw:h-[210px] tw:w-full">
-                    <img
-                      className="tw:w-full tw:h-full tw:object-cover"
-                      src={firstImageFromPoster(event?.poster)}
-                      alt={event?.title || "Event"}
-                    />
+          <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.16)_42%,rgba(15,23,42,0.62)_100%)]" />
 
-                    {/* LIVE badge */}
-                    {isLive && (
-                      <>
-                        <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF3B30] tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
-                          <span>Live</span>
-                          <img
-                            src={camera_icon}
-                            alt="Live"
-                            className="tw:w-4 tw:h-4 tw:object-contain"
-                          />
-                        </div>
+          <div className="tw:absolute tw:left-4 tw:top-4 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/92 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-slate-900 tw:shadow-sm">
+            {isLive ? (
+              <Radio className="tw:h-3.5 tw:w-3.5 tw:text-red-500" />
+            ) : (
+              <CalendarDays className="tw:h-3.5 tw:w-3.5 tw:text-emerald-600" />
+            )}
+            {statusLabel}
+          </div>
 
-                        {/* viewers pill */}
-                        <div className="tw:absolute tw:right-4 tw:bottom-4 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:rounded-full tw:bg-lightPurple tw:text-xs tw:font-medium tw:text-black tw:shadow-sm">
-                          <span className="tw:inline-block tw:w-2 tw:h-2 tw:rounded-full tw:bg-[#22C55E]" />
-                          <span>
-                            {event?.live_viewers_label || "38M viewers"}
-                          </span>
-                        </div>
-                      </>
-                    )}
-
-                    {/* UPCOMING badge + countdown */}
-                    {isUpcoming && (
-                      <>
-                        <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:items-center tw:gap-1.5 tw:bg-[#FF9F0A] tw:px-2 tw:py-1 tw:rounded-full tw:text-[8px] tw:font-semibold tw:text-white tw:shadow-lg">
-                          <span>Upcoming</span>
-                          <img
-                            src={camera_icon}
-                            alt="Upcoming"
-                            className="tw:w-4 tw:h-4 tw:object-contain"
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </Link>
-
-                {/* Content */}
-                <div className="tw:px-3 tw:pt-3 tw:flex tw:flex-col tw:gap-3 tw:flex-1">
-                  {/* Title + price */}
-                  <div className="tw:flex tw:items-start tw:justify-between tw:gap-2">
-                    <div className="tw:flex-1">
-                      <span className="tw:text-[16px] tw:font-semibold tw:text-black tw:leading-snug">
-                        {event?.title?.length > 40
-                          ? event.title.slice(0, 40) + "…"
-                          : event?.title}
-                      </span>
-                    </div>
-                    <div className="tw:text-right tw:ml-2">
-                      <span className="tw:text-xl tw:font-bold tw:text-black">
-                        {priceText(event)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Host row */}
-                  <div className="tw:flex tw:items-center tw:gap-3 tw:-mt-3">
-                    <div className="tw:px-3 tw:py-1.5 tw:bg-lightPurple tw:rounded-lg tw:text-xs tw:font-medium tw:text-black tw:flex tw:items-center tw:gap-2">
-                      <span className="tw:inline-block tw:w-8 tw:h-8 tw:rounded-full tw:bg-zinc-300 tw:overflow-hidden tw:-ml-1">
-                        <img
-                          src={event.hostImage ?? "/images/avater_pix.avif"}
-                          alt={hostName(event)}
-                          className="tw:w-full tw:h-full tw:object-cover"
-                        />
-                      </span>
-                      <span>{hostName(event)}</span>
-                    </div>
-                  </div>
-
-                  {/* Location + date/time pill */}
-                  {isUpcoming && (
-                    <div className="tw:mt-1 tw:bg-zinc-50 tw:rounded-lg tw:px-4 tw:py-3 tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-zinc-600">
-                      <div className="tw:flex tw:items-center tw:gap-2">
-                        <CountdownPill target={startDate} />
-                      </div>
-                      <div className="tw:w-px tw:h-6 tw:bg-zinc-200" />
-                      <div className="tw:flex tw:items-center tw:gap-2">
-                        <CalendarDays className="tw:w-4 tw:h-4" />
-                        <span>{formatMetaLine(event)}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* CTA */}
-                  {isLive ? (
-                    // LIVE: show "Join event now" button instead of Buy
-                    <Link
-                      to={`/event/view/${event.id}`}
-                      className="tw:mt-2 tw:w-full tw:inline-block"
-                    >
-                      <button
-                        type="button"
-                        style={{ borderRadius: 8 }}
-                        className="tw:w-full tw:rounded-2xl tw:bg-red-500 tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
-                      >
-                        Join event now
-                      </button>
-                    </Link>
-                  ) : isUpcoming && event.hasPaid ? (
-                    // UPCOMING + already paid
-                    <button
-                      type="button"
-                      style={{ borderRadius: 8 }}
-                      disabled={event.hasPaid}
-                      className="tw:w-full tw:rounded-2xl tw:disabled:bg-primary/50 tw:disabled:cursor-not-allowed tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:transition-colors tw:duration-150"
-                    >
-                      Paid for this event
-                    </button>
-                  ) : (
-                    // Default: show Buy Ticket
-                    <Link
-                      to={`/event/view/${event.id}`}
-                      className="tw:mt-2 tw:w-full tw:inline-block"
-                    >
-                      <button
-                        type="button"
-                        style={{ borderRadius: 8 }}
-                        className="tw:w-full tw:rounded-2xl tw:bg-primary tw:text-white tw:py-3 tw:text-sm tw:font-semibold tw:shadow-md tw:hover:bg-primarySecond tw:transition-colors tw:duration-150"
-                      >
-                        {ticketLabel}
-                      </button>
-                    </Link>
-                  )}
-                </div>
+          <div className="tw:absolute tw:bottom-4 tw:left-4 tw:right-4 tw:flex tw:items-end tw:justify-between tw:gap-3">
+            <div className="tw:min-w-0">
+              <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.22em] tw:text-white/70">
+                Event
+              </div>
+              <div className="tw:line-clamp-2 tw:text-xl tw:font-semibold tw:leading-tight tw:text-white">
+                {event?.title || "Untitled event"}
               </div>
             </div>
-          );
-        })}
+
+            <div className="tw:max-w-[45%] tw:rounded-2xl tw:bg-white/92 tw:px-3 tw:py-2 tw:text-right tw:shadow-sm">
+              <div className="tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-slate-500">
+                Ticket
+              </div>
+              <div className="tw:break-words tw:text-base tw:font-semibold tw:leading-tight tw:text-slate-900">
+                {priceText(event)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+
+      <div className="tw:flex tw:flex-col tw:gap-4 tw:p-5">
+        <div className="tw:flex tw:items-center tw:gap-3 tw:rounded-2xl tw:bg-[#f8fafc] tw:px-3 tw:py-3">
+          <div className="tw:flex tw:h-11 tw:w-11 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-slate-200">
+            <img
+              src={event?.hostImage ?? "/images/avater_pix.avif"}
+              alt={host}
+              className="tw:h-full tw:w-full tw:object-cover"
+            />
+          </div>
+          <div className="tw:min-w-0">
+            <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
+              Organised by
+            </div>
+            <div className="tw:flex tw:items-center tw:gap-1.5 tw:truncate tw:text-sm tw:font-semibold tw:text-slate-900">
+              <span className="tw:truncate">{host}</span>
+              {hostHasActiveSubscription(event) && (
+                <SubscriptionBadge className="tw:size-4" />
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="tw:flex tw:flex-col tw:gap-3">
+          {startDate && status === "upcoming" ? (
+            <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:rounded-2xl tw:border tw:border-[#eef2f7] tw:bg-[#fcfdff] tw:px-4 tw:py-3">
+              <div className="tw:flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-slate-600">
+                <Clock className="tw:h-4 tw:w-4" />
+                Starts in
+              </div>
+              <CountdownPill target={startDate} />
+            </div>
+          ) : (
+            <div className="tw:rounded-2xl tw:border tw:border-[#eef2f7] tw:bg-[#fcfdff] tw:px-4 tw:py-3 tw:text-sm tw:font-medium tw:text-slate-700">
+              {formatMetaLine(event)}
+            </div>
+          )}
+
+          <Link
+          style={{
+            color: "white"
+          }}
+            to={`/event/view/${event.id}`}
+            className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:no-underline hover:tw:bg-primarySecond"
+          >
+            {isPaid ? "View event" : `Buy Ticket (${priceText(event)})`}
+          </Link>
+        </div>
       </div>
-    </div>
+    </article>
+  );
+}
+
+export default function YouMayAlsoLike({
+  recs = [],
+  posterFallback,
+  title = "You may also like",
+}) {
+  const items = recs.slice(0, 8);
+  const [sliderRef, sliderInstanceRef] = useKeenSlider({
+    slides: {
+      perView: 1,
+      spacing: 16,
+    },
+    breakpoints: {
+      "(min-width: 768px)": {
+        slides: {
+          perView: 2,
+          spacing: 20,
+        },
+      },
+      "(min-width: 1280px)": {
+        slides: {
+          perView: 3,
+          spacing: 24,
+        },
+      },
+    },
+    rubberband: false,
+  });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState([]);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const updateState = useCallback(() => {
+    const slider = sliderInstanceRef.current;
+    if (!slider) return;
+    setSelectedIndex(slider.track.details.rel);
+    setCanScrollPrev(slider.track.details.rel > 0);
+    setCanScrollNext(
+      slider.track.details.rel < slider.track.details.slides.length - 1
+    );
+    setScrollSnaps(Array.from({ length: slider.track.details.slides.length }));
+  }, [sliderInstanceRef]);
+
+  useEffect(() => {
+    const slider = sliderInstanceRef.current;
+    if (!slider) return;
+    updateState();
+    slider.on("slideChanged", updateState);
+    slider.on("updated", updateState);
+    return () => {
+      slider.off("slideChanged", updateState);
+      slider.off("updated", updateState);
+    };
+  }, [sliderInstanceRef, updateState]);
+
+  if (!items.length) return null;
+
+  return (
+    <section className="tw:space-y-4">
+      <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+        <h4 className="tw:text-2xl tw:font-semibold tw:text-slate-900 tw:md:text-[28px]">
+          {title}
+        </h4>
+
+        <div className="tw:flex tw:items-center tw:gap-2">
+          <button
+            type="button"
+            onClick={() => sliderInstanceRef.current?.prev()}
+            disabled={!canScrollPrev}
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm hover:tw:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
+            aria-label="Show previous events"
+          >
+            <ArrowLeft className="tw:h-4 tw:w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => sliderInstanceRef.current?.next()}
+            disabled={!canScrollNext}
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm hover:tw:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
+            aria-label="Show more events"
+          >
+            <ArrowRight className="tw:h-4 tw:w-4" />
+          </button>
+        </div>
+      </div>
+
+      <div ref={sliderRef} className="keen-slider">
+          {items.map((event) => (
+            <div
+              key={event?.id || event?.slug || `${event?.title}-${event?.status}`}
+              className="keen-slider__slide tw:min-w-0"
+            >
+              <RecommendationCard
+                event={event}
+                posterFallback={posterFallback}
+              />
+            </div>
+          ))}
+      </div>
+
+      {scrollSnaps.length > 1 ? (
+        <div className="tw:flex tw:items-center tw:justify-center tw:gap-2">
+          {scrollSnaps.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => sliderInstanceRef.current?.moveToIdx(index)}
+              className={`tw:h-2.5 tw:rounded-full tw:transition-all ${
+                index === selectedIndex
+                  ? "tw:w-8 tw:bg-primary"
+                  : "tw:w-2.5 tw:bg-slate-300 hover:tw:bg-slate-400"
+              }`}
+              aria-label={`Go to recommendation ${index + 1}`}
+            />
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }

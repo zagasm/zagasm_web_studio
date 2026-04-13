@@ -194,7 +194,7 @@ export default function VerificationModal({
                         }}
                         onClick={handleRequestCode}
                         disabled={isLoading}
-                        className="tw:flex-1 tw:rounded-xl tw:bg-[#9333EA] tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-[#7E22CE] tw:flex tw:items-center tw:justify-center"
+                        className="tw:flex-1 tw:rounded-xl tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
                       >
                         {isLoading ? (
                           <Loader2 className="tw:animate-spin tw:w-5 tw:h-5" />
@@ -226,7 +226,7 @@ export default function VerificationModal({
                           key={index}
                           type="text"
                           maxLength="1"
-                          className="tw:w-12 tw:h-12 tw:rounded-xl tw:border tw:border-gray-300 tw:text-center tw:text-lg tw:font-bold tw:text-gray-900 focus:tw:border-[#9333EA] focus:tw:ring-2 focus:tw:ring-[#9333EA]/20 tw:outline-none"
+                          className="tw:w-12 tw:h-12 tw:rounded-xl tw:border tw:border-gray-300 tw:text-center tw:text-lg tw:font-bold tw:text-gray-900 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20 tw:outline-none"
                           value={data}
                           ref={(el) => (inputRefs.current[index] = el)}
                           onChange={(e) => handleOtpChange(e.target, index)}
@@ -240,7 +240,7 @@ export default function VerificationModal({
                       <button
                         onClick={handleResendCode}
                         disabled={isLoading}
-                        className="tw:text-[13px] tw:font-semibold tw:text-[#9333EA] tw:hover:underline tw:disabled:opacity-50"
+                        className="tw:text-[13px] tw:font-semibold tw:text-primary tw:hover:underline tw:disabled:opacity-50"
                       >
                         Resend Code
                       </button>
@@ -263,7 +263,7 @@ export default function VerificationModal({
                       <button
                         onClick={handleVerify}
                         disabled={isLoading}
-                        className="tw:flex-1 tw:rounded-xl tw:bg-[#9333EA] tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-[#7E22CE] tw:flex tw:items-center tw:justify-center"
+                        className="tw:flex-1 tw:rounded-xl tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
                       >
                         {isLoading ? (
                           <Loader2 className="tw:animate-spin tw:w-5 tw:h-5" />

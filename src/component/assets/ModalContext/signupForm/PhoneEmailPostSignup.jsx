@@ -159,7 +159,7 @@ const PhoneEmailPostSignup = ({ type, userupdate, token }) => {
                 <FaEnvelope className="tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-gray-400" />
                 <input
                   type="email"
-                  className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-12 tw:py-3 tw:text-sm tw:text-gray-900 focus:tw:border-primary focus:tw:outline-none"
+                  className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-12 tw:py-3 tw:text-sm tw:text-gray-900 focus:tw:border-black focus:tw:outline-none"
                   value={email}
                   readOnly
                 />
@@ -188,7 +188,7 @@ const PhoneEmailPostSignup = ({ type, userupdate, token }) => {
             <motion.button
               type="button"
               onClick={skipProcess}
-              className="tw:text-sm tw:font-semibold tw:text-primary tw:underline tw:transition tw:duration-200 hover:tw:opacity-90"
+              className="tw:text-sm tw:font-semibold tw:text-black tw:underline tw:transition tw:duration-200 hover:tw:opacity-90"
               whileHover={{ scale: 1.03 }}
             >
               Skip for now
@@ -204,7 +204,7 @@ const PhoneEmailPostSignup = ({ type, userupdate, token }) => {
               whileTap={isFormValid ? { scale: 0.98 } : {}}
               className={`tw:rounded-2xl tw:py-2.5 tw:px-5 tw:text-sm tw:font-semibold tw:transition tw:duration-200 ${
                 isFormValid
-                  ? "tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-white"
+                  ? "tw:bg-black tw:text-white"
                   : "tw:bg-gray-200 tw:text-gray-500"
               }`}
             >

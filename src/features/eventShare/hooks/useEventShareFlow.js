@@ -9,16 +9,57 @@ import {
   normalizeSharePayload,
 } from "../shareUtils";
 
+const SHARE_CACHE_PREFIX = "xilolo:event-share-payload:";
+
+function getCacheKey(eventId) {
+  return eventId ? `${SHARE_CACHE_PREFIX}${eventId}` : "";
+}
+
+function readCachedPayload(eventId) {
+  if (typeof window === "undefined") return null;
+
+  const key = getCacheKey(eventId);
+  if (!key) return null;
+
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    const normalized = normalizeSharePayload(parsed);
+    return normalized?.url ? normalized : null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function writeCachedPayload(eventId, payload) {
+  if (typeof window === "undefined") return;
+
+  const key = getCacheKey(eventId);
+  const normalized = normalizeSharePayload(payload);
+  if (!key || !normalized?.url) return;
+
+  try {
+    window.localStorage.setItem(key, JSON.stringify(normalized));
+  } catch (_error) {
+    // Ignore storage failures and continue with in-memory state.
+  }
+}
+
 export function useEventShareFlow() {
   const { token } = useAuth();
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [sharePayload, setSharePayload] = useState(null);
   const [lastShareContext, setLastShareContext] = useState(null);
+  const [shareInProgress, setShareInProgress] = useState(false);
 
   const sharePayloadMutation = useMutation({
     mutationFn: async ({ eventId }) => {
       const payload = await getEventSharePayload(eventId, token);
-      return normalizeSharePayload(payload);
+      const normalized = normalizeSharePayload(payload);
+      writeCachedPayload(eventId, normalized);
+      return normalized;
     },
   });
 
@@ -33,6 +74,7 @@ export function useEventShareFlow() {
     setShareModalOpen(false);
     setSharePayload(null);
     setLastShareContext(null);
+    setShareInProgress(false);
     sharePayloadMutation.reset();
   }, [sharePayloadMutation]);
 
@@ -59,7 +101,13 @@ export function useEventShareFlow() {
       const normalizedInitial = normalizeSharePayload(initialPayload);
 
       if (normalizedInitial?.url && normalizedInitial?.shareKey) {
+        writeCachedPayload(eventId, normalizedInitial);
         return normalizedInitial;
+      }
+
+      const cachedPayload = readCachedPayload(eventId);
+      if (cachedPayload?.url) {
+        return cachedPayload;
       }
 
       if (eventId && token) {
@@ -67,10 +115,40 @@ export function useEventShareFlow() {
       }
 
       if (normalizedInitial?.url) {
+        writeCachedPayload(eventId, normalizedInitial);
         return normalizedInitial;
       }
 
       throw new Error("Share details are unavailable for this event right now.");
+    },
+    [sharePayloadMutation, token]
+  );
+
+  const prefetchShare = useCallback(
+    async ({ eventId, initialPayload } = {}) => {
+      const normalizedInitial = normalizeSharePayload(initialPayload);
+
+      if (normalizedInitial?.url) {
+        writeCachedPayload(eventId, normalizedInitial);
+        setSharePayload(normalizedInitial);
+        return normalizedInitial;
+      }
+
+      const cachedPayload = readCachedPayload(eventId);
+      if (cachedPayload?.url) {
+        setSharePayload(cachedPayload);
+        return cachedPayload;
+      }
+
+      if (!eventId || !token) return null;
+
+      try {
+        const payload = await sharePayloadMutation.mutateAsync({ eventId });
+        setSharePayload(payload);
+        return payload;
+      } catch (_error) {
+        return null;
+      }
     },
     [sharePayloadMutation, token]
   );
@@ -82,6 +160,7 @@ export function useEventShareFlow() {
       setSharePayload(null);
       setLastShareContext(context);
       sharePayloadMutation.reset();
+      setShareInProgress(true);
 
       try {
         const payload = await resolveSharePayload(context);
@@ -99,21 +178,27 @@ export function useEventShareFlow() {
           } catch (error) {
             if (!isNavigatorShareCancelled(error)) {
               if (!import.meta.env.PROD) {
-                console.warn("navigator.share failed, using fallback", error);
+                console.warn("navigator.share failed", error);
               }
+              showError("Unable to open the browser share dialog right now.");
             }
+            return;
           }
         }
 
         setShareModalOpen(true);
       } catch (error) {
         setSharePayload(null);
-        setShareModalOpen(true);
+        if (!navigator?.share) {
+          setShareModalOpen(true);
+        }
         showError(
           error?.response?.data?.message ||
             error?.message ||
             "Unable to prepare this share right now."
         );
+      } finally {
+        setShareInProgress(false);
       }
     },
     [resolveSharePayload, sharePayloadMutation, trackIntent]
@@ -161,8 +246,10 @@ export function useEventShareFlow() {
       sharePayload,
       sharePayloadError: sharePayloadMutation.error,
       sharePayloadLoading: sharePayloadMutation.isPending,
+      shareInProgress,
       closeShareModal: () => setShareModalOpen(false),
       resetShareState,
+      prefetchShare,
       startShare,
       retryShare,
       handleCopyLink,
@@ -171,12 +258,14 @@ export function useEventShareFlow() {
     [
       handleChannelShare,
       handleCopyLink,
+      prefetchShare,
       resetShareState,
       retryShare,
       shareModalOpen,
       sharePayload,
       sharePayloadMutation.error,
       sharePayloadMutation.isPending,
+      shareInProgress,
       startShare,
     ]
   );

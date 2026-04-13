@@ -6,7 +6,7 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { AlertTriangle, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function WalletFundingRequiredModal({
   open,
@@ -14,6 +14,12 @@ export default function WalletFundingRequiredModal({
   details,
   formatAmount,
   onFundWallet,
+  title = "Wallet funding required",
+  description = "Your user wallet needs more balance before this ticket can be purchased.",
+  balanceLabel = "Wallet balance",
+  requiredAmountLabel = "Ticket amount",
+  deficitLabel = "Amount needed",
+  primaryActionLabel = "Fund wallet",
 }) {
   return (
     <Transition show={open} as={Fragment} appear>
@@ -44,13 +50,12 @@ export default function WalletFundingRequiredModal({
               <DialogPanel className="tw:w-full tw:max-w-md tw:rounded-[28px] tw:bg-white tw:p-6 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)]">
                 <div className="tw:flex tw:items-start tw:justify-between tw:gap-4">
                   <div className="tw:flex tw:items-center tw:gap-3">
-                    
                     <div>
                       <span className="tw:block tw:text-xl tw:font-semibold tw:text-gray-900">
-                        Wallet funding required
+                        {title}
                       </span>
                       <Dialog.Description className="tw:mt-1 tw:block tw:text-sm tw:text-gray-500">
-                        Your user wallet needs more balance before this ticket can be purchased.
+                        {description}
                       </Dialog.Description>
                     </div>
                   </div>
@@ -66,19 +71,19 @@ export default function WalletFundingRequiredModal({
 
                 <div className="tw:mt-6 tw:space-y-3">
                   <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3">
-                    <span className="tw:text-sm tw:text-gray-500">Wallet balance</span>
+                    <span className="tw:text-sm tw:text-gray-500">{balanceLabel}</span>
                     <span className="tw:text-sm tw:font-semibold tw:text-gray-900">
                       {formatAmount(details?.wallet_balance || 0)}
                     </span>
                   </div>
                   <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3">
-                    <span className="tw:text-sm tw:text-gray-500">Ticket amount</span>
+                    <span className="tw:text-sm tw:text-gray-500">{requiredAmountLabel}</span>
                     <span className="tw:text-sm tw:font-semibold tw:text-gray-900">
                       {formatAmount(details?.required_amount || 0)}
                     </span>
                   </div>
                   <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-[#faf8ff] tw:px-4 tw:py-3">
-                    <span className="tw:text-sm tw:text-gray-500">Amount needed</span>
+                    <span className="tw:text-sm tw:text-gray-500">{deficitLabel}</span>
                     <span className="tw:text-sm tw:font-semibold tw:text-primary">
                       {formatAmount(details?.deficit_amount || 0)}
                     </span>
@@ -100,7 +105,7 @@ export default function WalletFundingRequiredModal({
                     className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
                     style={{ borderRadius: 16 }}
                   >
-                    Fund wallet
+                    {primaryActionLabel}
                   </button>
                 </div>
               </DialogPanel>

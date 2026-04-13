@@ -123,6 +123,11 @@ export function normalizeEventRecord(rawEvent) {
   return {
     ...rawEvent,
     poster,
+    reviews: {
+      count: Number(rawEvent?.reviews?.count ?? 0) || 0,
+      average_rating: Number(rawEvent?.reviews?.average_rating ?? 0) || 0,
+      can_review: !!rawEvent?.reviews?.can_review,
+    },
     purchase_options: {
       ticket_only: !!rawEvent?.purchase_options?.ticket_only,
       ticket_and_manual: !!rawEvent?.purchase_options?.ticket_and_manual,
@@ -162,6 +167,8 @@ export function normalizeEventRecord(rawEvent) {
       rawEvent.hostImage ||
       rawEvent.host_image ||
       rawEvent.organizer_image ||
+      rawEvent.user?.profile_url ||
+      rawEvent.user?.profile_image ||
       rawEvent.user?.profileUrl ||
       rawEvent.user?.profile_image_id ||
       "",
@@ -172,6 +179,11 @@ export function normalizeEventRecord(rawEvent) {
       "Event",
     hostHasActiveSubscription:
       rawEvent.hostHasActiveSubscription ||
+      rawEvent.has_active_subscription ||
+      rawEvent.host?.has_active_subscription ||
+      rawEvent.user?.has_active_subscription ||
+      rawEvent.organiser?.has_active_subscription ||
+      rawEvent.organizer?.has_active_subscription ||
       rawEvent.hostSubscription?.isActive ||
       false,
     is_saved: !!rawEvent.is_saved,

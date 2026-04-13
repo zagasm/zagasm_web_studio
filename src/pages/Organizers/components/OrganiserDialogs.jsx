@@ -153,3 +153,78 @@ export function OrganiserNameMismatchDialog({
     </Transition>
   );
 }
+
+export function OrganiserProfilePhotoRequiredDialog({
+  open,
+  onEditProfile,
+}) {
+  return (
+    <Transition appear show={open} as={Fragment}>
+      <HeadlessDialog
+        as="div"
+        className="tw:relative tw:z-120"
+        onClose={() => {}}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="tw:ease-out tw:duration-200"
+          enterFrom="tw:opacity-0"
+          enterTo="tw:opacity-100"
+          leave="tw:ease-in tw:duration-150"
+          leaveFrom="tw:opacity-100"
+          leaveTo="tw:opacity-0"
+        >
+          <div className="tw:fixed tw:inset-0 tw:bg-black/50 tw:backdrop-blur-sm" />
+        </Transition.Child>
+
+        <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
+          <div className="tw:flex tw:min-h-full tw:items-end tw:justify-center tw:p-3 tw:sm:items-center tw:sm:p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="tw:ease-out tw:duration-200"
+              enterFrom="tw:opacity-0 tw:translate-y-3 tw:scale-95"
+              enterTo="tw:opacity-100 tw:translate-y-0 tw:scale-100"
+              leave="tw:ease-in tw:duration-150"
+              leaveFrom="tw:opacity-100 tw:translate-y-0 tw:scale-100"
+              leaveTo="tw:opacity-0 tw:translate-y-3 tw:scale-95"
+            >
+              <HeadlessDialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-[28px] tw:bg-white tw:px-5 tw:py-6 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:ring-1 tw:ring-black/5 tw:sm:px-6">
+                <div className="tw:flex tw:items-start tw:gap-4">
+                  
+                  <div className="tw:min-w-0">
+                    <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:sm:text-xl">
+                      Add a profile picture before continuing
+                    </span>
+                    <span className="tw:mt-2 tw:block tw:text-sm tw:leading-6 tw:text-slate-600">
+                      To become an organiser, your account needs a profile picture.
+                      Update your profile photo first, then return here to continue
+                      with verification.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="tw:mt-5 tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:text-sm tw:text-slate-600">
+                  A profile photo helps attendees and compliance reviewers
+                  recognise the account they are interacting with.
+                </div>
+
+                <div className="tw:mt-6 tw:flex tw:flex-col-reverse tw:gap-3 tw:sm:flex-row tw:sm:justify-end">
+                  <button
+                  style={{
+                    borderRadius: 16
+                  }}
+                    type="button"
+                    onClick={onEditProfile}
+                    className="tw:w-full tw:rounded-2xl tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition hover:tw:shadow-md tw:sm:w-auto"
+                  >
+                    Update profile picture
+                  </button>
+                </div>
+              </HeadlessDialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </HeadlessDialog>
+    </Transition>
+  );
+}

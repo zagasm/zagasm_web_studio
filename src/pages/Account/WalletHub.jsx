@@ -2,36 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
-  Building2,
   ChevronRight,
-  Coins,
   Landmark,
-  PlusCircle,
+  WalletCards,
 } from "lucide-react";
 
-const walletItems = [
-  {
-    icon: Coins,
-    label: "Crypto Wallet",
-    description: "Manage your connected crypto wallets.",
-    to: "/account/crypto-wallet",
-  },
-  {
-    icon: PlusCircle,
-    label: "Fund Wallet",
-    description: "Add funds to your Xilolo wallet.",
-    to: "/account/fund-wallet",
-  },
+const payoutItems = [
   {
     icon: Landmark,
-    label: "Payouts",
-    description: "Review balances, requests, and payout history.",
-    to: "/account/payouts",
+    label: "Request withdrawal",
+    description: "View your balance, ticket sales, and submit a withdrawal request.",
+    to: "/account/payouts/request",
   },
   {
-    icon: Building2,
-    label: "Bank Accounts",
-    description: "Add, remove, and manage payout bank accounts.",
+    icon: WalletCards,
+    label: "My bank accounts",
+    description: "Add, remove, and set the bank accounts used for organiser payouts.",
     to: "/account/bank-accounts",
   },
 ];
@@ -51,32 +37,32 @@ export default function WalletHub() {
                 <span>Back to account</span>
               </Link>
 
-              <span className="tw:block tw:mt-3 tw:text-2xl tw:font-semibold tw:text-gray-900 tw:md:text-3xl">
+              <span className="tw:mt-3 tw:block tw:text-2xl tw:font-semibold tw:text-gray-900 tw:md:text-3xl">
                 Payouts
               </span>
-              <span className="tw:mt-2 tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
-                Choose where you want to go for wallet management, funding, or payouts.
+              <span className="tw:mt-2 tw:block tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
+                Choose what you want to do next.
               </span>
             </div>
           </div>
 
           <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-4">
-            {walletItems.map(({ icon: Icon, label, description, to }) => (
+            {payoutItems.map(({ icon: Icon, label, description, to }) => (
               <Link
                 key={label}
                 to={to}
-                className="tw:flex tw:items-center tw:justify-between tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:transition hover:tw:border-gray-200 hover:tw:bg-white hover:tw:shadow-sm tw:py-2 tw:md:p-5"
+                className="tw:flex tw:items-center tw:justify-between tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:px-4 tw:py-4 tw:transition hover:tw:border-gray-200 hover:tw:bg-white hover:tw:shadow-sm tw:md:p-5"
               >
                 <div className="tw:flex tw:items-center tw:gap-4">
-                  <span className="tw:flex tw:size-7 tw:md:size-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-white tw:shadow-sm">
-                    <Icon className="tw:size-4 tw:md:size-5 tw:text-gray-700" />
+                  <span className="tw:flex tw:size-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-white tw:shadow-sm">
+                    <Icon className="tw:size-5 tw:text-gray-700" />
                   </span>
 
                   <div>
                     <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
                       {label}
                     </div>
-                    <div className="tw:mt-1 tw:text-xs tw:text-gray-500">
+                    <div className="tw:mt-1 tw:text-xs tw:text-gray-500 tw:md:text-sm">
                       {description}
                     </div>
                   </div>

@@ -99,7 +99,7 @@ export default function TicketPurchaseSuccessModal({
                     to="/tickets"
                     onClick={onClose}
                     className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
-                    style={{ borderRadius: 16 }}
+                    style={{ borderRadius: 16, color: "#fff" }}
                   >
                     View my tickets
                   </Link>

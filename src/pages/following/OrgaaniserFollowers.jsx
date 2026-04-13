@@ -5,6 +5,7 @@ import { showError, showSuccess } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
 import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
+import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 
 const CACHE_KEY = "xilolo_followers_organisers";
 
@@ -236,12 +237,7 @@ function OrganiserCard({
         <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
           {name}
           {showVerified && (
-            <img
-              width={12}
-              height={12}
-              src="/images/verifiedIcon.svg"
-              alt="Verified organizer"
-            />
+            <SubscriptionBadge className="tw:size-3" />
           )}
         </span>
 

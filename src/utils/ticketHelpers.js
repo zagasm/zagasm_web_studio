@@ -71,3 +71,13 @@ export function formatTicketPrice(value, currencyLabel = "") {
   if (typeof value === "string" && value.trim()) return value;
   return "—";
 }
+
+export function formatPaymentMethodLabel(value) {
+  if (!value) return "—";
+
+  return String(value)
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}

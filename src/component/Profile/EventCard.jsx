@@ -6,7 +6,8 @@ import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
 import MediaCarousel from "./MediaCarousel";
 import DeleteConfirmModal from "../DeleteConfirmModal";
-import { CountdownPill, eventStartDate, formatMetaLine } from "../Events/SingleEvent";
+import { CountdownPill, eventStartDate } from "../Events/SingleEvent";
+import RescheduleEventModal from "./RescheduleEventModal";
 
 function collectMedia(poster = []) {
   const imgs = poster.filter((p) => p.type === "image");
@@ -35,11 +36,90 @@ function normalizeEventStatus(status) {
   return "upcoming";
 }
 
+function formatEventSchedule(event) {
+  const dateValue = event?.eventDateISO || event?.event_date || "";
+  const timeValue = event?.startTime || event?.start_time || "";
+  const [year, month, day] = String(dateValue).split("-").map(Number);
+  const date =
+    Number.isFinite(year) && Number.isFinite(month) && Number.isFinite(day)
+      ? new Date(year, month - 1, day)
+      : null;
+  const dateLabel =
+    date && !Number.isNaN(date.getTime())
+      ? date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : event?.eventDate || "Date not set";
+
+  if (!timeValue) return dateLabel;
+
+  const parsedDate = new Date(timeValue);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    const timeLabel = parsedDate.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    return `${dateLabel} • ${timeLabel}`;
+  }
+
+  const normalized = String(timeValue).trim();
+  const twentyFourHourMatch = normalized.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (twentyFourHourMatch) {
+    let hour = Number(twentyFourHourMatch[1]);
+    const minute = twentyFourHourMatch[2];
+    const suffix = hour >= 12 ? "PM" : "AM";
+    hour = ((hour + 11) % 12) + 1;
+    return `${dateLabel} • ${hour}:${minute} ${suffix}`;
+  }
+
+  const meridianMatch = normalized.match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
+  if (meridianMatch) {
+    return `${dateLabel} • ${normalized.toUpperCase()}`;
+  }
+
+  return `${dateLabel} • ${normalized}`;
+}
+
+function isStatusBlockedForReschedule(status) {
+  const normalized = (status ?? "").toString().toLowerCase().trim();
+
+  return [
+    "live",
+    "ended",
+    "completed",
+    "past",
+    "cancelled",
+    "canceled",
+    "did not hold",
+    "did_not_hold",
+    "did-not-hold",
+  ].includes(normalized);
+}
+
+function hasUsedReschedule(event) {
+  const remainingChanges = Number(event?.remaining_changes);
+  const dateTimeChangeCount = Number(event?.date_time_change_count);
+
+  if (Number.isFinite(remainingChanges)) {
+    return remainingChanges <= 0;
+  }
+
+  if (Number.isFinite(dateTimeChangeCount)) {
+    return dateTimeChangeCount >= 1;
+  }
+
+  return false;
+}
+
 export default function EventCard({
   event,
   isOwnProfile,
   isOrganiserProfile,
   onDeleted,
+  onUpdated,
+  refreshEvents,
 }) {
   const media = useMemo(() => collectMedia(event.poster), [event]);
   const startDate = useMemo(() => eventStartDate(event), [event]);
@@ -47,8 +127,10 @@ export default function EventCard({
     () => normalizeEventStatus(event?.status),
     [event?.status],
   );
+  const scheduleLabel = useMemo(() => formatEventSchedule(event), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [deleteError, setDeleteError] = useState("");
+  const [openReschedule, setOpenReschedule] = useState(false);
 
   const [openDelete, setOpenDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -57,6 +139,9 @@ export default function EventCard({
   const navigate = useNavigate();
 
   const isOwnerEvent = Boolean(event?.isOwner || isOwnProfile);
+  const shouldShowRescheduleAction =
+    isOwnerEvent && !isStatusBlockedForReschedule(event?.status);
+  const rescheduleLocked = hasUsedReschedule(event);
 
   const goToEvent = () => {
     navigate(`/event/view/${event.id}`);
@@ -127,10 +212,15 @@ export default function EventCard({
     </span>
   ) : null;
 
+  const handleRescheduleSuccess = async ({ event: nextEvent }) => {
+    onUpdated?.(nextEvent);
+    await refreshEvents?.();
+  };
+
   return (
     <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-[#ffffff]">
       {/* Top-right actions (only for owner) */}
-      {event.isOwner && (
+      {isOwnerEvent && (
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:flex tw:gap-2">
           {/* Edit */}
           <button
@@ -177,13 +267,38 @@ export default function EventCard({
       <div className="tw:flex tw:flex-col tw:gap-4 tw:p-5">
         <div className="tw:text-xs tw:text-zinc-600">
           <div className="tw:flex tw:flex-col tw:gap-3">
-            {statusChip && (
-              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            {(statusChip || shouldShowRescheduleAction) && (
+              <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                 {statusChip}
                 {normalizedStatus === "upcoming" && <CountdownPill target={startDate} />}
+                </div>
+                {shouldShowRescheduleAction ? (
+                  <button
+                    type="button"
+                    disabled={rescheduleLocked}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenReschedule(true);
+                    }}
+                    className={`tw:inline-flex tw:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:px-3 tw:text-[11px] tw:font-semibold tw:transition ${
+                      rescheduleLocked
+                        ? "tw:cursor-not-allowed tw:bg-slate-100 tw:text-slate-400"
+                        : "tw:bg-slate-900 tw:text-white hover:tw:bg-slate-800"
+                    }`}
+                    style={{ borderRadius: 999 }}
+                    title={
+                      rescheduleLocked
+                        ? "This event has already been rescheduled once."
+                        : "Reschedule this event"
+                    }
+                  >
+                    <CalendarDays className="tw:h-3.5 tw:w-3.5" />
+                    <span>Reschedule</span>
+                  </button>
+                ) : null}
               </div>
             )}
-            
           </div>
         </div>
 
@@ -216,7 +331,7 @@ export default function EventCard({
         <div className="tw:flex tw:items-center tw:justify-between tw:pt-1">
           <div className="tw:text-xs tw:inline-flex tw:items-center tw:gap-2 tw:text-gray-600">
             <Clock size={14} />
-            <span>{event.eventDate}</span>
+            <span>{scheduleLabel}</span>
           </div>
           <div className="tw:text-primary tw:text-lg tw:font-semibold">
             {event.price_display}
@@ -296,6 +411,12 @@ export default function EventCard({
         cancelText="Cancel"
         loading={deleting}
         onConfirm={deleteEvent}
+      />
+      <RescheduleEventModal
+        open={openReschedule}
+        event={event}
+        onClose={() => setOpenReschedule(false)}
+        onSuccess={handleRescheduleSuccess}
       />
     </div>
   );

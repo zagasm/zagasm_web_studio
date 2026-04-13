@@ -6,6 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { useAuth } from "../../auth/AuthContext";
+import SubscriptionBadge from "../../../component/ui/SubscriptionBadge.jsx";
 
 const CACHE_KEY = "Xilolo_blocked_users";
 
@@ -286,7 +287,7 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
             {name}
           </span>
           {has_active_subscription && (
-            <img className="tw:size-4" src="/images/verifiedIcon.svg" alt="" />
+            <SubscriptionBadge className="tw:size-4" />
           )}
         </div>
         {userName && (

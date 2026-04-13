@@ -174,7 +174,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
 
   return (
     <PostSignupFormModal>
-      <div className="tw:max-w-md tw:w-full tw:mx-auto tw:bg-white tw:rounded-3xl tw:shadow-2xl tw:px-6 tw:py-8 tw:space-y-5">
+      <div className="tw:max-w-md tw:w-full tw:mx-auto tw:py-4 tw:space-y-6">
         <div className="tw:space-y-1">
           <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
             We sent a code to your email

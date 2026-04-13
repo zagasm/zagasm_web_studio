@@ -42,7 +42,6 @@ export default function ProfileInfoCard({
         Edit Profile Info
       </span>
 
-      {/* Names */}
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:mt-4">
         <TextField
           label="First Name"
@@ -66,9 +65,7 @@ export default function ProfileInfoCard({
         />
       </div>
 
-      {/* Email row */}
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-        {/* Primary email */}
         <div>
           <TextField
             label="Email Address"
@@ -102,7 +99,6 @@ export default function ProfileInfoCard({
           </div>
         </div>
 
-        {/* Recovery email – no status badge */}
         <div>
           <TextField
             label="Recovery Email"
@@ -126,9 +122,7 @@ export default function ProfileInfoCard({
         </div>
       </div>
 
-      {/* Phones */}
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-        {/* Primary phone – read-only + status */}
         <div>
           <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
             Primary Phone Number
@@ -142,30 +136,18 @@ export default function ProfileInfoCard({
                 width: "100%",
                 border: "none",
                 background: "transparent",
-                paddingLeft: 75, // ✅ fix overlap
+                paddingLeft: 75,
               }}
               buttonStyle={{
                 background: "transparent",
                 border: "none",
-                width: 44, // ✅ smaller button
+                width: 44,
               }}
               containerStyle={{ width: "100%" }}
             />
           </div>
-          {/* <div className="tw:mt-1">
-            {phoneVerified ? (
-              <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-medium tw:text-emerald-700 tw:bg-emerald-50 tw:px-2.5 tw:py-1 tw:rounded-full">
-                <FiCheckCircle /> Verified
-              </span>
-            ) : (
-              <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-medium tw:text-amber-700 tw:bg-amber-50 tw:px-2.5 tw:py-1 tw:rounded-full">
-                <FiAlertCircle /> Unverified
-              </span>
-            )}
-          </div> */}
         </div>
 
-        {/* Recovery phone – editable, no status */}
         <div>
           <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
             Recovery Phone
@@ -186,7 +168,7 @@ export default function ProfileInfoCard({
                 width: "100%",
                 border: "none",
                 background: "transparent",
-                paddingLeft: 75, // ✅ fix overlap
+                paddingLeft: 75,
               }}
               buttonStyle={{
                 background: "transparent",
@@ -199,7 +181,6 @@ export default function ProfileInfoCard({
         </div>
       </div>
 
-      {/* DOB + Gender */}
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
         <div>
           <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
@@ -245,7 +226,6 @@ export default function ProfileInfoCard({
         </FormControl>
       </div>
 
-      {/* About me */}
       <TextField
         label="About Me"
         name="about"
@@ -262,7 +242,6 @@ export default function ProfileInfoCard({
         }}
       />
 
-      {/* Security rows */}
       <div className="tw:pt-4 tw:space-y-3">
         <button
           type="button"
@@ -272,10 +251,11 @@ export default function ProfileInfoCard({
           <span className="tw:flex tw:items-center tw:gap-2 tw:text-gray-800">
             <FiUser className="tw:text-gray-500" />
             <span className="tw:flex tw:flex-col tw:items-start">
-              <span className="tw:font-medium tw:text-sm">Set Username</span>
+              <span className="tw:font-medium tw:text-sm">Username</span>
               <span className="tw:text-xs tw:text-gray-500">
-                {username ? `@${username}` : "No username set"}
+                {username ? `${username}` : "No username set"}
               </span>
+              
             </span>
           </span>
           <span className="tw:flex tw:items-center tw:gap-2">
@@ -286,7 +266,7 @@ export default function ProfileInfoCard({
                   : "tw:bg-gray-100 tw:text-gray-600"
               }`}
             >
-              {canChangeUsername ? "Available" : "Locked"}
+              {canChangeUsername ? "Edit" : "Unavailable"}
             </span>
             <span className="tw:text-gray-400 tw:text-lg">›</span>
           </span>

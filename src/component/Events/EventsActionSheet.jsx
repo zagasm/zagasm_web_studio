@@ -14,6 +14,7 @@ import {
   Shield,
   Ticket,
 } from "lucide-react";
+import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
 const REASONS = [
   "Spam",
@@ -342,8 +343,11 @@ export default function EventActionsSheet({
                           </div>
                         )}
 
-                        <span className="tw:text-xs tw:text-black tw:truncate">
-                          {hostName}
+                        <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:text-black tw:truncate">
+                          <span className="tw:truncate">{hostName}</span>
+                          {!!event?.hostHasActiveSubscription && (
+                            <SubscriptionBadge className="tw:size-3.5" />
+                          )}
                         </span>
                       </button>
                     </div>

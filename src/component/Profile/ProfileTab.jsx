@@ -16,6 +16,7 @@ export default function ProfileTabs({ user, isOwnProfile }) {
     error: myEventsError,
     hasMore: myEventsHasMore,
     loadMore: loadMoreMyEvents,
+    refresh: refreshMyEvents,
   } = useMyEvents(apiFilter, user?.id);
 
   // ---------- ORGANISER PROFILE ----------
@@ -79,6 +80,7 @@ export default function ProfileTabs({ user, isOwnProfile }) {
           error={error}
           isOwnProfile={isOwnProfile}
           isOrganiserProfile={isOrganiserProfileData}
+          refreshEvents={isOrganiserProfileData ? undefined : refreshMyEvents}
         />
       </div>
     </div>

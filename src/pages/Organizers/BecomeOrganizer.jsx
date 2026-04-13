@@ -15,6 +15,7 @@ import OrganiserSidebarCard from "./components/OrganiserSidebarCard";
 import {
   OrganiserDiditInfoDialog,
   OrganiserNameMismatchDialog,
+  OrganiserProfilePhotoRequiredDialog,
   OrganiserProcessingDialog,
 } from "./components/OrganiserDialogs";
 import {
@@ -28,6 +29,7 @@ import {
   saveBanksToCache,
 } from "./organiserVerificationUtils";
 import { useDiditWebSdk } from "./hooks/useDiditWebSdk";
+import { hasProfileImage } from "../../component/Organizers/organiser.utils";
 
 const BecomeOrganiser = () => {
   const { user, token, refreshUser } = useAuth();
@@ -74,6 +76,18 @@ const BecomeOrganiser = () => {
       user?.name || `${user?.firstName || ""} ${user?.lastName || ""}`.trim(),
     [user]
   );
+  const profileImage = useMemo(
+    () =>
+      user?.profileUrl ||
+      user?.profileImage ||
+      user?.avatar ||
+      user?.avatar_url ||
+      user?.profile_photo_url ||
+      user?.image ||
+      null,
+    [user]
+  );
+  const requiresProfilePhoto = !hasProfileImage(profileImage);
 
   const isNigeria = selectedCountry?.code === "NG";
   const diditStatus = diditSessionState?.status || null;
@@ -567,7 +581,7 @@ const BecomeOrganiser = () => {
   }, [destroyVerification]);
 
   return (
-    <div className="tw:min-h-screen tw:bg-linear-to-b tw:from-lightPurple/60 tw:via-[#f7f2eb] tw:to-white tw:pt-24 tw:md:pt-28 tw:px-4">
+    <div className="tw:min-h-screen tw:bg-linear-to-b tw:from-lightPurple/60 tw:via-white tw:to-white tw:pt-24 tw:md:pt-28 tw:px-4">
       <div className="tw:max-w-6xl tw:mx-auto tw:pb-10">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:mb-4">
           <div>
@@ -586,7 +600,7 @@ const BecomeOrganiser = () => {
         </div>
 
         <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] tw:gap-6">
-          <div className="tw:bg-white tw:rounded-3xl tw:px-4 tw:py-5 tw:md:px-6 tw:md:py-6 tw:shadow-[0_18px_45px_rgba(15,23,42,0.08)] tw:border tw:border-white/60">
+          <div className="tw:bg-[#ffffff] tw:rounded-3xl tw:px-4 tw:py-5 tw:md:px-6 tw:md:py-6 tw:shadow-[0_18px_45px_rgba(15,23,42,0.08)] tw:border tw:border-white/60">
             {verificationMethod === "bvn" && (
               <div className="tw:mb-5 tw:border-b tw:border-gray-100 tw:pb-4">
                 <div className="tw:flex tw:items-center tw:justify-between tw:mb-2">
@@ -706,6 +720,11 @@ const BecomeOrganiser = () => {
           setNameMismatchOpen(false);
           navigate("/profile/edit-profile");
         }}
+      />
+
+      <OrganiserProfilePhotoRequiredDialog
+        open={requiresProfilePhoto}
+        onEditProfile={() => navigate("/profile/edit-profile")}
       />
     </div>
   );

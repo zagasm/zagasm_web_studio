@@ -4,6 +4,32 @@ import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showError, showSuccess } from "../../component/ui/toast";
 
+function validateUsername(value) {
+  const trimmed = String(value || "").trim();
+
+  if (!trimmed) {
+    return "Enter a username.";
+  }
+
+  if (trimmed.startsWith("@")) {
+    return "Do not include @ in your username.";
+  }
+
+  if (trimmed.length < 3 || trimmed.length > 30) {
+    return "Username must be 3 to 30 characters.";
+  }
+
+  if (!/^[a-z]/.test(trimmed)) {
+    return "Username must start with a lowercase letter.";
+  }
+
+  if (!/^[a-z0-9_]+$/.test(trimmed)) {
+    return "Use only lowercase letters, numbers, and underscores.";
+  }
+
+  return "";
+}
+
 export default function SetUsernameModal({
   open,
   onClose,
@@ -35,6 +61,7 @@ export default function SetUsernameModal({
   }, [open, currentUsername]);
 
   const normalizedUsername = username.trim().toLowerCase();
+  const validationMessage = validateUsername(normalizedUsername);
   const unchanged =
     normalizedUsername &&
     normalizedUsername === (currentUsername || "").trim().toLowerCase();
@@ -52,11 +79,20 @@ export default function SetUsernameModal({
   const canSubmit = useMemo(() => {
     if (!canChange) return false;
     if (!normalizedUsername) return false;
+    if (validationMessage) return false;
     if (unchanged) return false;
     if (!availability.checked || !availability.available) return false;
     if (checking || saving) return false;
     return true;
-  }, [availability, canChange, checking, normalizedUsername, saving, unchanged]);
+  }, [
+    availability,
+    canChange,
+    checking,
+    normalizedUsername,
+    saving,
+    unchanged,
+    validationMessage,
+  ]);
 
   useEffect(() => {
     if (!open || !canChange) return;
@@ -67,6 +103,16 @@ export default function SetUsernameModal({
         checked: false,
         available: false,
         message: "",
+      });
+      return;
+    }
+
+    if (validationMessage) {
+      setChecking(false);
+      setAvailability({
+        checked: true,
+        available: false,
+        message: validationMessage,
       });
       return;
     }
@@ -125,7 +171,14 @@ export default function SetUsernameModal({
     };
 
     runCheck();
-  }, [canChange, currentUsername, debouncedUsername, open, token]);
+  }, [
+    canChange,
+    currentUsername,
+    debouncedUsername,
+    open,
+    token,
+    validationMessage,
+  ]);
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
@@ -182,10 +235,14 @@ export default function SetUsernameModal({
                 <span className="tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-gray-900">
                   Set Username
                 </span>
-                <p className="tw:mt-1 tw:text-sm tw:text-gray-500">
+                <span className="tw:block tw:mt-1 tw:text-sm tw:text-gray-500">
                   Choose the username you want other users to see on your
                   profile.
-                </p>
+                </span>
+                <span className="tw:block tw:mt-2 tw:text-xs tw:leading-5 tw:text-slate-500">
+                  Use 3 to 30 characters. Allowed: lowercase letters, numbers,
+                  and underscores. Usernames cannot start with a number.
+                </span>
 
                 <form onSubmit={handleSubmit} className="tw:mt-6 tw:space-y-4">
                   <div>
@@ -196,34 +253,34 @@ export default function SetUsernameModal({
                       type="text"
                       value={username}
                       onChange={(e) => {
-                        setUsername(e.target.value);
+                        setUsername(e.target.value.replace(/\s+/g, "").toLowerCase());
                       }}
-                      placeholder="Enter username"
+                      placeholder="e.g. alice_stone"
                       disabled={!canChange || saving}
                       className="tw:w-full tw:h-11 tw:rounded-xl tw:border tw:border-gray-200 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20 tw:outline-none tw:px-3"
                     />
                     {!!currentUsername && (
-                      <p className="tw:mt-1 tw:text-xs tw:text-gray-500">
+                      <span className="tw:block tw:mt-1 tw:text-xs tw:text-gray-500">
                         Current username: @{currentUsername}
-                      </p>
+                      </span>
                     )}
                   </div>
 
-                  <div className="tw:min-h-[44px]">
+                  <div className="tw:min-h-11">
                     {!canChange ? (
-                      <p className="tw:text-sm tw:text-amber-700 tw:bg-amber-50 tw:rounded-xl tw:px-3 tw:py-2">
+                      <span className="tw:block tw:text-sm tw:text-amber-700 tw:bg-amber-50 tw:rounded-xl tw:px-3 tw:py-2">
                         Username can no longer be changed on this account.
-                      </p>
+                      </span>
                     ) : availability.message ? (
-                      <p
-                        className={`tw:text-sm tw:rounded-xl tw:px-3 tw:py-2 ${
+                      <span
+                       className={`tw:block tw:text-sm tw:rounded-xl tw:px-3 tw:py-2 ${
                           availability.available
                             ? "tw:text-emerald-700 tw:bg-emerald-50"
                             : "tw:text-gray-700 tw:bg-gray-50"
                         }`}
                       >
                         {availability.message}
-                      </p>
+                      </span>
                     ) : null}
                   </div>
 

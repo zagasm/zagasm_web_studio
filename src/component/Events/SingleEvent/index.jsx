@@ -16,10 +16,11 @@ import {
 } from "lucide-react";
 import Countdown from "react-countdown";
 import EventActionsSheet from "../EventsActionSheet";
+import SubscriptionBadge from "../../ui/SubscriptionBadge.jsx";
 
 /* ---- Shimmer ---- */
 export const EventShimmer = () => (
-  <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4 tw:flex">
+  <div className="col-xl-4 col-lg-4 col-md-6 col-sm-6 tw:flex">
     <div className="shadow-s rounded h-100 tw:w-full blog-card border-0 position-relative">
       <div className="shimmer-container">
         <div className="shimmer-image"></div>
@@ -111,6 +112,18 @@ export function hostName(event) {
   );
 }
 
+export function hostHasActiveSubscription(event) {
+  return !!(
+    event?.hostHasActiveSubscription ||
+    event?.has_active_subscription ||
+    event?.host?.has_active_subscription ||
+    event?.user?.has_active_subscription ||
+    event?.organiser?.has_active_subscription ||
+    event?.organizer?.has_active_subscription ||
+    event?.hostSubscription?.isActive
+  );
+}
+
 export function eventLocation(event) {
   if (event?.is_online) return "Online";
   return event?.location || "Venue TBA";
@@ -120,6 +133,14 @@ export function eventLocation(event) {
 export function getRawDate(event) {
   const raw = event?.eventDate || event?.event_date;
   if (!raw) return null;
+
+  const parsedIso = new Date(raw);
+  if (!Number.isNaN(parsedIso.getTime())) {
+    const year = parsedIso.getFullYear();
+    const month = String(parsedIso.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedIso.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
   const parts = raw.split(",");
   if (parts.length < 3) return null;
@@ -157,6 +178,13 @@ export function getRawDate(event) {
 function getRawTime(event) {
   const raw = event?.startTime || event?.start_time;
   if (!raw) return "00:00:00";
+
+  const parsedIso = new Date(raw);
+  if (!Number.isNaN(parsedIso.getTime())) {
+    return `${String(parsedIso.getHours()).padStart(2, "0")}:${String(
+      parsedIso.getMinutes()
+    ).padStart(2, "0")}:${String(parsedIso.getSeconds()).padStart(2, "0")}`;
+  }
 
   const normalizedRaw = String(raw).trim();
   const [timePart = "", ampmRaw = ""] = normalizedRaw.split(/\s+/);
@@ -196,7 +224,7 @@ export function CountdownPill({ target }) {
   if (!target) return null;
 
   return (
-    <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:rounded-full tw:bg-black/70 tw:text-white tw:text-[10px] tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
+    <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:rounded-full tw:bg-black/70 tw:text-white tw:text-[10px] tw:md:text-[12px] tw:font-medium tw:border tw:border-white/30 tw:backdrop-blur">
       <Clock className="tw:w-4 tw:h-4 tw:opacity-80" />
 
       <Countdown
@@ -266,7 +294,7 @@ export function EventCard({
   };
 
   const statusChip = isLive ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-red-50 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-red-600">
+    <span className="tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-red-50 tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold tw:text-red-600">
       <span>Live now</span>
       <img
         src={camera_icon}
@@ -275,12 +303,12 @@ export function EventCard({
       />
     </span>
   ) : isPaused ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-blue-50 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-blue-700">
+    <span className="tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-blue-50 tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold tw:text-blue-700">
       <span>Paused</span>
       <Pause className="tw:size-3.5" />
     </span>
   ) : isUpcoming ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-emerald-800 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-white">
+    <span className="tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-emerald-800 tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold tw:text-white">
       <span>Upcoming</span>
       <img
         src={camera_icon}
@@ -291,9 +319,7 @@ export function EventCard({
   ) : null;
 
   return (
-    <div style={{
-      padding: 0
-    }} className="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4 tw:flex">
+    <div className="p-0 p-md-2 tw:col-xl-4 col-lg-4 col-md-6 col-sm-6 tw:flex">
       <div className="blog-card position-relative tw:relative tw:flex tw:h-full tw:w-full tw:flex-col tw:overflow-hidden tw:rounded-xl tw:bg-[#ffffff] tw:shadow-md border-0">
         <button
           style={{ borderRadius: "50%" }}
@@ -318,24 +344,9 @@ export function EventCard({
         </Link>
 
         <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-4 tw:px-4 tw:py-4">
-          <div className="tw:rounded-xl tw:bg-zinc-50 tw:px-4 tw:py-3 tw:text-xs tw:text-zinc-600">
-            <div className="tw:flex tw:flex-col tw:gap-3">
-              {(isLive || isPaused || isUpcoming) && (
-                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                  {statusChip}
-                  {isUpcoming && <CountdownPill target={startDate} />}
-                </div>
-              )}
-              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-zinc-700">
-                <CalendarDays className="tw:h-4 tw:w-4 tw:text-zinc-500" />
-                <span className="tw:font-medium">{formatMetaLine(event)}</span>
-              </div>
-            </div>
-          </div>
-
           <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
             <div className="tw:min-w-0 tw:flex-1">
-              <span className="tw:block tw:wrap-break-word tw:text-[18px] tw:font-semibold tw:leading-tight tw:text-slate-900">
+              <span className="tw:block tw:wrap-break-word tw:text-[16px] tw:font-semibold tw:leading-tight tw:text-slate-900">
                 {event?.title || "Untitled event"}
               </span>
             </div>
@@ -350,6 +361,22 @@ export function EventCard({
               </div>
             )}
           </div>
+          <div className=" tw:text-xs tw:text-zinc-600">
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              {(isLive || isPaused || isUpcoming) && (
+                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                  {statusChip}
+                  {isUpcoming && <CountdownPill target={startDate} />}
+                </div>
+              )}
+              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-zinc-700">
+                <CalendarDays className="tw:h-4 tw:w-4 tw:text-zinc-500" />
+                <span className="tw:font-medium">{formatMetaLine(event)}</span>
+              </div>
+            </div>
+          </div>
+
+          
 
           <div className="tw:min-h-[52px]">
             <button
@@ -371,16 +398,12 @@ export function EventCard({
 
               <div className="tw:min-w-0 tw:flex-1">
                 <div className="tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-zinc-500">
-                  Host
+                  Organiser
                 </div>
                 <div className="tw:flex tw:items-center tw:gap-1.5 tw:text-sm tw:font-semibold tw:text-slate-900">
                   <span className="tw:truncate">{hostName(event)}</span>
-                  {event.hostHasActiveSubscription && (
-                    <img
-                      className="tw:inline-block tw:size-4"
-                      src="/images/verifiedIcon.svg"
-                      alt="Verified"
-                    />
+                  {hostHasActiveSubscription(event) && (
+                    <SubscriptionBadge className="tw:size-4" />
                   )}
                 </div>
               </div>
@@ -495,7 +518,7 @@ export default function EventTemplate({
     <>
       {/* SHIMMER */}
       {showShimmer && (
-        <div className="row tw:mx-0">
+        <div className="row g-4 event-template-grid tw:mx-0">
           {Array.from({ length: 8 }).map((_, i) => (
             <EventShimmer key={i} />
           ))}
@@ -504,7 +527,7 @@ export default function EventTemplate({
 
       {/* EVENTS */}
       {!showShimmer && (
-        <div className="row tw:mx-0 tw:pt-8">
+        <div className="row g-4 event-template-grid tw:mx-0 tw:pt-8">
           {visibleEvents.map((event, index) => (
             <EventCard
               key={event.id}
@@ -519,7 +542,7 @@ export default function EventTemplate({
 
       {/* LOADING MORE */}
       {loadingMore && visibleEvents.length > 0 && (
-        <div className="row">
+        <div className="row g-4 event-template-grid">
           {Array.from({ length: 4 }).map((_, i) => (
             <EventShimmer key={i} />
           ))}

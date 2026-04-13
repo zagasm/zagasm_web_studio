@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError, showSuccess } from "../../component/ui/toast";
 import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
+import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 
 import { useAuth } from "../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
@@ -222,12 +223,7 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
         <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:font-semibold tw:text-gray-900 tw:truncate tw:pr-2">
           {name}
           {showVerified && (
-            <img
-              width={12}
-              height={12}
-              src="/images/verifiedIcon.svg"
-              alt="Verified organizer"
-            />
+            <SubscriptionBadge className="tw:size-3" />
           )}
         </span>
         <div className="tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-1 tw:rounded-lg tw:bg-black tw:text-[10px] tw:text-white tw:shrink-0">

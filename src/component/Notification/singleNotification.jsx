@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 const formatNotificationText = (value) => {
   if (typeof value === "string") {
@@ -17,7 +17,7 @@ const formatNotificationText = (value) => {
         return formattedVal ? `${key}: ${formattedVal}` : key;
       })
       .filter(Boolean)
-      .join(" • ");
+      .join(" - ");
   }
   return "";
 };
@@ -32,18 +32,7 @@ const pickNotificationText = (...values) => {
   return "";
 };
 
-/**
- * Props:
- * - notification: {
- *     id, message, data, read_at, read_at_human, created_at, time_ago
- *   }
- * - onClick: () => void   // mark as read (container click)
- * - onDelete: () => void  // opens confirm modal
- */
-function SingleNotificationTemplate({ notification, onClick, onDelete }) {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-
+function SingleNotificationTemplate({ notification, onClick }) {
   const actorName = notification?.data?.actor?.name || "Someone";
   const title =
     pickNotificationText(
@@ -54,81 +43,40 @@ function SingleNotificationTemplate({ notification, onClick, onDelete }) {
   const messageBody =
     pickNotificationText(notification?.data?.message, notification?.message) ||
     `${actorName} updated your feed`;
-  const previewText =
-    messageBody.length > 120 ? `${messageBody.slice(0, 120)}…` : messageBody;
-
-  useEffect(() => {
-    const checkIfMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkIfMobile();
-    window.addEventListener("resize", checkIfMobile);
-    return () => window.removeEventListener("resize", checkIfMobile);
-  }, []);
-
-  const toggleExpand = (e) => {
-    e.stopPropagation();
-    setIsExpanded((prev) => !prev);
-  };
-
   const isUnread = !notification?.read_at;
   const timeLabel = notification?.time_ago || notification?.created_at || "Just now";
 
   return (
-    <article
-      className={`tw:bg-[#ffffff] tw:p-5 tw:shadow-sm tw:transition tw:duration-200 tw:cursor-pointer tw:border ${
+    <div
+      className={`tw:cursor-pointer tw:px-4 tw:py-4 tw:transition tw:duration-200 hover:tw:bg-slate-50 ${
         isUnread
-          ? "tw:border-l-4 tw:border-primary tw:shadow-[0_12px_30px_rgba(15,23,42,0.15)]"
-          : "tw:border-transparent hover:tw:shadow-md"
+          ? "tw:bg-[#ffffff]"
+          : "tw:bg-[#ffffff]"
       }`}
       onClick={onClick}
       role="button"
     >
-      <div className="tw:flex tw:gap-4 tw:items-start">
+      <div className="tw:flex tw:items-start tw:gap-3">
         <span
-          className={`tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-full ${
+          className={`tw:mt-1 tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-full ${
             isUnread ? "tw:bg-primary" : "tw:bg-slate-300"
           }`}
         />
-        <div className="tw:flex-1 tw:space-y-3">
-          <div className="tw:flex tw:justify-between tw:gap-3">
-            <strong className="tw:text-base tw:font-semibold tw:text-slate-900 tw:first-letter:uppercase ">
+
+        <div className="tw:min-w-0 tw:flex-1">
+          <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+            <span className="tw:block tw:text-sm tw:font-medium tw:text-slate-900 sm:tw:text-[15px]">
               {title}
-            </strong>
-            {isUnread && (
-              <span className="tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-0.5 tw:text-xs tw:font-semibold tw:text-primary">
-                New
-              </span>
-            )}
+            </span>
+            <span className="tw:shrink-0 tw:text-xs tw:text-slate-400">{timeLabel}</span>
           </div>
 
-          <p className="tw:text-sm tw:text-slate-600">
-            {isMobile && !isExpanded ? previewText : messageBody}
-            {isMobile && messageBody.length > 120 && (
-              <button
-                type="button"
-                onClick={toggleExpand}
-                className="tw:ml-2 tw:text-xs tw:font-semibold tw:text-primary tw:underline-offset-4 hover:tw:underline"
-              >
-                {isExpanded ? "Read less" : "Read more"}
-              </button>
-            )}
-          </p>
-
-          <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-slate-500">
-            <span>{timeLabel}</span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete?.();
-              }}
-              className="tw:text-red-500 hover:tw:text-red-600"
-            >
-              Delete
-            </button>
-          </div>
+          <span className="tw:block tw:mt-1 tw:text-sm tw:leading-6 tw:text-slate-600">
+            {messageBody}
+          </span>
         </div>
       </div>
-    </article>
+    </div>
   );
 }
 
