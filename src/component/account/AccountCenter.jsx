@@ -348,7 +348,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                       Xilolo Verification Badge
                     </span>
                     <span className="tw:mt-1 tw:block tw:text-xs tw:text-white/90 tw:md:text-sm">
-                      Get the blue checkmark for {formattedSubscriptionPrice} monthly from your wallet.
+                      Get the Xilolo checkmark for {formattedSubscriptionPrice} monthly from your wallet.
                     </span>
                   </div>
 

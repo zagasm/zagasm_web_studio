@@ -62,7 +62,7 @@
   justify-content: center;
   gap: 6px;
   border-radius: 20px;
-  background: #eef2ff;
+  background: #f7f2eb;
   padding: 14px 16px;
 }
 
@@ -78,7 +78,7 @@
   display: block;
   overflow-wrap: anywhere;
   word-break: break-word;
-  font-size: clamp(1rem, 1.6vw, 1.55rem);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
   line-height: 1.2;
   font-weight: 700;
   color: #0f172a;

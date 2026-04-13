@@ -7,6 +7,7 @@ import {
   Clock3,
   CheckCircle2,
   AlertCircle,
+  Landmark,
 } from "lucide-react";
 import {
   Dialog,
@@ -29,6 +30,11 @@ const getCurrencySymbol = (currency) => {
   return "₦";
 };
 
+const resolveCurrencySymbol = (payout) =>
+  payout?.currency_symbol ||
+  payout?.currency?.symbol ||
+  getCurrencySymbol(payout?.currency?.code || payout?.currency);
+
 const formatMoney = (value, symbol = "₦") => {
   const num = Number(value ?? 0);
   if (Number.isNaN(num)) return `${symbol}0.00`;
@@ -42,21 +48,39 @@ const formatDateTime = (value) => {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+  return date.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 const statusTone = (status) => {
   const normalized = String(status || "").toLowerCase();
-  if (normalized === "paid" || normalized === "completed") {
-    return "tw:bg-emerald-50 tw:text-emerald-700";
-  }
+  if (normalized === "paid") return "tw:bg-emerald-50 tw:text-emerald-700";
   if (normalized === "pending" || normalized === "processing") {
     return "tw:bg-amber-50 tw:text-amber-700";
   }
-  if (normalized === "failed" || normalized === "rejected") {
+  if (normalized === "cancelled" || normalized === "rejected") {
     return "tw:bg-red-50 tw:text-red-700";
   }
   return "tw:bg-gray-50 tw:text-gray-700";
+};
+
+const normalizeCollection = (response) => {
+  const root = response?.data || {};
+  if (Array.isArray(root?.data)) return root.data;
+  if (Array.isArray(root)) return root;
+  return [];
+};
+
+const maskAccountNumber = (value = "") => {
+  const accountNumber = String(value || "");
+  return accountNumber.length <= 4
+    ? accountNumber
+    : `******${accountNumber.slice(-4)}`;
 };
 
 const HistorySkeleton = () => (
@@ -74,39 +98,27 @@ const HistorySkeleton = () => (
   </div>
 );
 
-function PayoutDetailsDialog({ open, payout, loading, onClose }) {
+function PayoutDetailsDialog({ open, payout, onClose }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const symbol = getCurrencySymbol(
-    payout?.currency || payout?.data?.currency || "NGN"
-  );
+  const symbol = resolveCurrencySymbol(payout);
+  const bankName =
+    payout?.bank_name || payout?.bank_account?.bank_name || payout?.bank_details;
+  const accountNumber =
+    payout?.account_number || payout?.bank_account?.account_number;
+  const accountName = payout?.account_name || payout?.bank_account?.account_name;
 
   return (
-    <Dialog
-      open={open}
-      onClose={loading ? undefined : onClose}
-      fullWidth
-      maxWidth="sm"
-      fullScreen={fullScreen}
-    >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" fullScreen={fullScreen}>
       <DialogTitle>Payout details</DialogTitle>
       <DialogContent dividers>
-        {loading ? (
-          <div className="tw:space-y-3 tw:py-2">
-            <div className="tw:h-4 tw:w-36 tw:animate-pulse tw:rounded-xl tw:bg-gray-200" />
-            <div className="tw:h-4 tw:w-52 tw:animate-pulse tw:rounded-xl tw:bg-gray-100" />
-            <div className="tw:h-24 tw:w-full tw:animate-pulse tw:rounded-2xl tw:bg-gray-100" />
-          </div>
-        ) : payout ? (
+        {payout ? (
           <div className="tw:space-y-4">
             <div className="tw:grid tw:grid-cols-2 tw:gap-3">
               <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
                 <div className="tw:text-xs tw:text-gray-500">Amount</div>
                 <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
-                  {formatMoney(
-                    payout?.amount || payout?.requested_amount || 0,
-                    symbol
-                  )}
+                  {formatMoney(payout?.amount ?? 0, symbol)}
                 </div>
               </div>
               <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
@@ -117,50 +129,57 @@ function PayoutDetailsDialog({ open, payout, loading, onClose }) {
               </div>
             </div>
 
-            <div className="tw:space-y-3">
-              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:text-sm">
-                <span className="tw:text-gray-500">Requested at</span>
-                <span className="tw:text-gray-900">
-                  {formatDateTime(
-                    payout?.requested_at || payout?.created_at || payout?.date
-                  )}
-                </span>
+            <div className="tw:space-y-3 tw:text-sm">
+              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                <span className="tw:text-gray-500">Created</span>
+                <span className="tw:text-gray-900">{formatDateTime(payout?.created_at)}</span>
               </div>
-              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:text-sm">
-                <span className="tw:text-gray-500">Paid at</span>
-                <span className="tw:text-gray-900">
-                  {formatDateTime(payout?.paid_at)}
-                </span>
+              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                <span className="tw:text-gray-500">Paid</span>
+                <span className="tw:text-gray-900">{formatDateTime(payout?.paid_at)}</span>
               </div>
-              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:text-sm">
-                <span className="tw:text-gray-500">Reference</span>
-                <span className="tw:text-gray-900">
-                  {payout?.reference || payout?.transaction_reference || payout?.id || "—"}
-                </span>
+              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                <span className="tw:text-gray-500">Bank</span>
+                <span className="tw:text-gray-900">{bankName || "—"}</span>
               </div>
-              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:text-sm">
-                <span className="tw:text-gray-500">Seen</span>
+              <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                <span className="tw:text-gray-500">Account</span>
                 <span className="tw:text-gray-900">
-                  {payout?.seen_at || payout?.is_seen ? "Yes" : "No"}
+                  {accountName || "—"}
+                  {accountNumber ? ` • ${maskAccountNumber(accountNumber)}` : ""}
                 </span>
               </div>
             </div>
 
-            <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
-              <div className="tw:mb-2 tw:text-xs tw:text-gray-500">Raw payload</div>
-              <pre className="tw:max-h-72 tw:overflow-auto tw:text-xs tw:text-slate-700">
-                {JSON.stringify(payout, null, 2)}
-              </pre>
-            </div>
+            {payout?.rejection_reason ? (
+              <div className="tw:rounded-2xl tw:border tw:border-red-200 tw:bg-red-50 tw:p-3 tw:text-sm tw:text-red-700">
+                Rejection reason: {payout.rejection_reason}
+              </div>
+            ) : null}
+
+            {payout?.admin_notes ? (
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-3 tw:text-sm tw:text-slate-700">
+                Admin notes: {payout.admin_notes}
+              </div>
+            ) : null}
+
+            {payout?.evidence_url ? (
+              <a
+                href={payout.evidence_url}
+                target="_blank"
+                rel="noreferrer"
+                className="tw:inline-flex tw:text-sm tw:font-semibold tw:text-primary"
+              >
+                View evidence
+              </a>
+            ) : null}
           </div>
         ) : (
           <div className="tw:text-sm tw:text-gray-500">No payout selected.</div>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
-          Close
-        </Button>
+        <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );
@@ -176,19 +195,25 @@ export default function AccountPayoutHistory() {
     total: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [detailLoading, setDetailLoading] = useState(false);
   const [selectedPayout, setSelectedPayout] = useState(null);
 
   const fetchHistory = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await api.get("/organiser/payouts/history", {
+      const res = await api.get("/api/v1/organiser/payouts/history", {
         ...authHeaders(token),
         params: { per_page: 20, page },
       });
-      setHistory(Array.isArray(res?.data?.data) ? res.data.data : []);
-      setMeta(res?.data?.meta || meta);
+      const items = normalizeCollection(res);
+      setHistory(items);
+      setMeta(
+        res?.data?.meta || {
+          current_page: page,
+          last_page: 1,
+          per_page: 20,
+          total: items.length,
+        }
+      );
     } catch (error) {
       console.error(error);
       showError("Could not load payout history.");
@@ -203,54 +228,22 @@ export default function AccountPayoutHistory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleOpenDetails = async (payoutId) => {
-    setDetailOpen(true);
-    setDetailLoading(true);
-    try {
-      const res = await api.get(
-        `/organiser/payouts/${payoutId}`,
-        authHeaders(token)
-      );
-      const payout = res?.data?.data || res?.data || null;
-      setSelectedPayout(payout);
-
-      try {
-        await api.post(
-          `/organiser/payouts/${payoutId}/seen`,
-          {},
-          authHeaders(token)
-        );
-        setHistory((prev) =>
-          prev.map((item) =>
-            String(item.id) === String(payoutId)
-              ? { ...item, seen_at: new Date().toISOString(), is_seen: true }
-              : item
-          )
-        );
-      } catch (seenError) {
-        console.error(seenError);
-      }
-    } catch (error) {
-      console.error(error);
-      showError("Could not load payout details.");
-      setSelectedPayout(null);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
   const totals = useMemo(() => {
     const totalAmount = history.reduce(
-      (sum, payout) => sum + Number(payout?.amount || payout?.requested_amount || 0),
+      (sum, payout) => sum + Number(payout?.amount ?? 0),
       0
     );
     const pendingCount = history.filter((payout) =>
       ["pending", "processing"].includes(String(payout?.status || "").toLowerCase())
     ).length;
+    const paidCount = history.filter(
+      (payout) => String(payout?.status || "").toLowerCase() === "paid"
+    ).length;
 
     return {
       totalAmount,
       pendingCount,
+      paidCount,
     };
   }, [history]);
 
@@ -260,7 +253,7 @@ export default function AccountPayoutHistory() {
         <div className="tw:mb-4 tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
           <div className="tw:flex tw:items-center tw:gap-3">
             <Link
-              to="/account/payouts"
+              to="/account/payouts/request"
               className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
@@ -301,10 +294,20 @@ export default function AccountPayoutHistory() {
             </div>
           </div>
           <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
-            <div className="tw:text-sm tw:text-gray-500">Visible amount</div>
+            <div className="tw:text-sm tw:text-gray-500">Paid items</div>
             <div className="tw:mt-2 tw:text-xl tw:font-bold tw:text-gray-900">
-              {loading ? "—" : formatMoney(totals.totalAmount)}
+              {loading ? "—" : totals.paidCount}
             </div>
+          </div>
+        </div>
+
+        <div className="tw:mb-4 tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+          <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-500">
+            <Landmark className="tw:h-4 tw:w-4" />
+            Visible amount
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {loading ? "—" : formatMoney(totals.totalAmount)}
           </div>
         </div>
 
@@ -312,9 +315,7 @@ export default function AccountPayoutHistory() {
           <HistorySkeleton />
         ) : history.length === 0 ? (
           <div className="tw:rounded-3xl tw:bg-white tw:p-6 tw:shadow-sm">
-            <div className="tw:font-semibold tw:text-gray-900">
-              No payout history yet
-            </div>
+            <div className="tw:font-semibold tw:text-gray-900">No payout history yet</div>
             <div className="tw:mt-1 tw:text-sm tw:text-gray-600">
               Completed and pending payout requests will appear here.
             </div>
@@ -322,25 +323,27 @@ export default function AccountPayoutHistory() {
         ) : (
           <div className="tw:space-y-3">
             {history.map((payout) => {
-              const symbol = getCurrencySymbol(payout?.currency);
-              const isSeen = !!(payout?.seen_at || payout?.is_seen);
+              const symbol = resolveCurrencySymbol(payout);
               const normalizedStatus = String(payout?.status || "").toLowerCase();
+              const bankName =
+                payout?.bank_name ||
+                payout?.bank_account?.bank_name ||
+                payout?.bank_details;
+              const accountNumber =
+                payout?.account_number || payout?.bank_account?.account_number;
 
               return (
                 <button
                   key={payout?.id}
                   type="button"
-                  onClick={() => handleOpenDetails(payout.id)}
+                  onClick={() => setSelectedPayout(payout)}
                   className="tw:w-full tw:rounded-3xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition hover:tw:shadow-md"
                 >
                   <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                     <div className="tw:min-w-0">
                       <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                         <span className="tw:font-semibold tw:text-gray-900">
-                          {formatMoney(
-                            payout?.amount || payout?.requested_amount || 0,
-                            symbol
-                          )}
+                          {formatMoney(payout?.amount ?? 0, symbol)}
                         </span>
                         <span
                           className={`tw:rounded-full tw:px-2.5 tw:py-1 tw:text-xs tw:capitalize ${statusTone(
@@ -349,28 +352,21 @@ export default function AccountPayoutHistory() {
                         >
                           {payout?.status || "unknown"}
                         </span>
-                        {!isSeen && (
-                          <span className="tw:rounded-full tw:bg-blue-50 tw:px-2.5 tw:py-1 tw:text-xs tw:text-blue-700">
-                            New
-                          </span>
-                        )}
                       </div>
 
                       <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-sm tw:text-gray-600">
                         <span className="tw:flex tw:items-center tw:gap-1">
                           <Clock3 className="tw:h-4 tw:w-4 tw:text-gray-400" />
-                          {formatDateTime(
-                            payout?.requested_at || payout?.created_at || payout?.date
-                          )}
+                          {formatDateTime(payout?.created_at)}
                         </span>
                         <span className="tw:flex tw:items-center tw:gap-1">
-                          {normalizedStatus === "paid" ||
-                          normalizedStatus === "completed" ? (
+                          {normalizedStatus === "paid" ? (
                             <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-emerald-500" />
                           ) : (
                             <AlertCircle className="tw:h-4 tw:w-4 tw:text-amber-500" />
                           )}
-                          {payout?.reference || payout?.transaction_reference || payout?.id}
+                          {bankName || "Bank details unavailable"}
+                          {accountNumber ? ` • ${maskAccountNumber(accountNumber)}` : ""}
                         </span>
                       </div>
                     </div>
@@ -412,14 +408,9 @@ export default function AccountPayoutHistory() {
       </div>
 
       <PayoutDetailsDialog
-        open={detailOpen}
+        open={!!selectedPayout}
         payout={selectedPayout}
-        loading={detailLoading}
-        onClose={() => {
-          if (!detailLoading) {
-            setDetailOpen(false);
-          }
-        }}
+        onClose={() => setSelectedPayout(null)}
       />
     </>
   );

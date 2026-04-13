@@ -17,6 +17,7 @@ import MobileNav from "./MobileNav";
 import { getInitials, hasProfileImage } from "../../component/Organizers/organiser.utils";
 import WalletBalanceChip from "../../features/wallet/components/WalletBalanceChip";
 import useNotifications from "../../component/Notification/useNotifications";
+import SubscriptionBadge from "../../component/ui/SubscriptionBadge";
 
 // src/component/Events/SingleEvent.jsx (Updated Navbar function)
 export default function Navbar() {
@@ -44,6 +45,12 @@ export default function Navbar() {
   ];
 
   const profilePath = user?.id ? `/profile/${user.id}` : "/account";
+  const hasActiveSubscription = !!(
+    user?.has_active_subscription ||
+    user?.hostHasActiveSubscription ||
+    user?.subscription?.isActive ||
+    user?.hostPlan?.id
+  );
 
   return (
     <>
@@ -133,12 +140,22 @@ export default function Navbar() {
               >
                 <Popover.Panel className="tw:absolute tw:right-0 tw:top-[calc(100%+12px)] tw:z-50 tw:w-56 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14)]">
                   <div className="tw:mb-2 tw:border-b tw:border-slate-100 tw:px-3 tw:pb-2">
-                    <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                      {user?.name || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Your account"}
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                        {user?.name || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Your account"}
+                      </div>
+                      {hasActiveSubscription ? (
+                        <SubscriptionBadge className="tw:size-4" />
+                      ) : null}
                     </div>
                     <div className="tw:text-xs tw:text-slate-500">
                       {user?.email || "Signed in"}
                     </div>
+                    {hasActiveSubscription ? (
+                      <div className="tw:mt-1 tw:text-[11px] tw:font-medium tw:text-slate-500">
+                        Subscription active
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="tw:flex tw:flex-col tw:gap-1">

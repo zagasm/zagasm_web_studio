@@ -30,7 +30,7 @@ const phaseStyles = {
   },
   upcoming: {
     label: "Upcoming",
-    classes: "tw:bg-orange-100 tw:text-orange-600",
+    classes: "tw:bg-emerald-100 tw:text-emerald-600",
   },
   ended: {
     label: "Ended",

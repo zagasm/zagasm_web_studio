@@ -82,6 +82,44 @@ function getTicketPromptStorageKey(eventIdentifier) {
   return `xilolo:event-ticket-prompt-seen:${eventIdentifier}`;
 }
 
+function resolveManualDownloadUrl(manual = {}) {
+  const directCandidates = [
+    manual?.cdn_url,
+    manual?.cdn_link,
+    manual?.document_url,
+    manual?.document_link,
+    manual?.file_url,
+    manual?.file_link,
+    manual?.download_url,
+    manual?.url,
+    manual?.link,
+    manual?.path,
+    manual?.document?.cdn_url,
+    manual?.document?.cdn_link,
+    manual?.document?.url,
+    manual?.document?.link,
+    manual?.document?.file_url,
+    manual?.file?.cdn_url,
+    manual?.file?.cdn_link,
+    manual?.file?.url,
+    manual?.file?.link,
+    manual?.file?.file_url,
+    manual?.manual_document?.cdn_url,
+    manual?.manual_document?.cdn_link,
+    manual?.manual_document?.url,
+    manual?.manual_document?.link,
+    manual?.asset?.url,
+    manual?.asset?.cdn_url,
+    manual?.asset?.cdn_link,
+  ];
+
+  return (
+    directCandidates.find(
+      (value) => typeof value === "string" && /^https?:\/\//i.test(value.trim())
+    ) || ""
+  );
+}
+
 function EventDetailShimmer() {
   return (
     <div className="tw:min-h-screen tw:w-full tw:pb-12 tw:pt-20">
@@ -331,47 +369,21 @@ export default function ViewEvent() {
       Number(manual?.price || 0),
       manual?.currency_code || event?.currency?.code || "NGN"
     );
+  const manualDownloadUrl = resolveManualDownloadUrl(manual);
 
-  const handleDownloadManual = async () => {
-    if (!event?.id) return;
-
+  const handleDownloadManual = () => {
     if (!token) {
       showError("Please log in to access the event manual.");
       navigate("/auth/signin");
       return;
     }
 
-    try {
-      const endpoint = manual?.download_endpoint || `/api/v1/events/${event.id}/manual/download`;
-      const response = await api.get(endpoint, authHeaders(token));
-      const payload = response?.data?.data || response?.data || {};
-      const downloadUrl = payload?.download_url;
-
-      if (!downloadUrl) {
-        showError("Manual download is not available right now.");
-        return;
-      }
-
-      window.open(downloadUrl, "_blank", "noopener,noreferrer");
-      setEvent((previous) =>
-        previous
-          ? {
-            ...previous,
-            manual: previous.manual
-              ? {
-                ...previous.manual,
-                viewer_has_access: true,
-                download_endpoint: endpoint,
-              }
-              : previous.manual,
-          }
-          : previous
-      );
-    } catch (downloadError) {
-      showError(
-        getApiErrorMessage(downloadError, "Unable to download the event manual.")
-      );
+    if (!manualDownloadUrl) {
+      showError("Manual CDN file link is missing from the event response.");
+      return;
     }
+
+    window.open(manualDownloadUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleGetTicket = async (purchaseType = "ticket_only") => {
@@ -502,7 +514,7 @@ export default function ViewEvent() {
   } else if (purchaseTicketMutation.isPending) {
     primaryCtaLabel = "Processing...";
   } else if (shouldChoosePurchaseType) {
-    primaryCtaLabel = "Choose Access";
+    primaryCtaLabel = "Buy Ticket";
   } else {
     primaryCtaLabel = "Buy Ticket";
   }

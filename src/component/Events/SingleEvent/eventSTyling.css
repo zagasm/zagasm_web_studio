@@ -239,7 +239,7 @@
   }
 
   .blog-card {
-    margin: 10px
+    margin: 0;
   }
 
   .event_price {
@@ -260,6 +260,19 @@
 
   .viewers-overlay-icon .viewers_indicator {
     margin-top: 3px;
+  }
+}
+
+@media (max-width: 768px) {
+  .event-template-grid {
+    --bs-gutter-x: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .event-template-grid > [class*="col-"] {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 

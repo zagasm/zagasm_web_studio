@@ -18,7 +18,7 @@ export default function Home() {
     if (!area) return;
 
     const onScroll = () => {
-      if (area.scrollTop > 20) setShowOrganizers(true);
+      if (area.scrollTop > 10) setShowOrganizers(true);
     };
 
     area.addEventListener("scroll", onScroll);

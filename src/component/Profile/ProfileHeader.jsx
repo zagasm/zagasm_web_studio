@@ -1,6 +1,6 @@
 import React from "react";
 import defaultProfile from "../../assets/avater_pix.avif";
-import { Users, UserPlus, ArrowUpRight, Ticket } from "lucide-react";
+import { ArrowUpRight, Ticket } from "lucide-react";
 import { Edit } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import "./profile.css";
@@ -49,7 +49,6 @@ export default function ProfileHeader({
   const followingCount = user?.followings_count ?? 0;
 
   const ticketsSold = user?.successfulPayments ?? user?.tickets_sold ?? 0;
-  console.log(user);
   const rankValue =
     user?.organiser?.rank ??
     user?.organiser?.rank_global ??
@@ -63,11 +62,21 @@ export default function ProfileHeader({
     user?.subscription?.isActive ||
     user?.has_active_subscription ||
     user?.organiser?.has_active_subscription ||
-    organiser?.has_active_subscription
+    (isOwnProfile && organiser?.has_active_subscription)
   );
 
   const handleEditClick = () => {
     navigate("/profile/edit-profile");
+  };
+
+  const handleFollowersClick = () => {
+    if (!isOwnProfile) return;
+    navigate("/me/organisers/followers");
+  };
+
+  const handleFollowingClick = () => {
+    if (!isOwnProfile) return;
+    navigate("/me/organisers");
   };
 
   const showFollowButton = !isOwnProfile && isOrganiserProfileData;
@@ -165,7 +174,9 @@ export default function ProfileHeader({
         <div className="tw:mt-5 tw:grid tw:w-full tw:grid-cols-2 tw:gap-3">
           <button
             type="button"
-            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100"
+            onClick={handleFollowersClick}
+            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100 disabled:tw:cursor-default disabled:tw:hover:bg-gray-50"
+            disabled={!isOwnProfile}
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
               <span className="tw:inline-flex tw:items-center tw:gap-1">
@@ -180,7 +191,9 @@ export default function ProfileHeader({
 
           <button
             type="button"
-            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100"
+            onClick={handleFollowingClick}
+            className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100 disabled:tw:cursor-default disabled:tw:hover:bg-gray-50"
+            disabled={!isOwnProfile}
           >
             <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
               <span className="tw:inline-flex tw:items-center tw:gap-1">

@@ -518,7 +518,7 @@ export default function EventTemplate({
     <>
       {/* SHIMMER */}
       {showShimmer && (
-        <div className="row g-4 tw:mx-0">
+        <div className="row g-4 event-template-grid tw:mx-0">
           {Array.from({ length: 8 }).map((_, i) => (
             <EventShimmer key={i} />
           ))}
@@ -527,7 +527,7 @@ export default function EventTemplate({
 
       {/* EVENTS */}
       {!showShimmer && (
-        <div className="row g-4 tw:mx-0 tw:pt-8">
+        <div className="row g-4 event-template-grid tw:mx-0 tw:pt-8">
           {visibleEvents.map((event, index) => (
             <EventCard
               key={event.id}
@@ -542,7 +542,7 @@ export default function EventTemplate({
 
       {/* LOADING MORE */}
       {loadingMore && visibleEvents.length > 0 && (
-        <div className="row g-4">
+        <div className="row g-4 event-template-grid">
           {Array.from({ length: 4 }).map((_, i) => (
             <EventShimmer key={i} />
           ))}

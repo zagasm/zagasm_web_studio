@@ -82,6 +82,7 @@ import DownloadAppModal from "./component/DownloadAppModal.jsx";
 import SignalDeck from "./pages/SignalDeck/index.jsx";
 import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
 import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
+import WalletHub from "./pages/Account/WalletHub.jsx";
 
 const MainLayout = () => (
   <>
@@ -344,7 +345,8 @@ export function App() {
               <Route path="bank-accounts" element={<BankAccountsPage />} />
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />
               <Route path="fund-wallet" element={<FundWalletPage />} />
-              <Route path="payouts" element={<AccountPayouts />} />
+              <Route path="payouts" element={<WalletHub />} />
+              <Route path="payouts/request" element={<AccountPayouts />} />
               <Route
                 path="payouts/history"
                 element={<AccountPayoutHistory />}

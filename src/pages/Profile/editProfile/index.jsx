@@ -12,7 +12,7 @@ import ProfileImageCard from "./ProfileImageCard";
 import { api, authHeaders } from "../../../lib/apiClient"; // ✅ use axios instance
 
 function EditProfile() {
-  const { user, login, token } = useAuth();
+  const { user, login, token, setAuth } = useAuth();
 
   // console.log(user);
 
@@ -119,7 +119,7 @@ function EditProfile() {
         const { data } = await api.get("/api/v1/username", authHeaders(token));
         setUsernameInfo({
           username: data?.data?.username || "",
-          canChange: !!data?.data?.can_change,
+          canChange: data?.data?.can_change ?? true,
         });
       } catch (err) {
         console.error("Failed to fetch username:", err);
@@ -364,9 +364,18 @@ function EditProfile() {
         onClose={() => setUsernameOpen(false)}
         currentUsername={usernameInfo.username}
         canChange={usernameInfo.canChange}
-        onUsernameUpdated={(username) =>
-          setUsernameInfo((prev) => ({ ...prev, username }))
-        }
+        onUsernameUpdated={(username) => {
+          setUsernameInfo((prev) => ({ ...prev, username }));
+          if (user) {
+            setAuth({
+              user: {
+                ...user,
+                username,
+                user_name: username,
+              },
+            });
+          }
+        }}
       />
       {/* hook verifyOpen into your verify modal when ready */}
     </div>
