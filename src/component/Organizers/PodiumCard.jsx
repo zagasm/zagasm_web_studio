@@ -10,7 +10,7 @@ import { Ticket } from "lucide-react";
 import { useAuth } from "../../pages/auth/AuthContext";
 import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
 
-export default function PodiumCard({ org, position, onToggleFollow, loading }) {
+export default function PodiumCard({ org, position, onToggleFollow }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -100,16 +100,13 @@ export default function PodiumCard({ org, position, onToggleFollow, loading }) {
               <button
                 style={{ borderRadius: 16 }}
                 type="button"
-                disabled={loading}
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleFollow(org.userId);
                 }}
-                className={`tw:w-full tw:rounded-2xl tw:px-2 tw:py-1 tw:text-[10px] tw:font-medium tw:leading-tight tw:ring-1 tw:transition tw:sm:px-3 tw:sm:py-1.5 tw:sm:text-[12px] ${buttonClass} ${
-                  loading ? "tw:cursor-not-allowed tw:opacity-70" : ""
-                }`}
+                className={`tw:w-full tw:rounded-2xl tw:px-2 tw:py-1 tw:text-[10px] tw:font-medium tw:leading-tight tw:ring-1 tw:transition tw:sm:px-3 tw:sm:py-1.5 tw:sm:text-[12px] ${buttonClass}`}
               >
-                {loading ? "Wait..." : followLabel}
+                {followLabel}
               </button>
             </div>
           ) : (

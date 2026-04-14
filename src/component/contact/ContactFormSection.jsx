@@ -94,7 +94,7 @@ export default function ContactFormSection() {
                     Choose one
                   </option>
                   <option value="creator">Creator / Host</option>
-                  <option value="agency">Studio / Agency</option>
+                  <option value="agency">Xilolo / Agency</option>
                   <option value="brand">Brand / Organisation</option>
                   <option value="event">Event organiser</option>
                   <option value="other">Other</option>
@@ -181,7 +181,7 @@ export default function ContactFormSection() {
             <div className="tw:absolute tw:inset-0 tw:bg-[radial-gradient(circle_at_top,rgba(43,43,43,0.22),transparent_55%),radial-gradient(circle_at_bottom,rgba(17,17,17,0.28),transparent_55%)] tw:opacity-80" />
             <div className="tw:relative">
               <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.2em] tw:text-white/70">
-                Studio contact
+                Xilolo contact
               </span>
               <span className="tw:block tw:mt-2 tw:text-sm tw:md:text-base tw:font-medium tw:text-white/95">
                 If you already have a fixed date, include it. We prioritize
@@ -203,7 +203,7 @@ export default function ContactFormSection() {
                   <Phone className="tw:w-4 tw:h-4 tw:mt-0.5 tw:text-primarySecond" />
                   <div>
                     <span className="tw:block tw:text-white/60">
-                      Studio line
+                      Xilolo line
                     </span>
                     <span className="tw:block tw:text-white tw:font-medium">
                       +234 (0) 802 379 7265

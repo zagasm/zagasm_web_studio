@@ -13,8 +13,10 @@ import {
 } from "../../../lib/authStorage";
 import defaultAvatar from "../../../assets/avater_pix.avif";
 import { api } from "../../../lib/apiClient";
+import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const REMEMBERED_ACCOUNT_INVALID_PATTERNS = [
   "account not found",
   "user not found",
@@ -35,6 +37,7 @@ export function Signin() {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
@@ -46,6 +49,7 @@ export function Signin() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const showBlackEmailHint = Boolean(emailExistsError);
   const redirectPath =
     typeof location.state?.from === "string" ? location.state.from : "/feed";
 
@@ -311,6 +315,49 @@ export function Signin() {
     }
   };
 
+  const handleGoogleLogin = async (googleResponse) => {
+    const idToken = googleResponse?.credential;
+    if (!idToken) {
+      showError("Google login could not be completed.");
+      return;
+    }
+
+    setIsGoogleLoading(true);
+
+    try {
+      const { data } = await api.post("/api/v1/google/login", {
+        id_token: idToken,
+        device_name: navigator.userAgent || "Web Browser",
+      });
+
+      if (!data?.token || !data?.user) {
+        throw new Error("Invalid Google login response.");
+      }
+
+      login({
+        user: data.user,
+        token: data.token,
+      });
+      showSuccess(data.message || "Google login successful.");
+      navigate(redirectPath, { replace: true });
+    } catch (err) {
+      const status = err?.response?.status;
+      const message =
+        err?.response?.data?.message || "Google login failed.";
+
+      showError(message);
+
+      if (status === 404) {
+        navigate("/auth/signup", {
+          replace: true,
+          state: { googleAuthHint: "signup" },
+        });
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   if (showVerification) {
     return (
       <SigninWithCode
@@ -330,6 +377,16 @@ export function Signin() {
       header={true}
       privacy={true}
       haveAccount={true}
+      socialSlot={
+        GOOGLE_CLIENT_ID ? (
+          <GoogleAuthSection
+            label={isGoogleLoading ? "Connecting to Google..." : "Or continue with"}
+            text="continue_with"
+            onSuccess={handleGoogleLogin}
+            onError={() => showError("Google login was cancelled or failed.")}
+          />
+        ) : null
+      }
     >
       <style>{`
         .continue-btn {
@@ -360,7 +417,7 @@ export function Signin() {
         {rememberedAccounts.length > 0 && !selectedAccount && !showPasswordField && (
           <motion.div variants={inputVariants} className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <label className="form-label mb-0">Remembered accounts</label>
+              <label className="form-label mb-0 tw:text-[11px]">Remembered accounts</label>
               {/* <button
                 type="button"
                 className="btn btn-link p-0 text-decoration-none"
@@ -401,14 +458,17 @@ export function Signin() {
                       }}
                     />
                     <span className="d-flex flex-column">
-                      <span className="fw-semibold text-dark">
+                      <span className="fw-semibold text-dark tw:text-xs tw:md:text-sm">
                         {account.fullName}
                       </span>
-                      <span className="text-muted small">{account.email}</span>
+                      <span className="text-muted tw:text-[10px] tw:md:text-sm">{account.email}</span>
                     </span>
                   </span>
 
                   <button
+                    style={{
+                      fontSize: 11
+                    }}
                     type="button"
                     className="btn btn-sm btn-link text-danger text-decoration-none"
                     onClick={(event) =>
@@ -437,7 +497,7 @@ export function Signin() {
         {!selectedAccount && (
           <motion.div variants={inputVariants} className="form-group mb-4">
             <div className="d-flex justify-content-between align-items-center">
-              
+
               {rememberedAccounts.length > 0 && showPasswordField && (
                 <button
                   type="button"
@@ -459,12 +519,12 @@ export function Signin() {
                 value={formData.email}
                 onChange={handleChange}
                 autoComplete="username"
-                error={Boolean(errors.email)}
+                error={Boolean(errors.email && errors.email !== emailExistsError)}
                 helperText={
                   errors.email ? (
                     errors.email
                   ) : emailExistsError ? (
-                    <>
+                    <span className="tw:inline-flex tw:flex-wrap tw:items-center tw:gap-1 tw:text-black">
                       {emailExistsError}{" "}
                       <Link
                         to="/auth/signup"
@@ -472,7 +532,7 @@ export function Signin() {
                       >
                         Create an account
                       </Link>
-                    </>
+                    </span>
                   ) : (
                     " "
                   )
@@ -488,6 +548,11 @@ export function Signin() {
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "8px",
                     backgroundColor: "#fff",
+                  },
+                  "& .MuiFormHelperText-root": {
+                    color: showBlackEmailHint ? "#111111" : undefined,
+                    marginLeft: 0,
+                    whiteSpace: "nowrap",
                   },
                 }}
               />
@@ -514,15 +579,16 @@ export function Signin() {
                   }}
                 />
                 <div>
-                  <div className="fw-semibold text-dark">
+                  <div className="fw-semibold text-dark tw:text-[12px] tw:md:text-xs">
                     {selectedAccount.fullName}
                   </div>
-                  <div className="text-muted small">{selectedAccount.email}</div>
+                  <div className="text-muted tw:text-[10px] tw:md:text-xs">{selectedAccount.email}</div>
                 </div>
               </div>
               <button
                 style={{
-                  color: '#111111'
+                  color: '#111111',
+                  fontSize: 11
                 }}
                 type="button"
                 className="btn btn-link p-0 text-decoration-none text-primary"
@@ -543,7 +609,7 @@ export function Signin() {
               transition={{ duration: 0.3 }}
               className="form-group mb-3"
             >
-              
+
               <TextField
                 fullWidth
                 id="password"

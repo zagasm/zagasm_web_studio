@@ -37,6 +37,7 @@ const AccountLeft = ({ user }) => {
     try {
       const res = await api.get("/api/v1/profile", authHeaders(token));
       setAuth({ user: res?.data?.user, token });
+      await refreshUser?.();
       showSuccess("Account verified successfully!");
     } catch (error) {
       console.error(error);

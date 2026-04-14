@@ -84,10 +84,10 @@ const getTicketSaleStatus = (item) =>
 const getTicketsSold = (item) =>
   Number(
     item?.tickets_sold_count ??
-      item?.tickets_sold ??
-      item?.ticketsSold ??
-      item?.sold_count ??
-      0
+    item?.tickets_sold ??
+    item?.ticketsSold ??
+    item?.sold_count ??
+    0
   );
 
 const getBankDisplayName = (account) =>
@@ -171,7 +171,7 @@ function WithdrawDialog({
       <Dialog
         as="div"
         className="tw:relative tw:z-50"
-        onClose={submitting ? () => {} : onClose}
+        onClose={submitting ? () => { } : onClose}
       >
         <Transition.Child
           as={Fragment}
@@ -198,7 +198,7 @@ function WithdrawDialog({
             >
               <Dialog.Panel className="tw:w-full tw:max-w-xl tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:sm:p-6">
                 <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
-                  Request withdrawal
+                  Request Payout
                 </span>
                 <p className="tw:mt-1 tw:text-xs tw:text-gray-500">
                   Choose a saved bank account and withdraw from your available balance.
@@ -404,11 +404,17 @@ export default function AccountPayouts() {
     setSelectedWithdrawBankAccountId((current) => {
       if (
         current &&
-        bankAccounts.some((account) => String(account?.bank_id) === String(current))
+        bankAccounts.some(
+          (account) =>
+            String(account?.id ?? account?.bank_id) === String(current)
+        )
       ) {
         return current;
       }
-      return defaultAccount?.bank_id || bankAccounts[0]?.bank_id || "";
+      return (
+        String(defaultAccount?.id ?? defaultAccount?.bank_id ?? "") ||
+        String(bankAccounts[0]?.id ?? bankAccounts[0]?.bank_id ?? "")
+      );
     });
   }, [bankAccounts]);
 
@@ -545,7 +551,7 @@ export default function AccountPayouts() {
             </Link>
             <div>
               <div className="tw:text-lg tw:font-bold tw:text-gray-900 tw:md:text-2xl">
-                Request withdrawal
+                Request Payout
               </div>
               <div className="tw:text-sm tw:text-gray-500">
                 Review your balance and submit a payout request.
@@ -591,19 +597,19 @@ export default function AccountPayouts() {
           {loading ? (
             <StatsSkeleton cards={3} />
           ) : (
-            <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-3">
+            <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-2">
               <StatCard
                 icon={Wallet}
                 label="Available balance"
                 value={formatMoney(balance?.available_balance ?? 0, balanceSymbol)}
                 hint={`Minimum withdrawal ${formatMoney(minimumWithdrawalAmount, balanceSymbol)}`}
               />
-              <StatCard
+              {/* <StatCard
                 icon={TrendingUp}
                 label="Ticket sales"
                 value={formatMoney(balance?.total_ticket_sales ?? 0, balanceSymbol)}
                 hint="Total processed ticket sales"
-              />
+              /> */}
               <StatCard
                 icon={Ticket}
                 label="Tickets sold"
@@ -684,13 +690,13 @@ export default function AccountPayouts() {
                         </div>
                       </div>
 
-                      <div className="tw:grid tw:grid-cols-2 tw:gap-2 tw:lg:min-w-[280px]">
-                        <div className="tw:rounded-2xl tw:bg-white tw:px-3 tw:py-2">
+                      <div className="tw:grid tw:grid-cols-1 tw:gap-2 tw:lg:min-w-[180px]">
+                        {/* <div className="tw:rounded-2xl tw:bg-white tw:px-3 tw:py-2">
                           <div className="tw:text-[11px] tw:text-gray-500">Ticket sales</div>
                           <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
                             {formatMoney(item?.total_ticket_sales ?? 0, balanceSymbol)}
                           </div>
-                        </div>
+                        </div> */}
                         <div className="tw:rounded-2xl tw:bg-white tw:px-3 tw:py-2">
                           <div className="tw:text-[11px] tw:text-gray-500">Tickets sold</div>
                           <div className="tw:text-sm tw:font-semibold tw:text-gray-900">

@@ -71,7 +71,7 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
 
           <div className="ticket-hero-content">
             <span
-              className={`tw:inline-flex tw:w-fit tw:items-center tw:rounded-full tw:px-3 tw:py-1 tw:text-[10px] tw:font-bold tw:uppercase ${phaseDef.classes}`}
+              className={`tw:inline-flex tw:w-fit tw:items-center tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[9px] tw:font-bold tw:uppercase tw:md:px-3 tw:md:text-[10px] ${phaseDef.classes}`}
             >
               {phaseDef.icon}
               {phaseDef.label}
@@ -79,10 +79,10 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
 
             <div className="tw:flex tw:items-end tw:justify-between tw:gap-4">
               <div className="tw:min-w-0">
-                <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.18em] tw:text-white/75">
+                <span className="tw:block tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.16em] tw:text-white/75 tw:md:text-[11px]">
                   Event Ticket
                 </span>
-                <span className="tw:mt-2 tw:block tw:line-clamp-2 tw:text-lg tw:font-semibold tw:leading-tight tw:text-white">
+                <span className="tw:mt-1.5 tw:block tw:line-clamp-2 tw:text-base tw:font-semibold tw:leading-tight tw:text-white tw:md:mt-2 tw:md:text-lg">
                   {title}
                 </span>
               </div>
@@ -100,8 +100,8 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
         <div className="ticket-body">
           <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-[minmax(0,1.2fr)_minmax(190px,0.8fr)]">
             <div className="tw:space-y-3">
-              <div className="tw:flex tw:items-start tw:gap-2 tw:text-sm tw:text-slate-700">
-                <CalendarDays className="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:text-primary" />
+              <div className="tw:flex tw:items-start tw:gap-2 tw:text-xs tw:text-slate-700 tw:md:text-sm">
+                <CalendarDays className="tw:mt-0.5 tw:h-3.5 tw:w-3.5 tw:shrink-0 tw:text-primary tw:md:h-4 tw:md:w-4" />
                 <div className="tw:min-w-0">
                   <span className="tw:block tw:font-medium tw:text-slate-900">
                     {dateLabel}
@@ -110,13 +110,13 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
                 </div>
               </div>
 
-              <div className="tw:flex tw:items-start tw:gap-2 tw:text-sm tw:text-slate-700">
-                <Wallet className="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:text-primary" />
+              <div className="tw:flex tw:items-start tw:gap-2 tw:text-xs tw:text-slate-700 tw:md:text-sm">
+                <Wallet className="tw:mt-0.5 tw:h-3.5 tw:w-3.5 tw:shrink-0 tw:text-primary tw:md:h-4 tw:md:w-4" />
                 <div className="tw:min-w-0">
                   <span className="tw:block tw:font-medium tw:text-slate-900">
                     Payment Method: {paymentMethodLabel}
                   </span>
-                  <span className="tw:block tw:break-all tw:text-xs tw:text-slate-500">
+                  <span className="tw:block tw:break-all tw:text-[11px] tw:text-slate-500 tw:md:text-xs">
                     {ticket?.code || "Ticket code unavailable"}
                   </span>
                 </div>
@@ -133,18 +133,18 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
         <div className="ticket-divider" aria-hidden="true" />
 
         <div className="ticket-footer">
-          <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2 tw:text-xs tw:text-slate-500">
-            <Receipt className="tw:h-4 tw:w-4 tw:shrink-0 tw:text-slate-400" />
+          <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2 tw:text-[11px] tw:text-slate-500 tw:md:text-xs">
+            <Receipt className="tw:h-3.5 tw:w-3.5 tw:shrink-0 tw:text-slate-400 tw:md:h-4 tw:md:w-4" />
             <span className="tw:truncate">
               Open your receipt for full payment and ticket details.
             </span>
           </div>
 
           <button
-            style={{ borderRadius: 12 }}
+            style={{ borderRadius: 12, fontSize: 11 }}
             type="button"
             onClick={onViewReceipt}
-            className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-xl tw:bg-slate-950 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:transition-colors hover:tw:bg-slate-800"
+            className="tw:inline-flex tw:h-10 tw:min-w-[132px] tw:items-center tw:justify-center tw:rounded-xl tw:bg-slate-950 tw:px-4 tw:text-xs tw:font-semibold tw:text-white tw:transition-colors hover:tw:bg-slate-800 tw:md:h-11 tw:md:min-w-[148px] tw:md:text-sm"
           >
             View Receipt
           </button>

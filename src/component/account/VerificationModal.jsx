@@ -74,7 +74,6 @@ export default function VerificationModal({
       // Passing email along with code is standard practice for stateless APIs
       await api.post("/api/v1/code/verify", { code }, authHeaders(token));
 
-      showSuccess("Account verified successfully!");
       onSuccess(); // Refresh user data in parent
       closeModal();
     } catch (error) {

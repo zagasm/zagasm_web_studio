@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
-import { ToastHost, showSuccess, showError } from "../../../component/ui/toast";
+import { showSuccess, showError } from "../../../component/ui/toast";
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import EventReviewsSection from "../../../component/Events/EventReviewsSection.jsx";
 import ReportModal from "../../../component/Events/ReportModal";
@@ -186,6 +186,14 @@ export default function ViewEvent() {
   const [followLoading, setFollowLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.pointerEvents = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, []);
+
   const purchaseTicketMutation = usePurchaseTicketWithWallet({
     onSuccess: (payload) => {
       const purchaseData = payload?.data || payload || {};
@@ -329,11 +337,6 @@ export default function ViewEvent() {
       setPurchaseModalOpen(true);
     }
   }, [event, eventId, modalAutoTrigger]);
-
-  useEffect(() => {
-    if (!event?.id) return;
-    shareFlow.prefetchShare({ eventId: event.id });
-  }, [event?.id, shareFlow.prefetchShare]);
 
   const closePurchaseModal = () => {
     setPurchaseModalOpen(false);
@@ -499,6 +502,13 @@ export default function ViewEvent() {
   const isEnded = event?.status === "ended";
   const isSoldOut = !!event?.is_sold_out;
   const hasPaid = !!event?.hasPaid;
+  const isOwnerEvent = !!(
+    event?.isOwner ||
+    event?.is_owner ||
+    event?.is_my_event ||
+    event?.isMine ||
+    event?.is_current_user_event
+  );
   const canBuyManualOnly = hasPaid && manualOnlyAvailable;
   const canDownloadManual = manualAvailable && manualHasAccess;
 
@@ -585,8 +595,6 @@ export default function ViewEvent() {
 
   return (
     <>
-      <ToastHost />
-
       <SEO
         title={
           event?.title ? `${event.title} - Event Details` : "Event Details"
@@ -906,7 +914,7 @@ export default function ViewEvent() {
                       </div>
                     </div>
 
-                    {hasPaid && (
+                    {hasPaid && !isOwnerEvent && (
                       <div className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1.5 tw:text-[11px] tw:text-emerald-700">
                         <span className="tw:inline-block tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-500" />
                         <span>You already paid for this event</span>
@@ -953,37 +961,41 @@ export default function ViewEvent() {
                       </div>
                     )}
 
-                    <button
-                      style={{
-                        borderRadius: 24
-                      }}
-                      type="button"
-                      disabled={ctaDisabled}
-                      onClick={handlePrimaryAction}
-                      className={`tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-4 tw:text-xs tw:font-semibold tw:transition tw:md:h-12 tw:md:px-5 tw:md:text-sm ${ctaDisabled
-                        ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                        : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
-                        }`}
-                    >
-                      {primaryCtaLabel}
-                      {!ctaDisabled && !hasPaid && !shouldChoosePurchaseType && (
-                        <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
-                          ({priceText(event)})
-                        </span>
-                      )}
-                    </button>
+                    {!isOwnerEvent && (
+                      <>
+                        <button
+                          style={{
+                            borderRadius: 24
+                          }}
+                          type="button"
+                          disabled={ctaDisabled}
+                          onClick={handlePrimaryAction}
+                          className={`tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-4 tw:text-xs tw:font-semibold tw:transition tw:md:h-12 tw:md:px-5 tw:md:text-sm ${ctaDisabled
+                            ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
+                            : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
+                            }`}
+                        >
+                          {primaryCtaLabel}
+                          {!ctaDisabled && !hasPaid && !shouldChoosePurchaseType && (
+                            <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
+                              ({priceText(event)})
+                            </span>
+                          )}
+                        </button>
 
-                    <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
-                      {hasPaid
-                        ? isLiveNow
-                          ? "You already have access. Tap the button above to join the live experience."
-                          : canBuyManualOnly
-                            ? "Your ticket is secured. You can still unlock the event manual."
-                            : "Your ticket is secured. We will notify you when the event starts."
-                        : shouldChoosePurchaseType
-                          ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
-                          : "Secure checkout and fast access to your purchased ticket."}
-                    </p>
+                        <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                          {hasPaid
+                            ? isLiveNow
+                              ? "You already have access. Tap the button above to join the live experience."
+                              : canBuyManualOnly
+                                ? "Your ticket is secured. You can still unlock the event manual."
+                                : "Your ticket is secured. We will notify you when the event starts."
+                            : shouldChoosePurchaseType
+                              ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
+                              : "Secure checkout and fast access to your purchased ticket."}
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   <div className="tw:mt-4 tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
@@ -1053,8 +1065,8 @@ export default function ViewEvent() {
                           color: "#ffffff"
                         }}
                         to={
-                          event.organiserId
-                            ? `/profile/${event.organiserId}`
+                          event.organiserUserId || event.organiserId
+                            ? `/profile/${event.organiserUserId || event.organiserId}`
                             : "/organizers"
                         }
                         className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] hover:tw:bg-primarySecond tw:md:h-11 tw:md:text-sm"
@@ -1094,18 +1106,20 @@ export default function ViewEvent() {
               </div>
             </div>
 
-            <button
-              style={{ borderRadius: 18 }}
-              type="button"
-              disabled={ctaDisabled}
-              onClick={handlePrimaryAction}
-              className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
-                ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
-                }`}
-            >
-              {primaryCtaLabel}
-            </button>
+            {!isOwnerEvent && (
+              <button
+                style={{ borderRadius: 18 }}
+                type="button"
+                disabled={ctaDisabled}
+                onClick={handlePrimaryAction}
+                className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
+                  ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
+                  : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
+                  }`}
+              >
+                {primaryCtaLabel}
+              </button>
+            )}
           </div>
         </div>
       </div>

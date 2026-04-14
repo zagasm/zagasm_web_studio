@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
               <section className="tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700">
                 <p>
                   Welcome to Xilolo Inc.&apos;s comprehensive Privacy Policy for
-                  the Studio App. As a provider of creative tools designed to
+                  the Xilolo App. As a provider of creative tools designed to
                   empower content creators, filmmakers, and collaborative teams
                   worldwide, we are committed to upholding high standards of
                   data privacy and protection. This policy outlines our
@@ -708,7 +708,7 @@ export default function PrivacyPolicyPage() {
                   8. Protection of Children&apos;s Privacy
                 </span>
                 <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
-                  The Studio App is intended for users aged 18 and above. We do
+                  The Xilolo App is intended for users aged 18 and above. We do
                   not knowingly collect personal data from children under 18 (or
                   under 16 in some jurisdictions). If we become aware that such
                   data has been collected, we will delete it within a reasonable

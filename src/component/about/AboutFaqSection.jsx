@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: "Can I start without fancy equipment?",
-    a: "Yes. You can start with your phone and upgrade later. If you already have a studio setup, that works too.",
+    a: "Yes. You can start with your phone and upgrade later. If you already have a Xilolo setup, that works too.",
   },
   {
     q: "Can I sell tickets for my events?",

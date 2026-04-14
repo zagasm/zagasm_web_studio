@@ -112,6 +112,28 @@ export function hostName(event) {
   );
 }
 
+function organiserProfileId(event) {
+  return (
+    event?.organiserUserId ||
+    event?.organiser_user_id ||
+    event?.organiser?.user_id ||
+    event?.organiser?.userId ||
+    event?.organiser?.user?.id ||
+    event?.organizer?.user_id ||
+    event?.organizer?.userId ||
+    event?.organizer?.user?.id ||
+    event?.host?.user_id ||
+    event?.host?.userId ||
+    event?.user_id ||
+    event?.userId ||
+    event?.user?.id ||
+    event?.hostId ||
+    event?.organiserId ||
+    event?.organizerId ||
+    null
+  );
+}
+
 export function hostHasActiveSubscription(event) {
   return !!(
     event?.hostHasActiveSubscription ||
@@ -280,6 +302,7 @@ export function EventCard({
   const hostInitials = initialsFromName(hostName(event) || "");
 
   const isMyEvent =
+    event?.isOwner ||
     event?.is_owner ||
     event?.is_my_event ||
     event?.isMine ||
@@ -288,7 +311,7 @@ export function EventCard({
   const goToHostProfile = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const hostId = event?.organiserId || event?.host?.id || event?.host?.userId;
+    const hostId = organiserProfileId(event);
     if (!hostId) return;
     navigate(`/profile/${hostId}`);
   };
@@ -420,7 +443,7 @@ export function EventCard({
                 style={{ borderRadius: 8 }}
                 className="tw:w-full tw:rounded-2xl tw:bg-black tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md"
               >
-                View event
+                You're hosting this event
               </button>
             </Link>
           ) : event?.hasPaid ? (

@@ -73,14 +73,14 @@ export default function TermsOfServicePage() {
               >
                 <span className="tw:block">
                   Welcome to the Terms of Service <span>(“Terms”)</span> for
-                  Xilolo Inc.’s Studio App <span>(“Service” or “App”)</span>.
+                  Xilolo Inc.’s Xilolo App <span>(“Service” or “App”)</span>.
                   Xilolo Inc., a technology company incorporated under the laws
                   of the Federal Republic of Nigeria and headquartered in Asaba,
                   provides this platform to help creators, filmmakers,
                   educators, and teams produce, edit, stream, and monetize
                   content. Whether you are hosting live interactive sessions,
                   building video projects, or collaborating across borders, the
-                  Studio App is designed to amplify your creative work while
+                  Xilolo App is designed to amplify your creative work while
                   maintaining strong standards of trust, security, and fairness.
                 </span>
 
@@ -230,7 +230,7 @@ export default function TermsOfServicePage() {
                 </span>
 
                 <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
-                  The Studio App provides tools for content creation and
+                  The Xilolo App provides tools for content creation and
                   distribution. Usage must stay within these Terms and our
                   community expectations.
                 </span>
@@ -470,7 +470,7 @@ export default function TermsOfServicePage() {
                 </span>
 
                 <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
-                  Transactions on the Studio App rely on secure, compliant
+                  Transactions on the Xilolo App rely on secure, compliant
                   payment processing and clear rules for fees and taxes.
                 </span>
 

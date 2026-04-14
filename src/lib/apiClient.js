@@ -1,15 +1,11 @@
-// lib/apiClient.js
 import axios from "axios";
-import { showError } from "../component/ui/toast"; // <-- adjust path if different
-import { clearActiveAuthStorage } from "./authStorage";
+import { showError } from "../component/ui/toast";
+import { emitForcedLogout } from "./authSessionSignals";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
 });
 
-/**
- * Helper to attach bearer header per request without piling interceptors
- */
 export function authHeaders(token) {
   const brToken = localStorage.getItem("token");
   const finalToken = token || brToken;
@@ -21,7 +17,6 @@ export function authHeaders(token) {
     : {};
 }
 
-// prevent repeated spam toasts for the same situation
 let lastDeactivatedToastAt = 0;
 const DEACTIVATED_TOAST_COOLDOWN_MS = 8000;
 
@@ -33,8 +28,22 @@ function maybeToastDeactivated(payload) {
   lastDeactivatedToastAt = now;
 
   const when = payload.deactivation_requested_at || "recently";
-  // keep it short and clear
   showError(`Account deactivated (${when}). Please reactivate to continue.`);
+}
+
+function resolveUnauthorizedReason(payload) {
+  const message = String(payload?.message || "").toLowerCase();
+
+  if (
+    message.includes("another device") ||
+    message.includes("logged in on another") ||
+    message.includes("logged in elsewhere") ||
+    message.includes("session revoked")
+  ) {
+    return "another_device";
+  }
+
+  return "session_invalid";
 }
 
 api.interceptors.response.use(
@@ -43,7 +52,6 @@ api.interceptors.response.use(
     const status = error?.response?.status;
     const url = error?.config?.url || "";
 
-    // Network / CORS / server not reachable -> no response object
     if (!error.response) {
       if (!import.meta.env.PROD) {
         console.warn("[api] Network or CORS error (no response)", error);
@@ -57,26 +65,25 @@ api.interceptors.response.use(
       console.log("[api] response status:", status, "url:", url);
     }
 
-    // ---- 403 handling (deactivated account) ----
     if (status === 403) {
       maybeToastDeactivated(payload);
       return Promise.reject(error);
     }
 
-    // For non-401, just bubble up
     if (status !== 401) {
       return Promise.reject(error);
     }
 
-    // ---- 401 handling ----
-    if (!import.meta.env.PROD) {
-      console.warn("[api] 401 in dev – NOT redirecting, just rejecting.");
-      return Promise.reject(error);
-    }
-
-    if (window.location.pathname !== "/auth/signin") {
-      clearActiveAuthStorage();
-      window.location.replace("/auth/signin");
+    if (typeof window !== "undefined") {
+      const reason = resolveUnauthorizedReason(payload);
+      emitForcedLogout({
+        reason,
+        message:
+          reason === "another_device"
+            ? "You have been logged out because you have logged in on another device."
+            : payload?.message ||
+              "Your session is no longer valid. Please sign in again.",
+      });
     }
 
     return Promise.reject(error);

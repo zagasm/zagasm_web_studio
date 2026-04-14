@@ -255,7 +255,10 @@ export default function ViewProfile() {
   };
 
   return (
-    <div className="tw:font-sans tw:bg-white tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden">
+    <div
+      data-bounce-page="profile"
+      className="tw:font-sans tw:bg-white tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden"
+    >
       {/* top bar */}
       <div className="tw:bg-white tw:w-full tw:pt-20 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
         <div className="tw:max-w-2xl tw:mx-auto tw:flex tw:items-center tw:justify-between tw:px-4">

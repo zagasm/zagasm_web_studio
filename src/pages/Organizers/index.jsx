@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SEO from "../../component/SEO";
 import { useAuth } from "../auth/AuthContext";
 import { useInView } from "react-intersection-observer";
@@ -101,12 +101,35 @@ export default function AllOrganizers() {
   const top3 = useMemo(() => organizers.slice(0, 3), [organizers]);
   const rest = useMemo(() => organizers.slice(3), [organizers]);
 
-  const [followLoading, setFollowLoading] = useState({});
+  const pendingFollowRef = useRef({});
 
   const toggleFollow = async (organizerUserId) => {
-    if (!organizerUserId) return;
+    if (!organizerUserId || pendingFollowRef.current[organizerUserId]) return;
 
-    setFollowLoading((p) => ({ ...p, [organizerUserId]: true }));
+    let previousFollowing = false;
+    pendingFollowRef.current[organizerUserId] = true;
+
+    setOrganizers((prev) =>
+      prev.map((o) => {
+        if (o.userId !== organizerUserId) {
+          return o;
+        }
+
+        previousFollowing = !!(o.isFollowing ?? o.following);
+        const nextFollowing = !previousFollowing;
+
+        return {
+          ...o,
+          isFollowing: nextFollowing,
+          following: nextFollowing,
+          numberOfFollowers: Math.max(
+            0,
+            Number(o?.numberOfFollowers ?? 0) + (nextFollowing ? 1 : -1)
+          ),
+        };
+      })
+    );
+
     try {
       const { data: result } = await api.post(
         `/api/v1/follow/${organizerUserId}`,
@@ -121,21 +144,41 @@ export default function AllOrganizers() {
       setOrganizers((prev) =>
         prev.map((o) =>
           o.userId === organizerUserId
-            ? { ...o, isFollowing: isNowFollowing, following: isNowFollowing }
+            ? {
+                ...o,
+                isFollowing: isNowFollowing,
+                following: isNowFollowing,
+              }
             : o
         )
       );
 
-      showSuccess(
-        result?.message ||
-        (isNowFollowing
-          ? "User followed successfully"
-          : "User unfollowed successfully")
-      );
+      // showSuccess(
+      //   result?.message ||
+      //   (isNowFollowing
+      //     ? "User followed successfully"
+      //     : "User unfollowed successfully")
+      // );
     } catch (e) {
+      setOrganizers((prev) =>
+        prev.map((o) =>
+          o.userId === organizerUserId
+            ? {
+                ...o,
+                isFollowing: previousFollowing,
+                following: previousFollowing,
+                numberOfFollowers: Math.max(
+                  0,
+                  Number(o?.numberOfFollowers ?? 0) +
+                    (previousFollowing ? 1 : -1)
+                ),
+              }
+            : o
+        )
+      );
       showError("Something went wrong. Try again.");
     } finally {
-      setFollowLoading((p) => ({ ...p, [organizerUserId]: false }));
+      delete pendingFollowRef.current[organizerUserId];
     }
   };
 
@@ -190,7 +233,6 @@ export default function AllOrganizers() {
                 <PodiumSection
                   top3={top3}
                   onToggleFollow={toggleFollow}
-                  followLoading={followLoading}
                 />
 
                 <div className="tw:mt-6 tw:space-y-3">
@@ -199,7 +241,6 @@ export default function AllOrganizers() {
                       key={org.id}
                       org={org}
                       onToggleFollow={toggleFollow}
-                      loading={!!followLoading[org.userId]}
                     />
                   ))}
                 </div>

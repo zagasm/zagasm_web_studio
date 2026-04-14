@@ -68,7 +68,7 @@ function Marketing() {
       <section className="section alt slide-up">
         <h2>Go Live in 3 Simple Steps</h2>
         <ol>
-          <li>Sign Up: Create your studio profile and connect payouts.</li>
+          <li>Sign Up: Create your Xilolo profile and connect payouts.</li>
           <li>
             Set Up: Add your stream or venue details, pricing, and schedule.
           </li>
@@ -199,7 +199,7 @@ function Marketing() {
               </div>
               {/* If you want a web CTA too, add it here:
               <div className="mt-3">
-                <a href="/studio" className="cta small">Open Studio on Web</a>
+                <a href="/studio" className="cta small">Open Xilolo on Web</a>
               </div>
               */}
             </div>

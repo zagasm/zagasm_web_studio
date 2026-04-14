@@ -4,7 +4,6 @@ import "./style.css";
 import { motion } from "framer-motion";
 
 import { Link } from "react-router-dom";
-import googleLogo from "../../../assets/google-logo.png";
 function AuthContainer({
   title,
   description,
@@ -14,6 +13,7 @@ function AuthContainer({
   header,
   haveAccount,
   privacy,
+  socialSlot,
 }) {
   // const images = [slider1, slider2, slider3];
   // const [currentImage, setCurrentImage] = useState(0);
@@ -76,54 +76,11 @@ function AuthContainer({
                   )}
                 </div>
                 {children}
-                {/* {footer && (
-                  <>
-                    {" "}
-                    <div
-                      style={{ maxWidth: "100%" }}
-                      className="text-center mt-4"
-                    >
-                      <p className="small text-muted mb-3">Or continue with</p>
-                      <div className="row">
-                        <div className="col-lg-11 mb-2 m-auto">
-                          <motion.button
-                            initial={{ opacity: 0, y: 70 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.9, ease: "easeOut" }}
-                            type="button"
-                            style={{
-                              borderRadius: 19
-                            }}
-                            className=" tw:w-full tw:flex tw:items-center tw:justify-center tw:md:gap-1 tw:py-4 tw:border tw:border-gray-100 tw:rounded-xl "
-                          >
-                            <img
-                              src={googleLogo}
-                              alt="Google Logo"
-                              className=""
-                              style={{
-                                width: "20px",
-                                height: "20px",
-                                marginTop: "-5px",
-                              }}
-                            />
-                            <span>Google</span>
-                          </motion.button>
-                        </div>
-                        <div className="col-lg-11 m-auto">
-                          <motion.button
-                            initial={{ opacity: 0, y: 70 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.9, ease: "easeOut" }}
-                            type="button"
-                            className=" api_btn dark_apple_api_btn btn-block"
-                          >
-                            <i className="fab fa-apple mr-2"></i> Apple
-                          </motion.button>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )} */}
+                {footer && socialSlot ? (
+                  <div style={{ maxWidth: "100%" }} className="text-center mt-4">
+                    {socialSlot}
+                  </div>
+                ) : null}
                 {haveAccount ? (
                   <div className="text-center footer_text mt-4 ">
                     Don't have an account?{" "}

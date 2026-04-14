@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock3, Search, X } from "lucide-react";
+import "keen-slider/keen-slider.min.css";
+import { useKeenSlider } from "keen-slider/react";
 
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
@@ -78,13 +80,17 @@ function getPersonId(item) {
 
   // organiser result
   if (item?.type === "organiser") {
+    if (typeof data.organiser === "object" && data.organiser?.userId)
+      return data.organiser.userId;
+    if (typeof data.organiser === "object" && data.organiser?.user_id)
+      return data.organiser.user_id;
     if (typeof data.organiser === "object" && data.organiser?.id)
       return data.organiser.id;
-    return data.id || data.userId || null;
+    return data.userId || data.user_id || data.id || null;
   }
 
   // user result
-  return data.id || data.userId || null;
+  return data.userId || data.user_id || data.id || null;
 }
 
 function getAvatarUrl(item) {
@@ -137,10 +143,10 @@ function CompactEventRow({ event, index = null, onClick }) {
           <span>{event?.title || "Untitled event"}</span>
           
         </div>
-        <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+        <div className="tw:mt-1 tw:text-[11px] tw:md:text-sm tw:text-slate-500">
           Organised by {organiser}
           {hasActiveSubscription ? (
-            <SubscriptionBadge className="tw:size-4 tw:ml-1" />
+            <SubscriptionBadge className="tw:size-3 tw:md:size-4 tw:ml-1" />
           ) : null}
         </div>
 
@@ -223,6 +229,43 @@ function PersonRow({ item, onClick }) {
   );
 }
 
+function PersonSliderCard({ item, onClick }) {
+  const name = getDisplayName(item);
+  const avatarUrl = getAvatarUrl(item);
+  const initials = initialsFromName(name);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [avatarUrl]);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:transition hover:tw:border-slate-300 hover:tw:bg-slate-50"
+    >
+      <div className="tw:flex tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple">
+        {avatarUrl && !avatarFailed ? (
+          <img
+            src={avatarUrl}
+            alt={name}
+            className="tw:h-full tw:w-full tw:object-cover"
+            onError={() => setAvatarFailed(true)}
+          />
+        ) : (
+          <span className="tw:text-primary tw:text-sm tw:font-semibold">
+            {initials}
+          </span>
+        )}
+      </div>
+      <span className="tw:line-clamp-2 tw:min-h-[40px] tw:text-sm tw:font-semibold tw:text-slate-900">
+        {name}
+      </span>
+    </button>
+  );
+}
+
 export default function SearchPage() {
   const navigate = useNavigate();
   const { token } = useAuth() || {};
@@ -235,6 +278,27 @@ export default function SearchPage() {
 
   const [trendingEvents, setTrendingEvents] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(false);
+  const [peopleSliderRef] = useKeenSlider({
+    slides: {
+      perView: 2.1,
+      spacing: 12,
+    },
+    breakpoints: {
+      "(min-width: 640px)": {
+        slides: {
+          perView: 3.2,
+          spacing: 14,
+        },
+      },
+      "(min-width: 1024px)": {
+        slides: {
+          perView: 5,
+          spacing: 16,
+        },
+      },
+    },
+    rubberband: false,
+  });
 
   const fetchTrending = async () => {
     try {
@@ -425,20 +489,24 @@ export default function SearchPage() {
         {showPeopleSection && (
           <section className="tw:mb-8">
             <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
-              Recent Searches
+              {people.length > 0 ? "Users" : "Recent Searches"}
             </div>
 
-            <div className="tw:flex tw:flex-col tw:gap-1">
+            <div ref={peopleSliderRef} className="keen-slider">
               {peopleToShow.map((item) => (
-                <PersonRow
+                <div
                   key={`${item.type}-${item.data.id}`}
-                  item={item}
-                  onClick={() => {
-                    const id = getPersonId(item);
-                    if (!id) return;
-                    navigate(`/profile/${id}`);
-                  }}
-                />
+                  className="keen-slider__slide"
+                >
+                  <PersonSliderCard
+                    item={item}
+                    onClick={() => {
+                      const id = getPersonId(item);
+                      if (!id) return;
+                      navigate(`/profile/${id}`);
+                    }}
+                  />
+                </div>
               ))}
             </div>
           </section>
