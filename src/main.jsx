@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as ReduxProvider } from "react-redux";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./assets/vendor/icons/feather.css";
@@ -35,6 +36,8 @@ const queryClient = new QueryClient({
   },
 });
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
 const RootWrapper = () => {
   const { user } = useAuth();
 
@@ -45,16 +48,30 @@ const RootWrapper = () => {
   );
 };
 
+const GoogleProviderBoundary = ({ children }) => {
+  if (!GOOGLE_CLIENT_ID) {
+    return children;
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      {children}
+    </GoogleOAuthProvider>
+  );
+};
+
 createRoot(document.getElementById("root")).render(
   <ReduxProvider store={store}>
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <ModalProvider>
-            <RootWrapper />
-          </ModalProvider>
-        </HelmetProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <GoogleProviderBoundary>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <HelmetProvider>
+            <ModalProvider>
+              <RootWrapper />
+            </ModalProvider>
+          </HelmetProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </GoogleProviderBoundary>
   </ReduxProvider>
 );

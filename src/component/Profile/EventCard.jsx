@@ -396,7 +396,7 @@ export default function EventCard({
             className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
             <span className="tw:mr-2">
-              {isOrganiserProfile ? "Join event" : "View event"}
+              {isOrganiserProfile ? "Buy Ticket" : "View event"}
             </span>
           </button>
         )}

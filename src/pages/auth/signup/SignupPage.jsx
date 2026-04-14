@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
@@ -7,8 +7,10 @@ import axios from "axios";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { api } from "../../../lib/apiClient";
+import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 export function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +18,7 @@ export function SignUp() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [emailExistsError, setEmailExistsError] = useState("");
   const [checkedEmail, setCheckedEmail] = useState("");
   const emailCheckRequestId = useRef(0);
@@ -24,6 +27,7 @@ export function SignUp() {
     label: "",
     class: ""
   });
+  const showBlackEmailHint = Boolean(emailExistsError);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -118,7 +122,7 @@ export function SignUp() {
       setCheckedEmail(trimmedEmail);
       setEmailExistsError(
         data?.exists
-          ? "This email is already in use. Please use another email."
+          ? "This email is already in use. Please "
           : ""
       );
       return Boolean(data?.exists);
@@ -204,6 +208,49 @@ export function SignUp() {
     }
   };
 
+  const handleGoogleSignup = async (googleResponse) => {
+    const idToken = googleResponse?.credential;
+    if (!idToken) {
+      showError("Google sign up could not be completed.");
+      return;
+    }
+
+    setIsGoogleLoading(true);
+
+    try {
+      const { data } = await api.post("/api/v1/google/signup", {
+        id_token: idToken,
+        device_name: navigator.userAgent || "Web Browser",
+      });
+
+      if (!data?.token || !data?.user) {
+        throw new Error("Invalid Google signup response.");
+      }
+
+      login({
+        token: data.token,
+        user: data.user,
+      });
+      showSuccess(data.message || "Google sign up successful.");
+      navigate("/feed", { replace: true });
+    } catch (err) {
+      const status = err?.response?.status;
+      const message =
+        err?.response?.data?.message || "Google sign up failed.";
+
+      showError(message);
+
+      if (status === 422) {
+        navigate("/auth/signin", {
+          replace: true,
+          state: { googleAuthHint: "login" },
+        });
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   const isFormValid = () => {
     return (
       formData.first_name.trim() !== "" &&
@@ -221,6 +268,16 @@ export function SignUp() {
       header={true}
       privacy={true}
       haveAccount={false}
+      socialSlot={
+        GOOGLE_CLIENT_ID ? (
+          <GoogleAuthSection
+            label={isGoogleLoading ? "Connecting to Google..." : "Or sign up with"}
+            text="signup_with"
+            onSuccess={handleGoogleSignup}
+            onError={() => showError("Google sign up was cancelled or failed.")}
+          />
+        ) : null
+      }
     >
       <form autoComplete="off" className="" onSubmit={handleSubmit}>
         {error && (
@@ -313,8 +370,19 @@ export function SignUp() {
             value={formData.email}
             onChange={handleChange}
             required
-            error={Boolean(emailExistsError)}
-            helperText={emailExistsError || " "}
+            error={false}
+            helperText={
+              emailExistsError ? (
+                <span className="tw:inline-flex tw:flex-wrap tw:items-center tw:gap-1 tw:text-black">
+                  {emailExistsError}{" "}
+                  <Link to="/auth/signin" className="tw:font-semibold tw:underline">
+                    Log in
+                  </Link>
+                </span>
+              ) : (
+                " "
+              )
+            }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -326,6 +394,11 @@ export function SignUp() {
               "& .MuiOutlinedInput-root": {
                 borderRadius: "8px",
                 backgroundColor: "#fff",
+              },
+              "& .MuiFormHelperText-root": {
+                color: showBlackEmailHint ? "#111111" : undefined,
+                marginLeft: 0,
+                whiteSpace: "nowrap",
               },
             }}
           />

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { showSuccess, showError } from "../../../component/ui/toast";
 import { useAuth } from "../AuthContext";
+import { api, authHeaders } from "../../../lib/apiClient";
 
 export function ChangePassword({ ResetPasswordVerificationData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -82,24 +82,53 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
       );
 
       const data = response.data;
-      const nextUser = data?.user || data?.data?.user || null;
-      const nextToken = data?.token || data?.data?.token || null;
+      const nextToken =
+        data?.token ||
+        data?.data?.token ||
+        data?.access_token ||
+        data?.data?.access_token ||
+        null;
+      let nextUser =
+        data?.user ||
+        data?.data?.user ||
+        data?.data?.profile ||
+        data?.profile ||
+        null;
 
-      if (data.message && nextUser && nextToken) {
-        showSuccess(data.message);
+      if (nextToken && !nextUser) {
+        try {
+          const profileResponse = await api.get(
+            "/api/v1/profile",
+            authHeaders(nextToken)
+          );
+          const profilePayload =
+            profileResponse?.data?.data || profileResponse?.data || {};
+          nextUser = profilePayload?.user || profilePayload || null;
+        } catch (profileError) {
+          console.error("Failed to fetch profile after password reset", profileError);
+        }
+      }
+
+      if (nextToken && nextUser) {
+        showSuccess(data?.message || "Password reset successful.");
         login({
           user: nextUser,
           token: nextToken,
+          organiser:
+            data?.organiser ||
+            data?.data?.organiser ||
+            nextUser?.organiser ||
+            nextUser?.organizer ||
+            null,
         });
-        setTimeout(() => {
-          navigate("/feed", { replace: true });
-        }, 500);
-      } else {
-        showError(
-          "Password reset succeeded, but automatic sign-in is unavailable. Please sign in manually."
-        );
-        navigate("/auth/signin", { replace: true });
+        navigate("/feed", { replace: true });
+        return;
       }
+
+      showError(
+        "Password reset succeeded, but automatic sign-in is unavailable. Please sign in manually."
+      );
+      navigate("/auth/signin", { replace: true });
     } catch (err) {
       let errorMessage = "An error occurred. Please try again.";
       

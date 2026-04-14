@@ -106,14 +106,14 @@ function TicketsPage() {
     <div className="tw:font-sans">
       <div className="tw:w-full tw:min-h-screen tw:bg-white tw:py-20 tw:md:pt-24 tw:lg:px-4">
         <div className="account_section" style={{ padding: 0 }}>
-          <div className="tw:px-4 tw:py-4 tw:md:px-8 tw:md:py-8">
+          <div className="tw:px-2 tw:py-4 tw:md:px-8 tw:md:py-8">
             <div className="tw:flex tw:flex-col tw:gap-6">
               {/* Header */}
               <div className="tw:flex tw:flex-col tw:gap-1">
-                <span className="tw:text-2xl tw:md:text-3xl tw:font-bold tw:text-gray-900">
+                <span className="tw:text-xl tw:md:text-3xl tw:font-bold tw:text-gray-900">
                   Tickets
                 </span>
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-gray-500">
+                <span className="tw:block tw:text-xs tw:md:text-base tw:text-gray-500">
                   Access all your event tickets in one place.
                 </span>
               </div>
@@ -133,7 +133,7 @@ function TicketsPage() {
                         type="button"
                         onClick={() => setActiveTab(tab.key)}
                         className={[
-                          "tw:px-4 tw:py-2 tw:rounded-full tw:text-sm tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150",
+                          "tw:px-3 tw:py-2 tw:rounded-full tw:text-xs tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150 tw:md:px-4 tw:md:text-sm",
                           active
                             ? "tw:bg-primary tw:text-white tw:shadow-sm"
                             : "tw:text-gray-500 tw:hover:text-gray-900",
@@ -148,7 +148,7 @@ function TicketsPage() {
 
               {/* Error state */}
               {error && (
-                <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-red-50 tw:border tw:border-red-100 tw:px-4 tw:py-3 tw:text-sm tw:text-red-700">
+                <div className="tw:flex tw:items-center tw:justify-between tw:rounded-2xl tw:bg-red-50 tw:border tw:border-red-100 tw:px-4 tw:py-3 tw:text-xs tw:text-red-700 tw:md:text-sm">
                   <span>{error}</span>
                   <button
                     onClick={fetchTickets}
@@ -173,13 +173,13 @@ function TicketsPage() {
               {/* Empty state */}
               {showEmpty && (
                 <div className="tw:mt-6 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center tw:py-10 tw:bg-white tw:rounded-3xl">
-                  <div className="tw:text-4xl">
-                    <TicketIcon className="tw:text-primary" size={40} />
+                  <div className="tw:text-3xl tw:md:text-4xl">
+                    <TicketIcon className="tw:text-primary" size={32} />
                   </div>
-                  <span className="tw:text-base tw:font-medium tw:text-gray-900">
+                  <span className="tw:text-sm tw:font-medium tw:text-gray-900 tw:md:text-base">
                     No tickets yet
                   </span>
-                  <span className="tw:text-sm tw:text-gray-500 tw:max-w-md">
+                  <span className="tw:text-xs tw:text-gray-500 tw:max-w-md tw:md:text-sm">
                     When you buy tickets to an event, they will appear here with
                     their receipt and details.
                   </span>
@@ -206,7 +206,7 @@ function TicketsPage() {
 
               {/* No tickets in current tab but there are in others */}
               {!loading && !showEmpty && filteredTickets.length === 0 && (
-                <div className="tw:py-10 tw:text-center tw:text-gray-500">
+                <div className="tw:py-10 tw:text-center tw:text-sm tw:text-gray-500 tw:md:text-base">
                   No {activeTab} tickets right now.
                 </div>
               )}

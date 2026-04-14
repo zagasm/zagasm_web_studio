@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
@@ -15,7 +15,7 @@ export default function MobileSingleOrganizers() {
 
   const [organizers, setOrganizers] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
-  const [followLoading, setFollowLoading] = useState({});
+  const pendingFollowRef = useRef({});
   const { token } = useAuth();
 
   // stable ids (your payload has BOTH id and userId)
@@ -80,9 +80,31 @@ export default function MobileSingleOrganizers() {
   };
 
   const toggleFollow = async (followUserId) => {
-    if (!followUserId) return;
+    if (!followUserId || pendingFollowRef.current[followUserId]) return;
 
-    setFollowLoading((prev) => ({ ...prev, [followUserId]: true }));
+    let previousFollowing = false;
+    pendingFollowRef.current[followUserId] = true;
+
+    setOrganizers((prev) =>
+      prev.map((org) => {
+        if (org?.userId !== followUserId) {
+          return org;
+        }
+
+        previousFollowing = deriveIsFollowing(org);
+        const nextFollowing = !previousFollowing;
+
+        return {
+          ...org,
+          isFollowing: nextFollowing,
+          following: nextFollowing,
+          numberOfFollowers: Math.max(
+            0,
+            Number(org?.numberOfFollowers ?? 0) + (nextFollowing ? 1 : -1)
+          ),
+        };
+      })
+    );
 
     try {
       const res = await api.post(
@@ -105,15 +127,35 @@ export default function MobileSingleOrganizers() {
       setOrganizers((prev) =>
         prev.map((org) =>
           org?.userId === followUserId
-            ? { ...org, isFollowing: newFollowing, following: newFollowing }
+            ? {
+                ...org,
+                isFollowing: newFollowing,
+                following: newFollowing,
+              }
             : org
         )
       );
     } catch (e) {
+      setOrganizers((prev) =>
+        prev.map((org) =>
+          org?.userId === followUserId
+            ? {
+                ...org,
+                isFollowing: previousFollowing,
+                following: previousFollowing,
+                numberOfFollowers: Math.max(
+                  0,
+                  Number(org?.numberOfFollowers ?? 0) +
+                    (previousFollowing ? 1 : -1)
+                ),
+              }
+            : org
+        )
+      );
       console.error("Error toggling follow:", e);
       showError("Something went wrong. Please try again.");
     } finally {
-      setFollowLoading((prev) => ({ ...prev, [followUserId]: false }));
+      delete pendingFollowRef.current[followUserId];
     }
   };
 
@@ -189,7 +231,6 @@ export default function MobileSingleOrganizers() {
               "Organizer";
 
             const isFollowing = deriveIsFollowing(organizer);
-            const isBusy = !!followLoading[followUserId];
             const showImage = hasValidProfileImage(organizer.profileImage);
             const initials = getInitials(organizer);
 
@@ -223,71 +264,43 @@ export default function MobileSingleOrganizers() {
 
                     <div className="tw:min-w-0 tw:flex-1">
                       <div className="tw:flex tw:items-center">
-                        <span className="tw:block tw:text-xs tw:font-medium tw:truncate">
+                        <span className="tw:block tw:text-xs tw:font-medium tw:truncate tw:first-letter:capitalize">
                           {truncate(name, 14)}
                         </span>
                         {(organizer.has_active_subscription || organizer.plan) && (
-                          <SubscriptionBadge className="tw:size-4" />
+                          <SubscriptionBadge className="tw:size-3 tw:ml-1" />
                         )}
                       </div>
-
-                      <span className="tw:block tw:text-[8px] tw:text-gray-500 tw:truncate">
-                        {organizer.totalEventsCreated || "No"} Events created
-                      </span>
                     </div>
                   </div>
 
                   {/* FOLLOW BUTTON: stopPropagation so it doesn't open profile */}
                   <button
-                    style={{ borderRadius: 6 }}
+                    style={{ borderRadius: 6, fontSize: 11 }}
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleFollow(followUserId);
                     }}
-                    disabled={isBusy || !followUserId}
+                    disabled={!followUserId}
                     className={`tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-xl tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:ring-1 tw:transition
                       ${
                         isFollowing
                           ? "tw:bg-primary tw:text-white tw:ring-primary"
                           : "tw:bg-lightPurple tw:text-black tw:ring-transparent tw:hover:bg-primary/10"
-                      } ${isBusy ? "tw:opacity-70 tw:cursor-not-allowed" : ""}`}
+                      }`}
                   >
-                    {isBusy ? (
-                      <svg
-                        className="tw:size-4 tw:animate-spin"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="tw:opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          fill="none"
-                        />
-                        <path
-                          className="tw:opacity-90"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 0 1 8-8v4A4 4 0 0 0 8 12H4z"
-                        />
-                      </svg>
-                    ) : (
-                      <>
-                        <span className="tw:text-[10px]">
-                          {isFollowing ? "Unfollow" : "Follow"}
-                        </span>
-                        <i
-                          className={
-                            isFollowing
-                              ? "feather-user-check"
-                              : "feather-user-plus"
-                          }
-                          aria-hidden
-                        />
-                      </>
-                    )}
+                    <span className="tw:text-[10px]">
+                      {isFollowing ? "Unfollow" : "Follow"}
+                    </span>
+                    <i
+                      className={
+                        isFollowing
+                          ? "feather-user-check"
+                          : "feather-user-plus"
+                      }
+                      aria-hidden
+                    />
                   </button>
                 </div>
               </SwiperSlide>

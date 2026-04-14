@@ -16,7 +16,7 @@ import EventReviewsSection from "../../component/Events/EventReviewsSection.jsx"
 import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 import { formatEventDateTime } from "../../utils/ui";
 import { api, authHeaders } from "../../lib/apiClient";
-import { ToastHost, showError, showSuccess } from "../../component/ui/toast";
+import { showError, showSuccess } from "../../component/ui/toast";
 import FundWalletModal from "../../features/wallet/components/FundWalletModal";
 import TicketPurchaseSuccessModal from "../../features/wallet/components/TicketPurchaseSuccessModal";
 import WalletFundingRequiredModal from "../../features/wallet/components/WalletFundingRequiredModal";
@@ -119,18 +119,16 @@ export default function SharedEventPage() {
   const startsInLabel = formatStartsInLabel(startDate);
 
   useEffect(() => {
-    setLocalEvent(sharedEventQuery.data?.event || null);
-  }, [sharedEventQuery.data?.event]);
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.pointerEvents = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, []);
 
   useEffect(() => {
-    if (!event?.id && !sharePayload?.url) return;
-
-    shareFlow.prefetchShare({
-      eventId: event?.id,
-      initialPayload:
-        sharePayload || normalizeSharePayload({ event, share: sharePayload }),
-    });
-  }, [event?.id, event, shareFlow.prefetchShare, sharePayload]);
+    setLocalEvent(sharedEventQuery.data?.event || null);
+  }, [sharedEventQuery.data?.event]);
 
   const purchaseTicketMutation = usePurchaseTicketWithWallet({
     onSuccess: (payload) => {
@@ -414,8 +412,6 @@ export default function SharedEventPage() {
 
   return (
     <>
-      <ToastHost />
-
       <SEO
         title={event?.title || "Shared Event"}
         description={description}

@@ -112,7 +112,11 @@ export default function EventActionsSheet({
   const [reporting, setReporting] = useState(false);
   const [selectedReason, setSelectedReason] = useState("Spam");
 
-  const hostId = event?.hostId;
+  const hostId =
+    event?.organiserUserId ||
+    event?.hostId ||
+    event?.organiserId ||
+    event?.organiser_id;
   const hostName = event?.hostName || "Organizer";
   const hostImage = event?.hostImage;
   const posterUrl = firstImageFromPosterLocal(event?.poster);
@@ -262,7 +266,7 @@ export default function EventActionsSheet({
   const goToHostProfile = (e) => {
     e?.stopPropagation?.();
     if (!hostId) return;
-    navigate(`/profile/${event.organiser_id}`);
+    navigate(`/profile/${hostId}`);
     onClose?.();
   };
 

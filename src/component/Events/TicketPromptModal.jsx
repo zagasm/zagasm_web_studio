@@ -115,7 +115,7 @@ export default function TicketPromptModal({
           <DialogBackdrop className="tw:fixed tw:inset-0 tw:z-40 tw:bg-black/60" />
         </Transition.Child>
 
-        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:p-4">
+        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:p-2 tw:sm:items-center tw:sm:p-4">
           <Transition.Child
             as={Fragment}
             enter="tw:ease-out tw:duration-300"
@@ -125,8 +125,8 @@ export default function TicketPromptModal({
             leaveFrom="tw:opacity-100 tw:scale-100"
             leaveTo="tw:opacity-0 tw:scale-95"
           >
-            <DialogPanel className="tw:relative tw:z-50 tw:w-full tw:max-w-xl tw:overflow-hidden tw:rounded-3xl tw:bg-white tw:p-6 tw:text-left tw:shadow-xl">
-              <div className="tw:flex tw:justify-end">
+            <DialogPanel className="tw:relative tw:z-50 tw:flex tw:w-full tw:max-w-xl tw:max-h-[86dvh] tw:flex-col tw:overflow-hidden tw:rounded-2xl tw:bg-white tw:p-2 tw:text-left tw:shadow-xl tw:sm:max-h-[88vh] tw:sm:rounded-3xl tw:sm:p-6">
+              <div className="tw:flex tw:justify-end tw:pb-1 tw:sm:pb-2">
                 <button
                   type="button"
                   onClick={onClose}
@@ -136,128 +136,133 @@ export default function TicketPromptModal({
                 </button>
               </div>
 
-              <div className="tw:space-y-5">
-                <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-[220px_minmax(0,1fr)]">
-                  <div className="tw:rounded-2xl tw:overflow-hidden tw:bg-gray-100 tw:shadow-inner">
-                    <img
-                      src={poster}
-                      alt={event?.title || "Event"}
-                      className="tw:h-full tw:min-h-[180px] tw:w-full tw:object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="tw:space-y-3">
-                    <div className="tw:space-y-1">
-                      <span className="tw:block tw:text-xl tw:font-semibold tw:text-gray-900">
-                        {event?.title}
-                      </span>
-                      <span className="tw:block tw:text-sm tw:text-gray-500">{dateLabel}</span>
+              <div className="tw:flex-1 tw:overflow-y-auto tw:pr-1">
+                <div className="tw:space-y-2 tw:sm:space-y-5">
+                  <div className="tw:grid tw:grid-cols-1 tw:gap-1.5 tw:sm:gap-4 tw:md:grid-cols-[220px_minmax(0,1fr)]">
+                    <div className="tw:hidden tw:md:block tw:overflow-hidden tw:rounded-2xl tw:bg-gray-100 tw:shadow-inner">
+                      <img
+                        src={poster}
+                        alt={event?.title || "Event"}
+                        className="tw:h-20 tw:w-full tw:object-cover tw:sm:h-36 tw:md:h-full tw:md:min-h-[180px]"
+                        loading="lazy"
+                      />
                     </div>
 
-                    <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-4">
-                      <span className="tw:block tw:text-sm tw:text-gray-500">Ticket price</span>
-                      <span className="tw:block tw:text-2xl tw:font-bold tw:text-black">
-                        {priceLabel}
-                      </span>
-                    </div>
-
-                    {manual?.available && (
-                      <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-4">
-                        <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
-                          <div className="tw:flex tw:items-center tw:gap-2">
-                            <span className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[#f3f4ff] tw:text-primary">
-                              <FileText className="tw:h-4 tw:w-4" />
-                            </span>
-                            <div>
-                              <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                                Event manual
-                              </div>
-                              <div className="tw:text-xs tw:text-slate-500">
-                                {manual?.file_name || "Soft-copy manual"}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                            {manual?.price_display || "Included"}
-                          </div>
-                        </div>
-
-                        {hasManualAccess ? (
-                          <button
-                            type="button"
-                            onClick={onDownloadManual}
-                            className="tw:mt-4 tw:w-full tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:py-3 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/10"
-                          >
-                            Download manual
-                          </button>
-                        ) : null}
+                    <div className="tw:space-y-1.5 tw:sm:space-y-3">
+                      <div className="tw:space-y-1">
+                        <span className="tw:block tw:text-base tw:font-semibold tw:text-gray-900 tw:sm:text-lg tw:md:text-xl">
+                          {event?.title}
+                        </span>
+                        <span className="tw:block tw:text-[11px] tw:text-gray-500 tw:sm:text-sm">
+                          {dateLabel}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                </div>
 
-                {!hasManualAccess && options.length > 0 && (
-                  <div className="tw:space-y-3">
-                    <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                      Choose access
-                    </div>
-                    <div className="tw:grid tw:grid-cols-1 tw:gap-3">
-                      {options.map((option) => {
-                        const selected = option.value === selectedPurchaseType;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => setSelectedPurchaseType(option.value)}
-                            className={`tw:rounded-2xl tw:border tw:px-4 tw:py-3 tw:text-left tw:transition ${
-                              selected
-                                ? "tw:border-primary tw:bg-primary/5"
-                                : "tw:border-gray-200 tw:bg-white hover:tw:border-primary/30"
-                            }`}
-                          >
-                            <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+                      <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-2 tw:sm:p-4">
+                        <span className="tw:block tw:text-[11px] tw:text-gray-500 tw:sm:text-sm">
+                          Ticket price
+                        </span>
+                        <span className="tw:block tw:text-lg tw:font-bold tw:text-black tw:sm:text-xl tw:md:text-2xl">
+                          {priceLabel}
+                        </span>
+                      </div>
+
+                      {manual?.available && (
+                        <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-2 tw:sm:p-4">
+                          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                            <div className="tw:flex tw:items-center tw:gap-2">
+                              <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[#f3f4ff] tw:text-primary">
+                                <FileText className="tw:h-4 tw:w-4" />
+                              </span>
                               <div>
-                                <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                                  {option.label}
+                                <div className="tw:text-xs tw:font-semibold tw:text-slate-900 tw:sm:text-sm">
+                                  Event manual
                                 </div>
-                                <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-500">
-                                  {option.description}
+                                <div className="tw:text-[10px] tw:text-slate-500 tw:sm:text-xs">
+                                  {manual?.file_name || "Soft-copy manual"}
                                 </div>
-                              </div>
-                              <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                                {option.amountLabel}
                               </div>
                             </div>
-                          </button>
-                        );
-                      })}
+                            <div className="tw:text-xs tw:font-semibold tw:text-slate-900 tw:sm:text-sm">
+                              {manual?.price_display || "Included"}
+                            </div>
+                          </div>
+
+                          {hasManualAccess ? (
+                            <button
+                              type="button"
+                              onClick={onDownloadManual}
+                              className="tw:mt-2 tw:w-full tw:rounded-[16px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/10"
+                            >
+                              Download manual
+                            </button>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
 
-                <div className="tw:flex tw:flex-col tw:gap-3">
-                  {selectedOption && (
-                    <button
-                      type="button"
-                      onClick={() => onBuy(selectedOption.value)}
-                      disabled={buying}
-                      className="tw:w-full tw:rounded-[20px] tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 hover:brightness-90 tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
-                      style={{ fontSize: 12, borderRadius: 16 }}
-                    >
-                      {buying
-                        ? "Processing purchase..."
-                        : `Continue with ${selectedOption.label} (${selectedOption.amountLabel})`}
-                    </button>
+                  {!hasManualAccess && options.length > 0 && (
+                    <div className="tw:space-y-2 tw:sm:space-y-3">
+                      <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                        Choose access
+                      </div>
+                      <div className="tw:grid tw:grid-cols-1 tw:gap-2">
+                        {options.map((option) => {
+                          const selected = option.value === selectedPurchaseType;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setSelectedPurchaseType(option.value)}
+                              className={`tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-left tw:transition ${
+                                selected
+                                  ? "tw:border-primary tw:bg-primary/5"
+                                  : "tw:border-gray-200 tw:bg-white hover:tw:border-primary/30"
+                              }`}
+                            >
+                              <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+                                <div>
+                                  <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                                    {option.label}
+                                  </div>
+                                  <div className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-slate-500 tw:sm:text-xs tw:sm:leading-5">
+                                    {option.description}
+                                  </div>
+                                </div>
+                                <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                                  {option.amountLabel}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="tw:w-full tw:rounded-[20px] tw:border tw:border-gray-200 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:duration-150 tw:hover:bg-gray-100"
-                  >
-                    Maybe later
-                  </button>
+                  <div className="tw:flex tw:flex-col tw:gap-2 tw:pb-1">
+                    {selectedOption && (
+                      <button
+                        type="button"
+                        onClick={() => onBuy(selectedOption.value)}
+                        disabled={buying}
+                        className="tw:w-full tw:rounded-[16px] tw:bg-primary tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 hover:brightness-90 tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                      >
+                        {buying
+                          ? "Processing purchase..."
+                          : `Continue with ${selectedOption.label} (${selectedOption.amountLabel})`}
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="tw:w-full tw:rounded-[16px] tw:border tw:border-gray-200 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:duration-150 tw:hover:bg-gray-100"
+                    >
+                      Maybe later
+                    </button>
+                  </div>
                 </div>
               </div>
             </DialogPanel>

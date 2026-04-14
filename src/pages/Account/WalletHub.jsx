@@ -10,7 +10,7 @@ import {
 const payoutItems = [
   {
     icon: Landmark,
-    label: "Request withdrawal",
+    label: "Request Payout",
     description: "View your balance, ticket sales, and submit a withdrawal request.",
     to: "/account/payouts/request",
   },

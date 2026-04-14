@@ -72,7 +72,7 @@ export default function CommunityGuidelinesPage() {
               >
                 <span className="tw:block">
                   Welcome to the Community Guidelines for the Xilolo App.
-                  The Studio App is a hub for creators, filmmakers, educators,
+                  The Xilolo App is a hub for creators, filmmakers, educators,
                   brands, and teams to produce videos, host live sessions,
                   manage projects, and monetize their work. These Guidelines set
                   the rules for keeping that space supportive, inclusive, and
@@ -173,7 +173,7 @@ export default function CommunityGuidelinesPage() {
                   </span>
 
                   <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
-                    To keep the Studio App family-friendly and suitable for
+                    To keep the Xilolo App family-friendly and suitable for
                     professional use, we enforce a full ban on adult sexual
                     content. This protects minors, supports brand safety, and
                     aligns with global content standards.
@@ -239,7 +239,7 @@ export default function CommunityGuidelinesPage() {
                   </span>
 
                   <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
-                    The Studio App cannot be used to promote, glamorize, or
+                    The Xilolo App cannot be used to promote, glamorize, or
                     instruct on crime or behavior that is likely to cause harm.
                   </span>
 
@@ -399,7 +399,7 @@ export default function CommunityGuidelinesPage() {
                   </span>
 
                   <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
-                    The Studio App is built for adults, but we still treat any
+                    The Xilolo App is built for adults, but we still treat any
                     involvement of minors with the highest caution.
                   </span>
 

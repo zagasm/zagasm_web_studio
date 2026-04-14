@@ -113,6 +113,26 @@ export function normalizeSharePayload(rawPayload = {}) {
 export function normalizeEventRecord(rawEvent) {
   if (!rawEvent) return null;
 
+  const organiserUserId =
+    rawEvent.organiser_user_id ||
+    rawEvent.organiserUserId ||
+    rawEvent.organiser?.user_id ||
+    rawEvent.organiser?.userId ||
+    rawEvent.organiser?.user?.id ||
+    rawEvent.organizer?.user_id ||
+    rawEvent.organizer?.userId ||
+    rawEvent.organizer?.user?.id ||
+    rawEvent.host?.user_id ||
+    rawEvent.host?.userId ||
+    rawEvent.host?.id ||
+    rawEvent.user_id ||
+    rawEvent.userId ||
+    rawEvent.user?.id ||
+    rawEvent.hostId ||
+    rawEvent.organiserId ||
+    rawEvent.organizerId ||
+    null;
+
   const poster =
     Array.isArray(rawEvent.poster) && rawEvent.poster.length > 0
       ? rawEvent.poster
@@ -151,18 +171,20 @@ export function normalizeEventRecord(rawEvent) {
     hostName:
       rawEvent.hostName ||
       rawEvent.userName ||
+      rawEvent.organiser?.organiser ||
+      rawEvent.organizer?.organiser ||
       rawEvent.organizer_name ||
       "Event Organizer",
+    organiserUserId,
     organiserId:
       rawEvent.organiserId ||
       rawEvent.organizerId ||
-      rawEvent.hostId ||
-      rawEvent.user_id,
+      organiserUserId,
     hostId:
+      organiserUserId ||
       rawEvent.hostId ||
       rawEvent.organiserId ||
-      rawEvent.organizerId ||
-      rawEvent.user_id,
+      rawEvent.organizerId,
     hostImage:
       rawEvent.hostImage ||
       rawEvent.host_image ||

@@ -67,9 +67,9 @@
 }
 
 .ticket-price-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #64748b;
 }
@@ -78,7 +78,7 @@
   display: block;
   overflow-wrap: anywhere;
   word-break: break-word;
-  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-size: clamp(0.9rem, 1.4vw, 1.2rem);
   line-height: 1.2;
   font-weight: 700;
   color: #0f172a;
@@ -141,5 +141,14 @@
 
   .ticket-divider::after {
     right: -30px;
+  }
+
+  .ticket-price-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .ticket-price-value {
+    font-size: 0.95rem;
   }
 }

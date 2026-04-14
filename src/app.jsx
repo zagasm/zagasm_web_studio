@@ -83,6 +83,7 @@ import SignalDeck from "./pages/SignalDeck/index.jsx";
 import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
 import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
 import WalletHub from "./pages/Account/WalletHub.jsx";
+import ForcedLogoutModalHost from "./component/auth/ForcedLogoutModalHost.jsx";
 
 const MainLayout = () => (
   <>
@@ -258,6 +259,7 @@ export function App() {
 
       <ToastHost />
       <ToastContainer />
+      <ForcedLogoutModalHost />
       <NetworkStatus />
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />

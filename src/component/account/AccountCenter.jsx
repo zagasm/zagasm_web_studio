@@ -153,6 +153,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
     try {
       const res = await api.get("/api/v1/profile", authHeaders(token));
       setAuth({ user: res?.data?.user, token });
+      await refreshUser?.();
       showSuccess("Account verified successfully!");
     } catch (error) {
       console.error(error);
@@ -327,7 +328,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                     {fullName}
                   </span>
                   {hasActiveSubscription ? (
-                    <SubscriptionBadge className="tw:size-5" />
+                    <SubscriptionBadge className="tw:-ml-1 tw:size-4 tw:md:size-5" />
                   ) : null}
                 </div>
                 <span className="tw:mt-1 tw:block tw:text-xs tw:font-medium tw:text-gray-500 tw:md:text-sm">
