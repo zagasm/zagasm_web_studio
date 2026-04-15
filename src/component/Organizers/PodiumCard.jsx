@@ -81,7 +81,7 @@ export default function PodiumCard({ org, position, onToggleFollow }) {
             {truncate(displayName, 12)}
           </span>
           {org.has_active_subscription && (
-            <SubscriptionBadge className="tw:size-3 tw:md:size-4" />
+            <SubscriptionBadge className="tw:-ml-0.5 tw:md:-ml-2 tw:size-2 tw:md:size-3" />
           )}
         </div>
 

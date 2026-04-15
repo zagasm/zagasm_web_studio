@@ -85,6 +85,7 @@ import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
 import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
 import WalletHub from "./pages/Account/WalletHub.jsx";
 import ForcedLogoutModalHost from "./component/auth/ForcedLogoutModalHost.jsx";
+import SharedProfileRedirectPage from "./pages/Profile/SharedProfileRedirectPage.jsx";
 
 const MainLayout = () => (
   <>
@@ -286,6 +287,14 @@ export function App() {
           <Route path="/event/view/share/:slug" element={<EventShareRedirect />} />
           <Route path="/events/:shareKey" element={<SharedEventPage />} />
         </Route>
+        <Route
+          path="/users/:shareKey"
+          element={<SharedProfileRedirectPage type="user" />}
+        />
+        <Route
+          path="/organisers/:shareKey"
+          element={<SharedProfileRedirectPage type="organiser" />}
+        />
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
