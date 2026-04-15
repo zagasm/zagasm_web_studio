@@ -1,5 +1,4 @@
 import { Link, Links, useNavigate } from "react-router-dom";
-import zagasmLogo from "../../assets/zagasm_studio_logo.png";
 export function Error404() {
   const navigate = useNavigate();
   return (
@@ -8,7 +7,7 @@ export function Error404() {
         <div className="row align-items-center vh-100">
           <div className="col-md-6">
             <img
-              src={zagasmLogo}
+              src={'/logo.png'}
               alt="Zagasm Logo"
               className="tw:w-[200px] tw:-ml-16"
             //   style={}

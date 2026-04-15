@@ -1,17 +1,17 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import PostSignupFormModal from "./ModalContainer";
 import "./postSignupStyle.css";
-import axios from "axios";
 import { useAuth } from "../../../../pages/auth/AuthContext";
 // import { useModal } from "../..";
 import { showSuccess, showError } from "../../../ui/toast";
-import qs from "qs";
 import { useModal } from "..";
+import { api, authHeaders } from "../../../../lib/apiClient";
 
 const DEFAULT_TIMER = 600; // seconds
 
 const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
   const inputRefs = useRef([]);
+  const lastAttemptedCodeRef = useRef("");
   const [code, setCode] = useState(["", "", "", "", ""]);
   const [newotpcode, setnewotpcode] = useState(Otpcode);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,20 +63,17 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
     setErrorMessage(null);
     setSuccessMessage(null);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/code/regenerate`,
-        qs.stringify({ input: contact }),
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await api.post(
+        "/api/v1/code/regenerate",
+        { input: contact },
+        authHeaders(token)
       );
 
       const payload = response.data?.data || response.data || {};
       const newCode = payload.code || response.data.code || "";
       setnewotpcode(newCode);
+      setCode(["", "", "", "", ""]);
+      lastAttemptedCodeRef.current = "";
       const successMsg =
         payload.message ||
         response.data.message ||
@@ -100,6 +97,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
+    setErrorMessage(null);
     if (value && index < 4) inputRefs.current[index + 1]?.focus();
   };
 
@@ -109,23 +107,32 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
     }
   };
 
-  const handleFinish = async () => {
-    const verificationCode = code.join("");
+  const handleFinish = async ({ force = false } = {}) => {
+    const verificationCode = code.join("").trim();
     const verificationType = "email_verification";
+
+    if (verificationCode.length < 5) {
+      if (force) {
+        const message = "Please enter the complete 5-digit code.";
+        setErrorMessage(message);
+        showError(message);
+      }
+      return;
+    }
+
+    if (!force && verificationCode === lastAttemptedCodeRef.current) {
+      return;
+    }
 
     setIsLoading(true);
     setErrorMessage(null);
+    lastAttemptedCodeRef.current = verificationCode;
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/code/verify`,
-        qs.stringify({ code: verificationCode, type: verificationType }),
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await api.post(
+        "/api/v1/code/verify",
+        { code: verificationCode, type: verificationType },
+        authHeaders(token)
       );
 
       const result = response.data;
@@ -165,6 +172,11 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
   };
 
   const isComplete = code.every((digit) => digit !== "");
+
+  useEffect(() => {
+    if (!isComplete || isLoading) return;
+    handleFinish();
+  }, [code, isComplete, isLoading]);
 
   const skipProcess = () => {
     const user = userupdate;
@@ -245,7 +257,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
               borderRadius: 24,
             }}
             type="button"
-            onClick={handleFinish}
+            onClick={() => handleFinish({ force: true })}
             disabled={!isComplete || isLoading}
             className={`tw:flex-1 tw:w-full tw:rounded-2xl tw:py-3 tw:text-sm tw:font-semibold tw:transition tw:duration-200 ${
               isComplete && !isLoading

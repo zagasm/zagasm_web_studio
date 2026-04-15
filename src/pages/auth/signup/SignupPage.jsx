@@ -7,7 +7,9 @@ import axios from "axios";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { api } from "../../../lib/apiClient";
+import { isAppleAuthConfigured } from "../../../lib/appleAuth";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
+import AppleAuthSection from "../components/AppleAuthSection.jsx";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -19,6 +21,7 @@ export function SignUp() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   const [emailExistsError, setEmailExistsError] = useState("");
   const [checkedEmail, setCheckedEmail] = useState("");
   const emailCheckRequestId = useRef(0);
@@ -27,6 +30,7 @@ export function SignUp() {
     label: "",
     class: ""
   });
+  const showSocialAuth = Boolean(GOOGLE_CLIENT_ID || isAppleAuthConfigured());
   const showBlackEmailHint = Boolean(emailExistsError);
   const [formData, setFormData] = useState({
     first_name: "",
@@ -251,6 +255,45 @@ export function SignUp() {
     }
   };
 
+  const handleAppleContinue = async ({ idToken }) => {
+    if (!idToken) {
+      showError("Apple sign in could not be completed.");
+      return;
+    }
+
+    setIsAppleLoading(true);
+
+    try {
+      const { data } = await api.post("/api/v1/apple/login", {
+        id_token: idToken,
+        device_name: navigator.userAgent || "React Web",
+      });
+
+      if (!data?.token || !data?.user) {
+        throw new Error("Invalid Apple login response.");
+      }
+
+      login({
+        token: data.token,
+        user: data.user,
+      });
+      showSuccess(
+        data.message ||
+          (data?.is_new_user
+            ? "Apple account created successfully."
+            : "Apple login successful.")
+      );
+      navigate("/feed", { replace: true });
+    } catch (err) {
+      const message =
+        err?.response?.data?.message || "Apple sign in failed.";
+
+      showError(message);
+    } finally {
+      setIsAppleLoading(false);
+    }
+  };
+
   const isFormValid = () => {
     return (
       formData.first_name.trim() !== "" &&
@@ -269,13 +312,36 @@ export function SignUp() {
       privacy={true}
       haveAccount={false}
       socialSlot={
-        GOOGLE_CLIENT_ID ? (
-          <GoogleAuthSection
-            label={isGoogleLoading ? "Connecting to Google..." : "Or sign up with"}
-            text="signup_with"
-            onSuccess={handleGoogleSignup}
-            onError={() => showError("Google sign up was cancelled or failed.")}
-          />
+        showSocialAuth ? (
+          <div className="tw:w-full tw:max-w-[420px] tw:mx-auto">
+            <p className="small text-muted mb-3">
+              {isGoogleLoading || isAppleLoading
+                ? "Connecting to your account..."
+                : "Or continue with"}
+            </p>
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              <GoogleAuthSection
+                label={null}
+                text="signup_with"
+                onSuccess={handleGoogleSignup}
+                onError={() => showError("Google sign up was cancelled or failed.")}
+              />
+              <AppleAuthSection
+                loading={isAppleLoading}
+                onSuccess={handleAppleContinue}
+                onError={(error, meta) => {
+                  if (meta?.cancelled) {
+                    showError("Apple sign in was cancelled.");
+                    return;
+                  }
+
+                  showError(
+                    error?.message || "Apple sign in was cancelled or failed."
+                  );
+                }}
+              />
+            </div>
+          </div>
         ) : null
       }
     >

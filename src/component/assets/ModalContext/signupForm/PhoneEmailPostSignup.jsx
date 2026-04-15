@@ -44,16 +44,11 @@ const PhoneEmailPostSignup = ({ type, userupdate, token }) => {
           ? phone
           : `+${phone}`.replace(/^\++/, "+");
       const input = type === "email" ? email : normalizedPhone;
-
-      const formData = new URLSearchParams();
-      formData.append("input", input);
-
-      const response = await api.post("/api/v1/code/generate", formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          ...authHeaders(token).headers,
-        },
-      });
+      const response = await api.post(
+        "/api/v1/code/generate",
+        { input },
+        authHeaders(token)
+      );
 
       if (response.status === 200) {
         setProceed(true);

@@ -21,6 +21,7 @@ import FullpagePreloader from "./component/assets/FullPagePreloader/index.jsx";
 
 import { SigninWithCode } from "./pages/auth/signin/SignCode.jsx";
 import { ChangePasswordSuccesffully } from "./pages/auth/ChangePassword/successPasswordChange.jsx";
+import AppleCallbackPage from "./pages/auth/AppleCallbackPage.jsx";
 import Navbar from "./pages/pageAssets/Navbar.jsx";
 import PostSignupForm from "./component/assets/ModalContext/signupForm/PostSignUpForm.jsx";
 import Sessionpage from "./pages/auth/SessionPage/index.jsx";
@@ -289,6 +290,7 @@ export function App() {
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="signin" element={<Signin />} />
+          <Route path="apple/callback" element={<AppleCallbackPage />} />
           <Route path="signinwithcode" element={<SigninWithCode />} />
           <Route path="forget-password" element={<ForgetPassword />} />
           <Route path="code-verification" element={<CodeVerification />} />
