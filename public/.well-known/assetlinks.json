@@ -1,13 +1,11 @@
 [
   {
-    "relation": [
-      "delegate_permission/common.handle_all_urls"
-    ],
+    "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.xilolostudio.app",
+      "package_name": "com.zagasmstudio.app",
       "sha256_cert_fingerprints": [
-        "A7:09:1B:ED:13:4B:DF:3A:AF:48:22:56:5C:34:FF:48:9D:92:63:3E:10:7F:C6:87:E9:00:9E:FB:F2:F5:30:91"
+        "79:CA:8A:EB:6C:6A:93:04:91:B5:0A:5D:D3:04:F0:04:30:F4:1B:49:5A:14:5E:C4:D8:F5"
       ]
     }
   }
