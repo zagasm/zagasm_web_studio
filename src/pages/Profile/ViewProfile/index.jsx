@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import useProfile from "../../../hooks/useProfile";
 import ProfileHeader from "../../../component/Profile/ProfileHeader";
 import AboutPanel from "../../../component/Profile/AboutPanel";
@@ -12,6 +12,10 @@ import { useAuth } from "../../auth/AuthContext";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { Edit } from "react-feather";
+import {
+  getOrganiserProfileShare,
+  getUserProfileShare,
+} from "../../../api/profileShareApi";
 
 const pickIsFollowing = (data) => {
   if (!data) return false;
@@ -49,6 +53,16 @@ const normalizeViewedOrganiserProfile = (response) => {
       organiserData?.upcomingEvents ??
       organiserData?.events?.upcoming ??
       [],
+  };
+};
+
+const normalizeSharedUserProfile = (payload) => {
+  if (!payload || typeof payload !== "object") return null;
+
+  return {
+    ...payload,
+    allEvents: payload?.allEvents ?? payload?.events?.all ?? [],
+    upcomingEvents: payload?.upcomingEvents ?? payload?.events?.upcoming ?? [],
   };
 };
 
@@ -114,6 +128,7 @@ const ProfileSkeleton = () => (
 
 export default function ViewProfile() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { profileId: routeUserId } = useParams();
 
@@ -131,10 +146,17 @@ export default function ViewProfile() {
   // follow state (only meaningful when viewing another organiser)
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
 
   // are we viewing our own profile or another user's?
   const isOwnProfile =
     !routeUserId || (me?.id && routeUserId && routeUserId === me.id);
+  const sharedProfileData = location.state?.sharedProfileData || null;
+  const sharedProfileType = location.state?.sharedProfileType || null;
+  const hydratedSharedProfile = useMemo(() => {
+    if (isOwnProfile || !sharedProfileData) return null;
+    return normalizeSharedUserProfile(sharedProfileData);
+  }, [isOwnProfile, sharedProfileData]);
 
   const mergedOwnProfile = useMemo(() => {
     if (!isOwnProfile) return null;
@@ -148,7 +170,12 @@ export default function ViewProfile() {
 
   const viewedOrganiserProfileQuery = useQuery({
     queryKey: ["profile", "organiser", routeUserId, token ?? "guest"],
-    enabled: !isOwnProfile && !!routeUserId && !!token,
+    enabled:
+      !isOwnProfile &&
+      !!routeUserId &&
+      !!token &&
+      sharedProfileType !== "user" &&
+      !hydratedSharedProfile,
     staleTime: 1000 * 60 * 2,
     queryFn: async () => {
       const res = await api.get(
@@ -162,7 +189,7 @@ export default function ViewProfile() {
 
   const finalProfileUser = isOwnProfile
     ? mergedOwnProfile
-    : viewedOrganiserProfileQuery.data ?? null;
+    : hydratedSharedProfile ?? viewedOrganiserProfileQuery.data ?? null;
 
   useEffect(() => {
     if (isOwnProfile) return;
@@ -171,7 +198,7 @@ export default function ViewProfile() {
 
   const isLoading = isOwnProfile
     ? myProfileLoading && !mergedOwnProfile && !myProfileError
-    : viewedOrganiserProfileQuery.isLoading;
+    : !hydratedSharedProfile && viewedOrganiserProfileQuery.isLoading;
   const profileError = isOwnProfile
     ? myProfileError
     : viewedOrganiserProfileQuery.error?.message || null;
@@ -184,6 +211,21 @@ export default function ViewProfile() {
       finalProfileUser?.roles?.includes("organizer") ||
       finalProfileUser?.organiser?.is_organiser_verified || // optional
       finalProfileUser?.organiser?.roles?.includes?.("organiser")); // optional
+  const isSharedOrganiserProfile =
+    sharedProfileType === "organiser" ||
+    !!finalProfileUser?.organiser ||
+    (!!finalProfileUser?.userId && (!!finalProfileUser?.events || !!finalProfileUser?.allEvents));
+  const shareTargetId = isSharedOrganiserProfile
+    ? finalProfileUser?.organiser?.id ||
+      finalProfileUser?.organiser?.user_id ||
+      finalProfileUser?.userId ||
+      finalProfileUser?.id
+    : finalProfileUser?.id || finalProfileUser?.user_id || finalProfileUser?.userId;
+  const profileHeading = isOwnProfile
+    ? "Profile"
+    : isSharedOrganiserProfile
+      ? "Organizer Profile"
+      : "Profile";
 
   const kycStatus = isOwnProfile ? finalProfileUser?.kyc?.status || null : null;
   const isKycVerified = kycStatus === "verified";
@@ -254,6 +296,50 @@ export default function ViewProfile() {
     }
   };
 
+  const handleShareProfile = async () => {
+    if (!token || !shareTargetId) {
+      showError("Unable to prepare this profile share right now.");
+      return;
+    }
+
+    setShareLoading(true);
+
+    try {
+      const payload = isSharedOrganiserProfile
+        ? await getOrganiserProfileShare(shareTargetId, token)
+        : await getUserProfileShare(shareTargetId, token);
+
+      const share = payload?.share || {};
+      if (!share?.url) {
+        throw new Error("Share URL is missing.");
+      }
+
+      if (navigator.share) {
+        await navigator.share({
+          title: share.title,
+          text: share.text,
+          url: share.url,
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(share.url);
+      showSuccess("Profile link copied.");
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        return;
+      }
+
+      showError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Unable to share this profile right now."
+      );
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
   return (
     <div
       data-bounce-page="profile"
@@ -271,7 +357,7 @@ export default function ViewProfile() {
             <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
           </button>
           <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
-            {isOwnProfile ? "Profile" : "Organizer Profile"}
+            {profileHeading}
           </span>
           <div className="tw:size-10" />
         </div>
@@ -449,6 +535,8 @@ export default function ViewProfile() {
                   isFollowing={isFollowing}
                   followLoading={followLoading}
                   onToggleFollow={handleToggleFollow}
+                  onShare={handleShareProfile}
+                  shareLoading={shareLoading}
                 />
                 <AboutPanel user={finalProfileUser} />
               </div>

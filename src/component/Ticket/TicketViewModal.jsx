@@ -35,6 +35,14 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
   const paymentMethodLabel = formatPaymentMethodLabel(
     payment.payment_method || ticket?.payment_method
   );
+  const organiserProfileId =
+    organiser?.user_id ||
+    organiser?.userId ||
+    organiser?.id ||
+    event?.organiserUserId ||
+    event?.organiserId ||
+    event?.hostId ||
+    null;
 
   const handleViewEvent = () => {
     if (!event?.id) {
@@ -43,6 +51,15 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
 
     onClose?.();
     navigate(`/event/view/${event.id}`);
+  };
+
+  const handleViewOrganiserProfile = () => {
+    if (!organiserProfileId) {
+      return;
+    }
+
+    onClose?.();
+    navigate(`/profile/${organiserProfileId}`);
   };
 
   return (
@@ -116,17 +133,30 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
 
                     {(organiser.name || organiser.user_name) && (
                       <div className="tw:flex tw:items-center tw:gap-2.5 tw:rounded-xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2.5 tw:py-2.5 tw:sm:gap-3 tw:sm:px-3 tw:sm:py-3">
-                        <img
-                          src={organiser.profile_image || "/images/avater_pix.avif"}
-                          alt={organiser.name || "Organiser"}
-                          className="tw:h-10 tw:w-10 tw:shrink-0 tw:rounded-full tw:object-cover tw:sm:h-11 tw:sm:w-11"
-                        />
+                        <button
+                          type="button"
+                          onClick={handleViewOrganiserProfile}
+                          disabled={!organiserProfileId}
+                          className="tw:shrink-0 tw:rounded-full disabled:tw:cursor-default"
+                          aria-label="View organiser profile"
+                        >
+                          <img
+                            src={organiser.profile_image || "/images/avater_pix.avif"}
+                            alt={organiser.name || "Organiser"}
+                            className="tw:h-10 tw:w-10 tw:rounded-full tw:object-cover tw:sm:h-11 tw:sm:w-11"
+                          />
+                        </button>
 
-                        <div className="tw:min-w-0 tw:flex-1">
+                        <button
+                          type="button"
+                          onClick={handleViewOrganiserProfile}
+                          disabled={!organiserProfileId}
+                          className="tw:min-w-0 tw:flex-1 tw:text-left disabled:tw:cursor-default"
+                        >
                           <span className="tw:block tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.12em] tw:text-gray-500 tw:sm:text-[11px]">
                             Organiser
                           </span>
-                          <span className="tw:block tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900 tw:sm:text-[15px]">
+                          <span className="tw:block tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900 tw:sm:text-[15px] hover:tw:text-primary">
                             {organiser.name || "Event organiser"}
                           </span>
                           {organiser.user_name && (
@@ -134,7 +164,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                               @{organiser.user_name}
                             </span>
                           )}
-                        </div>
+                        </button>
                       </div>
                     )}
 

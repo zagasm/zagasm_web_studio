@@ -1,6 +1,6 @@
 import React from "react";
 import defaultProfile from "../../assets/avater_pix.avif";
-import { ArrowUpRight, Ticket } from "lucide-react";
+import { ArrowUpRight, Share2, Ticket } from "lucide-react";
 import { Edit } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import "./profile.css";
@@ -13,6 +13,8 @@ export default function ProfileHeader({
   isFollowing = false,
   followLoading = false,
   onToggleFollow,
+  onShare,
+  shareLoading = false,
 }) {
   // console.log(user);
   const computedIsFollowing =
@@ -80,6 +82,7 @@ export default function ProfileHeader({
   };
 
   const showFollowButton = !isOwnProfile && isOrganiserProfileData;
+  const canShare = typeof onShare === "function";
 
   return (
     <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:py-6 tw:px-3 tw:shadow-sm">
@@ -134,6 +137,21 @@ export default function ProfileHeader({
               {isOrganiserProfileData ? "Organizer" : "Member"}
             </span>
           </div>
+
+          {canShare && (
+            <div className="tw:mt-4 tw:flex tw:items-center tw:justify-center">
+              <button
+                type="button"
+                onClick={onShare}
+                disabled={shareLoading}
+                className="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                style={{ borderRadius: 20 }}
+              >
+                <Share2 size={14} />
+                {shareLoading ? "Preparing..." : "Share Profile"}
+              </button>
+            </div>
+          )}
 
           {/* follow CTA for organiser profile (not your own) */}
           {showFollowButton && (

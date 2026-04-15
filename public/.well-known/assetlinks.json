@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.zagasmstudio.app",
       "sha256_cert_fingerprints": [
-        "79:CA:8A:EB:6C:6A:93:04:91:B5:0A:5D:D3:04:F0:04:30:F4:1B:49:5A:14:5E:C4:D8:F5"
+        "79:CA:8A:EB:6C:6A:93:04:91:B5:0A:5D:D3:04:F0:04:30:F4:1B:49:5A:14:5E:C4:D8:F5",
+        "CD:3E:84:42:AD:18:47:2A:E1:54:21:F4:FE:B9:17:EF:DF:22:E2:D0:A4:25:9D:BF:12:6B:9E:1D:63:B7:7E:E5"
       ]
     }
   }

@@ -53,7 +53,7 @@ export default function OrganizerRowCard({ org, onToggleFollow }) {
             {displayName}
           </span>
           {org.has_active_subscription && (
-            <SubscriptionBadge className="tw:size-3 tw:md:size-4" />
+            <SubscriptionBadge className="tw:size-2 tw:md:size-3" />
           )}
         </div>
 
