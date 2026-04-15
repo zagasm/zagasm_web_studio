@@ -8,12 +8,15 @@ import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { SigninWithCode } from "./SignCode";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import {
+  clearRememberedAccountQuickLogin,
   getRememberedAccounts,
   removeRememberedAccount,
 } from "../../../lib/authStorage";
 import defaultAvatar from "../../../assets/avater_pix.avif";
-import { api } from "../../../lib/apiClient";
+import { api, authHeaders } from "../../../lib/apiClient";
+import { isAppleAuthConfigured } from "../../../lib/appleAuth";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
+import AppleAuthSection from "../components/AppleAuthSection.jsx";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -38,6 +41,8 @@ export function Signin() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
+  const [isRememberedLoginLoading, setIsRememberedLoginLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
@@ -50,6 +55,7 @@ export function Signin() {
   const location = useLocation();
   const { login } = useAuth();
   const showBlackEmailHint = Boolean(emailExistsError);
+  const showSocialAuth = Boolean(GOOGLE_CLIENT_ID || isAppleAuthConfigured());
   const redirectPath =
     typeof location.state?.from === "string" ? location.state.from : "/feed";
 
@@ -219,20 +225,60 @@ export function Signin() {
     setSelectedAccount(null);
     setShowPasswordField(false);
     setShowPassword(false);
+    setIsRememberedLoginLoading(false);
     setFormData({ email: "", password: "" });
     setErrors({});
   };
 
-  const handleSelectAccount = (account) => {
+  const handleSelectAccount = async (account) => {
     setSelectedAccount(account);
     setVerificationSource(account.email || "");
-    setShowPasswordField(true);
     setShowPassword(false);
     setErrors({});
     setFormData({
       email: account.email || "",
       password: "",
     });
+
+    if (!account?.quickLoginToken || !account?.quickLoginExpiresAt) {
+      setShowPasswordField(true);
+      return;
+    }
+
+    setShowPasswordField(false);
+    setIsRememberedLoginLoading(true);
+
+    try {
+      const response = await api.get(
+        "/api/v1/profile",
+        authHeaders(account.quickLoginToken)
+      );
+      const payload = response?.data?.data || response?.data || {};
+      const freshUser = payload.user || payload;
+      const freshOrganiser =
+        payload.organiser ||
+        payload.organizer ||
+        freshUser?.organiser ||
+        freshUser?.organizer ||
+        null;
+
+      login({
+        user: freshUser,
+        organiser: freshOrganiser,
+        token: account.quickLoginToken,
+      });
+      showSuccess("Signed in successfully.");
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      clearRememberedAccountQuickLogin(
+        account.userId || account.email || account.id
+      );
+      setRememberedAccounts(getRememberedAccounts());
+      setShowPasswordField(true);
+      showError("Quick sign-in expired. Enter your password to continue.");
+    } finally {
+      setIsRememberedLoginLoading(false);
+    }
   };
 
   const handleRemoveRememberedAccount = (event, account) => {
@@ -358,6 +404,40 @@ export function Signin() {
     }
   };
 
+  const handleAppleLogin = async ({ idToken }) => {
+    if (!idToken) {
+      showError("Apple login could not be completed.");
+      return;
+    }
+
+    setIsAppleLoading(true);
+
+    try {
+      const { data } = await api.post("/api/v1/apple/login", {
+        id_token: idToken,
+        device_name: navigator.userAgent || "React Web",
+      });
+
+      if (!data?.token || !data?.user) {
+        throw new Error("Invalid Apple login response.");
+      }
+
+      login({
+        user: data.user,
+        token: data.token,
+      });
+      showSuccess(data.message || "Apple login successful.");
+      navigate(redirectPath, { replace: true });
+    } catch (err) {
+      const message =
+        err?.response?.data?.message || "Apple login failed.";
+
+      showError(message);
+    } finally {
+      setIsAppleLoading(false);
+    }
+  };
+
   if (showVerification) {
     return (
       <SigninWithCode
@@ -378,13 +458,36 @@ export function Signin() {
       privacy={true}
       haveAccount={true}
       socialSlot={
-        GOOGLE_CLIENT_ID ? (
-          <GoogleAuthSection
-            label={isGoogleLoading ? "Connecting to Google..." : "Or continue with"}
-            text="continue_with"
-            onSuccess={handleGoogleLogin}
-            onError={() => showError("Google login was cancelled or failed.")}
-          />
+        showSocialAuth ? (
+          <div className="tw:w-full tw:max-w-[420px] tw:mx-auto">
+            <p className="small text-muted mb-3">
+              {isGoogleLoading || isAppleLoading
+                ? "Connecting to your account..."
+                : "Or continue with"}
+            </p>
+            <div className="tw:flex tw:flex-col tw:gap-3">
+              <GoogleAuthSection
+                label={null}
+                text="continue_with"
+                onSuccess={handleGoogleLogin}
+                onError={() => showError("Google login was cancelled or failed.")}
+              />
+              <AppleAuthSection
+                loading={isAppleLoading}
+                onSuccess={handleAppleLogin}
+                onError={(error, meta) => {
+                  if (meta?.cancelled) {
+                    showError("Apple login was cancelled.");
+                    return;
+                  }
+
+                  showError(
+                    error?.message || "Apple login was cancelled or failed."
+                  );
+                }}
+              />
+            </div>
+          </div>
         ) : null
       }
     >
@@ -458,10 +561,10 @@ export function Signin() {
                       }}
                     />
                     <span className="d-flex flex-column">
-                      <span className="fw-semibold text-dark tw:text-xs tw:md:text-sm">
+                      <span className="fw-semibold text-dark tw:text-xs">
                         {account.fullName}
                       </span>
-                      <span className="text-muted tw:text-[10px] tw:md:text-sm">{account.email}</span>
+                      <span className="text-muted tw:text-[10px]">{account.email}</span>
                     </span>
                   </span>
 
@@ -597,6 +700,11 @@ export function Signin() {
                 Use another account
               </button>
             </div>
+            {isRememberedLoginLoading && (
+              <div className="tw:mt-3 tw:rounded-xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:px-3 tw:py-2 tw:text-[12px] tw:text-slate-600">
+                Trying quick sign-in...
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -707,7 +815,7 @@ export function Signin() {
                   fontWeight: "500",
                   border: "none",
                 }}
-                disabled={!isPasswordFilled || isLoading}
+                disabled={!isPasswordFilled || isLoading || isRememberedLoginLoading}
                 variants={buttonVariants}
                 whileHover={isPasswordFilled ? "hover" : {}}
                 whileTap={isPasswordFilled ? "tap" : {}}

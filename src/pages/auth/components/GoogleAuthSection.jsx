@@ -14,7 +14,7 @@ export default function GoogleAuthSection({
 
   return (
     <div className="tw:w-full">
-      <p className="small text-muted mb-3">{label}</p>
+      {label ? <p className="small text-muted mb-3">{label}</p> : null}
       <div className="tw:flex tw:justify-center">
         <div className="tw:relative tw:w-full tw:max-w-[420px] tw:overflow-hidden google-auth-shell">
           <div className="tw:pointer-events-none tw:flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-medium tw:text-gray-900">

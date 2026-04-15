@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
     setOrganiser(o ?? u?.organiser ?? u?.organizer ?? null);
     setToken(t);
     persist(u, t, o ?? u?.organiser ?? u?.organizer ?? null);
-    if (u) rememberAccount(u);
+    if (u) rememberAccount(u, t);
   };
 
   const refreshUser = async () => {
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         localStorage.removeItem("organiserdata");
       }
-      rememberAccount(freshUser);
+      rememberAccount(freshUser, token);
     } catch (err) {
       console.error("Failed to refresh user", err);
     }
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       setUser(u);
       if (u) localStorage.setItem("userdata", JSON.stringify(u));
       else localStorage.removeItem("userdata");
-      if (u) rememberAccount(u);
+      if (u) rememberAccount(u, typeof t !== "undefined" ? t : token);
     }
     if (typeof o !== "undefined") {
       setOrganiser(o);

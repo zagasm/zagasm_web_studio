@@ -18,12 +18,14 @@ export default function VerificationModal({
 
   const [otp, setOtp] = useState(new Array(5).fill(""));
   const inputRefs = useRef([]);
+  const lastAttemptedCodeRef = useRef("");
 
   useEffect(() => {
     if (isOpen) {
       setStep("email");
       setOtp(new Array(5).fill(""));
       setIsLoading(false);
+      lastAttemptedCodeRef.current = "";
     }
   }, [isOpen]);
 
@@ -50,9 +52,10 @@ export default function VerificationModal({
   const handleResendCode = async () => {
     setIsLoading(true);
     try {
-      await api.post("/api/v1/code/regenerate", { email }, authHeaders(token));
+      await api.post("/api/v1/code/regenerate", { input: email }, authHeaders(token));
       showSuccess("Code resent successfully.");
       setOtp(new Array(5).fill("")); // Clear inputs
+      lastAttemptedCodeRef.current = "";
       inputRefs.current[0]?.focus();
     } catch (error) {
       console.error(error);
@@ -62,14 +65,21 @@ export default function VerificationModal({
     }
   };
 
-  const handleVerify = async () => {
-    const code = otp.join("");
+  const handleVerify = async ({ force = false } = {}) => {
+    const code = otp.join("").trim();
     if (code.length < 5) {
-      showError("Please enter the complete 5-digit code.");
+      if (force) {
+        showError("Please enter the complete 5-digit code.");
+      }
+      return;
+    }
+
+    if (!force && code === lastAttemptedCodeRef.current) {
       return;
     }
 
     setIsLoading(true);
+    lastAttemptedCodeRef.current = code;
     try {
       // Passing email along with code is standard practice for stateless APIs
       await api.post("/api/v1/code/verify", { code }, authHeaders(token));
@@ -121,6 +131,12 @@ export default function VerificationModal({
       inputRefs.current[nextFocus]?.focus();
     }
   };
+
+  useEffect(() => {
+    if (step !== "otp" || isLoading) return;
+    if (otp.join("").length < 5) return;
+    handleVerify();
+  }, [otp, step, isLoading]);
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -260,7 +276,7 @@ export default function VerificationModal({
                         Skip for now
                       </button>
                       <button
-                        onClick={handleVerify}
+                        onClick={() => handleVerify({ force: true })}
                         disabled={isLoading}
                         className="tw:flex-1 tw:rounded-xl tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
                       >
