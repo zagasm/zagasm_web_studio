@@ -1,6 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Heart, Pencil, Trash2, Pause, CalendarDays } from "lucide-react";
+import { Menu, Transition } from "@headlessui/react";
+import {
+  Clock,
+  Heart,
+  Pencil,
+  Trash2,
+  Pause,
+  CalendarDays,
+  MoreVertical,
+  Upload,
+} from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
 import { useAuth } from "../../pages/auth/AuthContext";
@@ -8,6 +18,7 @@ import MediaCarousel from "./MediaCarousel";
 import DeleteConfirmModal from "../DeleteConfirmModal";
 import { CountdownPill, eventStartDate } from "../Events/SingleEvent";
 import RescheduleEventModal from "./RescheduleEventModal";
+import ReplayUploadModal from "../Events/ReplayUploadModal";
 
 function collectMedia(poster = []) {
   const imgs = poster.filter((p) => p.type === "image");
@@ -131,8 +142,8 @@ export default function EventCard({
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [deleteError, setDeleteError] = useState("");
   const [openReschedule, setOpenReschedule] = useState(false);
-
   const [openDelete, setOpenDelete] = useState(false);
+  const [openReplayUpload, setOpenReplayUpload] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const { token } = useAuth();
@@ -142,6 +153,8 @@ export default function EventCard({
   const shouldShowRescheduleAction =
     isOwnerEvent && !isStatusBlockedForReschedule(event?.status);
   const rescheduleLocked = hasUsedReschedule(event);
+  const replayUploadAllowed =
+    normalizeEventStatus(event?.status) === "ended" && !!event?.enable_replay;
 
   const goToEvent = () => {
     navigate(`/event/view/${event.id}`);
@@ -217,45 +230,120 @@ export default function EventCard({
     await refreshEvents?.();
   };
 
+  const handleReplayUploaded = async () => {
+    await refreshEvents?.();
+  };
+
   return (
     <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-[#ffffff]">
       {/* Top-right actions (only for owner) */}
       {isOwnerEvent && (
-        <div className="tw:absolute tw:right-4 tw:top-4 tw:z-10 tw:flex tw:gap-2">
-          {/* Edit */}
-          <button
-            style={{
-              borderRadius: 20,
-            }}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/event/edit/${event.id}`);
-            }}
-            className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-gray-500 tw:shadow-md hover:tw:bg-lightPurple hover:tw:text-primary tw:transition"
-            aria-label="Edit event"
-            title="Edit"
-          >
-            <Pencil className="tw:w-4 tw:h-4" />
-          </button>
+        <div className="tw:absolute tw:right-4 tw:top-4 tw:z-20">
+          <Menu as="div" className="tw:relative">
+            <Menu.Button
+              onClick={(e) => e.stopPropagation()}
+              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-md hover:tw:bg-slate-50"
+            >
+              <MoreVertical className="tw:h-4 tw:w-4" />
+            </Menu.Button>
 
-          {/* Delete */}
-          <button
-            style={{
-              borderRadius: 20,
-            }}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setDeleteError("");
-              setOpenDelete(true);
-            }}
-            className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-red-600 tw:shadow-md hover:tw:bg-red-50 tw:transition"
-            aria-label="Delete event"
-            title="Delete"
-          >
-            <Trash2 className="tw:w-4 tw:h-4" />
-          </button>
+            <Transition
+              as={Fragment}
+              enter="tw:transition tw:duration-100 tw:ease-out"
+              enterFrom="tw:opacity-0 tw:scale-95"
+              enterTo="tw:opacity-100 tw:scale-100"
+              leave="tw:transition tw:duration-75 tw:ease-in"
+              leaveFrom="tw:opacity-100 tw:scale-100"
+              leaveTo="tw:opacity-0 tw:scale-95"
+            >
+              <Menu.Items className="tw:absolute tw:right-0 tw:mt-2 tw:w-60 tw:origin-top-right tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14)] focus:tw:outline-none">
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/event/edit/${event.id}`);
+                      }}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${
+                        active ? "tw:bg-slate-100" : ""
+                      }`}
+                    >
+                      <Pencil className="tw:h-4 tw:w-4" />
+                      <span>Edit Event</span>
+                    </button>
+                  )}
+                </Menu.Item>
+
+                <Menu.Item disabled={!shouldShowRescheduleAction || rescheduleLocked}>
+                  {({ active, disabled }) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (disabled) return;
+                        setOpenReschedule(true);
+                      }}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
+                        disabled
+                          ? "tw:cursor-not-allowed tw:text-slate-400"
+                          : active
+                            ? "tw:bg-slate-100 tw:text-slate-700"
+                            : "tw:text-slate-700"
+                      }`}
+                    >
+                      <CalendarDays className="tw:h-4 tw:w-4" />
+                      <span>Reschedule Event</span>
+                    </button>
+                  )}
+                </Menu.Item>
+
+                {event?.enable_replay ? (
+                  <Menu.Item disabled={!replayUploadAllowed}>
+                    {({ active, disabled }) => (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (disabled) return;
+                          setOpenReplayUpload(true);
+                        }}
+                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
+                          disabled
+                            ? "tw:cursor-not-allowed tw:text-slate-400"
+                            : active
+                              ? "tw:bg-slate-100 tw:text-slate-700"
+                              : "tw:text-slate-700"
+                        }`}
+                      >
+                        <Upload className="tw:h-4 tw:w-4" />
+                        <span>Upload Replay Video</span>
+                      </button>
+                    )}
+                  </Menu.Item>
+                ) : null}
+
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteError("");
+                        setOpenDelete(true);
+                      }}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-red-600 ${
+                        active ? "tw:bg-red-50" : ""
+                      }`}
+                    >
+                      <Trash2 className="tw:h-4 tw:w-4" />
+                      <span>Delete Event</span>
+                    </button>
+                  )}
+                </Menu.Item>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
       )}
 
@@ -267,36 +355,12 @@ export default function EventCard({
       <div className="tw:flex tw:flex-col tw:gap-4 tw:p-5">
         <div className="tw:text-xs tw:text-zinc-600">
           <div className="tw:flex tw:flex-col tw:gap-3">
-            {(statusChip || shouldShowRescheduleAction) && (
+            {statusChip && (
               <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
                 <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                {statusChip}
-                {normalizedStatus === "upcoming" && <CountdownPill target={startDate} />}
+                  {statusChip}
+                  {normalizedStatus === "upcoming" && <CountdownPill target={startDate} />}
                 </div>
-                {shouldShowRescheduleAction ? (
-                  <button
-                    type="button"
-                    disabled={rescheduleLocked}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenReschedule(true);
-                    }}
-                    className={`tw:inline-flex tw:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:px-3 tw:text-[11px] tw:font-semibold tw:transition ${
-                      rescheduleLocked
-                        ? "tw:cursor-not-allowed tw:bg-slate-100 tw:text-slate-400"
-                        : "tw:bg-slate-900 tw:text-white hover:tw:bg-slate-800"
-                    }`}
-                    style={{ borderRadius: 999 }}
-                    title={
-                      rescheduleLocked
-                        ? "This event has already been rescheduled once."
-                        : "Reschedule this event"
-                    }
-                  >
-                    <CalendarDays className="tw:h-3.5 tw:w-3.5" />
-                    <span>Reschedule</span>
-                  </button>
-                ) : null}
               </div>
             )}
           </div>
@@ -417,6 +481,13 @@ export default function EventCard({
         event={event}
         onClose={() => setOpenReschedule(false)}
         onSuccess={handleRescheduleSuccess}
+      />
+      <ReplayUploadModal
+        open={openReplayUpload}
+        event={event}
+        token={token}
+        onClose={() => setOpenReplayUpload(false)}
+        onUploaded={handleReplayUploaded}
       />
     </div>
   );

@@ -30,14 +30,16 @@ function mapEventToDefaults(event) {
         currency: "",
         currencyCode: "NGN",
         hasMaterials: false,
-        enableReplay: true,
+        enableReplay: false,
+        replayAvailableAfterMinutes: 120,
+        replayAvailableForMinutes: 1440,
         manualPrice: 0,
         existingManual: null,
         existingManualCover: null,
       },
       streaming: {
         streamingOption: "in_app",
-        enableReplay: true,
+        enableReplay: false,
         streamingDuration: "24",
       },
       access: {
@@ -91,7 +93,13 @@ function mapEventToDefaults(event) {
       enableReplay:
         typeof currentEvent.enable_replay === "boolean"
           ? currentEvent.enable_replay
-          : true,
+          : false,
+      replayAvailableAfterMinutes: Number(
+        currentEvent.replay_available_after_minutes || 120
+      ),
+      replayAvailableForMinutes: Number(
+        currentEvent.replay_available_for_minutes || 1440
+      ),
       manualPrice: Number(currentEvent.manual?.price || 0),
       existingManual: currentEvent.manual?.available
         ? {
@@ -112,7 +120,7 @@ function mapEventToDefaults(event) {
       enableReplay:
         typeof currentEvent.enable_replay === "boolean"
           ? currentEvent.enable_replay
-          : true,
+          : false,
       streamingDuration: String(currentEvent.streaming_duration || 24),
     },
     access: {
@@ -286,8 +294,12 @@ export default function EventCreationWizard({
       payload.append("enable_replay", ticketing.enableReplay ? "1" : "0");
       if (ticketing.enableReplay) {
         payload.append(
-          "replay_time",
-          (mapped.streaming || {}).streamingDuration || "24"
+          "replay_available_after_minutes",
+          String(ticketing.replayAvailableAfterMinutes || 120)
+        );
+        payload.append(
+          "replay_available_for_minutes",
+          String(ticketing.replayAvailableForMinutes || 1440)
         );
       }
 
