@@ -167,6 +167,23 @@ export function normalizeEventRecord(rawEvent) {
           viewer_has_purchased: false,
           viewer_has_ticket: false,
         },
+    replay: rawEvent?.replay
+      ? {
+          ...rawEvent.replay,
+          is_available: !!rawEvent.replay.is_available,
+          url: rawEvent.replay.url || rawEvent.replay_url || "",
+        }
+      : {
+          is_available: false,
+          url: rawEvent?.replay_url || "",
+        },
+    enable_replay: !!rawEvent?.enable_replay,
+    has_replay: !!rawEvent?.has_replay,
+    replay_url: rawEvent?.replay_url || rawEvent?.replay?.url || "",
+    replay_available_at:
+      rawEvent?.replay_available_at || rawEvent?.replay?.available_at || "",
+    replay_expires_at:
+      rawEvent?.replay_expires_at || rawEvent?.replay?.expires_at || "",
     status: String(rawEvent.status || "upcoming").toLowerCase(),
     hostName:
       rawEvent.hostName ||

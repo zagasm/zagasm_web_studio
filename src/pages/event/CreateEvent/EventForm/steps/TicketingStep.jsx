@@ -34,6 +34,8 @@ const VISIBILITY_OPTIONS = [
   { value: "private", label: "Private" },
 ];
 
+const REPLAY_MINUTE_PRESETS = [30, 60, 120, 180, 720, 1440];
+
 const MANUAL_FILE_EXTENSIONS = [
   "pdf",
   "doc",
@@ -127,6 +129,8 @@ const schema = z
     visibility: z.enum(["public", "private"]),
     hasMaterials: z.boolean(),
     enableReplay: z.boolean(),
+    replayAvailableAfterMinutes: z.string().optional(),
+    replayAvailableForMinutes: z.string().optional(),
     matureContent: z.boolean(),
     manualPriceInput: z.string().optional(),
   })
@@ -184,6 +188,37 @@ const schema = z
         });
       }
     }
+
+    if (values.enableReplay) {
+      const replayAvailableAfterMinutes = Number(
+        values.replayAvailableAfterMinutes || ""
+      );
+      const replayAvailableForMinutes = Number(
+        values.replayAvailableForMinutes || ""
+      );
+
+      if (
+        !Number.isFinite(replayAvailableAfterMinutes) ||
+        replayAvailableAfterMinutes < 1
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["replayAvailableAfterMinutes"],
+          message: "Choose when the replay should unlock.",
+        });
+      }
+
+      if (
+        !Number.isFinite(replayAvailableForMinutes) ||
+        replayAvailableForMinutes < 1
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["replayAvailableForMinutes"],
+          message: "Choose how long the replay should stay available.",
+        });
+      }
+    }
   });
 
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
@@ -227,7 +262,13 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       enableReplay:
         typeof defaultValues.enableReplay === "boolean"
           ? defaultValues.enableReplay
-          : true,
+          : false,
+      replayAvailableAfterMinutes: String(
+        defaultValues.replayAvailableAfterMinutes || 120
+      ),
+      replayAvailableForMinutes: String(
+        defaultValues.replayAvailableForMinutes || 1440
+      ),
       matureContent: !!defaultValues.matureContent,
       manualPriceInput:
         defaultValues.manualPrice !== undefined && defaultValues.manualPrice !== null
@@ -242,6 +283,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const maxTickets = watch("maxTickets");
   const visibility = watch("visibility");
   const hasMaterials = watch("hasMaterials");
+  const enableReplay = watch("enableReplay");
   const selectedCurrency = useMemo(
     () =>
       DISPLAY_CURRENCIES.find((currency) => currency.value === selectedCurrencyCode) ||
@@ -325,6 +367,12 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
         visibility: values.visibility,
         hasMaterials: false,
         enableReplay: values.enableReplay,
+        replayAvailableAfterMinutes: Number(
+          values.replayAvailableAfterMinutes || 120
+        ),
+        replayAvailableForMinutes: Number(
+          values.replayAvailableForMinutes || 1440
+        ),
         matureContent: values.matureContent,
         manualPrice: 0,
         manualFile: null,
@@ -383,6 +431,12 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       visibility: values.visibility,
       hasMaterials: true,
       enableReplay: values.enableReplay,
+      replayAvailableAfterMinutes: Number(
+        values.replayAvailableAfterMinutes || 120
+      ),
+      replayAvailableForMinutes: Number(
+        values.replayAvailableForMinutes || 1440
+      ),
       matureContent: values.matureContent,
       manualPrice: manualPrice ?? 0,
       manualFile,
@@ -605,6 +659,96 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
             className="tw:h-4 tw:w-4 tw:accent-primary"
           />
         </div>
+
+        {enableReplay && (
+          <div className="tw:space-y-5 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50/80 tw:p-4">
+            <div>
+              <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
+                Replay becomes available after
+              </div>
+              <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                Choose when the replay should unlock after the event ends.
+              </div>
+              <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-2">
+                {REPLAY_MINUTE_PRESETS.map((minutes) => (
+                  <button
+                    key={`after-${minutes}`}
+                    type="button"
+                    onClick={() =>
+                      setValue("replayAvailableAfterMinutes", String(minutes), {
+                        shouldValidate: true,
+                      })
+                    }
+                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${
+                      String(watch("replayAvailableAfterMinutes")) === String(minutes)
+                        ? "tw:bg-slate-900 tw:text-white"
+                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
+                    }`}
+                  >
+                    {minutes} minutes
+                  </button>
+                ))}
+              </div>
+              <div className="tw:mt-3">
+                <input
+                  type="number"
+                  min="1"
+                  {...register("replayAvailableAfterMinutes")}
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                  placeholder="Minutes after the event ends"
+                />
+                {errors.replayAvailableAfterMinutes && (
+                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">
+                    {errors.replayAvailableAfterMinutes.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
+                Replay stays available for
+              </div>
+              <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                Choose how long the replay should stay online before automatic deletion.
+              </div>
+              <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-2">
+                {REPLAY_MINUTE_PRESETS.map((minutes) => (
+                  <button
+                    key={`for-${minutes}`}
+                    type="button"
+                    onClick={() =>
+                      setValue("replayAvailableForMinutes", String(minutes), {
+                        shouldValidate: true,
+                      })
+                    }
+                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${
+                      String(watch("replayAvailableForMinutes")) === String(minutes)
+                        ? "tw:bg-slate-900 tw:text-white"
+                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
+                    }`}
+                  >
+                    {minutes} minutes
+                  </button>
+                ))}
+              </div>
+              <div className="tw:mt-3">
+                <input
+                  type="number"
+                  min="1"
+                  {...register("replayAvailableForMinutes")}
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                  placeholder="Minutes replay stays online"
+                />
+                {errors.replayAvailableForMinutes && (
+                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">
+                    {errors.replayAvailableForMinutes.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
           <label className="tw:text-[15px]">This event contains mature content</label>

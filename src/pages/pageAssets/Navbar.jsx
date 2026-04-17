@@ -195,13 +195,13 @@ export default function Navbar() {
                     <Popover.Panel className="tw:absolute tw:right-0 tw:top-[calc(100%+12px)] tw:z-50 tw:w-56 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14)]">
                       <div className="tw:mb-2 tw:min-w-0 tw:border-b tw:border-slate-100 tw:px-3 tw:pb-2">
                         <div className="tw:flex tw:items-center tw:gap-2">
-                          <div className="tw:min-w-0 tw:flex-1 tw:text-sm tw:font-semibold tw:text-slate-900 tw:truncate">
+                          <div className="tw:min-w-0 tw:text-sm tw:font-semibold tw:text-slate-900 tw:truncate">
                             {user?.name ||
                               `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
                               "Your account"}
                           </div>
                           {hasActiveSubscription ? (
-                            <SubscriptionBadge className="tw:size-4" />
+                            <SubscriptionBadge className="tw:-ml-1 tw:size-3" />
                           ) : null}
                         </div>
                         <div

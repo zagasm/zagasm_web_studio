@@ -26,6 +26,8 @@ import {
   MapPin,
   Clock,
   Star,
+  Upload,
+  Video,
 } from "lucide-react";
 import EventShareModal from "../../../component/Events/EvenetShareModal";
 import TicketPromptModal from "../../../component/Events/TicketPromptModal";
@@ -46,6 +48,8 @@ import {
   getApiErrorMessage,
   getFundingRequiredDetails,
 } from "../../../features/wallet/walletUtils";
+import ReplayUploadModal from "../../../component/Events/ReplayUploadModal";
+import ReactPlayer from "react-player";
 
 export function CountdownPill({ target }) {
   if (!target) return null;
@@ -120,6 +124,36 @@ function resolveManualDownloadUrl(manual = {}) {
   );
 }
 
+function formatReplayMinutes(value) {
+  const minutes = Number(value || 0);
+  if (!Number.isFinite(minutes) || minutes <= 0) return "Not set";
+  if (minutes % 1440 === 0) {
+    const days = minutes / 1440;
+    return `${days} day${days === 1 ? "" : "s"}`;
+  }
+  if (minutes % 60 === 0) {
+    const hours = minutes / 60;
+    return `${hours} hour${hours === 1 ? "" : "s"}`;
+  }
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+}
+
+function formatReplayDateTime(value) {
+  if (!value) return "";
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return String(value);
+
+  return parsed.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 function EventDetailShimmer() {
   return (
     <div className="tw:min-h-screen tw:w-full tw:pb-12 tw:pt-20">
@@ -178,6 +212,7 @@ export default function ViewEvent() {
   const [fundingRequiredDetails, setFundingRequiredDetails] = useState(null);
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
   const [purchaseSummary, setPurchaseSummary] = useState(null);
+  const [replayUploadOpen, setReplayUploadOpen] = useState(false);
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const shareFlow = useEventShareFlow();
@@ -511,6 +546,22 @@ export default function ViewEvent() {
   );
   const canBuyManualOnly = hasPaid && manualOnlyAvailable;
   const canDownloadManual = manualAvailable && manualHasAccess;
+  const replay = event?.replay || {};
+  const replayEnabled = !!event?.enable_replay;
+  const hasReplay = !!event?.has_replay;
+  const replayAvailableAt =
+    event?.replay_available_at || replay?.available_at || "";
+  const replayExpiresAt =
+    event?.replay_expires_at || replay?.expires_at || "";
+  const replayUrl = event?.replay_url || replay?.url || "";
+  const replayIsAvailable = !!(replay?.is_available && replayUrl);
+  const replayExpired = !!(
+    replayEnabled &&
+    !replayUrl &&
+    replayExpiresAt &&
+    !Number.isNaN(new Date(replayExpiresAt).getTime()) &&
+    new Date(replayExpiresAt).getTime() <= Date.now()
+  );
 
   let primaryCtaLabel;
   if (hasPaid && isLiveNow) {
@@ -880,6 +931,121 @@ export default function ViewEvent() {
                     </div>
                   </div>
                 </div>
+
+                {replayEnabled && (
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
+                    <div className="tw:flex tw:flex-col tw:gap-6 tw:md:flex-row tw:md:items-start tw:md:justify-between">
+                      <div className="tw:max-w-3xl tw:flex-1">
+                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                          Event Replay
+                        </div>
+
+                        {replayIsAvailable ? (
+                          <div className="tw:mt-4 tw:space-y-4">
+                            <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+                              <div>
+                                <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                                  Replay is available
+                                </div>
+                                <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                                  {replayExpiresAt
+                                    ? `Replay expires at ${formatReplayDateTime(replayExpiresAt)}`
+                                    : "Replay is ready to watch."}
+                                </div>
+                              </div>
+                              <a
+                                href={replayUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800"
+                              >
+                                <Video className="tw:h-4 tw:w-4" />
+                                <span>Watch replay</span>
+                              </a>
+                            </div>
+
+                            <div className="tw:overflow-hidden tw:rounded-[24px] tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">
+                              <div className="tw:aspect-video">
+                                <ReactPlayer
+                                  url={replayUrl}
+                                  controls
+                                  width="100%"
+                                  height="100%"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : replayExpired ? (
+                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
+                            <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                              Replay is no longer available.
+                            </div>
+                            <div className="tw:mt-2 tw:text-sm tw:text-slate-500">
+                              The backend has already cleared access for this replay.
+                            </div>
+                          </div>
+                        ) : hasReplay ? (
+                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-amber-100 tw:bg-amber-50 tw:p-5">
+                            <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                              Replay will be available soon
+                            </div>
+                            <div className="tw:mt-2 tw:text-sm tw:text-slate-600">
+                              Replay is scheduled but not available yet.
+                            </div>
+                            {replayAvailableAt && (
+                              <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
+                                Available at {formatReplayDateTime(replayAvailableAt)}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
+                            <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
+                              Replay not uploaded yet
+                            </div>
+                            <div className="tw:mt-2 tw:text-sm tw:text-slate-500">
+                              The organiser has enabled replay, but the replay video has not been uploaded yet.
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {isOwnerEvent && isEnded && replayEnabled && (
+                        <div className="tw:w-full tw:max-w-sm tw:rounded-[22px] tw:bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_100%)] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-slate-200">
+                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                            Replay management
+                          </div>
+                          <div className="tw:mt-3 tw:space-y-3 tw:text-sm tw:text-slate-600">
+                            <div>
+                              <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
+                                Unlock delay
+                              </div>
+                              <div className="tw:mt-1 tw:font-medium tw:text-slate-900">
+                                {formatReplayMinutes(event?.replay_available_after_minutes)}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
+                                Expiry duration
+                              </div>
+                              <div className="tw:mt-1 tw:font-medium tw:text-slate-900">
+                                {formatReplayMinutes(event?.replay_available_for_minutes)}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setReplayUploadOpen(true)}
+                            className="tw:mt-4 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                          >
+                            <Upload className="tw:h-4 tw:w-4" />
+                            <span>Upload replay video</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <aside className="tw:flex tw:flex-col tw:gap-6">
@@ -1187,6 +1353,15 @@ export default function ViewEvent() {
       <LiveAppDownloadModal
         open={downloadModalOpen}
         onClose={() => setDownloadModalOpen(false)}
+      />
+      <ReplayUploadModal
+        open={replayUploadOpen}
+        event={event}
+        token={token}
+        onClose={() => setReplayUploadOpen(false)}
+        onUploaded={() => {
+          refreshEventDetailSilently();
+        }}
       />
     </>
   );

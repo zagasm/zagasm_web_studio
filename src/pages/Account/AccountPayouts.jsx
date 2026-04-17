@@ -10,16 +10,13 @@ import {
   RefreshCw,
   Search,
   Ticket,
-  TrendingUp,
   Wallet,
-  BadgeCheck,
 } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showError, showPromise } from "../../component/ui/toast";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
-const MINIMUM_WITHDRAWAL_AMOUNT = 10000;
 
 const getCurrencySymbol = (currency) => {
   const normalized = String(currency || "").toUpperCase();
@@ -152,8 +149,6 @@ function WithdrawDialog({
   onClose,
   balance,
   accounts,
-  amount,
-  onAmountChange,
   selectedAccountId,
   onSelectAccount,
   onSubmit,
@@ -161,10 +156,8 @@ function WithdrawDialog({
 }) {
   const symbol = resolveCurrencySymbol(balance);
   const availableBalance = Number(balance?.available_balance ?? 0);
-  const minimumAmount = Number(
-    balance?.minimum_withdrawal_amount ?? MINIMUM_WITHDRAWAL_AMOUNT
-  );
   const hasAccounts = accounts.length > 0;
+  const hasAvailableBalance = availableBalance > 0;
 
   return (
     <Transition show={open} as={Fragment} appear>
@@ -201,43 +194,30 @@ function WithdrawDialog({
                   Request Payout
                 </span>
                 <p className="tw:mt-1 tw:text-xs tw:text-gray-500">
-                  Choose a saved bank account and withdraw from your available balance.
+                  Choose a saved bank account to receive your available balance.
                 </p>
 
-                <div className="tw:mt-5 tw:grid tw:grid-cols-2 tw:gap-3">
-                  <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
-                    <div className="tw:text-xs tw:text-gray-500">Available balance</div>
-                    <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
-                      {formatMoney(availableBalance, symbol)}
-                    </div>
+                <div className="tw:mt-5 tw:rounded-2xl tw:bg-[#faf8ff] tw:p-4">
+                  <div className="tw:text-xs tw:text-gray-500">
+                    Amount to be withdrawn
                   </div>
-                  <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
-                    <div className="tw:text-xs tw:text-gray-500">Minimum withdrawal</div>
-                    <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
-                      {formatMoney(minimumAmount, symbol)}
-                    </div>
+                  <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
+                    {formatMoney(availableBalance, symbol)}
                   </div>
-                </div>
-
-                <div className="tw:mt-4">
-                  <label className="tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-700">
-                    Amount
-                  </label>
-                  <input
-                    type="number"
-                    value={amount}
-                    min="0"
-                    onChange={(event) => onAmountChange(event.target.value)}
-                    className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:text-sm tw:text-gray-900 tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
-                    placeholder="Enter amount"
-                  />
+                  <p className="tw:mt-2 tw:text-xs tw:text-gray-500">
+                    This withdrawal request will submit your full available balance.
+                  </p>
                 </div>
 
                 <div className="tw:mt-4">
                   <label className="tw:mb-2 tw:block tw:text-sm tw:font-medium tw:text-gray-700">
                     Bank account
                   </label>
-                  {!hasAccounts ? (
+                  {!hasAvailableBalance ? (
+                    <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
+                      You need an available balance before submitting a withdrawal.
+                    </div>
+                  ) : !hasAccounts ? (
                     <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
                       Add a bank account first before submitting a withdrawal.
                     </div>
@@ -305,7 +285,7 @@ function WithdrawDialog({
                   <button
                     type="button"
                     onClick={onSubmit}
-                    disabled={submitting || !hasAccounts}
+                    disabled={submitting || !hasAccounts || !hasAvailableBalance}
                     style={{ borderRadius: 20, fontSize: 12 }}
                     className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
@@ -336,7 +316,6 @@ export default function AccountPayouts() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState("");
   const [selectedWithdrawBankAccountId, setSelectedWithdrawBankAccountId] =
     useState("");
   const [submittingWithdraw, setSubmittingWithdraw] = useState(false);
@@ -419,9 +398,6 @@ export default function AccountPayouts() {
   }, [bankAccounts]);
 
   const balanceSymbol = resolveCurrencySymbol(balance);
-  const minimumWithdrawalAmount = Number(
-    balance?.minimum_withdrawal_amount ?? MINIMUM_WITHDRAWAL_AMOUNT
-  );
 
   const filteredTicketSales = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -463,26 +439,10 @@ export default function AccountPayouts() {
   }, [filteredTicketSales]);
 
   const handleWithdraw = async () => {
-    const amount = Number(withdrawAmount);
     const availableBalance = Number(balance?.available_balance ?? 0);
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-      showError("Enter a valid withdrawal amount.");
-      return;
-    }
-
-    if (amount < minimumWithdrawalAmount) {
-      showError(
-        `Minimum withdrawal amount is ${formatMoney(
-          minimumWithdrawalAmount,
-          balanceSymbol
-        )}.`
-      );
-      return;
-    }
-
-    if (amount > availableBalance) {
-      showError("Requested amount is higher than your available balance.");
+    if (!Number.isFinite(availableBalance) || availableBalance <= 0) {
+      showError("You need an available balance before requesting a withdrawal.");
       return;
     }
 
@@ -497,7 +457,6 @@ export default function AccountPayouts() {
         api.post(
           "/api/v1/organiser/payouts/withdraw",
           {
-            amount,
             bank_account_id: selectedWithdrawBankAccountId,
           },
           authHeaders(token)
@@ -509,7 +468,6 @@ export default function AccountPayouts() {
         }
       );
 
-      setWithdrawAmount("");
       setWithdrawOpen(false);
       await loadPage();
     } finally {
@@ -602,7 +560,7 @@ export default function AccountPayouts() {
                 icon={Wallet}
                 label="Available balance"
                 value={formatMoney(balance?.available_balance ?? 0, balanceSymbol)}
-                hint={`Minimum withdrawal ${formatMoney(minimumWithdrawalAmount, balanceSymbol)}`}
+                hint="Amount available for payout"
               />
               {/* <StatCard
                 icon={TrendingUp}
@@ -732,8 +690,6 @@ export default function AccountPayouts() {
         }}
         balance={balance}
         accounts={bankAccounts}
-        amount={withdrawAmount}
-        onAmountChange={setWithdrawAmount}
         selectedAccountId={selectedWithdrawBankAccountId}
         onSelectAccount={setSelectedWithdrawBankAccountId}
         onSubmit={handleWithdraw}

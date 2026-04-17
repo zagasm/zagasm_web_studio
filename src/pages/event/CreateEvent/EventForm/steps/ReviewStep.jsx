@@ -99,6 +99,20 @@ function PreviewMedia({ posterImages, posterVideos, existingPoster }) {
   );
 }
 
+function formatReplayMinutes(value) {
+  const minutes = Number(value || 0);
+  if (!Number.isFinite(minutes) || minutes <= 0) return "Not set";
+  if (minutes % 1440 === 0) {
+    const days = minutes / 1440;
+    return `${days} day${days === 1 ? "" : "s"}`;
+  }
+  if (minutes % 60 === 0) {
+    const hours = minutes / 60;
+    return `${hours} hour${hours === 1 ? "" : "s"}`;
+  }
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+}
+
 export default function ReviewStep({
   collected,
   formErrors,
@@ -123,6 +137,8 @@ export default function ReviewStep({
     visibility,
     hasMaterials,
     enableReplay,
+    replayAvailableAfterMinutes,
+    replayAvailableForMinutes,
     matureContent,
     manualPrice,
     manualFile,
@@ -328,6 +344,22 @@ export default function ReviewStep({
                   {enableReplay ? "Yes" : "No"}
                 </div>
               </div>
+              {enableReplay && (
+                <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                  <div className="tw:text-xs tw:text-slate-500">Replay unlock delay</div>
+                  <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                    {formatReplayMinutes(replayAvailableAfterMinutes)}
+                  </div>
+                </div>
+              )}
+              {enableReplay && (
+                <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                  <div className="tw:text-xs tw:text-slate-500">Replay expiry window</div>
+                  <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                    {formatReplayMinutes(replayAvailableForMinutes)}
+                  </div>
+                </div>
+              )}
               <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
                 <div className="tw:text-xs tw:text-slate-500">Mature content</div>
                 <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">

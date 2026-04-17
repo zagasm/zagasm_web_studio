@@ -700,11 +700,6 @@ export function Signin() {
                 Use another account
               </button>
             </div>
-            {isRememberedLoginLoading && (
-              <div className="tw:mt-3 tw:rounded-xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:px-3 tw:py-2 tw:text-[12px] tw:text-slate-600">
-                Trying quick sign-in...
-              </div>
-            )}
           </motion.div>
         )}
 
