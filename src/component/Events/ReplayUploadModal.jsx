@@ -186,12 +186,12 @@ export default function ReplayUploadModal({
               <Dialog.Panel className="tw:w-full tw:max-w-2xl tw:overflow-hidden tw:rounded-[28px] tw:bg-white tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:ring-1 tw:ring-black/5">
                 <div className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:px-5 tw:pt-5 tw:sm:px-6 tw:pt-6">
                   <div>
-                    <Dialog.Title className="tw:text-xl tw:font-semibold tw:text-slate-900">
+                    <span className="tw:block tw:text-xl tw:font-semibold tw:text-slate-900">
                       Upload replay video
-                    </Dialog.Title>
-                    <p className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                    </span>
+                    <span className="tw:block tw:mt-1 tw:text-sm tw:text-slate-500">
                       Upload the recorded replay after the event ends. The backend controls when it unlocks and when it expires.
-                    </p>
+                    </span>
                   </div>
 
                   <button
@@ -205,42 +205,24 @@ export default function ReplayUploadModal({
                 </div>
 
                 <div className="tw:px-5 tw:pb-5 tw:sm:px-6 tw:pb-6">
-                  <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
-                    <div className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4">
-                      <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                        Unlocks at
-                      </div>
-                      <div className="tw:mt-2 tw:text-sm tw:font-medium tw:text-slate-900">
-                        {formatAbsoluteDateTime(replayAvailableAt) || "After upload, based on event settings"}
-                      </div>
-                    </div>
-
-                    <div className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4">
-                      <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                        Expires at
-                      </div>
-                      <div className="tw:mt-2 tw:text-sm tw:font-medium tw:text-slate-900">
-                        {formatAbsoluteDateTime(replayExpiresAt) || "After upload, based on event settings"}
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="tw:mt-5 tw:rounded-[24px] tw:border tw:border-dashed tw:border-slate-300 tw:bg-slate-50/70 tw:p-5">
-                    <label className="tw:flex tw:cursor-pointer tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-center">
-                      <div className="tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-primary tw:shadow-sm">
-                        <Film className="tw:h-6 tw:w-6" />
-                      </div>
-                      <div>
-                        <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                          {selectedFile?.name || "Choose replay video"}
+                    <label className="tw:flex tw:min-h-[190px] tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:text-center">
+                      <div className="tw:flex tw:w-full tw:max-w-[360px] tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:mx-auto">
+                        <div className="tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-primary tw:shadow-sm">
+                          <Film className="tw:h-6 tw:w-6" />
                         </div>
-                        <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
-                          Supported video formats only. Upload is limited to ended events with replay enabled.
+                        <div className="tw:w-full">
+                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                            {selectedFile?.name || "Choose replay video"}
+                          </div>
+                          <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
+                            Supported video formats only. Upload is limited to ended events with replay enabled.
+                          </div>
                         </div>
+                        <span className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:px-4 tw:text-sm tw:font-medium tw:text-slate-700 tw:shadow-sm">
+                          Select video
+                        </span>
                       </div>
-                      <span className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:px-4 tw:text-sm tw:font-medium tw:text-slate-700 tw:shadow-sm">
-                        Select video
-                      </span>
                       <input
                         type="file"
                         accept="video/*,.m3u8"

@@ -1,256 +1,441 @@
-import React, { useEffect, useState } from "react";
-import { Sparkles } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  CalendarClock,
+  CheckCircle2,
+  CreditCard,
+  MessageSquareMore,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Wallet,
+} from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
-import { showError, showPromise } from "../../component/ui/toast";
-
-import BillingToggle from "../../component/subscription/BillingToggle";
-import PlanCard from "../../component/subscription/PlanCard";
-import FreeEligibilityCard from "../../component/subscription/FreeEligibility";
-import SmallSupportCard from "../../component/subscription/SmallSupportCard";
-import PlansSkeleton from "../../component/subscription/PlansSkeleton";
+import { showError, showSuccess } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
-import { useNavigate } from "react-router-dom";
+import {
+  formatWalletMoney,
+  getApiErrorCode,
+  getApiErrorMessage,
+} from "../../features/wallet/walletUtils";
+import WalletFundingRequiredModal from "../../features/wallet/components/WalletFundingRequiredModal";
+import FundWalletModal from "../../features/wallet/components/FundWalletModal";
+import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 
-export default function SubscriptionsPage({ }) {
-  const { token: authToken, user, refreshUser } = useAuth();
+const SUBSCRIPTION_BENEFITS = [
+  {
+    title: "Verified Badge Display",
+    description:
+      "Subscribers receive a visible badge on their profile and during live streams, which distinguishes them from regular users.",
+    icon: BadgeCheck,
+  },
+  {
+    title: "Priority Visibility in Live Streams",
+    description:
+      "Members’ comments and interactions are given higher visibility during live streams, making it easier for creators and other users to notice them.",
+    icon: MessageSquareMore,
+  },
+  {
+    title: "Exclusive Access to Premium Streams and Content",
+    description:
+      "Some live events and replays are restricted to badge members only.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Early Access to Events and Features",
+    description:
+      "Members may gain early access to upcoming live events, tickets, or newly released features.",
+    icon: CalendarClock,
+  },
+  {
+    title: "Enhanced Engagement Features",
+    description:
+      "Includes priority participation in live chats, potential access to exclusive reactions, and engagement tools.",
+    icon: Sparkles,
+  },
+  {
+    title: "Support for Creators",
+    description:
+      "The subscription helps support content creators on the platform by contributing to the ecosystem.",
+    icon: Star,
+  },
+];
+
+function formatDateTime(value) {
+  if (!value) return "Not available";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return date.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+function capitalizeWords(value) {
+  return String(value || "")
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+export default function SubscriptionsPage() {
   const navigate = useNavigate();
+  const { token, user, setAuth, refreshUser } = useAuth();
 
-  const [plans, setPlans] = useState([]);
-  const [plansMeta, setPlansMeta] = useState(null);
-  const [loadingPlans, setLoadingPlans] = useState(true);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(false);
+  const [fundingRequiredOpen, setFundingRequiredOpen] = useState(false);
+  const [fundingRequiredDetails, setFundingRequiredDetails] = useState(null);
+  const [fundWalletOpen, setFundWalletOpen] = useState(false);
 
-  const [eligibility, setEligibility] = useState(null);
-  const [loadingEligibility, setLoadingEligibility] = useState(true);
+  const loadSubscriptionStatus = useCallback(async () => {
+    if (!token) {
+      setSubscriptionStatus(null);
+      setLoading(false);
+      return null;
+    }
 
-  const [billingInterval, setBillingInterval] = useState("monthly");
-  const [initializingPlanId, setInitializingPlanId] = useState(null);
-
-  const isAuthenticated = !!authToken;
+    try {
+      setLoading(true);
+      const res = await api.get("/api/v1/user/subscription", authHeaders(token));
+      const payload = res?.data?.data || res?.data || null;
+      setSubscriptionStatus(payload);
+      return payload;
+    } catch (error) {
+      console.error("Failed to load subscription status", error);
+      showError("Unable to load subscription details right now.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    if (!user) return;
-
-    if (user.subscription != null) {
-      navigate("/account", { replace: true });
-    }
-  }, [user, isAuthenticated, navigate]);
-
-  useEffect(() => {
-    fetchPlans();
-    fetchEligibility();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function fetchPlans(page = 1) {
-    try {
-      setLoadingPlans(true);
-      const res = await api.get("/api/v1/subscription-plans", {
-        params: { page },
-        ...authHeaders(authToken),
-      });
-
-      const payload = res?.data?.data;
-      const items = payload?.data || [];
-      setPlans(items);
-      setPlansMeta({
-        currentPage: payload?.current_page,
-        lastPage: payload?.last_page,
-        total: payload?.total,
-      });
-    } catch (err) {
-      console.error(err);
-      showError("Unable to load subscription plans.");
-    } finally {
-      setLoadingPlans(false);
-    }
-  }
-
-  async function fetchEligibility() {
-    try {
-      setLoadingEligibility(true);
-      const res = await api.get("/api/v1/free-plan/eligibility", {
-        ...authHeaders(authToken),
-      });
-      setEligibility(res?.data?.data || null);
-    } catch (err) {
-      console.error(err);
-      // non-blocking error
-    } finally {
-      setLoadingEligibility(false);
-    }
-  }
-
-  function handleChangeInterval(next) {
-    setBillingInterval(next);
-  }
-
-  async function handleSubscribe(plan) {
-    if (!isAuthenticated) {
-      showError("Please sign in to subscribe.");
+    if (!token) {
+      navigate("/auth/signin", { replace: true });
       return;
     }
 
-    try {
-      setInitializingPlanId(plan.id);
+    loadSubscriptionStatus();
+  }, [loadSubscriptionStatus, navigate, token]);
 
-      const promise = api.post(
-        `/api/v1/user/subscription/create`,
-        {
-          plan_id: plan.id,
-          billing_interval: billingInterval,
-          channel: "card",
+  const subscriptionPrice = Number(subscriptionStatus?.price) || 2500;
+  const subscriptionCurrency = subscriptionStatus?.currency || "NGN";
+  const formattedSubscriptionPrice = formatWalletMoney(
+    subscriptionPrice,
+    subscriptionCurrency
+  );
+  const hasActiveSubscription = !!(
+    subscriptionStatus?.has_active_subscription ||
+    user?.has_active_subscription ||
+    user?.subscription?.isActive
+  );
+  const currentSubscription =
+    subscriptionStatus?.subscription || subscriptionStatus?.latest_subscription || null;
+  const currentPlanName =
+    currentSubscription?.plan?.name || "Verification Badge";
+  const currentPlanCode =
+    currentSubscription?.plan?.code ||
+    currentSubscription?.meta?.badge ||
+    "Verification_badge";
+
+  const statusItems = useMemo(
+    () => [
+      {
+        label: "Status",
+        value: capitalizeWords(currentSubscription?.status || "inactive"),
+      },
+      {
+        label: "Billing interval",
+        value: capitalizeWords(currentSubscription?.billing_interval || "monthly"),
+      },
+      {
+        label: "Current period start",
+        value: formatDateTime(currentSubscription?.current_period_start),
+      },
+      {
+        label: "Current period end",
+        value: formatDateTime(currentSubscription?.current_period_end),
+      },
+      {
+        label: "Last payment",
+        value: formatDateTime(currentSubscription?.last_payment_at),
+      },
+      {
+        label: "Source",
+        value: capitalizeWords(currentSubscription?.source || "wallet"),
+      },
+    ],
+    [currentSubscription]
+  );
+
+  const markLocalSubscriptionAsActive = useCallback(
+    (nextStatus = null) => {
+      if (!user) return;
+
+      setAuth({
+        user: {
+          ...user,
+          has_active_subscription: true,
+          subscription: {
+            ...user?.subscription,
+            ...(nextStatus?.subscription || {}),
+            isActive: true,
+            current_period_end:
+              nextStatus?.subscription?.current_period_end ||
+              user?.subscription?.current_period_end,
+          },
         },
-        authHeaders(authToken)
+        token,
+      });
+    },
+    [setAuth, token, user]
+  );
+
+  const handleInitializeSubscription = async () => {
+    if (!token || initializing || hasActiveSubscription) return;
+
+    setInitializing(true);
+
+    try {
+      const res = await api.post(
+        "/api/v1/user/subscription/subscribe-wallet",
+        null,
+        authHeaders(token)
       );
 
-      showPromise(promise, {
-        loading: "Initializing secure Paystack checkout…",
-        success: "Redirecting to Paystack…",
-        error: "Unable to start subscription. Please try again.",
-      });
+      const payload = res?.data?.data || {};
+      const message =
+        res?.data?.message || "Verification badge subscription activated successfully.";
 
-      const res = await promise;
+      setSubscriptionStatus((previous) => ({
+        ...(previous || {}),
+        ...payload,
+        has_active_subscription: true,
+        subscription: {
+          ...(previous?.subscription || {}),
+          ...(payload?.subscription || {}),
+        },
+      }));
+      markLocalSubscriptionAsActive(payload);
+      showSuccess(message);
 
-      const data = res?.data?.data || res?.data || {};
-      const redirectUrl =
-        data.authorization_url ||
-        data.checkout_url ||
-        data.url ||
-        data.redirect_url;
+      await Promise.all([refreshUser?.(), loadSubscriptionStatus()]);
+    } catch (error) {
+      const status = error?.response?.status;
+      const code = getApiErrorCode(error);
+      const message = getApiErrorMessage(
+        error,
+        "Unable to initialize your subscription right now."
+      );
+      const details = error?.response?.data?.data || {};
 
-      if (!redirectUrl) {
-        showError("Payment link not provided by server.");
+      if (
+        status === 422 &&
+        (code === "INSUFFICIENT_BALANCE" ||
+          message === "Insufficient balance. Please fund your wallet.")
+      ) {
+        setFundingRequiredDetails({
+          wallet_balance: details?.wallet_balance || 0,
+          required_amount: details?.required_amount || subscriptionPrice,
+          deficit_amount: details?.deficit_amount || 0,
+        });
+        setFundingRequiredOpen(true);
+        showError("Insufficient balance. Please fund your wallet.");
         return;
       }
 
-      window.location.href = redirectUrl;
-    } catch (err) {
-      console.error(err);
+      showError(message);
+      console.error("Verification badge subscription error:", error);
     } finally {
-      setInitializingPlanId(null);
+      setInitializing(false);
     }
-  }
-
-  const isFreeEligibleGlobal = eligibility?.eligible === true;
+  };
 
   return (
-    <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:text-slate-900 tw:pt-24 tw:md:pt-28 tw:px-4 tw:pb-20 tw:flex tw:justify-center">
-      <div className="tw:w-full tw:max-w-6xl">
-        {/* Header */}
-        <div className="tw:flex tw:flex-col tw:items-center tw:text-center tw:gap-4 tw:mb-10">
-          <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary/5 tw:px-4 tw:py-1 tw:border tw:border-primary/15">
-            <Sparkles className="tw:w-4 tw:h-4 tw:text-primary" />
-            <span className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-primary">
-              Xilolo • Subscriptions
-            </span>
+    <>
+      <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:px-4 tw:pb-20 tw:pt-24 tw:text-slate-900 tw:md:px-6 tw:md:pt-28">
+        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-6xl tw:flex-col tw:gap-6">
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+            <Link
+              to="/account"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-slate-700 hover:tw:text-slate-900"
+            >
+              <ArrowLeft className="tw:h-4 tw:w-4" />
+              Back to account
+            </Link>
           </div>
 
-          <div className="tw:max-w-3xl">
-            <span className="tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight">
-              Plans that scale with{" "}
-              <span className="tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:bg-clip-text tw:text-transparent">
-                your events
-              </span>
-            </span>
-          </div>
-
-          <div className="tw:max-w-2xl">
-            <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-600">
-              Unlock more templates, more reach and deeper insights — without
-              overthinking pricing. Switch between monthly and yearly anytime.
-            </span>
-          </div>
-
-          <BillingToggle
-            value={billingInterval}
-            onChange={handleChangeInterval}
-          />
-
-          {!isAuthenticated && (
-            <span className="tw:text-xs tw:mt-1 tw:text-amber-700">
-              You’re viewing plans as a guest.{" "}
-              <span className="tw:font-medium">
-                Sign in to actually subscribe.
-              </span>
-            </span>
-          )}
-        </div>
-
-        {/* Layout: Plans + side panel */}
-        <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] tw:gap-6">
-          {/* Plans */}
-          <section>
-            {loadingPlans ? (
-              <PlansSkeleton />
-            ) : plans.length === 0 ? (
-              <div className="tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:px-6 tw:py-10 tw:text-center tw:shadow-sm">
-                <span className="tw:text-slate-500 tw:text-sm">
-                  No subscription plans are available yet.
-                </span>
-              </div>
-            ) : (
-              <div className="tw:grid tw:grid-cols-1 tw:gap-5">
-                {plans.map((plan) => (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    billingInterval={billingInterval}
-                    selecting={initializingPlanId === plan.id}
-                    isFreeEligibleGlobal={isFreeEligibleGlobal}
-                    onSubscribe={() => handleSubscribe(plan)}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination footer */}
-            {plansMeta && plansMeta.lastPage > 1 && (
-              <div className="tw:flex tw:items-center tw:justify-between tw:mt-6 tw:text-xs tw:text-slate-500">
-                <span>
-                  Page {plansMeta.currentPage} of {plansMeta.lastPage}
-                </span>
-                <div className="tw:flex tw:gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      fetchPlans(Math.max(1, plansMeta.currentPage - 1))
-                    }
-                    disabled={plansMeta.currentPage <= 1 || loadingPlans}
-                    className="tw:px-3 tw:py-1 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:disabled:opacity-40 tw:text-slate-700 tw:shadow-sm"
-                  >
-                    <span>Prev</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      fetchPlans(
-                        Math.min(plansMeta.lastPage, plansMeta.currentPage + 1)
-                      )
-                    }
-                    disabled={
-                      plansMeta.currentPage >= plansMeta.lastPage ||
-                      loadingPlans
-                    }
-                    className="tw:px-3 tw:py-1 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:disabled:opacity-40 tw:text-slate-700 tw:shadow-sm"
-                  >
-                    <span>Next</span>
-                  </button>
+          <section className="tw:relative tw:overflow-hidden tw:rounded-[32px] tw:bg-primary tw:p-6 tw:text-white tw:shadow-[0_24px_80px_rgba(15,23,42,0.18)] tw:md:p-8">
+            <span className="tw:pointer-events-none tw:absolute tw:-right-10 tw:-top-10 tw:h-40 tw:w-40 tw:rounded-full tw:bg-white/10 tw:blur-3xl" />
+            <span className="tw:pointer-events-none tw:absolute tw:-left-8 tw:bottom-0 tw:h-32 tw:w-32 tw:rounded-full tw:bg-white/10 tw:blur-3xl" />
+            <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
+              <div>
+                <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-white/15 tw:bg-white/10 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em]">
+                  <SubscriptionBadge className="tw:h-4 tw:w-4 tw:text-white" />
+                  Verification Badge Subscription
                 </div>
+                <span className="tw:block tw:mt-4 tw:text-3xl tw:font-semibold tw:leading-tight tw:md:text-5xl">
+                  Subscribe once, keep your badge benefits in one place.
+                </span>
+                <span className="tw:block tw:mt-3 tw:max-w-2xl tw:text-sm tw:text-white/85 tw:md:text-base">
+                  Review your Verification badge benefits, current subscription status,
+                  and initialize your subscription directly from this page.
+                </span>
               </div>
-            )}
+
+              <div className="tw:rounded-[28px] tw:border tw:border-white/15 tw:bg-white/10 tw:p-5 tw:backdrop-blur">
+                <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+                  <div>
+                    <div className="tw:text-sm tw:text-white/70">Subscription amount</div>
+                    <div className="tw:mt-1 tw:text-3xl tw:font-semibold">
+                      {formattedSubscriptionPrice}
+                    </div>
+                    <div className="tw:mt-1 tw:text-sm tw:text-white/70">
+                      Charged monthly from your wallet balance.
+                    </div>
+                  </div>
+                  {hasActiveSubscription ? (
+                    <span className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-emerald-500/20 tw:px-3 tw:py-1 tw:text-xs tw:font-semibold tw:text-emerald-50">
+                      <CheckCircle2 className="tw:h-4 tw:w-4" />
+                      Active
+                    </span>
+                  ) : (
+                    <span className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-white/10 tw:px-3 tw:py-1 tw:text-xs tw:font-semibold tw:text-white">
+                      Inactive
+                    </span>
+                  )}
+                </div>
+
+                <button
+                style={{
+                  borderRadius: 24,
+                  marginTop: 24
+                }}
+                  type="button"
+                  onClick={handleInitializeSubscription}
+                  disabled={loading || initializing || hasActiveSubscription}
+                  className="tw:mt-6 tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-5 tw:text-sm tw:font-semibold tw:text-primary tw:transition hover:tw:bg-white/90 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                >
+                  <Wallet className="tw:h-4 tw:w-4" />
+                  <span>
+                    {hasActiveSubscription
+                      ? "Subscription already active"
+                      : initializing
+                        ? "Initializing subscription..."
+                        : "Initialize subscription"}
+                  </span>
+                </button>
+              </div>
+            </div>
           </section>
 
-          {/* Side panel */}
-          <aside className="tw:space-y-4">
-            <FreeEligibilityCard
-              eligibility={eligibility}
-              loading={loadingEligibility}
-            />
-            {/* <SmallSupportCard /> */}
-          </aside>
+          <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+            <section className="tw:rounded-4xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+              <div className="tw:flex tw:items-center tw:gap-2">
+                <Sparkles className="tw:h-5 tw:w-5 tw:text-primary" />
+                <span className="tw:block tw:text-xl tw:font-semibold tw:text-slate-900">
+                  Membership benefits
+                </span>
+              </div>
+
+              <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2">
+                {SUBSCRIPTION_BENEFITS.map((benefit) => {
+                  const Icon = benefit.icon;
+
+                  return (
+                    <div
+                      key={benefit.title}
+                      className="tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4"
+                    >
+                      <div className="tw:flex tw:items-start tw:gap-3">
+                        <span className="tw:flex tw:h-10 tw:w-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/10 tw:text-primary">
+                          <Icon className="tw:h-5 tw:w-5" />
+                        </span>
+                        <div>
+                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                            {benefit.title}
+                          </div>
+                          <span className="tw:mt-1 tw:text-sm tw:leading-6 tw:text-slate-600">
+                            {benefit.description}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <aside className="tw:space-y-6">
+              <section className="tw:rounded-4xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <CreditCard className="tw:h-5 tw:w-5 tw:text-primary" />
+                  <span className="tw:text-xl tw:font-semibold tw:text-slate-900">
+                    Subscription details
+                  </span>
+                </div>
+
+                {loading ? (
+                  <div className="tw:mt-5 tw:space-y-3">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="tw:h-14 tw:animate-pulse tw:rounded-2xl tw:bg-slate-100"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="tw:mt-5 tw:space-y-3">
+                    {statusItems.map((item) => (
+                      <div
+                        key={item.label}
+                        className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-4"
+                      >
+                        <span className="tw:text-sm tw:text-slate-500">{item.label}</span>
+                        <span className="tw:max-w-[60%] tw:text-right tw:text-sm tw:font-medium tw:text-slate-900">
+                          {item.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </aside>
+          </div>
         </div>
       </div>
-    </div>
+
+      <WalletFundingRequiredModal
+        open={fundingRequiredOpen}
+        onClose={() => setFundingRequiredOpen(false)}
+        details={fundingRequiredDetails}
+        formatAmount={(amount) =>
+          formatWalletMoney(amount, subscriptionCurrency)
+        }
+        title="Wallet funding required"
+        description="Your wallet balance is not enough to subscribe to the Xilolo badge right now."
+        requiredAmountLabel="Subscription amount"
+        onFundWallet={() => {
+          setFundingRequiredOpen(false);
+          setFundWalletOpen(true);
+        }}
+      />
+      <FundWalletModal
+        open={fundWalletOpen}
+        onClose={() => setFundWalletOpen(false)}
+        prefilledAmount={fundingRequiredDetails?.deficit_amount || ""}
+        source="Verification_badge_subscription"
+      />
+    </>
   );
 }

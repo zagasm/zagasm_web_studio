@@ -204,7 +204,7 @@ export default function ReviewStep({
         </div>
       )}
 
-      <div className="tw:mb-6 tw:overflow-hidden tw:rounded-[28px] tw:bg-linear-to-br tw:from-[#1f1536] tw:via-[#33165e] tw:to-[#7b1be0] tw:p-6 tw:text-white">
+      <div className="tw:mb-6 tw:overflow-hidden tw:rounded-[28px] tw:bg-primary tw:p-6 tw:text-white">
         <div className="tw:flex tw:flex-col tw:gap-6 tw:lg:flex-row tw:lg:items-end tw:lg:justify-between">
           <div className="tw:max-w-2xl">
             <div className="tw:inline-flex tw:rounded-full tw:bg-white/10 tw:px-3 tw:py-1 tw:text-[11px] tw:uppercase tw:tracking-[0.2em]">
