@@ -8,10 +8,13 @@ import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { api } from "../../../lib/apiClient";
 import { isAppleAuthConfigured } from "../../../lib/appleAuth";
+import {
+  isValidEmailAddress,
+  normalizeEmailInput,
+} from "../../../lib/emailValidation";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 export function SignUp() {
@@ -38,6 +41,11 @@ export function SignUp() {
     email: "",
     password: ""
   });
+  const normalizedEmail = normalizeEmailInput(formData.email);
+  const emailFormatError =
+    normalizedEmail && !isValidEmailAddress(normalizedEmail)
+      ? "Please enter a valid email address."
+      : "";
 
   useEffect(() => {
     if (formData.password) {
@@ -48,9 +56,9 @@ export function SignUp() {
   }, [formData.password]);
 
   useEffect(() => {
-    const trimmedEmail = formData.email.trim();
+    const trimmedEmail = normalizeEmailInput(formData.email);
 
-    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+    if (!trimmedEmail || !isValidEmailAddress(trimmedEmail)) {
       emailCheckRequestId.current += 1;
       setCheckedEmail("");
       setEmailExistsError("");
@@ -106,9 +114,9 @@ export function SignUp() {
   };
 
   const checkEmailExists = async (email) => {
-    const trimmedEmail = email.trim();
+    const trimmedEmail = normalizeEmailInput(email);
 
-    if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+    if (!trimmedEmail || !isValidEmailAddress(trimmedEmail)) {
       setEmailExistsError("");
       setCheckedEmail("");
       return null;
@@ -153,15 +161,15 @@ export function SignUp() {
       return;
     }
 
-    if (!EMAIL_REGEX.test(formData.email.trim())) {
+    if (!isValidEmailAddress(normalizedEmail)) {
       showError("Please enter a valid email");
       return;
     }
 
     let existsResult = null;
 
-    if (checkedEmail !== formData.email.trim()) {
-      existsResult = await checkEmailExists(formData.email);
+    if (checkedEmail !== normalizedEmail) {
+      existsResult = await checkEmailExists(normalizedEmail);
     }
 
     if (existsResult === true) {
@@ -170,7 +178,7 @@ export function SignUp() {
     }
 
     if (
-      checkedEmail === formData.email.trim() &&
+      checkedEmail === normalizedEmail &&
       emailExistsError
     ) {
       showError(emailExistsError);
@@ -182,7 +190,7 @@ export function SignUp() {
       const payload = {
         first_name: formData.first_name,
         last_name: formData.last_name,
-        email: formData.email,
+        email: normalizedEmail,
         password: formData.password
       };
 
@@ -298,7 +306,7 @@ export function SignUp() {
     return (
       formData.first_name.trim() !== "" &&
       formData.last_name.trim() !== "" &&
-      formData.email.trim() !== "" &&
+      isValidEmailAddress(normalizedEmail) &&
       formData.password.trim() !== ""
     );
   };
@@ -436,9 +444,11 @@ export function SignUp() {
             value={formData.email}
             onChange={handleChange}
             required
-            error={false}
+            error={Boolean(emailFormatError)}
             helperText={
-              emailExistsError ? (
+              emailFormatError ? (
+                emailFormatError
+              ) : emailExistsError ? (
                 <span className="tw:inline-flex tw:flex-wrap tw:items-center tw:gap-1 tw:text-black">
                   {emailExistsError}{" "}
                   <Link to="/auth/signin" className="tw:font-semibold tw:underline">
@@ -462,7 +472,8 @@ export function SignUp() {
                 backgroundColor: "#fff",
               },
               "& .MuiFormHelperText-root": {
-                color: showBlackEmailHint ? "#111111" : undefined,
+                color:
+                  !emailFormatError && showBlackEmailHint ? "#111111" : undefined,
                 marginLeft: 0,
                 whiteSpace: "nowrap",
               },

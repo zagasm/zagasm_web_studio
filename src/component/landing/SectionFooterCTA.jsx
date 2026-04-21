@@ -82,7 +82,7 @@ export default function Footer() {
                   },
                   {
                     Icon: FaTiktok,
-                    href: "https://www.tiktok.com/@zagasmstudios_hq?_r=1&_t=ZS-91QAAEVGGRO",
+                    href: "https://www.tiktok.com/@xilolo_hq?is_from_webapp=1&sender_device=pc",
                   },
                 ].map(({ Icon, href }, i) => (
                   <motion.a

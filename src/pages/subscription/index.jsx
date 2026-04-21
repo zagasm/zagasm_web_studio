@@ -275,7 +275,7 @@ export default function SubscriptionsPage() {
             </Link>
           </div>
 
-          <section className="tw:relative tw:overflow-hidden tw:rounded-[32px] tw:bg-primary tw:p-6 tw:text-white tw:shadow-[0_24px_80px_rgba(15,23,42,0.18)] tw:md:p-8">
+          <section className="tw:relative tw:overflow-hidden tw:rounded-4xl tw:bg-primary tw:p-6 tw:text-white tw:shadow-[0_24px_80px_rgba(15,23,42,0.18)] tw:md:p-8">
             <span className="tw:pointer-events-none tw:absolute tw:-right-10 tw:-top-10 tw:h-40 tw:w-40 tw:rounded-full tw:bg-white/10 tw:blur-3xl" />
             <span className="tw:pointer-events-none tw:absolute tw:-left-8 tw:bottom-0 tw:h-32 tw:w-32 tw:rounded-full tw:bg-white/10 tw:blur-3xl" />
             <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
@@ -332,7 +332,7 @@ export default function SubscriptionsPage() {
                       ? "Subscription already active"
                       : initializing
                         ? "Initializing subscription..."
-                        : "Initialize subscription"}
+                        : "Subscribe now"}
                   </span>
                 </button>
               </div>
