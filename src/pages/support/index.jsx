@@ -10,102 +10,129 @@ function Support() {
 
   const faqs = [
     {
-      question: "I can’t log in to my account. What should I do?",
+      heading: "General Questions",
+    },
+    {
+      question: "What is Xilolo?",
       answer: [
-        "Make sure your internet connection is stable.",
-        "Update the app to the latest version from your app store.",
-        "If you use social login, confirm the correct account is selected.",
-        "If the problem persists, contact us at support@xilolo.com.",
+        "Xilolo is an interactive live streaming platform where creators host events and users can watch, learn, and engage in real time. It supports entertainment, education, and private sessions.",
       ],
     },
     {
-      question: "How do I create a live event or go live?",
+      question: "Who can use Xilolo?",
       answer: [
-        "Tap Create Event on the Home or Profile tab.",
-        "Add a title, description, date/time, and a cover image.",
-        "Choose Live now (instant) or Schedule for later.",
-        "If using an external encoder, copy your RTMP server and Stream Key from the event setup screen.",
+        "Anyone can use Xilolo. Whether you are a content creator, educator, entertainer, or viewer, you can either host events or attend them.",
       ],
     },
     {
-      question: "How do viewers join or watch an event?",
+      question: "Is Xilolo free to use?",
       answer: [
-        "Open the event page and tap Join Stream when it’s live.",
-        "If the event is scheduled, tap Remind Me to get notified when it starts.",
-        "For private or ticketed events, make sure you have access or a valid ticket.",
+        "The app is free to download and sign up, but most events require payment depending on the creator’s pricing.",
       ],
     },
     {
-      question: "Why am I not seeing new or upcoming events?",
+      heading: "For Viewers",
+    },
+    {
+      question: "How do I join a live stream?",
       answer: [
-        "Pull down to refresh your feed or the Events tab.",
-        "Check your filters (e.g., category, location, ‘live now’ only).",
-        "Follow more organizers to see their events on your Home feed.",
-        "Ensure you’re online and not in Data Saver mode.",
+        "Create an account, browse available events, and click “Join” on any live or scheduled session.",
       ],
     },
     {
-      question: "My stream is buffering or low quality. How can I fix it?",
+      question: "Can I interact during a stream?",
       answer: [
-        "Switch to a stronger Wi-Fi or stable 4G/5G network.",
-        "Close other apps that might be using bandwidth.",
-        "Reduce the playback quality from the player settings.",
-        "Creators: stream at a stable bitrate and avoid frequent network switches.",
+        "Yes, you can chat, ask questions, and engage with the host in real time.",
       ],
     },
     {
-      question: "Can I upload posters or schedule events in advance?",
+      question: "Do I need to pay for all content?",
       answer: [
-        "Yes. During Create Event, add a poster/thumbnail and set a future date/time.",
-        "Use the Share button to promote your event link on social media.",
-        "Tap Remind Me to notify your followers before you go live.",
+        "Most content requires payment based on the creator’s pricing.",
       ],
     },
     {
-      question: "How do I report inappropriate content or a stream?",
+      question: "Can I watch past streams?",
       answer: [
-        "Tap the ⋮ (more) icon on the event or stream.",
-        "Select Report and choose a reason.",
-        "Optionally add details—this helps our team review faster.",
+        "This depends on the creator. Some provide replays, while others only host live sessions.",
       ],
     },
     {
-      question: "Can I collaborate or add co-hosts to my event?",
+      heading: "For Creators",
+    },
+    {
+      question: "How do I start streaming on Xilolo?",
       answer: [
-        "Yes, on the event setup screen, add co-hosts or moderators (if enabled for your account).",
-        "Co-hosts can help manage chat and, if granted, share the stage.",
+        "Sign up, create an event, set your pricing, and go live at your scheduled time.",
       ],
     },
     {
-      question: "Are replays available after the live ends?",
+      question: "What kind of content can I stream?",
       answer: [
-        "Creators can enable Replay during event setup.",
-        "If enabled, the stream is available on the event page after it ends.",
-        "Some events (e.g., premium) may limit or disable replays.",
+        "You can host live shows, classes or tutorials, concerts, private sessions, and interactive workshops.",
       ],
     },
     {
-      question: "I bought a ticket but can’t enter the event.",
+      question: "Can I earn money on Xilolo?",
       answer: [
-        "Make sure you’re logged into the same account used for purchase.",
-        "From the event page, tap Access Ticket to link your purchase.",
-        "If you still can’t join, contact support@xilolo.com with your payment reference.",
+        "Yes, you can monetize your streams through paid access, tickets, or exclusive sessions.",
       ],
     },
     {
-      question: "I’m not getting notifications for events I follow.",
+      question: "How do I get paid?",
       answer: [
-        "Check that notifications are enabled in device Settings and in-app Settings > Notifications.",
-        "Tap Remind Me on event pages for a start-time alert.",
-        "Following organizers increases the chance you’ll see their events on your feed.",
+        "Creators earn from paid events based on the platform’s payout system and policies.",
       ],
     },
     {
-      question: "How do I delete or edit my scheduled event?",
+      heading: "Technical and Account",
+    },
+    {
+      question: "What devices support Xilolo?",
       answer: [
-        "Go to Profile > My Events.",
-        "Open the scheduled event and tap Edit to update details or Delete to cancel.",
-        "Attendees who set reminders will be notified of major changes.",
+        "Xilolo works on smartphones, tablets, and compatible desktop devices.",
+      ],
+    },
+    {
+      question: "What internet speed do I need?",
+      answer: [
+        "Viewers need at least 5 Mbps, while creators are recommended to have at least 10 Mbps for smooth streaming.",
+      ],
+    },
+    {
+      question: "What should I do if the app is not working properly?",
+      answer: [
+        "Update the app, check your internet connection, restart your device, and contact support if the issue persists.",
+      ],
+    },
+    {
+      heading: "Safety and Privacy",
+    },
+    {
+      question: "Is my data safe on Xilolo?",
+      answer: [
+        "Xilolo collects basic information such as email, name, and user content to operate the platform securely.",
+      ],
+    },
+    {
+      question: "Can I host private events?",
+      answer: [
+        "Yes, you can restrict access to selected users or paid participants only.",
+      ],
+    },
+    {
+      heading: "Growth and Experience",
+    },
+    {
+      question: "How can I grow my audience on Xilolo?",
+      answer: [
+        "Promote your streams on social media, stay consistent with your schedule, engage actively with your audience, and offer valuable content.",
+      ],
+    },
+    {
+      question: "What makes Xilolo different from other platforms?",
+      answer: [
+        "Xilolo combines live streaming, real-time interaction, monetization, and both education and entertainment in one platform.",
       ],
     },
   ];
@@ -113,49 +140,63 @@ function Support() {
   return (
     <div className="support-container">
       <div className="support-header">
-        <h1>Xilolo Support</h1>
-        <p>
-          🎉 Welcome to the Xilolo Support Center 🎉 <br />
-          We’re here to make sure your laughter never stops!
-        </p>
+        <span className="tw:text-primary tw:text-2xl tw:md:text-3xl tw:font-bold">Xilolo Support</span>
+        <span className="tw:block tw:text-secondary tw:text-lg tw:md:text-xl tw:mt-2">
+             Welcome to the Xilolo Support Center <br />
+          Weâ€™re here to make sure your laughter never stops!
+        </span>
       </div>
 
       <section className="faq-section">
         <h2>Frequently Asked Questions (FAQ)</h2>
         <div className="faq-list">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className={`faq-item ${openFAQ === index ? "open" : ""}`}
-            >
-              <button className="faq-question" onClick={() => toggleFAQ(index)}>
-                {faq.question}
-                <span className="arrow">{openFAQ === index ? "−" : "+"}</span>
-              </button>
-              {openFAQ === index && (
-                <div className="faq-answer">
-                  <ul>
-                    {faq.answer.map((line, i) => (
-                      <li key={i}>{line}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ))}
+          {faqs.map((faq, index) =>
+            faq.heading ? (
+              <div key={index} className="faq-category">
+                <h3>{faq.heading}</h3>
+              </div>
+            ) : (
+              <div
+                key={index}
+                className={`faq-item ${openFAQ === index ? "open" : ""}`}
+              >
+                <button className="faq-question" onClick={() => toggleFAQ(index)}>
+                  {faq.question}
+                  <span className="arrow">{openFAQ === index ? "âˆ’" : "+"}</span>
+                </button>
+                {openFAQ === index && (
+                  <div className="faq-answer">
+                    <ul>
+                      {faq.answer.map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )
+          )}
         </div>
       </section>
 
       <section className="contact-section">
         <h2>Contact Us</h2>
-        <p>Still need help? We’d love to hear from you 💌</p>
+        <span className="tw:text-secondary tw:text-lg tw:md:text-xl tw:mt-2">Still need help? Weâ€™d love to hear from you ðŸ’Œ</span>
         <ul>
           <li>
-            📧 Email: <a href="mailto:support@xilolo.com">support@xilolo.com</a>
+            ðŸ“§ Email: <a style={{
+              color: "#111111",
+              textDecoration: "underline",
+              fontWeight: "500",
+            }} className="tw:text-primary tw:underline" href="mailto:support@xilolo.com">support@xilolo.com</a>
           </li>
           <li>
-            🌐 Website:{" "}
-            <a
+            ðŸŒ Website:{" "}
+            <a style={{
+              color: "#111111",
+              textDecoration: "underline",
+              fontWeight: "500",
+            }} className="tw:text-primary tw:underline"
               href="https://www.xilolo.com"
               target="_blank"
               rel="noreferrer"
@@ -164,14 +205,14 @@ function Support() {
             </a>
           </li>
           <li>
-            📱 Twitter / Instagram / TikTok: <b>@zagasmapp</b>
+            ðŸ“± Twitter / Instagram / TikTok: <b>@xilolo_hq</b>
           </li>
         </ul>
       </section>
 
       <section className="guidelines-section">
         <h2>Community Guidelines</h2>
-        <p>To keep Xilolo fun for everyone, please avoid:</p>
+        <span className="tw:text-secondary tw:text-lg tw:md:text-xl tw:mt-2">To keep Xilolo fun for everyone, please avoid:</span>
         <ul>
           <li>Posting hateful or harmful content.</li>
           <li>Sharing copyrighted memes without permission.</li>
@@ -180,13 +221,8 @@ function Support() {
       </section>
 
       <section className="feedback-section">
-        <h2>Feedback</h2>
-        <p>
-          Your feedback helps us improve! If you have suggestions for new
-          features, memes, or improvements, reach us anytime via the app under{" "}
-          <b>Settings &gt; Feedback</b>.
-        </p>
-        <p className="footer">✨ Keep laughing, keep zagging! ✨</p>
+        
+        <p className="tw:block tw:text-secondary tw:text-lg tw:md:text-xl tw:mt-2" className="footer">âœ¨ Thank you for your feedback! âœ¨</p>
       </section>
     </div>
   );
