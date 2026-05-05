@@ -57,17 +57,7 @@ export default function Home() {
               : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
               }`}
           >
-            All
-          </button>
-          <button
-            style={{ borderRadius: 16 }}
-            onClick={() => handleTabChange("upcoming")}
-            className={`tw:px-5 tw:md:px-6 tw:py-2 tw:rounded-xl tw:text-[10px] tw:md:text-sm tw:font-medium ${activeTab === "upcoming"
-              ? "tw:bg-primary tw:text-white"
-              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200"
-              }`}
-          >
-            Trending
+            For You
           </button>
           <button
             style={{ borderRadius: 16 }}
@@ -90,12 +80,10 @@ export default function Home() {
             endpoint={
               activeTab === "live"
                 ? "/api/v1/events/view/live"
-                : activeTab === "all"
-                  ? "/api/v1/events/all/get"
-                  : "/api/v1/events"
+                : "/api/v1/events/all/get"
             }
             live={activeTab === "live"}
-            upcoming={activeTab === "upcoming"}
+            upcoming={false}
             all={activeTab === "all"}
           />
 

@@ -15,6 +15,7 @@ import {
 import defaultAvatar from "../../../assets/avater_pix.avif";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { isAppleAuthConfigured } from "../../../lib/appleAuth";
+import { getWebDeviceName } from "../../../lib/deviceName";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
 
@@ -327,6 +328,7 @@ export function Signin() {
       const payload = {
         input: formData.email,
         password: formData.password,
+        device_name: getWebDeviceName(),
       };
 
       const response = await axios.post(
@@ -373,7 +375,7 @@ export function Signin() {
     try {
       const { data } = await api.post("/api/v1/google/login", {
         id_token: idToken,
-        device_name: navigator.userAgent || "Web Browser",
+        device_name: getWebDeviceName(),
       });
 
       if (!data?.token || !data?.user) {
@@ -415,7 +417,7 @@ export function Signin() {
     try {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
-        device_name: navigator.userAgent || "React Web",
+        device_name: getWebDeviceName(),
       });
 
       if (!data?.token || !data?.user) {

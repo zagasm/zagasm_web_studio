@@ -1,39 +1,27 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { api, authHeaders } from "../../lib/apiClient";
+import { useQueryClient } from "@tanstack/react-query";
 import { subscribeToForcedLogout, emitForcedLogout } from "../../lib/authSessionSignals";
-import { canUseRealtimePusher, createRealtimePusher } from "../../lib/realtimePusher";
+import {
+  connectSessionRealtime,
+  disconnectSessionRealtime,
+} from "../../lib/sessionRealtime";
 import { useAuth } from "../../pages/auth/AuthContext";
-
-const SESSION_CHECK_INTERVAL_MS = 8000;
 
 export default function ForcedLogoutModalHost() {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { token, user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState(
     "You have been logged out because you have logged in on another device."
   );
   const isHandlingRef = useRef(false);
-  const isCheckingRef = useRef(false);
-  const pusherRef = useRef(null);
-  const channelRef = useRef(null);
 
   const disconnectRealtime = useCallback(() => {
-    if (channelRef.current) {
-      channelRef.current.unbind_all();
-      if (pusherRef.current) {
-        pusherRef.current.unsubscribe(channelRef.current.name);
-      }
-      channelRef.current = null;
-    }
-
-    if (pusherRef.current) {
-      pusherRef.current.disconnect();
-      pusherRef.current = null;
-    }
+    disconnectSessionRealtime();
   }, []);
 
   const handleForcedLogout = useCallback(
@@ -47,33 +35,15 @@ export default function ForcedLogoutModalHost() {
       );
       setOpen(true);
       disconnectRealtime();
+      queryClient.clear();
       logout();
 
       if (location.pathname !== "/auth/signin") {
         navigate("/auth/signin", { replace: true });
       }
     },
-    [disconnectRealtime, location.pathname, logout, navigate]
+    [disconnectRealtime, location.pathname, logout, navigate, queryClient]
   );
-
-  const validateSession = useCallback(async () => {
-    if (!token || !user || isCheckingRef.current) return;
-
-    isCheckingRef.current = true;
-    try {
-      await api.get("/api/v1/profile", authHeaders(token));
-    } catch (error) {
-      if (error?.response?.status === 401) {
-        emitForcedLogout({
-          reason: "another_device",
-          message:
-            "You have been logged out because you have logged in on another device.",
-        });
-      }
-    } finally {
-      isCheckingRef.current = false;
-    }
-  }, [token, user]);
 
   useEffect(() => {
     const unsubscribe = subscribeToForcedLogout(handleForcedLogout);
@@ -81,33 +51,42 @@ export default function ForcedLogoutModalHost() {
   }, [handleForcedLogout]);
 
   useEffect(() => {
-    if (!token || !user?.id || !canUseRealtimePusher()) {
+    if (!token || !user?.id) {
       disconnectRealtime();
       return;
     }
 
-    const pusher = createRealtimePusher(token);
-    if (!pusher) {
-      return;
-    }
-
-    const channelName = `private-user.${user.id}`;
-    const channel = pusher.subscribe(channelName);
-
-    channel.bind("session.revoked", (payload = {}) => {
-      emitForcedLogout({
-        reason: payload?.reason || "another_device",
-        message:
+    const echo = connectSessionRealtime({
+      apiUrl: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "",
+      token,
+      userId: user.id,
+      reverbKey: import.meta.env.VITE_REVERB_APP_KEY,
+      reverbHost: import.meta.env.VITE_REVERB_HOST,
+      reverbPort: import.meta.env.VITE_REVERB_PORT,
+      forceTLS: import.meta.env.VITE_REVERB_SCHEME === "https",
+      onRevoked: (payload = {}) => {
+        const locationText = payload?.login?.location || "Unknown location";
+        const message =
           payload?.message ||
-          "You have been logged out because you have logged in on another device.",
-      });
+          `You have been logged out because your account just signed in from ${locationText}.`;
+
+        emitForcedLogout({
+          reason: payload?.reason || "another_device",
+          message,
+          login: {
+            ...(payload?.login || {}),
+            location: locationText,
+          },
+        });
+      },
     });
 
-    pusherRef.current = pusher;
-    channelRef.current = channel;
+    if (!echo) {
+      return;
+    }
 
     return () => {
-      disconnectRealtime();
+      echo.disconnect();
     };
   }, [disconnectRealtime, token, user?.id]);
 
@@ -118,45 +97,25 @@ export default function ForcedLogoutModalHost() {
       return;
     }
 
-    const interval = window.setInterval(() => {
-      validateSession();
-    }, SESSION_CHECK_INTERVAL_MS);
-
-    const handleFocus = () => validateSession();
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
-        validateSession();
-      }
-    };
-
     const handleStorage = (event) => {
       if (event.key !== "token") return;
       if (!token) return;
 
       if (!event.newValue || event.newValue !== token) {
-        emitForcedLogout({
-          reason: "another_device",
-          message:
-            "You have been logged out because you have logged in on another device.",
-        });
+      emitForcedLogout({
+        reason: "another_device",
+        message:
+          "You have been logged out because you have logged in on another device.",
+      });
       }
     };
 
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("online", handleFocus);
     window.addEventListener("storage", handleStorage);
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    validateSession();
 
     return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("online", handleFocus);
       window.removeEventListener("storage", handleStorage);
-      document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [disconnectRealtime, token, user, validateSession]);
+  }, [disconnectRealtime, token, user]);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -208,13 +167,13 @@ export default function ForcedLogoutModalHost() {
                 </div>
 
                 <div className="tw:mt-5 tw:text-center">
-                  <Dialog.Title className="tw:text-[1.35rem] tw:font-semibold tw:tracking-tight tw:text-slate-900">
-                    Session ended
-                  </Dialog.Title>
+                  <span className="tw:block tw:text-[1.35rem] tw:font-semibold tw:tracking-tight tw:text-slate-900">
+                    Logged out on this device
+                  </span>
 
-                  <p className="tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-600">
+                  <span className="tw:block tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-600">
                     {message}
-                  </p>
+                  </span>
 
                   <div className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-100 tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-slate-600">
                     <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-rose-500" />
@@ -234,9 +193,9 @@ export default function ForcedLogoutModalHost() {
                     Continue to sign in
                   </button>
 
-                  <p className="tw:text-center tw:text-xs tw:leading-5 tw:text-slate-500">
+                  <span className="tw:block tw:mt-3 tw:text-center tw:text-xs tw:leading-5 tw:text-slate-500">
                     You may need to sign in again to continue using your account.
-                  </p>
+                  </span>
                 </div>
               </div>
             </Dialog.Panel>

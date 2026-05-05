@@ -1,6 +1,6 @@
 // src/pages/search/SearchPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock3, Search, X } from "lucide-react";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
@@ -268,9 +268,11 @@ function PersonSliderCard({ item, onClick }) {
 
 export default function SearchPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { token } = useAuth() || {};
 
-  const [query, setQuery] = useState("");
+  const initialQuery = searchParams.get("q") || "";
+  const [query, setQuery] = useState(initialQuery);
   const [people, setPeople] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -340,6 +342,12 @@ export default function SearchPage() {
 
   // small debounce
   const [pendingQuery, setPendingQuery] = useState("");
+  useEffect(() => {
+    const urlQuery = searchParams.get("q") || "";
+    setQuery(urlQuery);
+    setPendingQuery(urlQuery);
+  }, [searchParams]);
+
   useEffect(() => {
     const id = setTimeout(() => {
       const t = pendingQuery.trim();

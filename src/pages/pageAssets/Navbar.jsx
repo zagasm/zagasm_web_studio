@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
@@ -27,6 +27,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, token } = useAuth();
   const { unreadCount } = useNotifications(token);
+  const [desktopSearch, setDesktopSearch] = useState("");
 
   const profileImage = user?.profileUrl;
   const hasImage = hasProfileImage(profileImage);
@@ -54,7 +55,6 @@ export default function Navbar() {
     { name: "Tickets", to: "/tickets", icon: Ticket },
     { name: "Create Event", to: "/event/select-event-type", icon: PlusSquare },
     { name: "Organizers", to: "/organizers", icon: Star },
-    { name: "Search", to: "/search", icon: Search },
   ];
 
   const profilePath = user?.id ? `/profile/${user.id}` : "/account";
@@ -97,6 +97,17 @@ export default function Navbar() {
     navigate(targetPath);
   };
 
+  const handleDesktopSearchSubmit = (event) => {
+    event.preventDefault();
+    const term = desktopSearch.trim();
+    if (!term) {
+      navigate("/search");
+      return;
+    }
+
+    navigate(`/search?q=${encodeURIComponent(term)}`);
+  };
+
   return (
     <>
       <div className="tw:flex tw:w-full tw:h-[74px] tw:bg-white tw:border-b tw:border-gray-200 tw:px-4 tw:md:px-6 tw:lg:px-7 tw:items-center tw:justify-between tw:fixed tw:z-999 tw:top-0">
@@ -136,6 +147,19 @@ export default function Navbar() {
         </div>
 
         <div className="tw:flex tw:items-center tw:gap-3 tw:md:gap-3.5">
+          <form
+            onSubmit={handleDesktopSearchSubmit}
+            className="tw:hidden tw:lg:flex tw:h-10 tw:w-[220px] tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-3"
+          >
+            <Search className="tw:size-4 tw:text-gray-500" />
+            <input
+              value={desktopSearch}
+              onChange={(event) => setDesktopSearch(event.target.value)}
+              placeholder="Search Xilolo"
+              className="tw:w-full tw:bg-transparent tw:text-sm tw:text-gray-800 tw:outline-none placeholder:tw:text-gray-400"
+            />
+          </form>
+
           {isAuthenticated ? <WalletBalanceChip /> : null}
 
           <Link to={"/notifications"} className="tw:relative tw:cursor-pointer">
