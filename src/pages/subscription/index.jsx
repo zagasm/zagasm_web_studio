@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   CreditCard,
   MessageSquareMore,
+  RefreshCw,
   ShieldCheck,
   Sparkles,
   Star,
@@ -86,6 +87,15 @@ function capitalizeWords(value) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function getDaysUntil(value) {
+  if (!value) return null;
+
+  const end = new Date(value);
+  if (Number.isNaN(end.getTime())) return null;
+
+  return (end.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+}
+
 export default function SubscriptionsPage() {
   const navigate = useNavigate();
   const { token, user, setAuth, refreshUser } = useAuth();
@@ -93,6 +103,7 @@ export default function SubscriptionsPage() {
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [initializing, setInitializing] = useState(false);
+  const [renewing, setRenewing] = useState(false);
   const [fundingRequiredOpen, setFundingRequiredOpen] = useState(false);
   const [fundingRequiredDetails, setFundingRequiredDetails] = useState(null);
   const [fundWalletOpen, setFundWalletOpen] = useState(false);
@@ -147,6 +158,12 @@ export default function SubscriptionsPage() {
     currentSubscription?.plan?.code ||
     currentSubscription?.meta?.badge ||
     "Verification_badge";
+  const daysUntilPeriodEnd = getDaysUntil(currentSubscription?.current_period_end);
+  const canRenewSubscription =
+    hasActiveSubscription &&
+    String(currentSubscription?.status || "").toLowerCase() === "active" &&
+    daysUntilPeriodEnd !== null &&
+    daysUntilPeriodEnd <= 10;
 
   const statusItems = useMemo(
     () => [
@@ -261,6 +278,67 @@ export default function SubscriptionsPage() {
     }
   };
 
+  const handleRenewSubscription = async () => {
+    if (!token || renewing || !canRenewSubscription) return;
+
+    setRenewing(true);
+
+    try {
+      const res = await api.post(
+        "/api/v1/user/subscription/renew-wallet",
+        null,
+        authHeaders(token)
+      );
+
+      const payload = res?.data?.data || {};
+      const message =
+        res?.data?.message ||
+        "Xilolo badge subscription renewed from wallet.";
+
+      setSubscriptionStatus((previous) => ({
+        ...(previous || {}),
+        ...payload,
+        has_active_subscription: true,
+        subscription: {
+          ...(previous?.subscription || {}),
+          ...(payload?.subscription || {}),
+        },
+      }));
+      markLocalSubscriptionAsActive(payload);
+      showSuccess(message);
+
+      await Promise.all([refreshUser?.(), loadSubscriptionStatus()]);
+    } catch (error) {
+      const status = error?.response?.status;
+      const code = getApiErrorCode(error);
+      const message = getApiErrorMessage(
+        error,
+        "Unable to renew your subscription right now."
+      );
+      const details = error?.response?.data?.data || {};
+
+      if (
+        status === 422 &&
+        (code === "INSUFFICIENT_BALANCE" ||
+          message === "Insufficient balance. Please fund your wallet.")
+      ) {
+        setFundingRequiredDetails({
+          wallet_balance: details?.wallet_balance || 0,
+          required_amount: details?.required_amount || subscriptionPrice,
+          deficit_amount: details?.deficit_amount || 0,
+        });
+        setFundingRequiredOpen(true);
+        showError("Insufficient balance. Please fund your wallet.");
+        return;
+      }
+
+      showError(message);
+      console.error("Verification badge renewal error:", error);
+    } finally {
+      setRenewing(false);
+    }
+  };
+
   return (
     <>
       <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:px-4 tw:pb-20 tw:pt-24 tw:text-slate-900 tw:md:px-6 tw:md:pt-28">
@@ -335,6 +413,22 @@ export default function SubscriptionsPage() {
                         : "Subscribe now"}
                   </span>
                 </button>
+
+                {canRenewSubscription ? (
+                  <button
+                    style={{
+                      borderRadius: 24,
+                      marginTop: 12,
+                    }}
+                    type="button"
+                    onClick={handleRenewSubscription}
+                    disabled={loading || renewing}
+                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-white/25 tw:bg-white/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition hover:tw:bg-white/15 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  >
+                    <RefreshCw className="tw:h-4 tw:w-4" />
+                    <span>{renewing ? "Renewing..." : "Renew subscription"}</span>
+                  </button>
+                ) : null}
               </div>
             </div>
           </section>

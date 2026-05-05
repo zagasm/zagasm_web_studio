@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   AlertTriangle,
   CalendarDays,
+  Coins,
   History,
   Landmark,
   RefreshCw,
@@ -149,15 +150,24 @@ function WithdrawDialog({
   onClose,
   balance,
   accounts,
+  cryptoWallets,
+  payoutMethod,
+  onSelectPayoutMethod,
   selectedAccountId,
   onSelectAccount,
+  selectedCryptoWalletId,
+  onSelectCryptoWallet,
   onSubmit,
   submitting,
 }) {
   const symbol = resolveCurrencySymbol(balance);
   const availableBalance = Number(balance?.available_balance ?? 0);
   const hasAccounts = accounts.length > 0;
+  const hasCryptoWallets = cryptoWallets.length > 0;
   const hasAvailableBalance = availableBalance > 0;
+  const canSubmit =
+    hasAvailableBalance &&
+    (payoutMethod === "crypto" ? hasCryptoWallets : hasAccounts);
 
   return (
     <Transition show={open} as={Fragment} appear>
@@ -194,7 +204,7 @@ function WithdrawDialog({
                   Request Payout
                 </span>
                 <p className="tw:mt-1 tw:text-xs tw:text-gray-500">
-                  Choose a saved bank account to receive your available balance.
+                  Choose where to receive your available balance.
                 </p>
 
                 <div className="tw:mt-5 tw:rounded-2xl tw:bg-[#faf8ff] tw:p-4">
@@ -211,12 +221,99 @@ function WithdrawDialog({
 
                 <div className="tw:mt-4">
                   <label className="tw:mb-2 tw:block tw:text-sm tw:font-medium tw:text-gray-700">
-                    Bank account
+                    Payout method
                   </label>
+                  <div className="tw:mb-4 tw:grid tw:grid-cols-2 tw:gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onSelectPayoutMethod("bank")}
+                      className={cx(
+                        "tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-sm tw:font-semibold",
+                        payoutMethod === "bank"
+                          ? "tw:border-primary tw:bg-primary/5 tw:text-primary"
+                          : "tw:border-gray-200 tw:bg-white tw:text-gray-700"
+                      )}
+                    >
+                      Bank account
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onSelectPayoutMethod("crypto")}
+                      className={cx(
+                        "tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-sm tw:font-semibold",
+                        payoutMethod === "crypto"
+                          ? "tw:border-primary tw:bg-primary/5 tw:text-primary"
+                          : "tw:border-gray-200 tw:bg-white tw:text-gray-700"
+                      )}
+                    >
+                      Crypto wallet
+                    </button>
+                  </div>
                   {!hasAvailableBalance ? (
                     <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
                       You need an available balance before submitting a withdrawal.
                     </div>
+                  ) : payoutMethod === "crypto" ? (
+                    !hasCryptoWallets ? (
+                      <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
+                        Add and verify a crypto wallet first before submitting a crypto payout.
+                      </div>
+                    ) : (
+                      <div className="tw:max-h-64 tw:space-y-2 tw:overflow-y-auto">
+                        {cryptoWallets.map((wallet) => {
+                          const checked =
+                            String(selectedCryptoWalletId) === String(wallet?.id);
+                          const verified =
+                            wallet?.status === "verified" || !!wallet?.verified_at;
+
+                          return (
+                            <label
+                              key={wallet?.id}
+                              className={cx(
+                                "tw:flex tw:cursor-pointer tw:items-start tw:justify-between tw:gap-3 tw:rounded-2xl tw:border tw:p-3",
+                                checked
+                                  ? "tw:border-primary tw:bg-primary/5"
+                                  : "tw:border-gray-200 tw:bg-white"
+                              )}
+                            >
+                              <div className="tw:min-w-0">
+                                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                                  <span className="tw:font-semibold tw:text-gray-900">
+                                    {String(wallet?.currency || "Crypto").toUpperCase()} on{" "}
+                                    {wallet?.network || "network"}
+                                  </span>
+                                  {wallet?.is_primary ? (
+                                    <span className="tw:rounded-full tw:bg-primary/10 tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
+                                      Primary
+                                    </span>
+                                  ) : null}
+                                  <span
+                                    className={cx(
+                                      "tw:rounded-full tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:capitalize",
+                                      verified
+                                        ? "tw:bg-emerald-50 tw:text-emerald-700"
+                                        : "tw:bg-amber-50 tw:text-amber-700"
+                                    )}
+                                  >
+                                    {verified ? "verified" : wallet?.status || "pending"}
+                                  </span>
+                                </div>
+                                <div className="tw:mt-1 tw:truncate tw:text-sm tw:text-gray-600">
+                                  {wallet?.address || "Wallet address"}
+                                </div>
+                              </div>
+                              <input
+                                type="radio"
+                                name="withdraw-crypto-wallet"
+                                checked={checked}
+                                onChange={() => onSelectCryptoWallet(wallet?.id)}
+                                className="tw:mt-1"
+                              />
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )
                   ) : !hasAccounts ? (
                     <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
                       Add a bank account first before submitting a withdrawal.
@@ -285,7 +382,7 @@ function WithdrawDialog({
                   <button
                     type="button"
                     onClick={onSubmit}
-                    disabled={submitting || !hasAccounts || !hasAvailableBalance}
+                    disabled={submitting || !canSubmit}
                     style={{ borderRadius: 20, fontSize: 12 }}
                     className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
@@ -308,6 +405,7 @@ export default function AccountPayouts() {
   const [balance, setBalance] = useState(null);
   const [ticketSales, setTicketSales] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
+  const [cryptoWallets, setCryptoWallets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ticketSalesLoading, setTicketSalesLoading] = useState(true);
   const [sectionError, setSectionError] = useState("");
@@ -316,7 +414,10 @@ export default function AccountPayouts() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [payoutMethod, setPayoutMethod] = useState("bank");
   const [selectedWithdrawBankAccountId, setSelectedWithdrawBankAccountId] =
+    useState("");
+  const [selectedWithdrawCryptoWalletId, setSelectedWithdrawCryptoWalletId] =
     useState("");
   const [submittingWithdraw, setSubmittingWithdraw] = useState(false);
 
@@ -341,22 +442,36 @@ export default function AccountPayouts() {
     return normalizeCollection(res);
   };
 
+  const fetchCryptoWallets = async () => {
+    const res = await api.get("/api/v1/crypto-wallets", authHeaders(token));
+    return normalizeCollection(res).filter(
+      (wallet) => wallet?.status === "verified" || !!wallet?.verified_at
+    );
+  };
+
   const loadPage = async () => {
     setLoading(true);
     setTicketSalesLoading(true);
     setSectionError("");
 
     try {
-      const [balanceResult, ticketSalesResult, bankAccountsResult] =
+      const [
+        balanceResult,
+        ticketSalesResult,
+        bankAccountsResult,
+        cryptoWalletsResult,
+      ] =
         await Promise.all([
           fetchBalance(),
           fetchTicketSales(),
           fetchBankAccounts(),
+          fetchCryptoWallets(),
         ]);
 
       setBalance(balanceResult);
       setTicketSales(ticketSalesResult);
       setBankAccounts(bankAccountsResult);
+      setCryptoWallets(cryptoWalletsResult);
     } catch (error) {
       console.error(error);
       setSectionError("Could not load payout information right now. Please try again.");
@@ -374,7 +489,6 @@ export default function AccountPayouts() {
 
   useEffect(() => {
     const defaultAccount = bankAccounts.find((account) => account?.is_default);
-    console.log({ bankAccounts, defaultAccount, selectedWithdrawBankAccountId });
     if (!defaultAccount && bankAccounts.length === 0) {
       setSelectedWithdrawBankAccountId("");
       return;
@@ -396,6 +510,25 @@ export default function AccountPayouts() {
       );
     });
   }, [bankAccounts]);
+
+  useEffect(() => {
+    const defaultWallet = cryptoWallets.find((wallet) => wallet?.is_primary);
+    if (!defaultWallet && cryptoWallets.length === 0) {
+      setSelectedWithdrawCryptoWalletId("");
+      return;
+    }
+
+    setSelectedWithdrawCryptoWalletId((current) => {
+      if (
+        current &&
+        cryptoWallets.some((wallet) => String(wallet?.id) === String(current))
+      ) {
+        return current;
+      }
+
+      return String(defaultWallet?.id || cryptoWallets[0]?.id || "");
+    });
+  }, [cryptoWallets]);
 
   const balanceSymbol = resolveCurrencySymbol(balance);
 
@@ -446,25 +579,39 @@ export default function AccountPayouts() {
       return;
     }
 
-    if (!selectedWithdrawBankAccountId) {
+    if (payoutMethod === "crypto" && !selectedWithdrawCryptoWalletId) {
+      showError("Select a crypto wallet for this payout.");
+      return;
+    }
+
+    if (payoutMethod !== "crypto" && !selectedWithdrawBankAccountId) {
       showError("Select a bank account for this withdrawal.");
       return;
     }
+
+    const payload =
+      payoutMethod === "crypto"
+        ? {
+            payout_method: "crypto",
+            crypto_wallet_id: selectedWithdrawCryptoWalletId,
+          }
+        : {
+            payout_method: "bank",
+            bank_account_id: selectedWithdrawBankAccountId,
+          };
 
     try {
       setSubmittingWithdraw(true);
       await showPromise(
         api.post(
           "/api/v1/organiser/payouts/withdraw",
-          {
-            bank_account_id: selectedWithdrawBankAccountId,
-          },
+          payload,
           authHeaders(token)
         ),
         {
-          loading: "Submitting withdrawal...",
-          success: "Withdrawal request submitted.",
-          error: "Unable to submit withdrawal request.",
+          loading: "Submitting payout request...",
+          success: "Payout request submitted.",
+          error: "Unable to submit payout request.",
         }
       );
 
@@ -534,6 +681,13 @@ export default function AccountPayouts() {
               <Landmark className="tw:h-4 tw:w-4" />
               Withdraw
             </button>
+            <Link
+              to="/account/crypto-wallet"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+            >
+              <Coins className="tw:h-4 tw:w-4" />
+              Crypto wallets
+            </Link>
             <button
               type="button"
               onClick={loadPage}
@@ -690,8 +844,13 @@ export default function AccountPayouts() {
         }}
         balance={balance}
         accounts={bankAccounts}
+        cryptoWallets={cryptoWallets}
+        payoutMethod={payoutMethod}
+        onSelectPayoutMethod={setPayoutMethod}
         selectedAccountId={selectedWithdrawBankAccountId}
         onSelectAccount={setSelectedWithdrawBankAccountId}
+        selectedCryptoWalletId={selectedWithdrawCryptoWalletId}
+        onSelectCryptoWallet={setSelectedWithdrawCryptoWalletId}
         onSubmit={handleWithdraw}
         submitting={submittingWithdraw}
       />

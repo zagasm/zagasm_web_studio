@@ -12,6 +12,7 @@ import {
   isValidEmailAddress,
   normalizeEmailInput,
 } from "../../../lib/emailValidation";
+import { getWebDeviceName } from "../../../lib/deviceName";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
 
@@ -191,7 +192,8 @@ export function SignUp() {
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: normalizedEmail,
-        password: formData.password
+        password: formData.password,
+        device_name: getWebDeviceName(),
       };
 
       const response = await axios.post(
@@ -232,7 +234,7 @@ export function SignUp() {
     try {
       const { data } = await api.post("/api/v1/google/signup", {
         id_token: idToken,
-        device_name: navigator.userAgent || "Web Browser",
+        device_name: getWebDeviceName(),
       });
 
       if (!data?.token || !data?.user) {
@@ -274,7 +276,7 @@ export function SignUp() {
     try {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
-        device_name: navigator.userAgent || "React Web",
+        device_name: getWebDeviceName(),
       });
 
       if (!data?.token || !data?.user) {
