@@ -1,21 +1,48 @@
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   ArrowLeft,
   AlertTriangle,
+  BadgeCheck,
   CalendarDays,
   Coins,
   History,
   Landmark,
+  Plus,
   RefreshCw,
   Search,
   Ticket,
   Wallet,
 } from "lucide-react";
+import {
+  Autocomplete,
+  Checkbox,
+  CircularProgress,
+  Dialog as MuiDialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  TextField,
+} from "@mui/material";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { showError, showPromise } from "../../component/ui/toast";
+import AddWalletModal from "../../component/crypto/AddWalletModal";
+import VerifyWalletModal from "../../component/crypto/VerifyWalletModal";
+import {
+  addBankAccount,
+  clearBankMutationState,
+  clearBankVerification,
+  verifyBankAccount,
+} from "../../store/bankAccountsSlice";
+import {
+  selectIsAddingBankAccount,
+  selectIsVerifyingBankAccount,
+  selectVerifiedBankAccount,
+} from "../../store/bankAccountsSelectors";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
 
@@ -102,6 +129,126 @@ const getBankVerificationLabel = (account) => {
   return "";
 };
 
+function AddBankAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) {
+  const dispatch = useDispatch();
+  const verifiedAccount = useSelector(selectVerifiedBankAccount);
+  const isVerifying = useSelector(selectIsVerifyingBankAccount);
+  const isAdding = useSelector(selectIsAddingBankAccount);
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [accountNumber, setAccountNumber] = useState("");
+  const [setAsDefault, setSetAsDefault] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedBank(null);
+      setAccountNumber("");
+      setSetAsDefault(false);
+      dispatch(clearBankVerification());
+      dispatch(clearBankMutationState("add"));
+    }
+  }, [dispatch, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!selectedBank?.code || accountNumber.length !== 10) {
+      dispatch(clearBankVerification());
+      return;
+    }
+
+    const id = setTimeout(() => {
+      dispatch(verifyBankAccount({ bankCode: selectedBank.code, accountNumber }));
+    }, 350);
+
+    return () => clearTimeout(id);
+  }, [accountNumber, dispatch, open, selectedBank]);
+
+  const canSubmit =
+    !!selectedBank &&
+    accountNumber.length === 10 &&
+    !!verifiedAccount &&
+    !isVerifying &&
+    !isAdding;
+
+  return (
+    <MuiDialog open={open} onClose={isAdding ? undefined : onClose} fullWidth maxWidth="sm">
+      <DialogTitle sx={{ fontWeight: 700 }}>Add bank account</DialogTitle>
+      <DialogContent>
+        <div className="tw:space-y-4 tw:pt-2">
+          <Autocomplete
+            options={banks}
+            loading={banksLoading}
+            value={selectedBank}
+            onChange={(_, value) => setSelectedBank(value)}
+            getOptionLabel={(option) => option?.name || ""}
+            isOptionEqualToValue={(option, value) => option?.code === value?.code}
+            renderInput={(params) => <TextField {...params} label="Select bank" />}
+          />
+          <TextField
+            label="Account number"
+            value={accountNumber}
+            onChange={(event) =>
+              setAccountNumber(event.target.value.replace(/\D/g, "").slice(0, 10))
+            }
+            fullWidth
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={setAsDefault}
+                onChange={(event) => setSetAsDefault(event.target.checked)}
+              />
+            }
+            label="Set as default account"
+          />
+          <div className="tw:min-h-20 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:p-4 tw:text-xs tw:text-gray-600">
+            {isVerifying ? (
+              <div className="tw:flex tw:items-center tw:gap-3">
+                <CircularProgress size={18} />
+                Verifying account details...
+              </div>
+            ) : verifiedAccount ? (
+              <div className="tw:space-y-1">
+                <div className="tw:flex tw:items-center tw:gap-2 tw:font-semibold tw:text-gray-900">
+                  <BadgeCheck className="tw:h-4 tw:w-4 tw:text-green-600" />
+                  {verifiedAccount.account_name}
+                </div>
+                <div className="tw:text-xs tw:text-gray-500">
+                  {selectedBank?.name} - {maskAccountNumber(accountNumber)}
+                </div>
+              </div>
+            ) : (
+              "Select a bank and enter a 10-digit account number to verify it."
+            )}
+          </div>
+        </div>
+      </DialogContent>
+      <DialogActions sx={{ padding: "0 24px 24px" }}>
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={isAdding}
+          style={{ borderRadius: 16 }}
+          className="tw:h-11 tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          disabled={!canSubmit}
+          onClick={() =>
+            onSubmit({ bankCode: selectedBank.code, accountNumber, setAsDefault })
+          }
+          style={{ borderRadius: 16 }}
+          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+        >
+          {isAdding ? "Saving..." : "Add account"}
+        </button>
+      </DialogActions>
+    </MuiDialog>
+  );
+}
+
 const SkeletonBlock = ({ className }) => (
   <div
     className={cx("tw:animate-pulse tw:rounded-2xl tw:bg-gray-200", className)}
@@ -157,6 +304,8 @@ function WithdrawDialog({
   onSelectAccount,
   selectedCryptoWalletId,
   onSelectCryptoWallet,
+  onAddBankAccount,
+  onAddCryptoWallet,
   onSubmit,
   submitting,
 }) {
@@ -255,20 +404,120 @@ function WithdrawDialog({
                     </div>
                   ) : payoutMethod === "crypto" ? (
                     !hasCryptoWallets ? (
-                      <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
-                        Add and verify a crypto wallet first before submitting a crypto payout.
+                      <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3">
+                        <div className="tw:text-sm tw:text-amber-800 tw:mb-2">
+                          Add and verify a crypto wallet first before submitting a crypto payout.
+                        </div>
+                        <button
+                          style={{
+                            borderRadius: 20
+                          }}
+                          type="button"
+                          onClick={onAddCryptoWallet}
+                          className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-white"
+                        >
+                          <Plus className="tw:h-4 tw:w-4" />
+                          Add crypto wallet
+                        </button>
                       </div>
                     ) : (
+                      <div className="tw:space-y-2">
+                        <button
+                          type="button"
+                          onClick={onAddCryptoWallet}
+                          className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-100 tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-800"
+                        >
+                          <Plus className="tw:h-4 tw:w-4" />
+                          Add another wallet
+                        </button>
+                        <div className="tw:max-h-64 tw:space-y-2 tw:overflow-y-auto">
+                          {cryptoWallets.map((wallet) => {
+                            const checked =
+                              String(selectedCryptoWalletId) === String(wallet?.id);
+                            const verified =
+                              wallet?.status === "verified" || !!wallet?.verified_at;
+
+                            return (
+                              <label
+                                key={wallet?.id}
+                                className={cx(
+                                  "tw:flex tw:cursor-pointer tw:items-start tw:justify-between tw:gap-3 tw:rounded-2xl tw:border tw:p-3",
+                                  checked
+                                    ? "tw:border-primary tw:bg-primary/5"
+                                    : "tw:border-gray-200 tw:bg-white"
+                                )}
+                              >
+                                <div className="tw:min-w-0">
+                                  <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                                    <span className="tw:font-semibold tw:text-gray-900">
+                                      {String(wallet?.currency || "Crypto").toUpperCase()} on{" "}
+                                      {wallet?.network || "network"}
+                                    </span>
+                                    {wallet?.is_primary ? (
+                                      <span className="tw:rounded-full tw:bg-primary/10 tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
+                                        Primary
+                                      </span>
+                                    ) : null}
+                                    <span
+                                      className={cx(
+                                        "tw:rounded-full tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:capitalize",
+                                        verified
+                                          ? "tw:bg-emerald-50 tw:text-emerald-700"
+                                          : "tw:bg-amber-50 tw:text-amber-700"
+                                      )}
+                                    >
+                                      {verified ? "verified" : wallet?.status || "pending"}
+                                    </span>
+                                  </div>
+                                  <div className="tw:mt-1 tw:truncate tw:text-sm tw:text-gray-600">
+                                    {wallet?.address || "Wallet address"}
+                                  </div>
+                                </div>
+                                <input
+                                  type="radio"
+                                  name="withdraw-crypto-wallet"
+                                  checked={checked}
+                                  onChange={() => onSelectCryptoWallet(wallet?.id)}
+                                  className="tw:mt-1"
+                                />
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )
+                  ) : !hasAccounts ? (
+                    <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3">
+                      <div className="tw:text-sm tw:text-amber-800">
+                        Add a bank account first before submitting a withdrawal.
+                      </div>
+                      <button
+                        type="button"
+                        onClick={onAddBankAccount}
+                        className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-white"
+                      >
+                        <Plus className="tw:h-4 tw:w-4" />
+                        Add bank account
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="tw:space-y-2">
+                      <button
+                        type="button"
+                        onClick={onAddBankAccount}
+                        className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-100 tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-800"
+                      >
+                        <Plus className="tw:h-4 tw:w-4" />
+                        Add another account
+                      </button>
                       <div className="tw:max-h-64 tw:space-y-2 tw:overflow-y-auto">
-                        {cryptoWallets.map((wallet) => {
-                          const checked =
-                            String(selectedCryptoWalletId) === String(wallet?.id);
-                          const verified =
-                            wallet?.status === "verified" || !!wallet?.verified_at;
+                        {accounts.map((account) => {
+                          const verificationLabel = getBankVerificationLabel(account);
+                          const checked = String(selectedAccountId) === String(account?.id);
 
                           return (
                             <label
-                              key={wallet?.id}
+                              key={account?.id}
                               className={cx(
                                 "tw:flex tw:cursor-pointer tw:items-start tw:justify-between tw:gap-3 tw:rounded-2xl tw:border tw:p-3",
                                 checked
@@ -279,92 +528,35 @@ function WithdrawDialog({
                               <div className="tw:min-w-0">
                                 <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                                   <span className="tw:font-semibold tw:text-gray-900">
-                                    {String(wallet?.currency || "Crypto").toUpperCase()} on{" "}
-                                    {wallet?.network || "network"}
+                                    {getBankDisplayName(account)}
                                   </span>
-                                  {wallet?.is_primary ? (
+                                  {account?.is_default ? (
                                     <span className="tw:rounded-full tw:bg-primary/10 tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
-                                      Primary
+                                      Default
                                     </span>
                                   ) : null}
-                                  <span
-                                    className={cx(
-                                      "tw:rounded-full tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:capitalize",
-                                      verified
-                                        ? "tw:bg-emerald-50 tw:text-emerald-700"
-                                        : "tw:bg-amber-50 tw:text-amber-700"
-                                    )}
-                                  >
-                                    {verified ? "verified" : wallet?.status || "pending"}
-                                  </span>
+                                  {verificationLabel ? (
+                                    <span className="tw:rounded-full tw:bg-emerald-50 tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-emerald-700 tw:capitalize">
+                                      {verificationLabel}
+                                    </span>
+                                  ) : null}
                                 </div>
-                                <div className="tw:mt-1 tw:truncate tw:text-sm tw:text-gray-600">
-                                  {wallet?.address || "Wallet address"}
+                                <div className="tw:mt-1 tw:text-sm tw:text-gray-600">
+                                  {account?.account_name || "Account holder"} •{" "}
+                                  {maskAccountNumber(account?.account_number)}
                                 </div>
                               </div>
                               <input
                                 type="radio"
-                                name="withdraw-crypto-wallet"
+                                name="withdraw-bank-account"
                                 checked={checked}
-                                onChange={() => onSelectCryptoWallet(wallet?.id)}
+                                onChange={() => onSelectAccount(account?.id)}
                                 className="tw:mt-1"
                               />
                             </label>
                           );
                         })}
                       </div>
-                    )
-                  ) : !hasAccounts ? (
-                    <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
-                      Add a bank account first before submitting a withdrawal.
-                    </div>
-                  ) : (
-                    <div className="tw:max-h-64 tw:space-y-2 tw:overflow-y-auto">
-                      {accounts.map((account) => {
-                        const verificationLabel = getBankVerificationLabel(account);
-                        const checked = String(selectedAccountId) === String(account?.id);
-
-                        return (
-                          <label
-                            key={account?.id}
-                            className={cx(
-                              "tw:flex tw:cursor-pointer tw:items-start tw:justify-between tw:gap-3 tw:rounded-2xl tw:border tw:p-3",
-                              checked
-                                ? "tw:border-primary tw:bg-primary/5"
-                                : "tw:border-gray-200 tw:bg-white"
-                            )}
-                          >
-                            <div className="tw:min-w-0">
-                              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                                <span className="tw:font-semibold tw:text-gray-900">
-                                  {getBankDisplayName(account)}
-                                </span>
-                                {account?.is_default ? (
-                                  <span className="tw:rounded-full tw:bg-primary/10 tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
-                                    Default
-                                  </span>
-                                ) : null}
-                                {verificationLabel ? (
-                                  <span className="tw:rounded-full tw:bg-emerald-50 tw:px-2 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-emerald-700 tw:capitalize">
-                                    {verificationLabel}
-                                  </span>
-                                ) : null}
-                              </div>
-                              <div className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                                {account?.account_name || "Account holder"} •{" "}
-                                {maskAccountNumber(account?.account_number)}
-                              </div>
-                            </div>
-                            <input
-                              type="radio"
-                              name="withdraw-bank-account"
-                              checked={checked}
-                              onChange={() => onSelectAccount(account?.id)}
-                              className="tw:mt-1"
-                            />
-                          </label>
-                        );
-                      })}
                     </div>
                   )}
                 </div>
@@ -399,6 +591,7 @@ function WithdrawDialog({
 }
 
 export default function AccountPayouts() {
+  const dispatch = useDispatch();
   const { user, token } = useAuth();
   const isOrganizer = !!user?.is_organiser_verified;
 
@@ -406,7 +599,11 @@ export default function AccountPayouts() {
   const [ticketSales, setTicketSales] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [cryptoWallets, setCryptoWallets] = useState([]);
+  const [banks, setBanks] = useState([]);
+  const [cryptoOptions, setCryptoOptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [banksLoading, setBanksLoading] = useState(false);
+  const [cryptoOptionsLoading, setCryptoOptionsLoading] = useState(false);
   const [ticketSalesLoading, setTicketSalesLoading] = useState(true);
   const [sectionError, setSectionError] = useState("");
 
@@ -414,6 +611,11 @@ export default function AccountPayouts() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [addBankOpen, setAddBankOpen] = useState(false);
+  const [addWalletOpen, setAddWalletOpen] = useState(false);
+  const [verifyWalletOpen, setVerifyWalletOpen] = useState(false);
+  const [walletToVerify, setWalletToVerify] = useState(null);
+  const [walletOwnership, setWalletOwnership] = useState(null);
   const [payoutMethod, setPayoutMethod] = useState("bank");
   const [selectedWithdrawBankAccountId, setSelectedWithdrawBankAccountId] =
     useState("");
@@ -442,11 +644,21 @@ export default function AccountPayouts() {
     return normalizeCollection(res);
   };
 
+  const fetchBanksDirectory = async () => {
+    const res = await api.get("/api/v1/banks", authHeaders(token));
+    return res?.data?.banks || [];
+  };
+
   const fetchCryptoWallets = async () => {
     const res = await api.get("/api/v1/crypto-wallets", authHeaders(token));
     return normalizeCollection(res).filter(
       (wallet) => wallet?.status === "verified" || !!wallet?.verified_at
     );
+  };
+
+  const fetchCryptoOptions = async () => {
+    const res = await api.get("/api/v1/crypto/options", authHeaders(token));
+    return res?.data?.data || [];
   };
 
   const loadPage = async () => {
@@ -486,6 +698,32 @@ export default function AccountPayouts() {
     loadPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOrganizer]);
+
+  useEffect(() => {
+    if (!isOrganizer || !token) return;
+
+    const loadDestinationOptions = async () => {
+      setBanksLoading(true);
+      setCryptoOptionsLoading(true);
+      try {
+        const [banksResult, cryptoOptionsResult] = await Promise.all([
+          fetchBanksDirectory(),
+          fetchCryptoOptions(),
+        ]);
+        setBanks(banksResult);
+        setCryptoOptions(cryptoOptionsResult);
+      } catch (error) {
+        console.error(error);
+        showError("Could not load payout destination options.");
+      } finally {
+        setBanksLoading(false);
+        setCryptoOptionsLoading(false);
+      }
+    };
+
+    loadDestinationOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOrganizer, token]);
 
   useEffect(() => {
     const defaultAccount = bankAccounts.find((account) => account?.is_default);
@@ -571,6 +809,66 @@ export default function AccountPayouts() {
     );
   }, [filteredTicketSales]);
 
+  const handleAddBankAccount = async (payload) => {
+    try {
+      const result = await showPromise(dispatch(addBankAccount(payload)).unwrap(), {
+        loading: "Adding bank account...",
+        success: "Bank account added successfully.",
+        error: "Unable to add bank account.",
+      });
+
+      dispatch(clearBankMutationState("add"));
+      setAddBankOpen(false);
+      const nextBankAccounts = await fetchBankAccounts();
+      setBankAccounts(nextBankAccounts);
+
+      const createdAccount =
+        result?.data ||
+        result?.account ||
+        nextBankAccounts.find(
+          (account) =>
+            String(account?.account_number) === String(payload.accountNumber)
+        );
+
+      if (createdAccount?.id) {
+        setSelectedWithdrawBankAccountId(String(createdAccount.id));
+      }
+      setPayoutMethod("bank");
+    } catch (error) {
+      showError(error || "Unable to add bank account.");
+    }
+  };
+
+  const handleWalletCreated = async (wallet, ownership = null) => {
+    setPayoutMethod("crypto");
+
+    if (
+      wallet &&
+      (wallet.status === "pending" ||
+        (!wallet.verified_at && wallet.status !== "verified"))
+    ) {
+      setWalletToVerify(wallet);
+      setWalletOwnership(ownership);
+      setVerifyWalletOpen(true);
+      return;
+    }
+
+    const nextWallets = await fetchCryptoWallets();
+    setCryptoWallets(nextWallets);
+    if (wallet?.id) {
+      setSelectedWithdrawCryptoWalletId(String(wallet.id));
+    }
+  };
+
+  const handleWalletVerified = async (wallet) => {
+    const nextWallets = await fetchCryptoWallets();
+    setCryptoWallets(nextWallets);
+    if (wallet?.id) {
+      setSelectedWithdrawCryptoWalletId(String(wallet.id));
+    }
+    setPayoutMethod("crypto");
+  };
+
   const handleWithdraw = async () => {
     const availableBalance = Number(balance?.available_balance ?? 0);
 
@@ -592,13 +890,13 @@ export default function AccountPayouts() {
     const payload =
       payoutMethod === "crypto"
         ? {
-            payout_method: "crypto",
-            crypto_wallet_id: selectedWithdrawCryptoWalletId,
-          }
+          payout_method: "crypto",
+          crypto_wallet_id: selectedWithdrawCryptoWalletId,
+        }
         : {
-            payout_method: "bank",
-            bank_account_id: selectedWithdrawBankAccountId,
-          };
+          payout_method: "bank",
+          bank_account_id: selectedWithdrawBankAccountId,
+        };
 
     try {
       setSubmittingWithdraw(true);
@@ -851,8 +1149,33 @@ export default function AccountPayouts() {
         onSelectAccount={setSelectedWithdrawBankAccountId}
         selectedCryptoWalletId={selectedWithdrawCryptoWalletId}
         onSelectCryptoWallet={setSelectedWithdrawCryptoWalletId}
+        onAddBankAccount={() => setAddBankOpen(true)}
+        onAddCryptoWallet={() => setAddWalletOpen(true)}
         onSubmit={handleWithdraw}
         submitting={submittingWithdraw}
+      />
+      <AddBankAccountDialog
+        open={addBankOpen}
+        onClose={() => setAddBankOpen(false)}
+        banks={banks}
+        banksLoading={banksLoading}
+        onSubmit={handleAddBankAccount}
+      />
+      <AddWalletModal
+        open={addWalletOpen}
+        onClose={() => setAddWalletOpen(false)}
+        token={token}
+        options={cryptoOptions}
+        loading={cryptoOptionsLoading}
+        onCreated={handleWalletCreated}
+      />
+      <VerifyWalletModal
+        open={verifyWalletOpen}
+        onClose={() => setVerifyWalletOpen(false)}
+        token={token}
+        wallet={walletToVerify}
+        ownership={walletOwnership}
+        onVerified={handleWalletVerified}
       />
     </>
   );

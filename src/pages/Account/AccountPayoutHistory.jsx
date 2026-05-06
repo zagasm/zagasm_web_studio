@@ -83,6 +83,23 @@ const maskAccountNumber = (value = "") => {
     : `******${accountNumber.slice(-4)}`;
 };
 
+const resolveBankDetails = (payout) => {
+  const bankDetails =
+    payout?.bank_account ||
+    (typeof payout?.bank_details === "object" && payout?.bank_details !== null
+      ? payout.bank_details
+      : null);
+
+  const bankName =
+    payout?.bank_name ||
+    bankDetails?.bank_name ||
+    (typeof payout?.bank_details === "string" ? payout.bank_details : "");
+  const accountNumber = payout?.account_number || bankDetails?.account_number || "";
+  const accountName = payout?.account_name || bankDetails?.account_name || "";
+
+  return { bankName, accountNumber, accountName };
+};
+
 const HistorySkeleton = () => (
   <div className="tw:mt-4 tw:space-y-3">
     {Array.from({ length: 5 }).map((_, index) => (
@@ -102,11 +119,7 @@ function PayoutDetailsDialog({ open, payout, onClose }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const symbol = resolveCurrencySymbol(payout);
-  const bankName =
-    payout?.bank_name || payout?.bank_account?.bank_name || payout?.bank_details;
-  const accountNumber =
-    payout?.account_number || payout?.bank_account?.account_number;
-  const accountName = payout?.account_name || payout?.bank_account?.account_name;
+  const { bankName, accountNumber, accountName } = resolveBankDetails(payout);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" fullScreen={fullScreen}>
@@ -325,12 +338,7 @@ export default function AccountPayoutHistory() {
             {history.map((payout) => {
               const symbol = resolveCurrencySymbol(payout);
               const normalizedStatus = String(payout?.status || "").toLowerCase();
-              const bankName =
-                payout?.bank_name ||
-                payout?.bank_account?.bank_name ||
-                payout?.bank_details;
-              const accountNumber =
-                payout?.account_number || payout?.bank_account?.account_number;
+              const { bankName, accountNumber } = resolveBankDetails(payout);
 
               return (
                 <button
