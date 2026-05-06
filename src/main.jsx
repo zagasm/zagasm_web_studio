@@ -18,7 +18,7 @@ import { ModalProvider } from "./component/assets/ModalContext/index.jsx";
 import { store } from "./store";
 
 import { initGA } from "./lib/analytics";
-import AnalyticsTracker from "./components/AnalyticsTracker";
+import AnalyticsTracker from "./component/AnalyticsTracker";
 
 initGA();
 
